@@ -1,0 +1,10 @@
+[
+  {
+    "name": "Example Site",
+    "subdomain": "example",
+    "url": "https://example.base31.org",
+    "tags": ["demo", "starter"],
+    "description": "A placeholder site showing how a new subdomain gets added to the directory.",
+    "show": true
+  }
+]

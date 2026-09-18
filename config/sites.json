@@ -6,5 +6,13 @@
     "tags": ["demo", "starter"],
     "description": "A placeholder site showing how a new subdomain gets added to the directory.",
     "show": true
+  },
+  {
+    "name": "CompMails",
+    "subdomain": "compmails",
+    "url": "https://compmails.base31.org",
+    "tags": ["email", "privacy", "utility"],
+    "description": "A fast disposable email client for temporary inboxes and quick online signups.",
+    "show": true
   }
 ]

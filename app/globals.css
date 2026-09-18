@@ -67,6 +67,13 @@ h1 { max-width: 620px; margin: 0; color: #fff; font-size: clamp(36px, 7vw, 58px)
 .site-footer-inner { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 22px 0 24px; color: var(--subtle); font-size: 10px; letter-spacing: 0.04em; text-transform: uppercase; }
 .site-footer a { color: var(--muted); text-decoration: none; }
 .site-footer a:hover { color: #fff; }
+.view-counter {
+  position: fixed; right: 16px; bottom: 16px; z-index: 10; display: inline-flex; align-items: center; gap: 8px;
+  padding: 9px 12px; border: 1px solid var(--line); border-radius: 999px; background: rgb(10 10 10 / 90%);
+  box-shadow: 0 8px 28px rgb(0 0 0 / 35%); color: var(--muted); font-size: 11px; backdrop-filter: blur(12px);
+}
+.view-counter::before { width: 5px; height: 5px; border-radius: 50%; background: var(--live); content: ""; box-shadow: 0 0 0 3px rgb(70 232 145 / 10%); }
+.view-counter strong { color: #eee; font-weight: 500; }
 @media (max-width: 600px) {
   .site-header-inner, .site-footer-inner, main { width: min(100% - 32px, 720px); }
   main { padding-top: 64px; }
@@ -76,5 +83,6 @@ h1 { max-width: 620px; margin: 0; color: #fff; font-size: clamp(36px, 7vw, 58px)
   .intro { margin-bottom: 64px; }
   .site-card { padding: 18px; }
   .about-section { margin-top: 80px; }
+  .view-counter { right: 12px; bottom: 12px; }
 }
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } *, *::before, *::after { transition-duration: 0.01ms !important; } }

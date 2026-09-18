@@ -1,0 +1,1655 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vercel TempMail - Disposable Email Client</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        vercel: {
+                            black: '#000000',
+                            dark: '#0a0a0a',
+                            card: '#111111',
+                            border: '#222222',
+                            hover: '#1a1a1a',
+                            accent: '#ffffff',
+                            muted: '#888888',
+                            blue: '#0070f3',
+                            green: '#50e3c2',
+                            red: '#ee0000'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'Fira Code', 'Menlo', 'Monaco', 'Consolas', 'monospace']
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Inter & JetBrains Mono Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- QRCode.js Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #000000;
+            color: #ededed;
+        }
+        
+        /* Custom scrollbar for Vercel dark theme */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #000000;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #222222;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #333333;
+        }
+        
+        .grid-pattern {
+            background-image: radial-gradient(rgba(255, 255, 255, 0.12) 1px, transparent 1px);
+            background-size: 28px 28px;
+        }
+
+        .vercel-border {
+            border: 1px solid #222222;
+        }
+
+        .vercel-glass {
+            background: rgba(10, 10, 10, 0.8);
+            backdrop-filter: blur(12px);
+        }
+
+        /* Ambient Lighting Gradient */
+        .glow-effect {
+            background: radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.03) 35%, transparent 70%);
+        }
+
+        /* Micro-animations and Shimmers */
+        @keyframes skeleton-shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+
+        .skeleton-loader {
+            background: linear-gradient(90deg, #18181b 25%, #27272a 37%, #18181b 63%);
+            background-size: 200% 100%;
+            animation: skeleton-shimmer 1.8s infinite ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(4px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .animate-fade-in {
+            animation: fadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        .btn-interact {
+            transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .btn-interact:hover {
+            transform: translateY(-1px);
+        }
+
+        .btn-interact:active {
+            transform: translateY(0.5px) scale(0.98);
+        }
+
+        @keyframes pulse-slow {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+
+        /* Keyboard Shortcuts Hints */
+        .kb-hint {
+            display: none;
+        }
+        @media (hover: hover) and (pointer: fine) {
+            .kb-hint {
+                display: inline-flex;
+            }
+        }
+
+        /* Phone layout: keep controls reachable without horizontal scrolling. */
+        @media (max-width: 640px) {
+            html {
+                -webkit-text-size-adjust: 100%;
+            }
+
+            body {
+                min-width: 0;
+            }
+
+            header > div {
+                height: auto;
+                min-height: 58px;
+                padding: 10px 12px;
+                gap: 10px;
+                flex-wrap: wrap;
+            }
+
+            header > div > div:first-child {
+                flex: 1 1 auto;
+                min-width: 0;
+            }
+
+            header > div > div:last-child {
+                width: 100%;
+                display: flex;
+                gap: 8px;
+            }
+
+            header > div > div:last-child button {
+                min-height: 42px;
+                flex: 1 1 0;
+                justify-content: center;
+                padding: 8px 10px;
+                white-space: nowrap;
+            }
+
+            #headerTitle {
+                max-width: calc(100vw - 55px);
+            }
+
+            main {
+                padding: 16px 12px 20px !important;
+                gap: 16px !important;
+            }
+
+            #addressCard {
+                padding: 16px;
+                border-radius: 14px;
+            }
+
+            #addressCard > div {
+                gap: 14px;
+            }
+
+            #domainBadge {
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                max-width: 46vw;
+            }
+
+            #currentAddress {
+                max-width: 100%;
+                font-size: 1rem;
+                line-height: 1.45;
+                overflow-wrap: anywhere;
+            }
+
+            #addressCard .flex.flex-wrap {
+                display: grid;
+                grid-template-columns: minmax(0, 1fr) auto auto;
+                gap: 8px;
+                width: 100%;
+            }
+
+            #addressCard .flex.flex-wrap button {
+                min-height: 44px;
+                padding: 9px 10px;
+            }
+
+            #btnCopyAddress {
+                min-width: 0;
+            }
+
+            #btnCopyAddress span {
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+
+            #btnRefresh span,
+            #btnAutoRefreshToggle span:not(#autoRefreshText) {
+                display: none;
+            }
+
+            #btnAutoRefreshToggle {
+                grid-column: 1 / -1;
+                justify-content: center;
+            }
+
+            #btnAutoRefreshToggle span#autoRefreshText {
+                display: inline;
+            }
+
+            main > div.grid {
+                gap: 14px !important;
+                min-height: 0;
+            }
+
+            main > div.grid > div:first-child {
+                min-height: 360px;
+                border-radius: 14px;
+            }
+
+            #messageList {
+                min-height: 300px;
+                max-height: none;
+            }
+
+            #searchInput {
+                min-height: 40px;
+                font-size: 13px;
+            }
+
+            #readerPanel {
+                inset: 8px;
+                border-radius: 14px;
+            }
+
+            #readerContent .p-4 {
+                padding: 14px;
+            }
+
+            #msgSubject {
+                font-size: 1rem;
+                line-height: 1.35;
+                white-space: normal;
+            }
+
+            #msgBodyIframe {
+                min-height: 55vh;
+            }
+
+            footer {
+                padding: 18px 12px;
+            }
+
+            footer > div {
+                align-items: flex-start;
+            }
+
+            footer > div > div:last-child {
+                width: 100%;
+                justify-content: space-between;
+                gap: 10px;
+                flex-wrap: wrap;
+            }
+
+            footer > div > div:last-child button {
+                min-height: 36px;
+            }
+
+            .footer-tab {
+                min-height: 40px;
+            }
+        }
+
+        @media (max-width: 380px) {
+            header > div > div:last-child button {
+                font-size: 11px;
+                padding-inline: 7px;
+            }
+
+            #addressCard .flex.flex-wrap {
+                grid-template-columns: minmax(0, 1fr) 44px 44px;
+            }
+
+            #btnShowQr,
+            #btnRefresh {
+                width: 44px;
+                padding-inline: 0 !important;
+            }
+
+            #btnRefresh span {
+                display: none;
+            }
+        }
+
+        /* Premium product finish */
+        :root {
+            --premium-line: rgba(255, 255, 255, 0.1);
+            --premium-glow: rgba(120, 119, 198, 0.16);
+        }
+
+        button,
+        input {
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        button:focus-visible,
+        input:focus-visible {
+            outline: 2px solid rgba(167, 243, 208, 0.72);
+            outline-offset: 2px;
+        }
+
+        header {
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.24);
+        }
+
+        header > div > div:first-child svg {
+            filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.35));
+        }
+
+        #addressCard {
+            background:
+                radial-gradient(circle at 88% 0%, rgba(134, 239, 172, 0.08), transparent 28%),
+                linear-gradient(135deg, rgba(39, 39, 42, 0.9), rgba(9, 9, 11, 0.94) 62%);
+            border-color: var(--premium-line);
+            box-shadow: 0 18px 60px rgba(0, 0, 0, 0.3), inset 0 1px rgba(255, 255, 255, 0.06);
+        }
+
+        #currentAddress {
+            text-shadow: 0 0 24px rgba(255, 255, 255, 0.12);
+        }
+
+        #addressCard button,
+        header button {
+            box-shadow: inset 0 1px rgba(255, 255, 255, 0.05), 0 6px 18px rgba(0, 0, 0, 0.16);
+        }
+
+        #btnNewMail {
+            background: linear-gradient(135deg, #ffffff, #d4d4d8);
+        }
+
+        #btnNewMail:hover {
+            box-shadow: 0 8px 24px rgba(255, 255, 255, 0.16);
+        }
+
+        #messageList > .msg-item {
+            transition: background-color 180ms ease, padding 180ms ease, transform 180ms ease;
+        }
+
+        #messageList > .msg-item:hover {
+            background: rgba(255, 255, 255, 0.035);
+        }
+
+        #toast {
+            border-color: rgba(167, 243, 208, 0.2);
+            background: linear-gradient(135deg, rgba(24, 24, 27, 0.96), rgba(9, 9, 11, 0.96));
+            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.42), 0 0 0 1px rgba(255, 255, 255, 0.03);
+        }
+
+        @media (prefers-reduced-motion: no-preference) {
+            #addressCard {
+                animation: premium-rise 500ms cubic-bezier(0.23, 1, 0.32, 1) both;
+            }
+
+            @keyframes premium-rise {
+                from { opacity: 0; transform: translateY(8px); }
+                to { opacity: 1; transform: translateY(0); }
+            }
+        }
+    </style>
+</head>
+<body class="bg-black text-zinc-100 min-h-screen flex flex-col selection:bg-zinc-800 selection:text-white relative overflow-x-hidden">
+
+    <!-- Ambient Background Light Effect -->
+    <div class="fixed inset-0 pointer-events-none grid-pattern opacity-40 -z-20"></div>
+    <div id="mouseGlow" class="fixed top-0 left-0 w-[500px] h-[500px] bg-zinc-600/10 rounded-full blur-[120px] pointer-events-none -z-10 opacity-0 transition-opacity duration-700" style="transform: translate(-50%, -50%);"></div>
+    <div class="fixed top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[400px] glow-effect pointer-events-none -z-10"></div>
+    <div class="fixed -top-40 -left-40 w-96 h-96 bg-zinc-800/20 rounded-full blur-[128px] pointer-events-none -z-10"></div>
+    <div class="fixed top-1/3 -right-40 w-96 h-96 bg-zinc-700/10 rounded-full blur-[128px] pointer-events-none -z-10"></div>
+
+    <!-- Top Header Navigation -->
+    <header class="sticky top-0 z-40 w-full border-b border-zinc-800 bg-black/80 backdrop-blur-md transition-all duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-14 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="flex items-center space-x-2.5">
+                    <!-- Triangle Logo -->
+                    <svg width="20" height="18" viewBox="0 0 76 65" fill="none" xmlns="http://www.w3.org/2000/svg" class="shrink-0">
+                        <path d="M37.5274 0L75.0548 65H0L37.5274 0Z" fill="currentColor"/>
+                    </svg>
+                    <!-- Header Dynamic Title / Scrolled Email -->
+                    <span id="headerTitle" class="font-bold tracking-tight text-sm text-white transition-all duration-300 font-mono sm:font-sans truncate max-w-[200px] sm:max-w-xs">TempMail</span>
+                </div>
+            </div>
+
+            <!-- Top Actions -->
+            <div class="flex items-center space-x-3">
+                <div id="statusIndicator" class="hidden sm:flex items-center space-x-2 px-2.5 py-1 rounded-full border border-zinc-800 bg-zinc-950 text-xs">
+                    <span class="w-2 height-2 w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                    <span class="text-zinc-400 font-mono text-[11px]" id="statusText">Connected</span>
+                </div>
+
+                <button id="btnCreateCustom" class="inline-flex items-center space-x-1.5 text-xs bg-zinc-900 hover:bg-zinc-800 text-zinc-200 border border-zinc-800 px-3 py-1.5 rounded-md transition-all">
+                    <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+                    <span>Custom Inbox</span>
+                </button>
+                
+                <button id="btnNewMail" class="inline-flex items-center space-x-1.5 text-xs bg-white text-black font-medium hover:bg-zinc-200 px-3 py-1.5 rounded-md transition-all shadow-sm">
+                    <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
+                    <span>Random Inbox</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col gap-6">
+
+        <!-- Active Inbox Address Card -->
+        <section id="addressCard" class="relative overflow-hidden rounded-xl border border-zinc-800 bg-gradient-to-b from-zinc-900/80 via-zinc-900/40 to-zinc-950 p-5 shadow-2xl transition-all">
+            <div class="absolute -right-16 -top-16 w-64 h-64 bg-zinc-800/15 rounded-full blur-3xl pointer-events-none"></div>
+            
+            <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 relative z-10">
+                <div class="space-y-1">
+                    <div class="flex items-center space-x-2 text-xs text-zinc-400 font-medium">
+                        <span>Active Temporary Email</span>
+                        <span class="text-zinc-600">•</span>
+                        <span id="domainBadge" class="text-zinc-400 font-mono">Fetching domain...</span>
+                    </div>
+                    
+                    <div class="flex items-center space-x-3">
+                        <h1 id="currentAddress" class="text-xl sm:text-2xl font-mono font-bold tracking-tight text-white select-all">
+                            Generating inbox...
+                        </h1>
+                        <span id="copySuccessBadge" class="hidden text-xs bg-emerald-950 text-emerald-400 border border-emerald-800/60 px-2 py-0.5 rounded font-mono">
+                            Copied!
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Email Control Buttons -->
+                <div class="flex flex-wrap items-center gap-2">
+                    <button id="btnCopyAddress" title="Copy Address (C)" class="btn-interact flex-1 sm:flex-none inline-flex items-center justify-center space-x-2 text-xs font-medium bg-zinc-900 hover:bg-zinc-800 text-zinc-100 border border-zinc-700/60 px-3.5 py-2 rounded-lg transition-colors shadow-sm active:border-zinc-500">
+                        <i data-lucide="copy" class="w-4 h-4"></i>
+                        <span>Copy Address</span>
+                        <kbd class="kb-hint ml-1.5 px-1.5 py-0.5 text-[9px] bg-zinc-950 border border-zinc-800 rounded text-zinc-500 font-mono leading-none items-center justify-center">C</kbd>
+                    </button>
+
+                    <button id="btnShowQr" title="Show QR Code" class="btn-interact inline-flex items-center justify-center p-2 text-xs font-medium bg-zinc-900 hover:bg-zinc-800 text-zinc-300 border border-zinc-800 rounded-lg transition-colors">
+                        <i data-lucide="qr-code" class="w-4 h-4"></i>
+                    </button>
+
+                    <button id="btnRefresh" title="Refresh Inbox (R)" class="btn-interact inline-flex items-center justify-center space-x-1.5 text-xs font-medium bg-zinc-900 hover:bg-zinc-800 text-zinc-300 border border-zinc-800 px-3 py-2 rounded-lg transition-colors">
+                        <i data-lucide="refresh-cw" id="refreshIcon" class="w-4 h-4 transition-transform duration-300"></i>
+                        <span>Refresh</span>
+                        <kbd class="kb-hint ml-1 px-1.5 py-0.5 text-[9px] bg-zinc-950 border border-zinc-800 rounded text-zinc-500 font-mono leading-none items-center justify-center">R</kbd>
+                    </button>
+
+                    <button id="btnAutoRefreshToggle" title="Toggle Auto Refresh" class="btn-interact inline-flex items-center justify-center space-x-1.5 text-xs font-medium bg-zinc-900 hover:bg-zinc-800 text-emerald-400 border border-zinc-800 px-3 py-2 rounded-lg transition-colors">
+                        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
+                        <span id="autoRefreshText">Auto (10s)</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Split Inbox & Reader Workspace -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 flex-1 min-h-[580px]">
+
+            <!-- Left Panel: Messages List -->
+            <div class="lg:col-span-5 flex flex-col rounded-xl border border-zinc-800 bg-zinc-950/80 backdrop-blur overflow-hidden transition-all duration-200">
+                <!-- Search & Filters Toolbar -->
+                <div class="p-3 border-b border-zinc-800 flex items-center justify-between gap-2 bg-zinc-900/40">
+                    <div class="relative flex-1">
+                        <i data-lucide="search" class="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500"></i>
+                        <input type="text" id="searchInput" placeholder="Filter emails..." class="w-full bg-zinc-900 border border-zinc-800 rounded-md pl-9 pr-3 py-1.5 text-xs text-zinc-200 placeholder-zinc-500 focus:outline-none focus:border-zinc-600 transition-all">
+                    </div>
+                    <span id="msgCountBadge" class="text-[11px] font-mono text-zinc-400 bg-zinc-900 border border-zinc-800 px-2 py-1 rounded">0 msgs</span>
+                </div>
+
+                <!-- Messages List Container -->
+                <div id="messageList" class="flex-1 overflow-y-auto divide-y divide-zinc-800/60 min-h-[300px] max-h-[600px] lg:max-h-none">
+                    
+                    <!-- Error State (Connection Failed) -->
+                    <div id="errorState" class="hidden p-8 text-center space-y-4">
+                        <div class="w-12 h-12 rounded-full bg-red-950/40 border border-red-900/50 flex items-center justify-center mx-auto text-red-500 shadow-inner">
+                            <i data-lucide="wifi-off" class="w-6 h-6"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm font-semibold text-white">Connection Failed</p>
+                            <p id="errorMsgText" class="text-xs text-zinc-500 mt-1 max-w-xs mx-auto">Could not connect to the Mail.tm API. Please check your network.</p>
+                        </div>
+                        <div class="pt-2">
+                            <button id="btnRetryInit" class="btn-interact px-4 py-2 text-xs font-medium text-black bg-white hover:bg-zinc-200 rounded-lg transition-colors shadow-sm inline-flex items-center space-x-1.5">
+                                <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
+                                <span>Try Again</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Loading Skeleton State -->
+                    <div id="inboxSkeletonState" class="p-4 space-y-4">
+                        <div class="p-3.5 rounded-lg border border-zinc-800/40 space-y-2.5">
+                            <div class="flex items-center justify-between">
+                                <div class="h-3 w-28 rounded skeleton-loader"></div>
+                                <div class="h-2.5 w-12 rounded skeleton-loader"></div>
+                            </div>
+                            <div class="h-3.5 w-3/4 rounded skeleton-loader"></div>
+                            <div class="h-3 w-full rounded skeleton-loader"></div>
+                        </div>
+                        <div class="p-3.5 rounded-lg border border-zinc-800/40 space-y-2.5">
+                            <div class="flex items-center justify-between">
+                                <div class="h-3 w-20 rounded skeleton-loader"></div>
+                                <div class="h-2.5 w-10 rounded skeleton-loader"></div>
+                            </div>
+                            <div class="h-3.5 w-2/3 rounded skeleton-loader"></div>
+                            <div class="h-3 w-5/6 rounded skeleton-loader"></div>
+                        </div>
+                        <div class="p-3.5 rounded-lg border border-zinc-800/40 space-y-2.5">
+                            <div class="flex items-center justify-between">
+                                <div class="h-3 w-24 rounded skeleton-loader"></div>
+                                <div class="h-2.5 w-14 rounded skeleton-loader"></div>
+                            </div>
+                            <div class="h-3.5 w-4/5 rounded skeleton-loader"></div>
+                            <div class="h-3 w-3/4 rounded skeleton-loader"></div>
+                        </div>
+                    </div>
+
+                    <!-- Empty State -->
+                    <div class="p-8 text-center space-y-3 hidden" id="inboxEmptyState">
+                        <div class="w-10 h-10 rounded-full bg-zinc-900 border border-zinc-800 flex items-center justify-center mx-auto text-zinc-500 hover:scale-105 transition-transform duration-200">
+                            <i data-lucide="inbox" class="w-5 h-5"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm font-medium text-zinc-300">Your inbox is empty</p>
+                            <p class="text-xs text-zinc-500 mt-1 max-w-xs mx-auto">Waiting for incoming emails. Sent messages to your address will appear here instantly.</p>
+                        </div>
+                        <div class="pt-2">
+                            <span class="inline-flex items-center space-x-1.5 text-[11px] text-zinc-400 font-mono bg-zinc-900/80 px-2.5 py-1 rounded border border-zinc-800">
+                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                                <span>Listening for new mail...</span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Panel: Message Reader -->
+            <div id="readerPanel" class="hidden lg:flex lg:col-span-7 flex-col rounded-xl border border-zinc-800 bg-zinc-950 lg:bg-zinc-950/80 lg:backdrop-blur overflow-hidden transition-all duration-200 fixed inset-2 sm:inset-8 z-[70] lg:relative lg:inset-auto lg:z-auto shadow-2xl lg:shadow-none">
+                
+                <!-- Unselected Reader Banner -->
+                <div id="readerEmptyState" class="hidden lg:flex flex-1 flex-col items-center justify-center p-8 text-center min-h-[400px]">
+                    <div class="w-12 h-12 rounded-xl bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-500 mb-3 hover:scale-110 transition-transform">
+                        <i data-lucide="mail-open" class="w-6 h-6"></i>
+                    </div>
+                    <h3 class="text-sm font-semibold text-zinc-200">No message selected</h3>
+                    <p class="text-xs text-zinc-500 max-w-sm mt-1">Select an email from the inbox list on the left to read its rendered contents, inspect headers, or download attachments.</p>
+                </div>
+
+                <!-- Message Reader Loading Skeleton -->
+                <div id="readerSkeleton" class="hidden flex-1 p-6 space-y-6">
+                    <div class="space-y-3 pb-4 border-b border-zinc-800">
+                        <div class="h-6 w-3/4 rounded skeleton-loader"></div>
+                        <div class="flex justify-between items-center pt-2">
+                            <div class="h-4 w-48 rounded skeleton-loader"></div>
+                            <div class="h-3 w-20 rounded skeleton-loader"></div>
+                        </div>
+                    </div>
+                    <div class="space-y-3 pt-2">
+                        <div class="h-4 w-full rounded skeleton-loader"></div>
+                        <div class="h-4 w-11/12 rounded skeleton-loader"></div>
+                        <div class="h-4 w-4/5 rounded skeleton-loader"></div>
+                        <div class="h-4 w-2/3 rounded skeleton-loader"></div>
+                    </div>
+                </div>
+
+                <!-- Active Reader Container -->
+                <div id="readerContent" class="hidden flex-1 flex-col h-full animate-fade-in">
+                    <!-- Reader Header -->
+                    <div class="p-4 border-b border-zinc-800 bg-zinc-900/40 space-y-3">
+                        <div class="flex items-start justify-between gap-4">
+                            <div class="flex items-center gap-2 overflow-hidden flex-1">
+                                <button id="btnMobileBack" title="Back to Inbox" class="lg:hidden shrink-0 btn-interact p-1.5 text-zinc-400 hover:text-white bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 rounded-md transition-colors">
+                                    <i data-lucide="arrow-left" class="w-4 h-4"></i>
+                                </button>
+                                <h2 id="msgSubject" class="text-lg font-bold text-white tracking-tight break-words truncate"></h2>
+                            </div>
+                            
+                            <div class="flex items-center space-x-1.5 shrink-0">
+                                <button id="btnDownloadMsg" title="Download Source (.eml / .json)" class="btn-interact p-1.5 text-zinc-400 hover:text-white bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 rounded-md transition-colors">
+                                    <i data-lucide="download" class="w-4 h-4"></i>
+                                </button>
+                                <button id="btnRawHeaders" title="Toggle Raw Headers" class="btn-interact p-1.5 text-zinc-400 hover:text-white bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 rounded-md transition-colors">
+                                    <i data-lucide="code" class="w-4 h-4"></i>
+                                </button>
+                                <button id="btnDeleteMsg" title="Delete Message" class="btn-interact p-1.5 text-red-400 hover:text-red-300 bg-zinc-900 hover:bg-red-950/40 border border-zinc-800 hover:border-red-900 rounded-md transition-colors">
+                                    <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Sender & Receiver Metadata -->
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between text-xs gap-2 pt-1 border-t border-zinc-800/60">
+                            <div class="space-y-0.5">
+                                <div class="flex items-center space-x-2">
+                                    <span class="text-zinc-500 w-10">From:</span>
+                                    <span id="msgFrom" class="text-zinc-200 font-mono font-medium"></span>
+                                </div>
+                                <div class="flex items-center space-x-2">
+                                    <span class="text-zinc-500 w-10">To:</span>
+                                    <span id="msgTo" class="text-zinc-400 font-mono"></span>
+                                </div>
+                            </div>
+
+                            <div class="text-zinc-500 font-mono text-[11px] self-start sm:self-auto" id="msgDate">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Raw Headers Accordion (Hidden by default) -->
+                    <div id="rawHeadersPanel" class="hidden p-3 bg-black border-b border-zinc-800 text-xs font-mono text-zinc-400 overflow-x-auto max-h-40">
+                        <pre id="rawHeadersContent" class="whitespace-pre-wrap"></pre>
+                    </div>
+
+                    <!-- Attachments Bar -->
+                    <div id="attachmentsContainer" class="hidden px-4 py-2.5 bg-zinc-900/60 border-b border-zinc-800 flex items-center space-x-2 overflow-x-auto">
+                        <span class="text-xs text-zinc-400 flex items-center gap-1 font-medium"><i data-lucide="paperclip" class="w-3.5 h-3.5"></i> Attachments:</span>
+                        <div id="attachmentsList" class="flex items-center space-x-2"></div>
+                    </div>
+
+                    <!-- Message Body Renderer (Iframe Sandbox for Safety & CSS Isolation) -->
+                    <div class="flex-1 bg-white relative min-h-[400px]">
+                        <iframe id="msgBodyIframe" class="w-full h-full border-0 absolute inset-0" sandbox="allow-popups"></iframe>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        
+    </main>
+
+    <!-- Footer with Quick Links -->
+    <footer class="mt-auto border-t border-zinc-900 bg-black/80 backdrop-blur py-6 text-xs text-zinc-500">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="flex items-center space-x-2">
+                <svg width="14" height="12" viewBox="0 0 76 65" fill="none" class="text-zinc-400">
+                    <path d="M37.5274 0L75.0548 65H0L37.5274 0Z" fill="currentColor"/>
+                </svg>
+                <span>&copy; Built by sawyer. Powered by Mail.tm API.</span>
+            </div>
+
+            <!-- Quick Links -->
+            <div class="flex items-center space-x-6 font-medium">
+                <button data-footer-modal="terms" class="hover:text-zinc-200 transition-colors btn-interact">Terms of Service</button>
+                <button data-footer-modal="privacy" class="hover:text-zinc-200 transition-colors btn-interact">Privacy Policy</button>
+                <button data-footer-modal="contact" class="hover:text-zinc-200 transition-colors btn-interact">Contact Us</button>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Footer Quick Links Modal -->
+    <div id="footerQuickModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4 transition-opacity">
+        <div class="bg-zinc-950 border border-zinc-800 rounded-xl max-w-xl w-full p-6 shadow-2xl relative animate-fade-in">
+            <button id="btnCloseFooterModal" class="absolute right-4 top-4 text-zinc-500 hover:text-white p-1 rounded-md hover:bg-zinc-900 transition-colors">
+                <i data-lucide="x" class="w-4 h-4"></i>
+            </button>
+
+            <!-- Modal Nav Tabs -->
+            <div class="flex items-center space-x-4 border-b border-zinc-800 pb-3 mb-4">
+                <button id="tabTerms" class="footer-tab text-xs font-semibold text-white pb-1 border-b-2 border-white">Terms of Service</button>
+                <button id="tabPrivacy" class="footer-tab text-xs font-semibold text-zinc-500 hover:text-zinc-300 pb-1 border-b-2 border-transparent">Privacy Policy</button>
+                <button id="tabContact" class="footer-tab text-xs font-semibold text-zinc-500 hover:text-zinc-300 pb-1 border-b-2 border-transparent">Contact Us</button>
+            </div>
+
+            <!-- Tab Content: Terms -->
+            <div id="contentTerms" class="footer-modal-section space-y-3 text-xs text-zinc-300 leading-relaxed max-h-80 overflow-y-auto pr-1">
+                <h4 class="text-sm font-semibold text-white">1. Use of Temporary Email Service</h4>
+                <p>This service provides disposable, temporary email addresses powered by the Mail.tm public API. Addresses are designed strictly for short-term testing, verification, and privacy preservation.</p>
+                <h4 class="text-sm font-semibold text-white">2. Data Retention & Expiration</h4>
+                <p>Emails received on temporary addresses are automatically deleted after a retention period managed by Mail.tm (typically 7 days). Do not use this service for crucial personal or legal correspondence.</p>
+                <h4 class="text-sm font-semibold text-white">3. Acceptable Use</h4>
+                <p>Users agree not to utilize this tool for fraudulent activity, spam dissemination, or unlawful purposes. Abuse may result in IP rate limiting or domain blocks.</p>
+            </div>
+
+            <!-- Tab Content: Privacy -->
+            <div id="contentPrivacy" class="footer-modal-section hidden space-y-3 text-xs text-zinc-300 leading-relaxed max-h-80 overflow-y-auto pr-1">
+                <h4 class="text-sm font-semibold text-white">Privacy Commitment</h4>
+                <p>We prioritize your anonymity. We do not track personal identifiers, require sign-ups, or store logs of email contents on our frontend servers.</p>
+                <h4 class="text-sm font-semibold text-white">Third-Party Processing</h4>
+                <p>All inbox requests, message fetching, and token generation are routed directly to the public REST endpoints of <strong>Mail.tm</strong>. Session data (JWT tokens and active mailbox credentials) is stored locally in your browser session storage.</p>
+            </div>
+
+            <!-- Tab Content: Contact Us -->
+            <div id="contentContact" class="footer-modal-section hidden space-y-4 text-xs text-zinc-300">
+                <p>Have questions, feedback, or API issues to report? Send a message through our direct quick contact form below.</p>
+                <form id="contactForm" class="space-y-3">
+                    <div>
+                        <label class="block text-[11px] font-medium text-zinc-400 mb-1">Your Email Address</label>
+                        <input type="email" required placeholder="you@example.com" class="w-full bg-zinc-900 border border-zinc-800 rounded-md px-3 py-1.5 text-xs text-zinc-100 placeholder-zinc-600 focus:outline-none focus:border-zinc-500">
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-medium text-zinc-400 mb-1">Subject / Query</label>
+                        <input type="text" required placeholder="Feedback or Bug Report" class="w-full bg-zinc-900 border border-zinc-800 rounded-md px-3 py-1.5 text-xs text-zinc-100 placeholder-zinc-600 focus:outline-none focus:border-zinc-500">
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-medium text-zinc-400 mb-1">Message</label>
+                        <textarea rows="3" required placeholder="Describe your inquiry..." class="w-full bg-zinc-900 border border-zinc-800 rounded-md px-3 py-1.5 text-xs text-zinc-100 placeholder-zinc-600 focus:outline-none focus:border-zinc-500"></textarea>
+                    </div>
+                    <div class="flex justify-end pt-1">
+                        <button type="submit" class="btn-interact px-4 py-1.5 text-xs font-medium text-black bg-white hover:bg-zinc-200 rounded-md transition-colors flex items-center space-x-1.5">
+                            <i data-lucide="send" class="w-3.5 h-3.5"></i>
+                            <span>Send Message</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom Inbox Modal -->
+    <div id="customModal" class="fixed inset-0 z-[100] bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4 transition-opacity">
+        <div class="bg-zinc-950 border border-zinc-800 rounded-xl max-w-md w-full p-6 shadow-2xl relative animate-fade-in">
+            <button id="btnCloseCustomModal" class="absolute right-4 top-4 text-zinc-500 hover:text-white p-1 rounded-md hover:bg-zinc-900 transition-colors">
+                <i data-lucide="x" class="w-4 h-4"></i>
+            </button>
+            <h3 class="text-lg font-semibold text-white mb-1">Create Custom Inbox</h3>
+            <p class="text-xs text-zinc-400 mb-5">Choose a specific username and password for your temporary email.</p>
+            
+            <form id="customAccountForm" class="space-y-4">
+                <div>
+                    <label class="block text-[11px] font-medium text-zinc-400 mb-1">Email Address</label>
+                    <div class="flex items-center gap-2">
+                        <input type="text" id="customUsername" required placeholder="username" class="flex-1 bg-zinc-900 border border-zinc-800 rounded-md px-3 py-2 text-xs text-zinc-100 placeholder-zinc-600 focus:outline-none focus:border-zinc-500">
+                        <span class="text-zinc-500 font-mono text-xs">@</span>
+                        <select id="domainSelect" class="flex-1 bg-zinc-900 border border-zinc-800 rounded-md px-2 py-2 text-xs text-zinc-100 focus:outline-none focus:border-zinc-500 appearance-none cursor-pointer">
+                            <!-- Populated by JS -->
+                        </select>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-[11px] font-medium text-zinc-400 mb-1">Password</label>
+                    <input type="password" id="customPassword" required placeholder="••••••••" class="w-full bg-zinc-900 border border-zinc-800 rounded-md px-3 py-2 text-xs text-zinc-100 placeholder-zinc-600 focus:outline-none focus:border-zinc-500">
+                    <p class="text-[10px] text-zinc-500 mt-1">Remember this if you want to restore the inbox later.</p>
+                </div>
+                <div class="flex justify-end gap-2 pt-2">
+                    <button type="button" id="btnCancelCustom" class="btn-interact px-4 py-2 text-xs font-medium text-zinc-300 hover:text-white bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 rounded-md transition-colors">Cancel</button>
+                    <button type="submit" class="btn-interact px-4 py-2 text-xs font-medium text-black bg-white hover:bg-zinc-200 rounded-md transition-colors flex items-center justify-center min-w-[120px]">
+                        <span>Create & Login</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- QR Code Modal -->
+    <div id="qrModal" class="fixed inset-0 z-[100] bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4 transition-opacity">
+        <div class="bg-zinc-950 border border-zinc-800 rounded-xl max-w-sm w-full p-6 shadow-2xl relative animate-fade-in flex flex-col items-center text-center">
+            <button id="btnCloseQrModal" class="absolute right-4 top-4 text-zinc-500 hover:text-white p-1 rounded-md hover:bg-zinc-900 transition-colors">
+                <i data-lucide="x" class="w-4 h-4"></i>
+            </button>
+            <h3 class="text-lg font-semibold text-white mb-2">Scan to Email</h3>
+            <p class="text-xs text-zinc-400 mb-6">Point your camera at this QR code to quickly send an email to this temporary address.</p>
+            
+            <div class="bg-white p-3 rounded-lg mb-4">
+                <div id="qrcodeContainer"></div>
+            </div>
+            
+            <span id="qrAddressText" class="text-xs font-mono text-emerald-400 bg-emerald-950/30 border border-emerald-900/50 px-3 py-1.5 rounded select-all"></span>
+        </div>
+    </div>
+
+    <!-- Cookie Consent Overlay -->
+    <div id="cookieConsent" class="fixed bottom-4 left-4 right-4 sm:left-auto sm:right-6 sm:w-96 z-[100] bg-zinc-950 border border-zinc-800 rounded-xl shadow-2xl p-5 flex flex-col gap-4 transform translate-y-20 opacity-0 transition-all duration-500 pointer-events-none">
+        <p class="text-xs text-zinc-300 leading-relaxed">
+            We use cookies to analyze traffic and improve your experience. See our <button data-footer-modal="privacy" class="text-emerald-400 hover:underline font-medium pointer-events-auto">Cookie Policy</button>.
+        </p>
+        <div class="flex items-center justify-end gap-2 pointer-events-auto">
+            <button id="btnRejectCookies" class="btn-interact px-3.5 py-1.5 text-xs font-medium text-zinc-300 hover:text-white bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 rounded-lg transition-colors">Reject</button>
+            <button id="btnAcceptCookies" class="btn-interact px-3.5 py-1.5 text-xs font-medium text-black bg-white hover:bg-zinc-200 rounded-lg transition-colors shadow-sm">Accept all</button>
+        </div>
+    </div>
+
+    <!-- Toast Notification Overlay -->
+    <div id="toast" class="fixed bottom-5 right-5 z-[110] bg-zinc-900 border border-zinc-700 text-zinc-100 text-xs px-4 py-3 rounded-lg shadow-2xl flex items-center space-x-2 transition-all transform translate-y-20 opacity-0 pointer-events-none">
+        <i data-lucide="info" id="toastIcon" class="w-4 h-4 text-emerald-400"></i>
+        <span id="toastText">Action completed successfully</span>
+    </div>
+
+    <script>
+        // Mail.tm does not return a browser CORS origin header, so production requests
+        // use the verified Cloudflare Worker proxy. Local file testing still works directly.
+        const API_BASE = window.location.protocol === 'file:'
+            ? 'https://api.mail.tm'
+            : 'https://compmails-mail-proxy.sawyerbobk563.workers.dev';
+
+        const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+        // Haptics are intentionally subtle and completely optional on unsupported devices.
+        function haptic(pattern = 'light') {
+            if (!('vibrate' in navigator)) return;
+            const patterns = { light: 8, medium: 16, success: [10, 35, 10], warning: [18, 45, 18] };
+            try { navigator.vibrate(patterns[pattern] || patterns.light); } catch (_) { /* no-op */ }
+        }
+
+        class MailTmService {
+            // Keep auth metadata out of fetch() options and never recurse while requesting /token.
+            static async request(url, options = {}, retries = 3, backoff = 800) {
+                const { _authRetry = false, ...fetchOptions } = options;
+                try {
+                    const res = await fetch(url, fetchOptions);
+
+                    if (res.status === 429 && retries > 0) {
+                        const retryAfter = Number.parseInt(res.headers.get('Retry-After') || '0', 10);
+                        const wait = retryAfter > 0 ? retryAfter * 1000 : backoff;
+                        await sleep(wait);
+                        return MailTmService.request(url, { ...fetchOptions, _authRetry }, retries - 1, backoff * 2);
+                    }
+
+                    // A mailbox token can expire. Re-authenticate once, but never for /token itself.
+                    const isTokenRequest = url.endsWith('/token');
+                    if (res.status === 401 && !isTokenRequest && !_authRetry && appState.account?.address && appState.account?.password) {
+                        const newToken = await MailTmService.getToken(appState.account.address, appState.account.password);
+                        appState.token = newToken;
+                        sessionStorage.setItem('vercel_tempmail_session', JSON.stringify(appState.account));
+                        const headers = new Headers(fetchOptions.headers || {});
+                        headers.set('Authorization', `Bearer ${newToken}`);
+                        return MailTmService.request(url, { ...fetchOptions, headers, _authRetry: true }, retries, backoff);
+                    }
+
+                    return res;
+                } catch (err) {
+                    if (retries > 0) {
+                        await sleep(backoff);
+                        return MailTmService.request(url, { ...fetchOptions, _authRetry }, retries - 1, backoff * 2);
+                    }
+                    throw new Error(`Mail service unavailable: ${err.message || 'network request failed'}`);
+                }
+            }
+
+            // Step 1: Get active domains only
+            static async getDomains() {
+                const res = await MailTmService.request(`${API_BASE}/domains`);
+                if (!res.ok) throw new Error(`Failed to fetch domain list (${res.status})`);
+                const data = await res.json();
+                const members = Array.isArray(data['hydra:member']) ? data['hydra:member'] 
+                              : Array.isArray(data) ? data 
+                              : [];
+                // Filter for active domains as specified in the API guide
+                return members.filter(d => d.isActive !== false);
+            }
+
+            // Step 2: Create Account
+            static async createAccount(address, password) {
+                const res = await MailTmService.request(`${API_BASE}/accounts`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                    body: JSON.stringify({ address, password })
+                });
+                const data = await res.json().catch(() => ({}));
+                if (!res.ok) {
+                    const detail = data.message || data['hydra:description'] || data.detail;
+                    throw new Error(detail || `Failed to create account (${res.status})`);
+                }
+                if (!data.id || data.address !== address) {
+                    throw new Error('Mail service returned an invalid mailbox response');
+                }
+                return data;
+            }
+
+            // Step 3: Request Token
+            static async getToken(address, password) {
+                const res = await MailTmService.request(`${API_BASE}/token`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ address, password })
+                });
+
+                const data = await res.json().catch(() => ({}));
+                if (!res.ok || !data.token) {
+                    throw new Error(data.message || data['hydra:description'] || `Failed to authenticate mailbox (${res.status})`);
+                }
+                return data.token;
+            }
+
+            // Core Endpoint: List Messages
+            static async getMessages(token) {
+                const res = await MailTmService.request(`${API_BASE}/messages`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (!res.ok) throw new Error(`Failed to retrieve inbox messages (${res.status})`);
+                const data = await res.json();
+                const members = Array.isArray(data['hydra:member']) ? data['hydra:member'] 
+                              : Array.isArray(data) ? data 
+                              : [];
+                return members;
+            }
+
+            // Core Endpoint: Get Single Message Details
+            static async getMessageDetails(id, token) {
+                const res = await MailTmService.request(`${API_BASE}/messages/${id}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (!res.ok) throw new Error(`Failed to fetch message contents (${res.status})`);
+                return await res.json();
+            }
+
+            // Core Endpoint: Delete Message
+            static async deleteMessage(id, token) {
+                const res = await MailTmService.request(`${API_BASE}/messages/${id}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (!res.ok && res.status !== 204) {
+                    throw new Error(`Failed to delete message (${res.status})`);
+                }
+                return true;
+            }
+        }
+
+        // State Management
+        let appState = {
+            domains: [],
+            account: null,
+            token: null,
+            messages: [],
+            selectedMessageId: null,
+            autoRefreshTimer: null,
+            autoRefreshEnabled: true,
+            autoRefreshInterval: 10000
+        };
+
+        // DOM Elements Initialization
+        const elements = {
+            headerTitle: document.getElementById('headerTitle'),
+            addressCard: document.getElementById('addressCard'),
+            currentAddress: document.getElementById('currentAddress'),
+            domainBadge: document.getElementById('domainBadge'),
+            btnCopyAddress: document.getElementById('btnCopyAddress'),
+            copySuccessBadge: document.getElementById('copySuccessBadge'),
+            btnNewMail: document.getElementById('btnNewMail'),
+            btnCreateCustom: document.getElementById('btnCreateCustom'),
+            btnRefresh: document.getElementById('btnRefresh'),
+            refreshIcon: document.getElementById('refreshIcon'),
+            btnAutoRefreshToggle: document.getElementById('btnAutoRefreshToggle'),
+            autoRefreshText: document.getElementById('autoRefreshText'),
+            btnShowQr: document.getElementById('btnShowQr'),
+            messageList: document.getElementById('messageList'),
+            msgCountBadge: document.getElementById('msgCountBadge'),
+            inboxEmptyState: document.getElementById('inboxEmptyState'),
+            inboxSkeletonState: document.getElementById('inboxSkeletonState'),
+            errorState: document.getElementById('errorState'),
+            errorMsgText: document.getElementById('errorMsgText'),
+            btnRetryInit: document.getElementById('btnRetryInit'),
+            searchInput: document.getElementById('searchInput'),
+            
+            // Reader
+            readerEmptyState: document.getElementById('readerEmptyState'),
+            readerSkeleton: document.getElementById('readerSkeleton'),
+            readerContent: document.getElementById('readerContent'),
+            msgSubject: document.getElementById('msgSubject'),
+            msgFrom: document.getElementById('msgFrom'),
+            msgTo: document.getElementById('msgTo'),
+            msgDate: document.getElementById('msgDate'),
+            msgBodyIframe: document.getElementById('msgBodyIframe'),
+            btnDeleteMsg: document.getElementById('btnDeleteMsg'),
+            btnDownloadMsg: document.getElementById('btnDownloadMsg'),
+            btnRawHeaders: document.getElementById('btnRawHeaders'),
+            rawHeadersPanel: document.getElementById('rawHeadersPanel'),
+            rawHeadersContent: document.getElementById('rawHeadersContent'),
+            attachmentsContainer: document.getElementById('attachmentsContainer'),
+            attachmentsList: document.getElementById('attachmentsList'),
+            readerPanel: document.getElementById('readerPanel'),
+            btnMobileBack: document.getElementById('btnMobileBack'),
+
+            // Modals
+            customModal: document.getElementById('customModal'),
+            btnCloseCustomModal: document.getElementById('btnCloseCustomModal'),
+            btnCancelCustom: document.getElementById('btnCancelCustom'),
+            customAccountForm: document.getElementById('customAccountForm'),
+            customUsername: document.getElementById('customUsername'),
+            customPassword: document.getElementById('customPassword'),
+            domainSelect: document.getElementById('domainSelect'),
+            qrModal: document.getElementById('qrModal'),
+            btnCloseQrModal: document.getElementById('btnCloseQrModal'),
+            qrcodeContainer: document.getElementById('qrcodeContainer'),
+            qrAddressText: document.getElementById('qrAddressText'),
+
+            // Footer Quick Modal Elements
+            footerQuickModal: document.getElementById('footerQuickModal'),
+            btnCloseFooterModal: document.getElementById('btnCloseFooterModal'),
+            tabTerms: document.getElementById('tabTerms'),
+            tabPrivacy: document.getElementById('tabPrivacy'),
+            tabContact: document.getElementById('tabContact'),
+            contentTerms: document.getElementById('contentTerms'),
+            contentPrivacy: document.getElementById('contentPrivacy'),
+            contentContact: document.getElementById('contentContact'),
+            contactForm: document.getElementById('contactForm'),
+
+            // Toasts & Indicators
+            statusIndicator: document.getElementById('statusIndicator'),
+            statusText: document.getElementById('statusText'),
+            toast: document.getElementById('toast'),
+            toastText: document.getElementById('toastText'),
+            toastIcon: document.getElementById('toastIcon'),
+
+            // Ambient effects
+            mouseGlow: document.getElementById('mouseGlow'),
+
+            // Cookie Consent
+            cookieConsent: document.getElementById('cookieConsent'),
+            btnRejectCookies: document.getElementById('btnRejectCookies'),
+            btnAcceptCookies: document.getElementById('btnAcceptCookies')
+        };
+
+        async function initApp() {
+            try {
+                elements.errorState.classList.add('hidden');
+                updateStatus('Connecting...', 'animate-pulse bg-amber-500');
+                lucide.createIcons();
+
+                // Show Skeleton state initially
+                elements.inboxSkeletonState.classList.remove('hidden');
+
+                // Artificial delay to make skeleton loading longer on startup as requested
+                const skeletonMinWait = new Promise(resolve => setTimeout(resolve, 800));
+
+                elements.domainBadge.textContent = 'Fetching domains...';
+                const domainPromise = MailTmService.getDomains();
+
+                const [domainsResult] = await Promise.all([domainPromise, skeletonMinWait]);
+                appState.domains = domainsResult;
+                
+                if (!appState.domains || appState.domains.length === 0) {
+                    throw new Error('No active domains returned from Mail.tm');
+                }
+
+                elements.domainSelect.innerHTML = appState.domains
+                    .map(d => `<option value="${d.domain}">@${d.domain}</option>`)
+                    .join('');
+
+                elements.domainBadge.textContent = `@${appState.domains[0].domain}`;
+
+                // Restore session or generate new account
+                const savedSession = sessionStorage.getItem('vercel_tempmail_session');
+                if (savedSession) {
+                    let parsed;
+                    try {
+                        parsed = JSON.parse(savedSession);
+                        appState.token = await MailTmService.getToken(parsed.address, parsed.password);
+                        appState.account = parsed;
+                        elements.currentAddress.textContent = parsed.address;
+                        showToast(`Restored session: ${parsed.address}`);
+                    } catch (err) {
+                        console.warn('Session restore failed, clearing:', err);
+                        sessionStorage.removeItem('vercel_tempmail_session');
+                        await createRandomAccount();
+                    }
+                } else {
+                    await createRandomAccount();
+                }
+
+                await refreshInbox();
+                startAutoRefresh();
+                updateStatus('Connected', 'animate-pulse bg-emerald-500');
+
+            } catch (err) {
+                console.error('Initialization Error:', err);
+                showToast(`Initialization error: ${err.message}`, 'error');
+                elements.currentAddress.textContent = 'Connection Error';
+                elements.domainBadge.textContent = 'API Unavailable';
+                updateStatus('Disconnected', 'bg-red-500');
+                
+                // Show Error State GUI
+                elements.inboxEmptyState.classList.add('hidden');
+                elements.messageList.querySelectorAll('.msg-item').forEach(el => el.remove());
+                elements.errorState.classList.remove('hidden');
+                
+                let errorText = err.message;
+                if (errorText.toLowerCase().includes('load failed') || errorText.toLowerCase().includes('fetch')) {
+                    errorText = 'Network blocked or API is currently unreachable. Check your CORS/Adblocker settings.';
+                }
+                elements.errorMsgText.textContent = errorText;
+            } finally {
+                elements.inboxSkeletonState.classList.add('hidden');
+            }
+        }
+
+        function updateStatus(text, colorClass) {
+            if (elements.statusText && elements.statusIndicator) {
+                elements.statusText.textContent = text;
+                const dot = elements.statusIndicator.querySelector('span:first-child');
+                dot.className = `w-2 h-2 rounded-full ${colorClass}`;
+            }
+        }
+
+        function setupScrollEffect() {
+            window.addEventListener('scroll', () => {
+                if (!elements.addressCard) return;
+                const rect = elements.addressCard.getBoundingClientRect();
+                
+                // When address card scrolls out of view top threshold
+                if (rect.bottom < 40 && appState.account?.address) {
+                    if (elements.headerTitle.textContent !== appState.account.address) {
+                        elements.headerTitle.classList.add('opacity-0');
+                        setTimeout(() => {
+                            elements.headerTitle.textContent = appState.account.address;
+                            elements.headerTitle.classList.remove('opacity-0');
+                        }, 150);
+                    }
+                } else {
+                    if (elements.headerTitle.textContent !== 'TempMail') {
+                        elements.headerTitle.classList.add('opacity-0');
+                        setTimeout(() => {
+                            elements.headerTitle.textContent = 'TempMail';
+                            elements.headerTitle.classList.remove('opacity-0');
+                        }, 150);
+                    }
+                }
+            });
+        }
+
+        function showToast(message, type = 'success') {
+            elements.toastText.textContent = message;
+            elements.toastIcon.setAttribute('data-lucide', type === 'error' ? 'alert-circle' : 'check-circle');
+            if (type === 'error') {
+                elements.toastIcon.classList.remove('text-emerald-400');
+                elements.toastIcon.classList.add('text-red-400');
+            } else {
+                elements.toastIcon.classList.add('text-emerald-400');
+                elements.toastIcon.classList.remove('text-red-400');
+            }
+            lucide.createIcons();
+            
+            elements.toast.classList.remove('translate-y-20', 'opacity-0', 'pointer-events-none');
+            setTimeout(() => {
+                elements.toast.classList.add('translate-y-20', 'opacity-0', 'pointer-events-none');
+            }, 3000);
+        }
+
+        function generateRandomString(length = 10) {
+            const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
+            return Array.from({length}, () => chars[Math.floor(Math.random() * chars.length)]).join('');
+        }
+
+        async function createRandomAccount() {
+            if (!appState.domains.length) throw new Error('No active domains available');
+            elements.currentAddress.textContent = 'Creating inbox…';
+            let lastError;
+
+            // A random local-part can very rarely already exist. Try a fresh address a few times.
+            for (let attempt = 0; attempt < 5; attempt++) {
+                const domain = appState.domains[Math.floor(Math.random() * appState.domains.length)].domain;
+                const address = `${generateRandomString(10)}@${domain}`;
+                const password = generateRandomString(18);
+                try {
+                    const account = await MailTmService.createAccount(address, password);
+                    const token = await MailTmService.getToken(address, password);
+                    appState.account = { address, password, id: account.id };
+                    appState.token = token;
+                    sessionStorage.setItem('vercel_tempmail_session', JSON.stringify(appState.account));
+                    elements.currentAddress.textContent = address;
+                    elements.domainBadge.textContent = `@${domain}`;
+                    updateStatus('Connected', 'animate-pulse bg-emerald-500');
+                    showToast(`Inbox created: ${address}`);
+                    return;
+                } catch (err) {
+                    lastError = err;
+                    console.warn(`Mailbox creation attempt ${attempt + 1} failed`, err);
+                    if (!/exist|already|taken|duplicate|invalid/i.test(err.message || '')) break;
+                }
+            }
+            throw lastError || new Error('Could not create a temporary inbox');
+        }
+
+        async function refreshInbox() {
+            if (!appState.token) return;
+            
+            elements.refreshIcon.classList.add('animate-spin');
+            updateStatus('Syncing...', 'animate-pulse bg-blue-500');
+            try {
+                const messages = await MailTmService.getMessages(appState.token);
+                appState.messages = messages;
+                renderMessages();
+                
+                elements.msgCountBadge.textContent = `${messages.length} msgs`;
+                updateStatus('Connected', 'animate-pulse bg-emerald-500');
+            } catch (err) {
+                console.error(err);
+                showToast('Failed to refresh inbox', 'error');
+                updateStatus('Error', 'bg-red-500');
+            } finally {
+                setTimeout(() => elements.refreshIcon.classList.remove('animate-spin'), 500);
+            }
+        }
+
+        function renderMessages(filterText = '') {
+            const container = elements.messageList;
+            
+            container.querySelectorAll('.msg-item').forEach(el => el.remove());
+            elements.inboxEmptyState.classList.add('hidden');
+            
+            let displayMsgs = appState.messages;
+            if (filterText) {
+                const lowerFilter = filterText.toLowerCase();
+                displayMsgs = displayMsgs.filter(m => 
+                    (m.subject && m.subject.toLowerCase().includes(lowerFilter)) || 
+                    (m.from.address && m.from.address.toLowerCase().includes(lowerFilter))
+                );
+            }
+
+            if (displayMsgs.length === 0) {
+                elements.inboxEmptyState.classList.remove('hidden');
+                return;
+            }
+
+            displayMsgs.forEach(msg => {
+                const isSelected = appState.selectedMessageId === msg.id;
+                const div = document.createElement('div');
+                div.className = `msg-item p-4 cursor-pointer hover:bg-zinc-900/60 transition-colors ${isSelected ? 'bg-zinc-900 border-l-2 border-emerald-500' : 'border-l-2 border-zinc-900/0'}`;
+                
+                const timeStr = new Date(msg.createdAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                
+                div.innerHTML = `
+                    <div class="flex items-center justify-between mb-1">
+                        <span class="text-xs font-semibold text-zinc-200 truncate pr-2">${escapeHTML(msg.from.name || msg.from.address)}</span>
+                        <span class="text-[10px] text-zinc-500 font-mono shrink-0">${timeStr}</span>
+                    </div>
+                    <div class="text-xs font-medium text-zinc-300 truncate mb-1">${escapeHTML(msg.subject || '(No Subject)')}</div>
+                    <div class="text-[11px] text-zinc-500 truncate">${escapeHTML(msg.intro || '...')}</div>
+                `;
+                
+                div.addEventListener('click', () => loadMessageContent(msg.id));
+                container.appendChild(div);
+            });
+        }
+
+        async function loadMessageContent(id) {
+            haptic('light');
+            appState.selectedMessageId = id;
+            renderMessages(elements.searchInput.value); 
+            
+            elements.readerPanel.classList.remove('hidden');
+            elements.readerEmptyState.classList.add('hidden');
+            elements.readerContent.classList.add('hidden');
+            elements.readerSkeleton.classList.remove('hidden');
+
+            try {
+                const msg = await MailTmService.getMessageDetails(id, appState.token);
+                
+                elements.msgSubject.textContent = msg.subject || '(No Subject)';
+                elements.msgFrom.textContent = msg.from.address;
+                elements.msgTo.textContent = msg.to.map(t => t.address).join(', ');
+                elements.msgDate.textContent = new Date(msg.createdAt).toLocaleString();
+                
+                // Safely render message body using srcdoc
+                let bodyContent = '';
+                if (msg.html) {
+                    bodyContent = Array.isArray(msg.html) ? msg.html.join('') : msg.html;
+                } else if (msg.text) {
+                    bodyContent = `<pre style="font-family: monospace; white-space: pre-wrap; font-size: 14px; padding: 16px; word-break: break-word;">${escapeHTML(msg.text)}</pre>`;
+                } else {
+                    bodyContent = '<div style="font-family: sans-serif; padding: 16px; color: #888;">(Empty message body)</div>';
+                }
+                elements.msgBodyIframe.srcdoc = bodyContent;
+
+                if (msg.headerLines) {
+                    elements.rawHeadersContent.textContent = msg.headerLines.map(h => h.line).join('');
+                }
+
+                if (msg.hasAttachments && msg.attachments && msg.attachments.length > 0) {
+                    elements.attachmentsContainer.classList.remove('hidden');
+                    elements.attachmentsList.innerHTML = msg.attachments.map(att => `
+                        <button onclick="downloadAttachment('${att.id}', '${escapeHTML(att.filename)}', '${att.downloadUrl}')" class="flex items-center space-x-1.5 px-2 py-1 bg-zinc-800 hover:bg-zinc-700 rounded text-[11px] text-zinc-300 transition-colors">
+                            <i data-lucide="file" class="w-3 h-3"></i>
+                            <span class="truncate max-w-[150px]">${escapeHTML(att.filename)}</span>
+                        </button>
+                    `).join('');
+                    lucide.createIcons();
+                } else {
+                    elements.attachmentsContainer.classList.add('hidden');
+                }
+                
+                elements.readerSkeleton.classList.add('hidden');
+                elements.readerContent.classList.remove('hidden');
+
+            } catch (err) {
+                console.error(err);
+                showToast('Failed to load message', 'error');
+                elements.readerSkeleton.classList.add('hidden');
+                elements.readerEmptyState.classList.remove('hidden');
+            }
+        }
+
+        function escapeHTML(str) {
+            if (!str) return '';
+            return str.replace(/[&<>'"]/g, tag => ({
+                '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
+            }[tag]));
+        }
+
+        async function downloadAttachment(id, filename, urlPath) {
+            try {
+                showToast(`Downloading ${filename}...`);
+                const res = await MailTmService.request(`${API_BASE}${urlPath}`, {
+                    headers: { 'Authorization': `Bearer ${appState.token}` }
+                });
+                const blob = await res.blob();
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            } catch (err) {
+                console.error(err);
+                showToast(`Failed to download ${filename}`, 'error');
+            }
+        }
+
+        function startAutoRefresh() {
+            if (appState.autoRefreshTimer) clearTimeout(appState.autoRefreshTimer);
+            if (!appState.autoRefreshEnabled) return;
+            
+            const tick = async () => {
+                await refreshInbox();
+                if (appState.autoRefreshEnabled) {
+                    appState.autoRefreshTimer = setTimeout(tick, appState.autoRefreshInterval);
+                }
+            };
+            
+            appState.autoRefreshTimer = setTimeout(tick, appState.autoRefreshInterval);
+        }
+
+        function setupEventListeners() {
+            elements.btnRefresh.addEventListener('click', () => {
+                haptic('light');
+                refreshInbox();
+            });
+            
+            elements.btnAutoRefreshToggle.addEventListener('click', () => {
+                haptic('light');
+                appState.autoRefreshEnabled = !appState.autoRefreshEnabled;
+                const indicator = elements.btnAutoRefreshToggle.querySelector('.animate-ping');
+                if (appState.autoRefreshEnabled) {
+                    elements.autoRefreshText.textContent = `Auto (${appState.autoRefreshInterval/1000}s)`;
+                    elements.btnAutoRefreshToggle.classList.remove('text-zinc-500');
+                    elements.btnAutoRefreshToggle.classList.add('text-emerald-400');
+                    indicator.classList.remove('hidden');
+                    startAutoRefresh();
+                    showToast('Auto-refresh enabled');
+                } else {
+                    elements.autoRefreshText.textContent = 'Auto (Off)';
+                    elements.btnAutoRefreshToggle.classList.remove('text-emerald-400');
+                    elements.btnAutoRefreshToggle.classList.add('text-zinc-500');
+                    indicator.classList.add('hidden');
+                    clearTimeout(appState.autoRefreshTimer);
+                    showToast('Auto-refresh disabled');
+                }
+            });
+            
+            elements.searchInput.addEventListener('input', (e) => {
+                renderMessages(e.target.value);
+            });
+
+            elements.btnCopyAddress.addEventListener('click', async () => {
+                if (!appState.account?.address) return;
+                haptic('success');
+                try {
+                    await navigator.clipboard.writeText(appState.account.address);
+                } catch (e) {
+                    const textArea = document.createElement("textarea");
+                    textArea.value = appState.account.address;
+                    document.body.appendChild(textArea);
+                    textArea.select();
+                    document.execCommand("copy");
+                    textArea.remove();
+                }
+                
+                elements.copySuccessBadge.classList.remove('hidden');
+                setTimeout(() => elements.copySuccessBadge.classList.add('hidden'), 2000);
+                showToast('Address copied to clipboard');
+            });
+
+            elements.btnNewMail.addEventListener('click', async () => {
+                if (confirm('Create new random inbox? Current messages will be lost if not saved.')) {
+                    haptic('medium');
+                    elements.inboxSkeletonState.classList.remove('hidden');
+                    elements.messageList.querySelectorAll('.msg-item').forEach(el => el.remove());
+                    elements.readerContent.classList.add('hidden');
+                    elements.readerEmptyState.classList.remove('hidden');
+                    elements.readerPanel.classList.add('hidden');
+                    appState.selectedMessageId = null;
+                    appState.messages = [];
+                    await createRandomAccount();
+                    await refreshInbox();
+                    elements.inboxSkeletonState.classList.add('hidden');
+                }
+            });
+
+            document.addEventListener('keydown', (e) => {
+                if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+                if (e.key.toLowerCase() === 'r') {
+                    refreshInbox();
+                } else if (e.key.toLowerCase() === 'c') {
+                    elements.btnCopyAddress.click();
+                }
+            });
+
+            elements.btnRawHeaders.addEventListener('click', () => {
+                haptic('light');
+                elements.rawHeadersPanel.classList.toggle('hidden');
+            });
+
+            elements.btnMobileBack.addEventListener('click', () => {
+                haptic('light');
+                elements.readerPanel.classList.add('hidden');
+                appState.selectedMessageId = null;
+                renderMessages(elements.searchInput.value);
+            });
+
+            elements.btnDownloadMsg.addEventListener('click', async () => {
+                if (!appState.selectedMessageId) return;
+                haptic('medium');
+                try {
+                    const msg = await MailTmService.getMessageDetails(appState.selectedMessageId, appState.token);
+                    const blob = new Blob([JSON.stringify(msg, null, 2)], { type: 'application/json' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `message_${appState.selectedMessageId}.json`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                    showToast('Message source downloaded');
+                } catch (err) {
+                    showToast('Failed to download message', 'error');
+                }
+            });
+
+            elements.btnDeleteMsg.addEventListener('click', async () => {
+                if (!appState.selectedMessageId) return;
+                if (confirm('Permanently delete this message?')) {
+                    haptic('warning');
+                    try {
+                        await MailTmService.deleteMessage(appState.selectedMessageId, appState.token);
+                        showToast('Message deleted');
+                        appState.selectedMessageId = null;
+                        elements.readerContent.classList.add('hidden');
+                        elements.readerEmptyState.classList.remove('hidden');
+                        elements.readerPanel.classList.add('hidden');
+                        await refreshInbox();
+                    } catch (err) {
+                        showToast('Failed to delete message', 'error');
+                    }
+                }
+            });
+
+            elements.btnCreateCustom.addEventListener('click', () => {
+                haptic('light');
+                elements.customModal.classList.remove('hidden');
+            });
+            const closeCustom = () => elements.customModal.classList.add('hidden');
+            elements.btnCloseCustomModal.addEventListener('click', closeCustom);
+            elements.btnCancelCustom.addEventListener('click', closeCustom);
+            
+            elements.customAccountForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const username = elements.customUsername.value.trim();
+                const domain = elements.domainSelect.value;
+                const password = elements.customPassword.value;
+                const address = `${username}@${domain}`;
+
+                if (!username || !domain || !password) {
+                    showToast('Please fill all fields', 'error');
+                    return;
+                }
+
+                try {
+                    const btn = elements.customAccountForm.querySelector('button[type="submit"]');
+                    btn.disabled = true;
+                    btn.innerHTML = '<span class="animate-spin w-4 h-4 border-2 border-zinc-900 border-t-transparent rounded-full inline-block"></span>';
+
+                    const account = await MailTmService.createAccount(address, password);
+                    const token = await MailTmService.getToken(address, password);
+                    
+                    appState.account = { address, password, id: account.id };
+                    appState.token = token;
+                    sessionStorage.setItem('vercel_tempmail_session', JSON.stringify(appState.account));
+                    
+                    elements.currentAddress.textContent = address;
+                    appState.selectedMessageId = null;
+                    elements.readerContent.classList.add('hidden');
+                    elements.readerEmptyState.classList.remove('hidden');
+                    
+                    showToast(`Logged into: ${address}`);
+                    closeCustom();
+                    
+                    elements.inboxSkeletonState.classList.remove('hidden');
+                    await refreshInbox();
+                    elements.inboxSkeletonState.classList.add('hidden');
+                    
+                } catch (err) {
+                    showToast(err.message || 'Failed to create custom account', 'error');
+                } finally {
+                    const btn = elements.customAccountForm.querySelector('button[type="submit"]');
+                    btn.disabled = false;
+                    btn.innerHTML = '<span>Create & Login</span>';
+                }
+            });
+
+            elements.btnShowQr.addEventListener('click', () => {
+                if (!appState.account?.address) return;
+                haptic('light');
+                elements.qrcodeContainer.innerHTML = '';
+                new QRCode(elements.qrcodeContainer, {
+                    text: `mailto:${appState.account.address}`,
+                    width: 180,
+                    height: 180,
+                    colorDark : "#000000",
+                    colorLight : "#ffffff",
+                    correctLevel : QRCode.CorrectLevel.L
+                });
+                elements.qrAddressText.textContent = appState.account.address;
+                elements.qrModal.classList.remove('hidden');
+            });
+            
+            elements.btnCloseQrModal.addEventListener('click', () => {
+                elements.qrModal.classList.add('hidden');
+            });
+
+            const tabs = {
+                terms: { btn: elements.tabTerms, content: elements.contentTerms },
+                privacy: { btn: elements.tabPrivacy, content: elements.contentPrivacy },
+                contact: { btn: elements.tabContact, content: elements.contentContact }
+            };
+
+            const switchTab = (tabId) => {
+                Object.values(tabs).forEach(t => {
+                    t.btn.classList.remove('text-white', 'border-white');
+                    t.btn.classList.add('text-zinc-500', 'border-transparent');
+                    t.content.classList.add('hidden');
+                });
+                
+                tabs[tabId].btn.classList.add('text-white', 'border-white');
+                tabs[tabId].btn.classList.remove('text-zinc-500', 'border-transparent');
+                tabs[tabId].content.classList.remove('hidden');
+            };
+
+            document.querySelectorAll('[data-footer-modal]').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const tabId = e.target.getAttribute('data-footer-modal');
+                    switchTab(tabId);
+                    elements.footerQuickModal.classList.remove('hidden');
+                });
+            });
+
+            elements.tabTerms.addEventListener('click', () => switchTab('terms'));
+            elements.tabPrivacy.addEventListener('click', () => switchTab('privacy'));
+            elements.tabContact.addEventListener('click', () => switchTab('contact'));
+
+            elements.btnCloseFooterModal.addEventListener('click', () => {
+                elements.footerQuickModal.classList.add('hidden');
+            });
+
+            elements.contactForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                showToast('Message sent to developer');
+                elements.footerQuickModal.classList.add('hidden');
+                e.target.reset();
+            });
+
+            [elements.customModal, elements.qrModal, elements.footerQuickModal].forEach(modal => {
+                modal.addEventListener('click', (e) => {
+                    if (e.target === modal) modal.classList.add('hidden');
+                });
+            });
+
+            // Cookie Consent Logic
+            if (!sessionStorage.getItem('vercel_cookie_consent')) {
+                setTimeout(() => {
+                    elements.cookieConsent.classList.remove('translate-y-20', 'opacity-0', 'pointer-events-none');
+                }, 1500);
+            }
+            
+            const closeCookieConsent = () => {
+                elements.cookieConsent.classList.add('translate-y-20', 'opacity-0', 'pointer-events-none');
+                sessionStorage.setItem('vercel_cookie_consent', 'true');
+            };
+            
+            elements.btnAcceptCookies.addEventListener('click', closeCookieConsent);
+            elements.btnRejectCookies.addEventListener('click', closeCookieConsent);
+            
+            // Retry button listener
+            elements.btnRetryInit.addEventListener('click', initApp);
+
+            // Mouse Follower Effect (Vercel Style)
+            let glowTimeout;
+            window.addEventListener('mousemove', (e) => {
+                if (!elements.mouseGlow) return;
+                
+                // Use requestAnimationFrame for smoother performance
+                requestAnimationFrame(() => {
+                    elements.mouseGlow.style.opacity = '1';
+                    elements.mouseGlow.style.transform = `translate(${e.clientX}px, ${e.clientY}px) translate(-50%, -50%)`;
+                });
+
+                clearTimeout(glowTimeout);
+                glowTimeout = setTimeout(() => {
+                    if(elements.mouseGlow) elements.mouseGlow.style.opacity = '0';
+                }, 1500);
+            });
+        }
+
+        // Initialize on DOM load
+        window.addEventListener('load', () => {
+            setupEventListeners();
+            setupScrollEffect();
+            initApp();
+        });
+    </script>
+</body>
+</html>

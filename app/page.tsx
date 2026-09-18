@@ -10,6 +10,7 @@ type Site = {
 };
 
 const siteUrl = "https://base31.org";
+const counterUrl = "https://base31-directory-counter.sawyerbobk563.workers.dev";
 
 export default function HomePage() {
   const visibleSites = (sites as Site[]).filter((site) => site.show !== false);
@@ -42,6 +43,16 @@ export default function HomePage() {
       },
     ],
   };
+
+  const counterScript = `
+    fetch(${JSON.stringify(`${counterUrl}/?key=base31-directory`)}, { cache: "no-store" })
+      .then((response) => response.ok ? response.json() : Promise.reject(new Error("Counter unavailable")))
+      .then((data) => {
+        const count = document.getElementById("directory-view-count");
+        if (count && Number.isFinite(data.views)) count.textContent = Number(data.views).toLocaleString();
+      })
+      .catch(() => {});
+  `;
 
   return (
     <>
@@ -144,6 +155,12 @@ export default function HomePage() {
           <a href="#page-title">Back to top ↑</a>
         </div>
       </footer>
+
+      <div className="view-counter mono" aria-live="polite" aria-label="Directory page views">
+        <span>views</span>
+        <strong id="directory-view-count">—</strong>
+      </div>
+      <script dangerouslySetInnerHTML={{ __html: counterScript }} />
     </>
   );
 }

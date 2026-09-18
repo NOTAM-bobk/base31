@@ -1,10 +1,18 @@
 [
   {
-    "name": "Example Site",
-    "subdomain": "example",
-    "url": "https://example.base31.org",
-    "tags": ["demo", "starter"],
-    "description": "A placeholder site showing how a new subdomain gets added to the directory.",
+    "name": "App Screenshot",
+    "subdomain": "appscreenshot",
+    "url": "https://appscreenshot.base31.org",
+    "tags": ["utility", "screenshot", "tools"],
+    "description": "Generate and customize app screenshots for showcase and presentation.",
+    "show": true
+  },
+  {
+    "name": "Chat With Your Data Garmin",
+    "subdomain": "chatwithyourdatagarmin",
+    "url": "https://chatwithyourdatagarmin.base31.org",
+    "tags": ["ai", "garmin", "data", "fitness"],
+    "description": "Interactive AI chat interface to analyze and query Garmin fitness data.",
     "show": true
   },
   {
@@ -13,6 +21,70 @@
     "url": "https://compmails.base31.org",
     "tags": ["email", "privacy", "utility"],
     "description": "A fast disposable email client for temporary inboxes and quick online signups.",
+    "show": true
+  },
+  {
+    "name": "Daily Wordel",
+    "subdomain": "dailywordel",
+    "url": "https://dailywordel.base31.org",
+    "tags": ["game", "word", "puzzle"],
+    "description": "A daily word puzzle game to test your vocabulary.",
+    "show": true
+  },
+  {
+    "name": "Example Site",
+    "subdomain": "example",
+    "url": "https://example.base31.org",
+    "tags": ["demo", "starter"],
+    "description": "A placeholder site showing how a new subdomain gets added to the directory.",
+    "show": false
+  },
+  {
+    "name": "Focus Canvas",
+    "subdomain": "focuscanvas",
+    "url": "https://focuscanvas.base31.org",
+    "tags": ["productivity", "canvas", "utility"],
+    "description": "A visual productivity canvas for focused work and brainstorming.",
+    "show": true
+  },
+  {
+    "name": "Is It Down",
+    "subdomain": "isitdown",
+    "url": "https://isitdown.base31.org",
+    "tags": ["utility", "network", "status"],
+    "description": "Check website status and verify service availability.",
+    "show": true
+  },
+  {
+    "name": "Joke Generator",
+    "subdomain": "jokegenrator",
+    "url": "https://jokegenrator.base31.org",
+    "tags": ["entertainment", "fun", "utility"],
+    "description": "A lighthearted tool for generating quick jokes and humor.",
+    "show": true
+  },
+  {
+    "name": "Voice Transcribe",
+    "subdomain": "voicetransrib",
+    "url": "https://voicetransrib.base31.org",
+    "tags": ["audio", "transcription", "utility"],
+    "description": "Transcribe voice audio into text quickly and accurately.",
+    "show": true
+  },
+  {
+    "name": "What's My Device",
+    "subdomain": "whatsmydevice",
+    "url": "https://whatsmydevice.base31.org",
+    "tags": ["utility", "device", "info"],
+    "description": "Inspect system specifications, browser details, and device attributes.",
+    "show": true
+  },
+  {
+    "name": "Word of the Day",
+    "subdomain": "wordoftheday",
+    "url": "https://wordoftheday.base31.org",
+    "tags": ["education", "vocabulary", "learning"],
+    "description": "Learn new words daily with definitions and example usages.",
     "show": true
   }
 ]

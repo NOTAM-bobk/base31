@@ -1,112 +1,51 @@
 import sites from "@/config/sites.json";
 
-type Site = {
-  name: string;
-  subdomain: string;
-  url: string;
-  tags?: string[];
-  description?: string;
-  show?: boolean;
-};
-
+type Site = { name: string; subdomain: string; url: string; tags?: string[]; description?: string; show?: boolean };
 const siteUrl = "https://base31.org";
 const counterUrl = "https://base31-directory-counter.sawyerbobk563.workers.dev";
 
 export default function HomePage() {
   const visibleSites = (sites as Site[]).filter((site) => site.show !== false);
   const itemList = visibleSites.map((site, index) => ({ "@type": "ListItem", position: index + 1, name: site.name, url: site.url }));
-  const structuredData = {
-    "@context": "https://schema.org",
-    "@graph": [
-      { "@type": "WebSite", "@id": `${siteUrl}/#website`, url: siteUrl, name: "base31.org", description: "An independent directory of cool sites, fun websites, creative web projects, and useful online tools.", inLanguage: "en-US" },
-      { "@type": "ItemList", "@id": `${siteUrl}/#directory`, name: "base31.org website directory", description: "A list of live sites and web projects on base31.org.", numberOfItems: visibleSites.length, itemListElement: itemList },
-    ],
-  };
-
+  const structuredData = { "@context": "https://schema.org", "@graph": [
+    { "@type": "WebSite", "@id": `${siteUrl}/#website`, url: siteUrl, name: "base31.org", description: "An independent directory of cool sites, fun websites, creative web projects, and useful online tools.", inLanguage: "en-US" },
+    { "@type": "ItemList", "@id": `${siteUrl}/#directory`, name: "base31.org website directory", description: "A list of live sites and web projects on base31.org.", numberOfItems: visibleSites.length, itemListElement: itemList },
+  ] };
   const pageScript = `
     (function () {
-      var consentKey = "base31-consent";
-      var consent = document.getElementById("cookie-consent");
+      var vibrate = function (pattern) { try { if (navigator.vibrate) navigator.vibrate(pattern || 8); } catch (_) {} };
+      var consentKey = "base31-consent", consent = document.getElementById("cookie-consent");
       var hideConsent = function () { if (consent) consent.hidden = true; };
       try { if (localStorage.getItem(consentKey)) hideConsent(); else if (consent) consent.hidden = false; } catch (_) { if (consent) consent.hidden = false; }
-      ["cookie-confirm", "cookie-deny"].forEach(function (id) {
-        var button = document.getElementById(id);
-        if (button) button.addEventListener("click", function () {
-          try { localStorage.setItem(consentKey, id === "cookie-confirm" ? "accepted" : "denied"); } catch (_) {}
-          hideConsent();
-        });
-      });
-      var share = document.getElementById("share-button");
-      if (share) share.addEventListener("click", function () {
-        var data = { title: "base31.org", text: "Cool sites for curious people.", url: window.location.href };
-        if (navigator.share) navigator.share(data).catch(function () {});
-        else if (navigator.clipboard) {
-          navigator.clipboard.writeText(window.location.href).then(function () {
-            share.querySelector("span").textContent = "Link copied";
-            window.setTimeout(function () { share.querySelector("span").textContent = "Share"; }, 1600);
-          });
-        }
-      });
-      fetch(${JSON.stringify(`${counterUrl}/?key=base31-directory`)}, { cache: "no-store" })
-        .then(function (response) { return response.ok ? response.json() : Promise.reject(); })
-        .then(function (data) { var count = document.getElementById("directory-view-count"); if (count && Number.isFinite(data.views)) count.textContent = Number(data.views).toLocaleString(); })
-        .catch(function () {})
-        .finally(function () { var skeleton = document.getElementById("page-skeleton"); if (skeleton) skeleton.hidden = true; });
+      ["cookie-confirm", "cookie-deny"].forEach(function (id) { var button = document.getElementById(id); if (button) button.addEventListener("click", function () { try { localStorage.setItem(consentKey, id === "cookie-confirm" ? "accepted" : "denied"); } catch (_) {} vibrate(10); hideConsent(); }); });
+      var search = document.getElementById("site-search"), cards = Array.prototype.slice.call(document.querySelectorAll(".site-card")), list = document.querySelector(".site-list");
+      var favorites = []; try { favorites = JSON.parse(localStorage.getItem("base31-favorites") || "[]"); } catch (_) {}
+      var syncFavorite = function (card, active) { card.classList.toggle("is-pinned", active); var button = card.querySelector(".favorite-button"); if (button) { button.setAttribute("aria-pressed", String(active)); button.setAttribute("aria-label", active ? "Unpin " + card.dataset.name : "Pin " + card.dataset.name); button.querySelector("span").textContent = active ? "♥" : "♡"; } };
+      var sortCards = function () { if (!list) return; cards.sort(function (a, b) { return Number(favorites.indexOf(a.dataset.subdomain) < 0) - Number(favorites.indexOf(b.dataset.subdomain) < 0) || a.dataset.name.localeCompare(b.dataset.name); }); cards.forEach(function (card) { list.appendChild(card); }); };
+      cards.forEach(function (card) { syncFavorite(card, favorites.indexOf(card.dataset.subdomain) >= 0); var button = card.querySelector(".favorite-button"); if (button) button.addEventListener("click", function () { var key = card.dataset.subdomain, index = favorites.indexOf(key); if (index >= 0) favorites.splice(index, 1); else favorites.push(key); try { localStorage.setItem("base31-favorites", JSON.stringify(favorites)); } catch (_) {} syncFavorite(card, favorites.indexOf(key) >= 0); sortCards(); vibrate(12); }); });
+      sortCards();
+      if (search) search.addEventListener("input", function () { var query = search.value.toLowerCase().trim(); cards.forEach(function (card) { card.hidden = !!query && card.dataset.search.indexOf(query) < 0; }); });
+      var share = document.getElementById("share-button"); if (share) share.addEventListener("click", function () { vibrate(10); var data = { title: "base31.org", text: "Cool sites for curious people.", url: window.location.href }; if (navigator.share) navigator.share(data).catch(function () {}); else if (navigator.clipboard) navigator.clipboard.writeText(window.location.href).then(function () { share.querySelector("span").textContent = "Link copied"; window.setTimeout(function () { share.querySelector("span").textContent = "Share"; }, 1600); }); });
+      var closeMilestone = function () { var popup = document.getElementById("milestone-popup"); if (popup) popup.hidden = true; };
+      var celebrate = function (views) { var popup = document.getElementById("milestone-popup"), value = document.getElementById("milestone-number"); if (!popup || !value) return; value.textContent = Number(views).toLocaleString(); popup.hidden = false; vibrate([20, 40, 20]); for (var i = 0; i < 28; i++) { var piece = document.createElement("i"); piece.className = "confetti-piece"; piece.style.left = (Math.random() * 100) + "%"; piece.style.animationDelay = (Math.random() * .35) + "s"; piece.style.setProperty("--hue", String(Math.floor(Math.random() * 360))); document.body.appendChild(piece); window.setTimeout(function () { piece.remove(); }, 1800); } };
+      var milestoneShare = document.getElementById("milestone-share"); if (milestoneShare) milestoneShare.addEventListener("click", function () { var value = document.getElementById("milestone-number").textContent, data = { title: "A base31 milestone", text: "I was the " + value + "th visit to base31.org!", url: window.location.href }; vibrate(10); if (navigator.share) navigator.share(data).catch(function () {}); else if (navigator.clipboard) navigator.clipboard.writeText(data.text + " " + data.url); });
+      var certificate = document.getElementById("milestone-certificate"); if (certificate) certificate.addEventListener("click", function () { var value = document.getElementById("milestone-number").textContent, text = "BASE31.ORG\\n\\nMILESTONE CERTIFICATE\\n\\nThis certifies that you were visitor number " + value + " to the base31 directory.\\n\\nCool sites for curious people.\\nhttps://base31.org"; var link = document.createElement("a"); link.href = URL.createObjectURL(new Blob([text], { type: "text/plain" })); link.download = "base31-milestone-" + value + ".txt"; link.click(); URL.revokeObjectURL(link.href); vibrate(12); });
+      document.querySelectorAll("[data-close-milestone]").forEach(function (button) { button.addEventListener("click", closeMilestone); });
+      var finishLoader = function () { var skeleton = document.getElementById("page-skeleton"); if (skeleton) skeleton.hidden = true; }; window.setTimeout(finishLoader, 1100);
+      fetch(${JSON.stringify(`${counterUrl}/?key=base31-directory`)}, { cache: "no-store", signal: typeof AbortSignal !== "undefined" && AbortSignal.timeout ? AbortSignal.timeout(2200) : undefined }).then(function (response) { return response.ok ? response.json() : Promise.reject(); }).then(function (data) { var count = document.getElementById("directory-view-count"); if (count && Number.isFinite(data.views)) count.textContent = Number(data.views).toLocaleString(); if (Number.isFinite(data.views) && data.views > 0 && data.views % 10 === 0) celebrate(data.views); }).catch(function () {}).finally(finishLoader);
     }());
   `;
-
-  return (
-    <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
-      <div id="page-skeleton" className="page-skeleton" aria-hidden="true">
-        <div className="skeleton-bar skeleton-bar-wide" /><div className="skeleton-bar skeleton-bar-mid" /><div className="skeleton-bar skeleton-bar-short" />
-      </div>
-      <header className="site-header">
-        <div className="site-header-inner">
-          <a className="wordmark mono" href="/" aria-label="base31.org home">base31.org</a>
-          <nav className="site-nav" aria-label="Main navigation"><a href="#sites">Sites</a><a href="#about">About</a></nav>
-          <div className="header-actions">
-            <button id="share-button" className="share-button mono" type="button" aria-label="Share base31.org"><span>Share</span><span aria-hidden="true">↗</span></button>
-            <span className="header-meta mono" aria-label={`${visibleSites.length} listed sites`}>{String(visibleSites.length).padStart(2, "0")} / sites</span>
-          </div>
-        </div>
-      </header>
-
-      <main>
-        <section className="intro" aria-labelledby="page-title">
-          <p className="eyebrow mono">the independent web directory</p>
-          <h1 id="page-title">Cool sites for curious people.</h1>
-          <p className="subtitle">Discover fun websites, useful online tools, and creative web projects built on base31.org and the open web.</p>
-          <div className="intro-links" aria-label="Explore the directory"><a className="text-link" href="#sites">Browse all sites <span aria-hidden="true">↓</span></a><a className="text-link muted-link" href="#about">Why base31? <span aria-hidden="true">→</span></a></div>
-        </section>
-
-        <section id="sites" className="directory-section" aria-labelledby="sites-heading">
-          <div className="section-heading"><h2 id="sites-heading">Featured sites</h2><span className="section-count mono">{visibleSites.length} live</span></div>
-          {visibleSites.length === 0 ? <div className="empty">No sites deployed yet.</div> : <div className="site-list" aria-label="Deployed sites">
-            {visibleSites.map((site) => <a key={site.subdomain} href={site.url} className="site-card" target="_blank" rel="noreferrer">
-              <div className="site-card-top"><div className="site-name-row"><span className="live-dot" aria-hidden="true" /><span className="site-name">{site.name}</span></div><span className="site-arrow mono" aria-hidden="true">↗</span></div>
-              <p className="site-url mono">{site.url.replace(/^https?:\/\//, "")}</p>
-              {site.description && <p className="site-description">{site.description}</p>}
-              {site.tags && site.tags.length > 0 && <div className="tags" aria-label="Tags">{site.tags.map((tag) => <span key={tag} className="tag mono">{tag}</span>)}</div>}
-            </a>)}
-          </div>}
-        </section>
-
-        <section id="about" className="about-section" aria-labelledby="about-heading">
-          <p className="eyebrow mono">about the directory</p><h2 id="about-heading">A small home for the interesting internet.</h2>
-          <p>base31.org is an independent collection of personal sites, experiments, tools, and other projects worth exploring. It is a hand-built alternative to noisy app lists: every link leads to a real project with something to see or use.</p>
-          <p>Looking for Base44? base31 is a separate, independent project and is not affiliated with Base44. Start here for a different kind of website directory: slower, stranger, and made for curious people.</p>
-          <div className="topic-links" aria-label="Directory topics"><a href="#sites">Cool sites</a><a href="#sites">Fun websites</a><a href="#sites">Creative web projects</a><a href="#sites">Useful online tools</a></div>
-        </section>
-      </main>
-
-      <footer className="site-footer"><div className="site-footer-inner mono"><span>© {new Date().getFullYear()} base31.org</span><a href="#page-title">Back to top ↑</a></div></footer>
-      <div className="view-counter mono" aria-live="polite" aria-label="Directory page views"><span>views</span><strong id="directory-view-count">—</strong></div>
-      <aside id="cookie-consent" className="cookie-consent" aria-label="Cookie consent" hidden>
-        <p>We use a small preference to remember your choice. <a href="/privacy">Privacy policy</a>.</p>
-        <div className="cookie-actions"><button id="cookie-deny" type="button" className="cookie-button cookie-deny">Deny</button><button id="cookie-confirm" type="button" className="cookie-button cookie-confirm">Confirm</button></div>
-      </aside>
-      <script dangerouslySetInnerHTML={{ __html: pageScript }} />
-    </>
-  );
+  return <>
+    <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
+    <div id="page-skeleton" className="page-skeleton" aria-hidden="true"><div className="skeleton-bar skeleton-bar-wide" /><div className="skeleton-bar skeleton-bar-mid" /><div className="skeleton-bar skeleton-bar-short" /></div>
+    <header className="site-header"><div className="site-header-inner"><a className="wordmark mono" href="/" aria-label="base31.org home">base31.org</a><nav className="site-nav" aria-label="Main navigation"><a href="#sites">Sites</a><a href="#about">About</a></nav><div className="header-actions"><button id="share-button" className="share-button mono" type="button" aria-label="Share base31.org"><span>Share</span><span aria-hidden="true">↗</span></button><span className="header-meta mono">{String(visibleSites.length).padStart(2, "0")} / sites</span></div></div></header>
+    <main><section className="intro" aria-labelledby="page-title"><p className="eyebrow mono">the independent web directory</p><h1 id="page-title">Cool sites for curious people.</h1><p className="subtitle">Discover fun websites, useful online tools, and creative web projects built on base31.org and the open web.</p><div className="intro-links"><a className="text-link" href="#sites">Browse all sites <span aria-hidden="true">↓</span></a><a className="text-link muted-link" href="#about">Why base31? <span aria-hidden="true">→</span></a></div><label className="search-wrap" htmlFor="site-search"><span className="mono">⌕</span><input id="site-search" type="search" placeholder="Search all sites..." autoComplete="off" /></label></section>
+      <section id="sites" className="directory-section" aria-labelledby="sites-heading"><div className="section-heading"><h2 id="sites-heading">Featured sites</h2><span className="section-count mono">{visibleSites.length} live · pinned first</span></div><div className="site-list" aria-label="Deployed sites">{visibleSites.map((site) => <article key={site.subdomain} className="site-card" data-subdomain={site.subdomain} data-name={site.name} data-search={`${site.name} ${site.subdomain} ${(site.tags || []).join(" ")} ${site.description || ""}`.toLowerCase()}><div className="site-card-top"><a href={site.url} className="site-link" target="_blank" rel="noreferrer"><span className="site-name-row"><span className="live-dot" aria-hidden="true" /><span className="site-name">{site.name}</span></span><span className="site-arrow mono" aria-hidden="true">↗</span></a><button type="button" className="favorite-button" aria-pressed="false" aria-label={`Pin ${site.name}`}><span>♡</span></button></div><a href={site.url} className="site-link site-details" target="_blank" rel="noreferrer"><p className="site-url mono">{site.url.replace(/^https?:\/\//, "")}</p>{site.description && <p className="site-description">{site.description}</p>}{site.tags && site.tags.length > 0 && <div className="tags" aria-label="Tags">{site.tags.map((tag) => <span key={tag} className="tag mono">{tag}</span>)}</div>}</a></article>)}</div></section>
+      <section id="about" className="about-section" aria-labelledby="about-heading"><p className="eyebrow mono">about the directory</p><h2 id="about-heading">A small home for the interesting internet.</h2><p>base31.org is an independent collection of personal sites, experiments, tools, and other projects worth exploring. It is a hand-built alternative to noisy app lists: every link leads to a real project with something to see or use.</p><p>Looking for Base44? base31 is a separate, independent project and is not affiliated with Base44. Start here for a different kind of website directory: slower, stranger, and made for curious people.</p><div className="topic-links"><a href="#sites">Cool sites</a><a href="#sites">Fun websites</a><a href="#sites">Creative web projects</a><a href="#sites">Useful online tools</a></div></section></main>
+    <footer className="site-footer"><div className="site-footer-inner mono"><span>© {new Date().getFullYear()} base31.org · built by Sawyer Schulz</span><nav className="footer-links" aria-label="Footer navigation"><a href="/about">About</a><a href="/terms">Terms of service</a><a href="/privacy">Privacy</a><a href="#page-title">Top ↑</a></nav></div></footer>
+    <div className="view-counter mono" aria-live="polite" aria-label="Directory page views"><span>views</span><strong id="directory-view-count">—</strong></div>
+    <aside id="cookie-consent" className="cookie-consent" aria-label="Cookie consent" hidden><p>We use a small preference to remember your choice. <a href="/privacy">Privacy policy</a>.</p><div className="cookie-actions"><button id="cookie-deny" type="button" className="cookie-button cookie-deny">Deny</button><button id="cookie-confirm" type="button" className="cookie-button cookie-confirm">Confirm</button></div></aside>
+    <aside id="milestone-popup" className="milestone-popup" aria-live="polite" hidden><button className="milestone-close" type="button" data-close-milestone aria-label="Close milestone">×</button><p className="eyebrow mono">directory milestone</p><h2>You were visitor <strong id="milestone-number">10</strong>.</h2><p>You helped base31 reach another milestone. Save it or share the moment.</p><div className="milestone-actions"><button id="milestone-share" type="button">Share milestone</button><button id="milestone-certificate" type="button">Download certificate</button></div></aside>
+    <script dangerouslySetInnerHTML={{ __html: pageScript }} />
+  </>;
 }

@@ -5,8 +5,8 @@
   --line: #262626;
   --line-strong: #3a3a3a;
   --text: #ededed;
-  --muted: #888;
-  --subtle: #555;
+  --muted: #b0b0b0;
+  --subtle: #777;
   --live: #46e891;
   --radius: 10px;
 }
@@ -91,7 +91,9 @@ h1 { max-width: 620px; margin: 0; color: #fff; font-size: clamp(36px, 7vw, 58px)
 .share-button { display: inline-flex; align-items: center; gap: 6px; padding: 6px 9px; border: 1px solid var(--line); border-radius: 6px; background: transparent; color: var(--muted); font-size: 10px; cursor: pointer; }
 .share-button:hover { border-color: var(--line-strong); color: #fff; }
 .share-button:focus-visible, .cookie-button:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
+.shortcut-hint { display: inline-flex; align-items: center; justify-content: center; min-width: 17px; height: 17px; padding: 0 4px; border: 1px solid var(--line-strong); border-radius: 4px; color: var(--subtle); font: inherit; font-size: 9px; line-height: 1; }
 .page-skeleton { position: fixed; inset: 0; z-index: 30; display: flex; flex-direction: column; gap: 12px; justify-content: center; width: min(100% - 48px, 720px); height: 160px; margin: auto; pointer-events: none; }
+.page-skeleton[hidden] { display: none !important; }
 .skeleton-bar { height: 13px; border-radius: 5px; background: linear-gradient(90deg, #101010 25%, #242424 45%, #101010 65%); background-size: 240% 100%; animation: skeleton-shimmer 1.25s linear infinite; }
 .skeleton-bar-wide { width: 42%; height: 30px; }
 .skeleton-bar-mid { width: 72%; }
@@ -135,6 +137,7 @@ h1 { max-width: 620px; margin: 0; color: #fff; font-size: clamp(36px, 7vw, 58px)
 .search-wrap:focus-within { border-color: var(--line-strong); }
 .search-wrap input { width: 100%; border: 0; outline: 0; background: transparent; color: #fff; font: inherit; font-size: 13px; }
 .search-wrap input::placeholder { color: var(--subtle); }
+.search-wrap .shortcut-hint { margin-left: auto; }
 .footer-links { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 12px 16px; }
 .footer-links a { color: var(--muted); text-decoration: none; }
 .footer-links a:hover { color: #fff; }
@@ -155,5 +158,16 @@ h1 { max-width: 620px; margin: 0; color: #fff; font-size: clamp(36px, 7vw, 58px)
   .header-meta { display: none; }
   .footer-links { justify-content: flex-start; }
   .site-footer-inner { align-items: flex-start; flex-direction: column; }
+  main { width: min(100% - 28px, 720px); padding-bottom: 132px; }
+  .site-header-inner { width: min(100% - 28px, 720px); }
+  .site-nav a { font-size: 11px; }
+  .intro { margin-bottom: 52px; }
+  h1 { font-size: clamp(34px, 12vw, 48px); }
+  .subtitle { font-size: 15px; }
+  .search-wrap { max-width: none; margin-top: 28px; min-height: 48px; }
+  .site-card { padding: 16px; }
+  .site-description { font-size: 13px; }
+  .favorite-button { width: 36px; height: 36px; }
+  .view-counter { bottom: 12px; }
 }
 @media (prefers-reduced-motion: reduce) { .confetti-piece { animation: none; display: none; } }

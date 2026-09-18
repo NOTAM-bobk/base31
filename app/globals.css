@@ -131,7 +131,8 @@ h1 { max-width: 620px; margin: 0; color: #fff; font-size: clamp(36px, 7vw, 58px)
 .site-card.is-pinned::before { position: absolute; top: 0; left: 18px; width: 28px; height: 2px; background: #fff; content: ""; }
 .site-card-top > .site-link { flex: 1; min-width: 0; }
 .favorite-button { width: 30px; height: 30px; flex: 0 0 auto; border: 1px solid var(--line); border-radius: 7px; background: transparent; color: var(--muted); font-size: 17px; line-height: 1; cursor: pointer; }
-.favorite-button:hover, .site-card.is-pinned .favorite-button { border-color: var(--line-strong); color: #fff; }
+.favorite-button:hover { border-color: var(--line-strong); color: #ff5f6d; }
+.site-card.is-pinned .favorite-button { border-color: rgb(255 95 109 / 45%); color: #ff5f6d; background: rgb(255 95 109 / 8%); }
 .site-details { display: block; }
 .search-wrap { display: flex; align-items: center; gap: 10px; max-width: 480px; margin-top: 36px; padding: 12px 14px; border: 1px solid var(--line); border-radius: 9px; background: #080808; color: var(--subtle); }
 .search-wrap:focus-within { border-color: var(--line-strong); }

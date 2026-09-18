@@ -86,3 +86,39 @@ h1 { max-width: 620px; margin: 0; color: #fff; font-size: clamp(36px, 7vw, 58px)
   .view-counter { right: 12px; bottom: 12px; }
 }
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } *, *::before, *::after { transition-duration: 0.01ms !important; } }
+
+.header-actions { display: flex; align-items: center; gap: 14px; }
+.share-button { display: inline-flex; align-items: center; gap: 6px; padding: 6px 9px; border: 1px solid var(--line); border-radius: 6px; background: transparent; color: var(--muted); font-size: 10px; cursor: pointer; }
+.share-button:hover { border-color: var(--line-strong); color: #fff; }
+.share-button:focus-visible, .cookie-button:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
+.page-skeleton { position: fixed; inset: 0; z-index: 30; display: flex; flex-direction: column; gap: 12px; justify-content: center; width: min(100% - 48px, 720px); height: 160px; margin: auto; pointer-events: none; }
+.skeleton-bar { height: 13px; border-radius: 5px; background: linear-gradient(90deg, #101010 25%, #242424 45%, #101010 65%); background-size: 240% 100%; animation: skeleton-shimmer 1.25s linear infinite; }
+.skeleton-bar-wide { width: 42%; height: 30px; }
+.skeleton-bar-mid { width: 72%; }
+.skeleton-bar-short { width: 30%; }
+@keyframes skeleton-shimmer { from { background-position: 200% 0; } to { background-position: -40% 0; } }
+.cookie-consent { position: fixed; right: 16px; bottom: 66px; z-index: 20; width: min(360px, calc(100vw - 32px)); padding: 15px; border: 1px solid var(--line-strong); border-radius: 10px; background: rgb(10 10 10 / 96%); box-shadow: 0 16px 45px rgb(0 0 0 / 50%); backdrop-filter: blur(16px); }
+.cookie-consent p { margin: 0; color: var(--muted); font-size: 12px; line-height: 1.5; }
+.cookie-consent a { color: #fff; text-underline-offset: 3px; }
+.cookie-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 13px; }
+.cookie-button { padding: 7px 11px; border: 1px solid var(--line); border-radius: 6px; font-size: 11px; cursor: pointer; }
+.cookie-deny { background: transparent; color: var(--muted); }
+.cookie-confirm { border-color: #fff; background: #fff; color: #000; }
+.privacy-page { min-height: 100vh; width: min(100% - 48px, 680px); margin: 0 auto; padding: 64px 0 100px; }
+.privacy-back { display: inline-block; margin-bottom: 84px; color: var(--muted); font-size: 12px; text-decoration: none; }
+.privacy-back:hover { color: #fff; }
+.privacy-page h1 { font-size: clamp(34px, 6vw, 52px); }
+.privacy-updated { margin-top: 14px; color: var(--subtle); font-size: 12px; }
+.privacy-copy { max-width: 580px; margin-top: 64px; }
+.privacy-copy h2 { margin: 36px 0 10px; color: #fff; font-size: 16px; font-weight: 500; letter-spacing: -0.02em; }
+.privacy-copy h2:first-child { margin-top: 0; }
+.privacy-copy p { margin: 0; color: var(--muted); font-size: 14px; line-height: 1.7; }
+@media (max-width: 600px) {
+  .header-actions { gap: 8px; }
+  .share-button { padding-inline: 8px; }
+  .page-skeleton { width: min(100% - 32px, 720px); }
+  .cookie-consent { right: 12px; bottom: 60px; }
+  .privacy-page { width: min(100% - 32px, 680px); padding-top: 40px; }
+  .privacy-back { margin-bottom: 64px; }
+}
+@media (prefers-reduced-motion: reduce) { .skeleton-bar { animation: none; } }

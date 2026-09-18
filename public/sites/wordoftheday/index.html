@@ -1,1 +1,1228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Word of the Day — Word.dev</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: #000;
+            color: #ededed;
+            -webkit-tap-highlight-color: transparent;
+        }
 
+        *:focus {
+            outline: none;
+        }
+        
+        button:focus-visible, a:focus-visible, input:focus-visible {
+            outline: 2px solid #fff;
+            outline-offset: 2px;
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0a0a0a;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #222;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #444;
+        }
+
+        .fade-transition {
+            transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+        }
+
+        .fade-out {
+            opacity: 0;
+            transform: translateY(4px);
+        }
+
+        .fade-in {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        @keyframes pulse-custom {
+            0%, 100% { opacity: 1; }
+            50% { opacity: .4; }
+        }
+        .animate-pulse-custom {
+            animation: pulse-custom 1.8s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+
+        .toast-enter {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        .toast-exit {
+            transform: translateY(100%);
+            opacity: 0;
+        }
+
+        .heart-filled path {
+            fill: currentColor;
+        }
+
+        .drawer-slide {
+            transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .modal-fade {
+            transition: opacity 0.25s ease-out;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-between relative overflow-x-hidden selection:bg-[#333] selection:text-white">
+
+    <!-- Background Animated Grid Canvas -->
+    <div class="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+        <canvas id="dots-canvas" class="w-full h-full block"></canvas>
+        <div class="absolute inset-0 pointer-events-none" style="background: radial-gradient(circle at center, transparent 20%, #000 90%);"></div>
+    </div>
+
+    <!-- Top Action Navigation -->
+    <header class="fixed top-0 left-0 right-0 z-20 flex justify-between items-center p-4 md:p-6 max-w-6xl mx-auto w-full backdrop-blur-md bg-black/40 border-b border-zinc-900/50">
+        <div class="flex items-center gap-3 select-none">
+            <div class="p-1.5 bg-[#111] border border-[#222] rounded-lg">
+                <svg width="20" height="20" viewBox="0 0 76 65" fill="none" xmlns="http://www.w3.org/2000/svg" class="text-white fill-current">
+                    <path d="M37.5274 0L75.0548 65H0L37.5274 0Z"/>
+                </svg>
+            </div>
+            <div>
+                <span class="text-sm font-semibold tracking-wider uppercase text-white">Word.dev</span>
+                <span class="hidden sm:inline-block text-[10px] font-mono text-zinc-500 ml-2 border border-[#222] px-1.5 py-0.5 rounded">API v1.0</span>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-2">
+            <!-- Quiz Practice Button -->
+            <button id="btn-open-quiz" class="flex items-center gap-2 px-3 py-1.5 bg-[#0a0a0a] border border-[#222] hover:border-[#444] rounded-full text-xs font-medium text-zinc-300 hover:text-white transition-all duration-200 active:scale-95">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-amber-400">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                    <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                </svg>
+                <span class="hidden sm:inline">Daily Quiz</span>
+            </button>
+
+            <!-- Favorites Button -->
+            <button id="btn-open-drawer" class="flex items-center gap-2 px-3 py-1.5 bg-[#0a0a0a] border border-[#222] hover:border-[#444] rounded-full text-xs font-medium text-zinc-300 hover:text-white transition-all duration-200 active:scale-95 group">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-rose-500">
+                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                </svg>
+                Saved
+                <span id="fav-count-badge" class="bg-[#222] text-zinc-300 px-1.5 py-0.5 rounded-full text-[10px] font-mono group-hover:bg-[#333] transition-colors">0</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Interactive Word Card -->
+    <main class="relative z-10 w-full max-w-2xl px-4 pt-24 pb-12 my-auto flex flex-col items-center">
+        
+        <div class="w-full bg-[#0a0a0a] border border-[#222] hover:border-[#333] rounded-2xl p-6 sm:p-10 shadow-2xl backdrop-blur-xl flex flex-col items-center text-center space-y-6 transition-all duration-500 ease-out group relative">
+            
+            <!-- Date Pill & Indicator -->
+            <div class="flex items-center gap-3">
+                <span id="date-badge" class="text-xs font-mono text-zinc-400 bg-[#111] border border-[#222] px-3 py-1 rounded-full flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
+                    <span id="current-date-text">Word of the Day</span>
+                </span>
+            </div>
+
+            <!-- Content Area with Skeleton Loader -->
+            <div class="w-full min-h-[260px] flex flex-col items-center justify-center relative px-2">
+                
+                <!-- Skeleton Loader -->
+                <div id="skeleton-loader" class="w-full flex flex-col items-center space-y-4 animate-pulse-custom fade-transition">
+                    <div class="h-10 bg-[#1a1a1a] rounded-lg w-1/2"></div>
+                    <div class="h-4 bg-[#1a1a1a] rounded w-1/4"></div>
+                    <div class="h-16 bg-[#111] rounded-xl w-full mt-4"></div>
+                    <div class="h-12 bg-[#111] rounded-xl w-5/6"></div>
+                </div>
+
+                <!-- Error Container -->
+                <div id="error-message" class="text-center space-y-3 fade-transition fade-out hidden">
+                    <p class="text-rose-400 text-base font-medium">Failed to fetch today's word.</p>
+                    <button id="btn-retry" class="px-4 py-2 bg-[#1b1b1b] hover:bg-[#252525] border border-[#333] text-xs font-mono text-zinc-300 rounded-lg transition-all">
+                        Try Again
+                    </button>
+                </div>
+
+                <!-- Word Display Card -->
+                <div id="word-card-content" class="w-full flex flex-col items-center space-y-6 fade-transition fade-out hidden">
+                    
+                    <!-- Title & Audio Button -->
+                    <div class="flex flex-col items-center space-y-2">
+                        <div class="flex items-center gap-3 flex-wrap justify-center">
+                            <h1 id="word-title" class="text-4xl sm:text-6xl font-bold tracking-tight text-white capitalize">
+                                Ephemeral
+                            </h1>
+                            <button id="btn-audio" class="p-2.5 bg-[#111] hover:bg-[#1f1f1f] border border-[#222] hover:border-[#444] rounded-full text-zinc-400 hover:text-white transition-all active:scale-95" title="Listen to pronunciation">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+                                    <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+                                </svg>
+                            </button>
+                        </div>
+
+                        <div class="flex items-center gap-3 text-sm">
+                            <span id="word-phonetic" class="font-mono text-amber-400/90 text-sm">/əˈfem(ə)rəl/</span>
+                            <span class="text-zinc-700">•</span>
+                            <span id="word-pos" class="italic text-zinc-400 font-medium lowercase">adjective</span>
+                        </div>
+                    </div>
+
+                    <!-- Definition Box -->
+                    <div class="w-full bg-[#0d0d0d] border border-[#1a1a1a] rounded-xl p-5 text-left space-y-2">
+                        <span class="text-[10px] font-mono uppercase tracking-widest text-zinc-500 font-semibold block">Definition</span>
+                        <p id="word-definition" class="text-base sm:text-lg text-zinc-200 leading-relaxed">
+                            Lasting for a very short time; fleeting or transitory in nature.
+                        </p>
+                    </div>
+
+                    <!-- Example Usage Box -->
+                    <div id="example-container" class="w-full bg-[#111111]/60 border border-[#222]/80 rounded-xl p-5 text-left space-y-2">
+                        <span class="text-[10px] font-mono uppercase tracking-widest text-emerald-400 font-semibold block">Example Usage</span>
+                        <p id="word-example" class="text-sm sm:text-base text-zinc-300 italic leading-relaxed">
+                            "The beauty of cherry blossoms is ephemeral, lasting only a few days every spring."
+                        </p>
+                    </div>
+
+                    <!-- Synonyms / Extra Metadata -->
+                    <div id="meta-container" class="w-full flex flex-wrap gap-2 justify-start text-xs text-zinc-400 pt-1">
+                        <span class="text-zinc-500 font-mono self-center">Synonyms:</span>
+                        <div id="synonyms-list" class="flex flex-wrap gap-1.5">
+                            <!-- Dynamic tags -->
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- Main Actions Toolbar -->
+            <div id="action-toolbar" class="flex items-center justify-center gap-3 w-full pt-2 border-t border-[#1a1a1a]">
+                <button id="btn-favorite" class="p-3 bg-[#111] border border-[#222] rounded-xl hover:bg-[#1a1a1a] hover:border-[#444] transition-all duration-200 active:scale-95 text-[#888] hover:text-white flex items-center gap-2 text-xs font-medium" title="Save to Favorites">
+                    <svg id="icon-heart" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="transition-all duration-300">
+                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                    </svg>
+                    <span id="fav-btn-label" class="hidden sm:inline">Save</span>
+                </button>
+
+                <button id="btn-export-card" class="p-3 bg-[#111] border border-[#222] rounded-xl hover:bg-[#1a1a1a] hover:border-[#444] transition-all duration-200 active:scale-95 text-[#888] hover:text-white flex items-center gap-2 text-xs font-medium" title="Generate Vercel Social Card">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                        <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                        <polyline points="21 15 16 10 5 21"></polyline>
+                    </svg>
+                    <span class="hidden sm:inline">Social Card</span>
+                </button>
+
+                <button id="btn-copy" class="p-3 bg-[#111] border border-[#222] rounded-xl hover:bg-[#1a1a1a] hover:border-[#444] transition-all duration-200 active:scale-95 text-[#888] hover:text-white flex items-center gap-2 text-xs font-medium" title="Copy Word & Definition">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                    </svg>
+                    <span class="hidden sm:inline">Copy</span>
+                </button>
+
+                <button id="btn-share" class="p-3 bg-[#111] border border-[#222] rounded-xl hover:bg-[#1a1a1a] hover:border-[#444] transition-all duration-200 active:scale-95 text-[#888] hover:text-white flex items-center gap-2 text-xs font-medium" title="Share">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="18" cy="5" r="3"></circle>
+                        <circle cx="6" cy="12" r="3"></circle>
+                        <circle cx="18" cy="19" r="3"></circle>
+                        <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+                        <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+                    </svg>
+                    <span class="hidden sm:inline">Share</span>
+                </button>
+            </div>
+
+            <!-- Date & Random Words Navigation Controls -->
+            <div class="w-full flex items-center justify-between gap-2 pt-2">
+                <button id="btn-prev-day" class="px-3 py-2 bg-[#111] border border-[#222] hover:border-[#333] hover:bg-[#181818] rounded-lg text-xs font-medium text-zinc-400 hover:text-white transition-all flex items-center gap-1">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+                    Previous
+                </button>
+
+                <button id="btn-random" class="px-4 py-2 bg-white text-black hover:bg-zinc-200 rounded-lg text-xs font-medium transition-all flex items-center gap-2 shadow-lg active:scale-95">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+                    Discover Random
+                </button>
+
+                <button id="btn-next-day" class="px-3 py-2 bg-[#111] border border-[#222] hover:border-[#333] hover:bg-[#181818] rounded-lg text-xs font-medium text-zinc-400 hover:text-white transition-all flex items-center gap-1 disabled:opacity-40 disabled:cursor-not-allowed">
+                    Next
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+                </button>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Favorites Drawer Overlay & Sidebar -->
+    <div id="drawer-backdrop" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-40 modal-fade opacity-0 pointer-events-none"></div>
+    <aside id="drawer" class="fixed top-0 right-0 bottom-0 w-full max-w-md bg-[#0a0a0a] border-l border-[#222] z-50 drawer-slide translate-x-full flex flex-col shadow-2xl">
+        <!-- Drawer Header -->
+        <div class="p-6 border-b border-[#222] flex items-center justify-between">
+            <div class="flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" class="text-rose-500">
+                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                </svg>
+                <h2 class="text-lg font-medium text-white">Saved Words</h2>
+            </div>
+            <button id="btn-close-drawer" class="p-2 text-zinc-400 hover:text-white hover:bg-[#1a1a1a] rounded-lg transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+        </div>
+
+        <!-- Drawer Search & Clear Controls -->
+        <div class="p-4 border-b border-[#1a1a1a] flex gap-2">
+            <div class="relative flex-1">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+                <input id="drawer-search" type="text" placeholder="Search saved words..." class="w-full bg-[#111] border border-[#222] focus:border-[#444] rounded-lg pl-9 pr-3 py-2 text-xs text-white placeholder-zinc-500 transition-colors">
+            </div>
+            <button id="btn-clear-favorites" class="px-3 py-2 text-xs font-medium text-rose-400 hover:text-rose-300 hover:bg-rose-950/30 rounded-lg transition-colors border border-transparent hover:border-rose-900/40">
+                Clear
+            </button>
+        </div>
+
+        <!-- Favorites List Container -->
+        <div id="drawer-fav-list" class="flex-1 overflow-y-auto p-4 space-y-3">
+            <!-- Dynamic favorite cards injected via JS -->
+        </div>
+    </aside>
+
+    <!-- Daily Quiz Practice Modal -->
+    <div id="quiz-modal-backdrop" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 modal-fade opacity-0 pointer-events-none flex items-center justify-center p-4">
+        <div class="bg-[#0a0a0a] border border-[#222] rounded-2xl max-w-lg w-full p-6 shadow-2xl flex flex-col space-y-6 relative overflow-hidden">
+            <div class="flex items-center justify-between border-b border-[#222] pb-4">
+                <div class="flex items-center gap-2">
+                    <span class="p-1.5 bg-amber-500/10 text-amber-400 rounded-lg border border-amber-500/20">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                    </span>
+                    <h3 class="text-base font-semibold text-white">Daily Vocabulary Quiz</h3>
+                </div>
+                <button id="btn-close-quiz" class="p-1 text-zinc-400 hover:text-white hover:bg-[#1a1a1a] rounded-lg transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Quiz Content Box -->
+            <div id="quiz-body" class="space-y-5">
+                <div class="space-y-1">
+                    <span class="text-[10px] font-mono text-zinc-500 uppercase tracking-wider">Question 1 of 5</span>
+                    <h4 id="quiz-question-word" class="text-2xl font-bold text-white capitalize">Ethereal</h4>
+                    <p class="text-xs text-zinc-400">Select the correct definition for this word:</p>
+                </div>
+
+                <div id="quiz-options-container" class="space-y-2.5">
+                    <!-- Dynamic multiple choice buttons -->
+                </div>
+            </div>
+
+            <div id="quiz-footer" class="flex items-center justify-between pt-2 border-t border-[#1a1a1a]">
+                <span id="quiz-score-badge" class="text-xs font-mono text-zinc-400">Score: 0 / 0</span>
+                <button id="btn-next-quiz" class="px-4 py-2 bg-white text-black hover:bg-zinc-200 text-xs font-medium rounded-lg transition-all disabled:opacity-50">
+                    Next Question
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Export Vercel Card Modal -->
+    <div id="card-modal-backdrop" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 modal-fade opacity-0 pointer-events-none flex items-center justify-center p-4">
+        <div class="bg-[#0a0a0a] border border-[#222] rounded-xl max-w-2xl w-full p-6 shadow-2xl flex flex-col space-y-6 relative overflow-hidden">
+            <div class="flex items-center justify-between border-b border-[#222] pb-4">
+                <div class="flex items-center gap-2">
+                    <svg width="20" height="20" viewBox="0 0 76 65" fill="none" xmlns="http://www.w3.org/2000/svg" class="text-white fill-current">
+                        <path d="M37.5274 0L75.0548 65H0L37.5274 0Z"/>
+                    </svg>
+                    <h3 class="text-base font-medium text-white">Vercel OG Social Card</h3>
+                </div>
+                <button id="btn-close-card-modal" class="p-1 text-zinc-400 hover:text-white hover:bg-[#1a1a1a] rounded-lg transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Canvas Card Preview Container -->
+            <div class="w-full flex justify-center items-center bg-[#000] border border-[#222] rounded-lg p-2 overflow-hidden shadow-inner">
+                <canvas id="social-card-canvas" width="1200" height="630" class="w-full h-auto rounded max-h-[380px] object-contain"></canvas>
+            </div>
+
+            <!-- Export Actions -->
+            <div class="flex items-center justify-end gap-3 pt-2">
+                <button id="btn-cancel-card" class="px-4 py-2 bg-[#111] hover:bg-[#1a1a1a] border border-[#222] text-xs font-medium text-zinc-300 rounded-lg transition-colors">
+                    Cancel
+                </button>
+                <button id="btn-download-social-card" class="px-5 py-2 bg-white hover:bg-[#e0e0e0] text-black text-xs font-medium rounded-lg shadow-lg flex items-center gap-2 transition-all active:scale-95">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="7 10 12 15 17 10"></polyline>
+                        <line x1="12" y1="15" x2="12" y2="3"></line>
+                    </svg>
+                    Download High-Res PNG
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="relative z-10 py-6 text-center text-xs text-zinc-600 font-mono">
+        Powered by <a href="https://freeapi.me/word-of-the-day" target="_blank" rel="noopener" class="text-zinc-400 hover:text-white underline underline-offset-4">FreeAPI.me</a> & FreeDictionaryAPI
+    </footer>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-8 left-1/2 -translate-x-1/2 px-4 py-2.5 bg-[#181818] border border-[#333] text-white rounded-full shadow-2xl text-xs font-medium transition-all duration-300 ease-in-out z-50 toast-exit flex items-center gap-2">
+        <!-- Toast message inserted via JavaScript -->
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Built-in curated vocabulary database for fallback, offline, and random discovery
+            const CURATED_WORDS = [
+                {
+                    word: "Ethereal",
+                    phonetic: "/əˈθiː.ri.əl/",
+                    partOfSpeech: "adjective",
+                    definition: "Extremely delicate and light in a way that seems too perfect for this world; heavenly or celestial.",
+                    example: "The mountain peaks were shrouded in an ethereal mist during the sunrise.",
+                    synonyms: ["celestial", "sublime", "delicate", "ghostly", "exquisite"]
+                },
+                {
+                    word: "Serendipity",
+                    phonetic: "/ˌser.ənˈdɪp.ə.ti/",
+                    partOfSpeech: "noun",
+                    definition: "The occurrence and development of events by chance in a happy or beneficial way.",
+                    example: "Finding her favorite out-of-print book at the thrift shop was pure serendipity.",
+                    synonyms: ["chance", "fortuity", "fluke", "happy accident"]
+                },
+                {
+                    word: "Petrichor",
+                    phonetic: "/ˈpet.rə.kɔːr/",
+                    partOfSpeech: "noun",
+                    definition: "A pleasant, distinctive smell that frequently accompanies the first rain after a long period of warm, dry weather.",
+                    example: "The fresh petrichor filled the summer air as giant raindrops struck the warm pavement.",
+                    synonyms: ["rain scent", "earthiness", "aroma"]
+                },
+                {
+                    word: "Mellifluous",
+                    phonetic: "/məˈlɪf.lu.əs/",
+                    partOfSpeech: "adjective",
+                    definition: "A sound or voice that is sweet or musical; pleasant and soothing to listen to.",
+                    example: "The radio host captivated listeners every night with her mellifluous tone.",
+                    synonyms: ["dulcet", "euphonious", "silken", "soothing"]
+                },
+                {
+                    word: "Sycophant",
+                    phonetic: "/ˈsɪk.ə.fænt/",
+                    partOfSpeech: "noun",
+                    definition: "A person who acts obsequiously toward someone important in order to gain advantage; a flatterer.",
+                    example: "The director was surrounded by sycophants who praised even his poorest ideas.",
+                    synonyms: ["flatterer", "yes-man", "lackey", "toady"]
+                },
+                {
+                    word: "Quixotic",
+                    phonetic: "/kwɪkˈsɒt.ɪk/",
+                    partOfSpeech: "adjective",
+                    definition: "Exceedingly idealistic, unrealistic, and impractical in pursuit of noble goals.",
+                    example: "His quixotic quest to overhaul the entire bureaucratic system in a single month failed.",
+                    synonyms: ["idealistic", "impractical", "romantic", "visionary"]
+                },
+                {
+                    word: "Ubiquitous",
+                    phonetic: "/juːˈbɪk.wɪ.təs/",
+                    partOfSpeech: "adjective",
+                    definition: "Present, appearing, or found everywhere at the same time.",
+                    example: "Smartphones have become ubiquitous in modern urban societies.",
+                    synonyms: ["omnipresent", "pervasive", "universal", "everywhere"]
+                },
+                {
+                    word: "Sonorous",
+                    phonetic: "/ˈsɒn.ər.əs/",
+                    partOfSpeech: "adjective",
+                    definition: "Imposingly deep and full in sound; capable of producing a deep, rich resonant tone.",
+                    example: "The cathedral bells echoed across the quiet valley with a sonorous ring.",
+                    synonyms: ["resonant", "booming", "rich", "vibrant"]
+                },
+                {
+                    word: "Limerence",
+                    phonetic: "/ˈlɪm.ər.əns/",
+                    partOfSpeech: "noun",
+                    definition: "The state of being infatuated or obsessed with another person, typically experienced involuntarily.",
+                    example: "He realized his intense feelings were not true love, but rather a temporary limerence.",
+                    synonyms: ["infatuation", "passion", "crush", "obsession"]
+                },
+                {
+                    word: "Inchoate",
+                    phonetic: "/ɪnˈkoʊ.ət/",
+                    partOfSpeech: "adjective",
+                    definition: "Just begun and so not fully formed or developed; rudimentary or chaotic.",
+                    example: "The author outlined an inchoate concept for a new novel on a napkin.",
+                    synonyms: ["rudimentary", "unformed", "nascent", "embryonic"]
+                }
+            ];
+
+            // State variables
+            let currentWordObj = null;
+            let favorites = [];
+            let toastTimeout = null;
+            let currentDateOffset = 0; // 0 = today, -1 = yesterday, etc.
+            let quizQuestions = [];
+            let currentQuizIndex = 0;
+            let quizScore = 0;
+
+            // DOM References
+            const skeletonLoader = document.getElementById('skeleton-loader');
+            const errorMsg = document.getElementById('error-message');
+            const wordCardContent = document.getElementById('word-card-content');
+            
+            const wordTitleEl = document.getElementById('word-title');
+            const wordPhoneticEl = document.getElementById('word-phonetic');
+            const wordPosEl = document.getElementById('word-pos');
+            const wordDefinitionEl = document.getElementById('word-definition');
+            const wordExampleEl = document.getElementById('word-example');
+            const synonymsListEl = document.getElementById('synonyms-list');
+            const currentDateText = document.getElementById('current-date-text');
+            
+            const btnAudio = document.getElementById('btn-audio');
+            const btnFavorite = document.getElementById('btn-favorite');
+            const iconHeart = document.getElementById('icon-heart');
+            const btnCopy = document.getElementById('btn-copy');
+            const btnShare = document.getElementById('btn-share');
+            const btnExportCard = document.getElementById('btn-export-card');
+            
+            const btnPrevDay = document.getElementById('btn-prev-day');
+            const btnNextDay = document.getElementById('btn-next-day');
+            const btnRandom = document.getElementById('btn-random');
+            const btnRetry = document.getElementById('btn-retry');
+            
+            const toast = document.getElementById('toast');
+
+            // Drawer elements
+            const btnOpenDrawer = document.getElementById('btn-open-drawer');
+            const btnCloseDrawer = document.getElementById('btn-close-drawer');
+            const drawerBackdrop = document.getElementById('drawer-backdrop');
+            const drawer = document.getElementById('drawer');
+            const favCountBadge = document.getElementById('fav-count-badge');
+            const drawerFavList = document.getElementById('drawer-fav-list');
+            const drawerSearch = document.getElementById('drawer-search');
+            const btnClearFavorites = document.getElementById('btn-clear-favorites');
+
+            // Quiz elements
+            const btnOpenQuiz = document.getElementById('btn-open-quiz');
+            const btnCloseQuiz = document.getElementById('btn-close-quiz');
+            const quizModalBackdrop = document.getElementById('quiz-modal-backdrop');
+            const quizQuestionWord = document.getElementById('quiz-question-word');
+            const quizOptionsContainer = document.getElementById('quiz-options-container');
+            const quizScoreBadge = document.getElementById('quiz-score-badge');
+            const btnNextQuiz = document.getElementById('btn-next-quiz');
+
+            // Card Modal elements
+            const cardModalBackdrop = document.getElementById('card-modal-backdrop');
+            const btnCloseCardModal = document.getElementById('btn-close-card-modal');
+            const btnCancelCard = document.getElementById('btn-cancel-card');
+            const btnDownloadSocialCard = document.getElementById('btn-download-social-card');
+            const socialCardCanvas = document.getElementById('social-card-canvas');
+
+            // Background Canvas animation setup
+            const canvas = document.getElementById('dots-canvas');
+            const ctx = canvas.getContext('2d');
+            let dots = [];
+            const spacing = 32;
+            const dotRadius = 1.5;
+            const baseOpacity = 0.2;
+
+            function resizeCanvas() {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+                initDots();
+            }
+
+            function initDots() {
+                dots = [];
+                const cols = Math.ceil(canvas.width / spacing) + 1;
+                const rows = Math.ceil(canvas.height / spacing) + 1;
+
+                for (let i = 0; i < cols; i++) {
+                    for (let j = 0; j < rows; j++) {
+                        dots.push({
+                            x: i * spacing,
+                            y: j * spacing,
+                            opacity: baseOpacity,
+                            targetOpacity: baseOpacity,
+                            speed: 0.01 + Math.random() * 0.02
+                        });
+                    }
+                }
+            }
+
+            function animateDots() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                if (dots.length > 0 && Math.random() < 0.3) {
+                    const randomIndex = Math.floor(Math.random() * dots.length);
+                    const dot = dots[randomIndex];
+                    if (dot.targetOpacity === baseOpacity) {
+                        dot.targetOpacity = 0.7 + Math.random() * 0.3;
+                    }
+                }
+
+                for (let i = 0; i < dots.length; i++) {
+                    const dot = dots[i];
+                    if (Math.abs(dot.opacity - dot.targetOpacity) < 0.01) {
+                        if (dot.targetOpacity > baseOpacity) {
+                            dot.targetOpacity = baseOpacity;
+                        }
+                    } else {
+                        if (dot.opacity < dot.targetOpacity) {
+                            dot.opacity += dot.speed;
+                        } else {
+                            dot.opacity -= dot.speed;
+                        }
+                    }
+
+                    ctx.beginPath();
+                    ctx.arc(dot.x, dot.y, dotRadius, 0, Math.PI * 2);
+                    ctx.fillStyle = `rgba(255, 255, 255, ${Math.max(0, Math.min(1, dot.opacity))})`;
+                    ctx.fill();
+                }
+
+                requestAnimationFrame(animateDots);
+            }
+
+            window.addEventListener('resize', resizeCanvas);
+            resizeCanvas();
+            requestAnimationFrame(animateDots);
+
+            // Load Local Storage
+            try {
+                const saved = localStorage.getItem('worddev_favorites');
+                if (saved) favorites = JSON.parse(saved);
+            } catch (e) {
+                console.error("Failed to load favorites", e);
+            }
+
+            updateFavBadge();
+
+            // Fetch Word Logic with API and local fallback
+            async function fetchWordForOffset(offset) {
+                showLoadingState();
+
+                // Format date string for UI
+                const date = new Date();
+                date.setDate(date.getDate() + offset);
+                const options = { month: 'short', day: 'numeric', year: 'numeric' };
+                currentDateText.textContent = offset === 0 ? `Word of the Day — Today` : date.toLocaleDateString('en-US', options);
+
+                // Disable Next button if offset >= 0
+                btnNextDay.disabled = offset >= 0;
+
+                // Try fetching live word of the day from API
+                try {
+                    let wordData = null;
+
+                    if (offset === 0) {
+                        try {
+                            const res = await fetch('https://wordoftheday.freeapi.me/');
+                            if (res.ok) {
+                                const data = await res.json();
+                                // Parse API response structure
+                                if (data && (data.word || data.entry || data.name)) {
+                                    const w = data.word || data.entry || data.name;
+                                    const def = data.definition || data.meaning || (data.definitions && data.definitions[0]);
+                                    const ex = data.example || data.sentence || (data.examples && data.examples[0]);
+                                    
+                                    wordData = {
+                                        word: w,
+                                        phonetic: data.phonetic || `/${w}/`,
+                                        partOfSpeech: data.partOfSpeech || data.pos || 'noun',
+                                        definition: typeof def === 'string' ? def : (def ? def.definition : ''),
+                                        example: typeof ex === 'string' ? ex : '',
+                                        synonyms: data.synonyms || []
+                                    };
+                                }
+                            }
+                        } catch (e) {
+                            console.warn("Primary API failed or blocked, falling back to dictionary enrichment", e);
+                        }
+                    }
+
+                    // If API result not obtained or navigating past days, pick deterministically or enrich
+                    if (!wordData) {
+                        const index = Math.abs(offset) % CURATED_WORDS.length;
+                        wordData = { ...CURATED_WORDS[index] };
+                    }
+
+                    // Attempt Dictionary API enrichment for phonetics and audio
+                    try {
+                        const dictRes = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${encodeURIComponent(wordData.word)}`);
+                        if (dictRes.ok) {
+                            const dictData = await dictRes.json();
+                            if (dictData && dictData.length > 0) {
+                                const entry = dictData[0];
+                                if (entry.phonetic) wordData.phonetic = entry.phonetic;
+                                if (entry.meanings && entry.meanings.length > 0) {
+                                    const m = entry.meanings[0];
+                                    if (m.partOfSpeech) wordData.partOfSpeech = m.partOfSpeech;
+                                    if (m.definitions && m.definitions.length > 0) {
+                                        if (!wordData.definition) wordData.definition = m.definitions[0].definition;
+                                        if (!wordData.example && m.definitions[0].example) wordData.example = m.definitions[0].example;
+                                    }
+                                    if (m.synonyms && m.synonyms.length > 0 && wordData.synonyms.length === 0) {
+                                        wordData.synonyms = m.synonyms.slice(0, 5);
+                                    }
+                                }
+                            }
+                        }
+                    } catch (errDict) {
+                        console.log("Dictionary API enrichment optional step skipped.");
+                    }
+
+                    currentWordObj = wordData;
+                    renderWordCard(currentWordObj);
+
+                } catch (err) {
+                    console.error("Error loading word:", err);
+                    showErrorState();
+                }
+            }
+
+            function renderWordCard(data) {
+                wordTitleEl.textContent = data.word;
+                wordPhoneticEl.textContent = data.phonetic || `/${data.word.toLowerCase()}/`;
+                wordPosEl.textContent = data.partOfSpeech || 'noun';
+                wordDefinitionEl.textContent = data.definition || 'No definition available for this entry.';
+
+                if (data.example) {
+                    wordExampleEl.textContent = `"${data.example.replace(/^["']|["']$/g, '')}"`;
+                    document.getElementById('example-container').classList.remove('hidden');
+                } else {
+                    document.getElementById('example-container').classList.add('hidden');
+                }
+
+                // Render Synonyms
+                synonymsListEl.innerHTML = '';
+                if (data.synonyms && data.synonyms.length > 0) {
+                    data.synonyms.slice(0, 5).forEach(syn => {
+                        const tag = document.createElement('span');
+                        tag.className = 'px-2 py-0.5 bg-[#141414] border border-[#222] rounded text-[11px] font-mono text-zinc-300';
+                        tag.textContent = syn;
+                        synonymsListEl.appendChild(tag);
+                    });
+                    document.getElementById('meta-container').classList.remove('hidden');
+                } else {
+                    document.getElementById('meta-container').classList.add('hidden');
+                }
+
+                updateFavButtonState();
+
+                // Reveal with smooth transition
+                skeletonLoader.classList.add('fade-out');
+                setTimeout(() => {
+                    skeletonLoader.classList.add('hidden');
+                    errorMsg.classList.add('hidden');
+                    wordCardContent.classList.remove('hidden', 'fade-out');
+                    wordCardContent.classList.add('fade-in');
+                }, 200);
+            }
+
+            function showLoadingState() {
+                wordCardContent.classList.add('fade-out');
+                errorMsg.classList.add('fade-out');
+                setTimeout(() => {
+                    wordCardContent.classList.add('hidden');
+                    errorMsg.classList.add('hidden');
+                    skeletonLoader.classList.remove('hidden', 'fade-out');
+                    skeletonLoader.classList.add('fade-in');
+                }, 200);
+            }
+
+            function showErrorState() {
+                skeletonLoader.classList.add('fade-out');
+                setTimeout(() => {
+                    skeletonLoader.classList.add('hidden');
+                    errorMsg.classList.remove('hidden', 'fade-out');
+                    errorMsg.classList.add('fade-in');
+                }, 200);
+            }
+
+            // Text to speech pronunciation
+            btnAudio.addEventListener('click', () => {
+                if (!currentWordObj || !currentWordObj.word) return;
+                
+                if ('speechSynthesis' in window) {
+                    window.speechSynthesis.cancel();
+                    const utterance = new SpeechSynthesisUtterance(currentWordObj.word);
+                    utterance.rate = 0.85;
+                    utterance.lang = 'en-US';
+                    window.speechSynthesis.speak(utterance);
+                    showToast(`Playing pronunciation for "${currentWordObj.word}"`);
+                } else {
+                    showToast("Audio synthesis not supported in this browser");
+                }
+            });
+
+            function updateFavButtonState() {
+                if (!currentWordObj) return;
+                const isFav = favorites.some(item => item.word.toLowerCase() === currentWordObj.word.toLowerCase());
+                if (isFav) {
+                    iconHeart.classList.add('text-rose-500', 'scale-110', 'heart-filled');
+                    iconHeart.parentElement.classList.add('border-rose-900/50', 'bg-rose-950/20');
+                } else {
+                    iconHeart.classList.remove('text-rose-500', 'scale-110', 'heart-filled');
+                    iconHeart.parentElement.classList.remove('border-rose-900/50', 'bg-rose-950/20');
+                }
+            }
+
+            btnFavorite.addEventListener('click', () => {
+                if (!currentWordObj) return;
+                const index = favorites.findIndex(item => item.word.toLowerCase() === currentWordObj.word.toLowerCase());
+                
+                if (index > -1) {
+                    favorites.splice(index, 1);
+                    showToast(`Removed "${currentWordObj.word}" from saved words`);
+                } else {
+                    favorites.push({ ...currentWordObj, savedAt: new Date().toLocaleDateString() });
+                    showToast(`Saved "${currentWordObj.word}" to favorites`);
+                }
+                
+                saveFavorites();
+                updateFavButtonState();
+            });
+
+            function saveFavorites() {
+                localStorage.setItem('worddev_favorites', JSON.stringify(favorites));
+                updateFavBadge();
+                renderFavoritesList();
+            }
+
+            function updateFavBadge() {
+                favCountBadge.textContent = favorites.length;
+            }
+
+            function openDrawer() {
+                renderFavoritesList();
+                drawerBackdrop.classList.remove('opacity-0', 'pointer-events-none');
+                drawerBackdrop.classList.add('opacity-100');
+                drawer.classList.remove('translate-x-full');
+            }
+
+            function closeDrawer() {
+                drawer.classList.add('translate-x-full');
+                drawerBackdrop.classList.remove('opacity-100');
+                drawerBackdrop.classList.add('opacity-0', 'pointer-events-none');
+            }
+
+            function renderFavoritesList() {
+                const query = drawerSearch.value.toLowerCase().trim();
+                const filtered = favorites.filter(item => 
+                    item.word.toLowerCase().includes(query) || 
+                    item.definition.toLowerCase().includes(query)
+                );
+
+                if (filtered.length === 0) {
+                    drawerFavList.innerHTML = `
+                        <div class="h-64 flex flex-col items-center justify-center text-center p-6 space-y-3">
+                            <div class="p-3 bg-[#111] border border-[#222] rounded-full text-zinc-600">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                                </svg>
+                            </div>
+                            <p class="text-xs text-zinc-500 font-medium">
+                                ${query ? 'No matching saved words found.' : 'No saved words yet. Click the heart button to save your favorites!'}
+                            </p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                drawerFavList.innerHTML = filtered.map(item => `
+                    <div class="bg-[#111] border border-[#222] hover:border-[#333] rounded-xl p-4 space-y-2 transition-colors">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-2">
+                                <h4 class="text-base font-semibold text-white capitalize">${escapeHtml(item.word)}</h4>
+                                <span class="text-[10px] font-mono text-amber-400/80">${escapeHtml(item.phonetic || '')}</span>
+                            </div>
+                            <button onclick="window.removeFavorite('${escapeJsString(item.word)}')" class="p-1 text-rose-400 hover:text-rose-300 hover:bg-rose-950/40 rounded transition-colors" title="Remove">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                            </button>
+                        </div>
+                        <p class="text-xs text-zinc-300 leading-relaxed">${escapeHtml(item.definition)}</p>
+                        <div class="pt-2 flex items-center justify-between text-[10px] text-zinc-500 font-mono border-t border-[#1a1a1a]">
+                            <span>${item.partOfSpeech || 'noun'}</span>
+                            <button onclick="window.loadSavedWord('${escapeJsString(item.word)}')" class="text-zinc-400 hover:text-white underline">View Details</button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            function escapeHtml(str) {
+                return String(str || '').replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[m]));
+            }
+
+            function escapeJsString(str) {
+                return String(str || '').replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+            }
+
+            // Expose globally for inline drawer buttons
+            window.removeFavorite = function(wordName) {
+                favorites = favorites.filter(item => item.word.toLowerCase() !== wordName.toLowerCase());
+                saveFavorites();
+                updateFavButtonState();
+                showToast(`Removed "${wordName}"`);
+            };
+
+            window.loadSavedWord = function(wordName) {
+                const found = favorites.find(item => item.word.toLowerCase() === wordName.toLowerCase());
+                if (found) {
+                    currentWordObj = found;
+                    renderWordCard(currentWordObj);
+                    closeDrawer();
+                }
+            };
+
+            // Vocabulary Quiz system
+            function openQuizModal() {
+                // Generate quiz questions combining curated + favorites
+                const pool = [...CURATED_WORDS, ...favorites];
+                if (pool.length < 3) {
+                    showToast("Need at least 3 words available to start a quiz.");
+                    return;
+                }
+
+                // Shuffle pool
+                const shuffled = [...pool].sort(() => 0.5 - Math.random());
+                quizQuestions = shuffled.slice(0, 5);
+                currentQuizIndex = 0;
+                quizScore = 0;
+
+                renderQuizQuestion();
+                quizModalBackdrop.classList.remove('opacity-0', 'pointer-events-none');
+                quizModalBackdrop.classList.add('opacity-100');
+            }
+
+            function renderQuizQuestion() {
+                if (currentQuizIndex >= quizQuestions.length) {
+                    // Quiz Completed
+                    quizBody.innerHTML = `
+                        <div class="text-center py-8 space-y-4">
+                            <div class="w-16 h-16 bg-emerald-500/10 border border-emerald-500/20 rounded-full flex items-center justify-center mx-auto text-emerald-400">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                            </div>
+                            <h4 class="text-2xl font-bold text-white">Quiz Completed!</h4>
+                            <p class="text-sm text-zinc-300">You scored <span class="font-bold text-emerald-400">${quizScore}</span> out of <span class="font-bold">${quizQuestions.length}</span>.</p>
+                        </div>
+                    `;
+                    btnNextQuiz.textContent = "Restart Quiz";
+                    btnNextQuiz.disabled = false;
+                    quizScoreBadge.textContent = `Score: ${quizScore} / ${quizQuestions.length}`;
+                    return;
+                }
+
+                const current = quizQuestions[currentQuizIndex];
+                quizQuestionWord.textContent = current.word;
+                quizScoreBadge.textContent = `Score: ${quizScore} / ${quizQuestions.length}`;
+                btnNextQuiz.disabled = true;
+                btnNextQuiz.textContent = "Next Question";
+
+                // Generate distractors
+                const wrongAnswers = CURATED_WORDS
+                    .filter(w => w.word.toLowerCase() !== current.word.toLowerCase())
+                    .sort(() => 0.5 - Math.random())
+                    .slice(0, 2)
+                    .map(w => w.definition);
+
+                const options = [current.definition, ...wrongAnswers].sort(() => 0.5 - Math.random());
+
+                quizOptionsContainer.innerHTML = options.map((opt) => `
+                    <button onclick="window.selectQuizOption(this, ${opt === current.definition})" class="w-full text-left p-3.5 bg-[#111] hover:bg-[#181818] border border-[#222] hover:border-[#333] rounded-xl text-xs text-zinc-200 transition-all font-sans">
+                        ${escapeHtml(opt)}
+                    </button>
+                `).join('');
+            }
+
+            window.selectQuizOption = function(buttonEl, isCorrect) {
+                const buttons = quizOptionsContainer.querySelectorAll('button');
+                buttons.forEach(btn => btn.disabled = true);
+
+                if (isCorrect) {
+                    buttonEl.classList.remove('bg-[#111]', 'border-[#222]');
+                    buttonEl.classList.add('bg-emerald-950/40', 'border-emerald-500/50', 'text-emerald-200');
+                    quizScore++;
+                } else {
+                    buttonEl.classList.remove('bg-[#111]', 'border-[#222]');
+                    buttonEl.classList.add('bg-rose-950/40', 'border-rose-500/50', 'text-rose-200');
+                }
+
+                quizScoreBadge.textContent = `Score: ${quizScore} / ${quizQuestions.length}`;
+                btnNextQuiz.disabled = false;
+            };
+
+            function closeQuizModal() {
+                quizModalBackdrop.classList.remove('opacity-100');
+                quizModalBackdrop.classList.add('opacity-0', 'pointer-events-none');
+            }
+
+            // Vercel OG Social Card Canvas Generator
+            function openCardModal() {
+                if (!currentWordObj) return;
+                renderSocialCardCanvas(currentWordObj);
+                cardModalBackdrop.classList.remove('opacity-0', 'pointer-events-none');
+                cardModalBackdrop.classList.add('opacity-100');
+            }
+
+            function closeCardModal() {
+                cardModalBackdrop.classList.remove('opacity-100');
+                cardModalBackdrop.classList.add('opacity-0', 'pointer-events-none');
+            }
+
+            function renderSocialCardCanvas(data) {
+                const cCtx = socialCardCanvas.getContext('2d');
+                const width = 1200;
+                const height = 630;
+
+                socialCardCanvas.width = width;
+                socialCardCanvas.height = height;
+
+                // Background
+                cCtx.fillStyle = '#000000';
+                cCtx.fillRect(0, 0, width, height);
+
+                // Grid overlay
+                cCtx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
+                cCtx.lineWidth = 1;
+                const gridSize = 40;
+                for (let x = 0; x < width; x += gridSize) {
+                    cCtx.beginPath();
+                    cCtx.moveTo(x, 0);
+                    cCtx.lineTo(x, height);
+                    cCtx.stroke();
+                }
+                for (let y = 0; y < height; y += gridSize) {
+                    cCtx.beginPath();
+                    cCtx.moveTo(0, y);
+                    cCtx.lineTo(width, y);
+                    cCtx.stroke();
+                }
+
+                // Outer Frame Border
+                cCtx.strokeStyle = '#222222';
+                cCtx.lineWidth = 8;
+                cCtx.strokeRect(20, 20, width - 40, height - 40);
+
+                // Header Logo Triangle
+                cCtx.fillStyle = '#ffffff';
+                cCtx.beginPath();
+                cCtx.moveTo(80, 80);
+                cCtx.lineTo(112, 135);
+                cCtx.lineTo(48, 135);
+                cCtx.closePath();
+                cCtx.fill();
+
+                // Brand Header Text
+                cCtx.font = '600 28px Inter, sans-serif';
+                cCtx.fillStyle = '#ffffff';
+                cCtx.fillText('WORD.DEV', 130, 118);
+
+                cCtx.font = '500 16px JetBrains Mono, monospace';
+                cCtx.fillStyle = '#666666';
+                cCtx.fillText('WORD OF THE DAY', width - 260, 115);
+
+                // Divider Line
+                cCtx.strokeStyle = '#222222';
+                cCtx.lineWidth = 2;
+                cCtx.beginPath();
+                cCtx.moveTo(80, 165);
+                cCtx.lineTo(width - 80, 165);
+                cCtx.stroke();
+
+                // Word Title
+                cCtx.font = '700 72px Inter, sans-serif';
+                cCtx.fillStyle = '#ffffff';
+                cCtx.fillText(data.word, 80, 260);
+
+                // Phonetics & Part of Speech
+                const subText = `${data.phonetic || ''}  •  ${data.partOfSpeech || ''}`;
+                cCtx.font = '400 24px JetBrains Mono, monospace';
+                cCtx.fillStyle = '#f59e0b';
+                cCtx.fillText(subText, 80, 310);
+
+                // Definition Text wrapping
+                cCtx.font = '400 32px Inter, sans-serif';
+                cCtx.fillStyle = '#d4d4d8';
+                
+                const maxLineWidth = width - 160;
+                const words = (data.definition || '').split(' ');
+                let line = '';
+                let currentY = 380;
+                const lineHeight = 46;
+
+                words.forEach(word => {
+                    const testLine = line + word + ' ';
+                    const metrics = cCtx.measureText(testLine);
+                    if (metrics.width > maxLineWidth && line !== '') {
+                        cCtx.fillText(line, 80, currentY);
+                        line = word + ' ';
+                        currentY += lineHeight;
+                    } else {
+                        line = testLine;
+                    }
+                });
+                cCtx.fillText(line, 80, currentY);
+
+                // Footer URL
+                cCtx.font = '400 18px JetBrains Mono, monospace';
+                cCtx.fillStyle = '#52525b';
+                cCtx.fillText('https://freeapi.me/word-of-the-day', 80, height - 60);
+                cCtx.fillText('Generated via Word.dev', width - 300, height - 60);
+            }
+
+            function downloadSocialCardPNG() {
+                const link = document.createElement('a');
+                link.download = `word-of-the-day-${(currentWordObj?.word || 'card').toLowerCase()}.png`;
+                link.href = socialCardCanvas.toDataURL('image/png');
+                link.click();
+                showToast('Downloaded High-Res Social Card');
+            }
+
+            // Copy & Share utilities
+            btnCopy.addEventListener('click', async () => {
+                if (!currentWordObj) return;
+                const text = `${currentWordObj.word} (${currentWordObj.partOfSpeech}): ${currentWordObj.definition}`;
+                
+                try {
+                    if (navigator.clipboard && navigator.clipboard.writeText) {
+                        await navigator.clipboard.writeText(text);
+                    } else {
+                        const textarea = document.createElement('textarea');
+                        textarea.value = text;
+                        document.body.appendChild(textarea);
+                        textarea.select();
+                        document.execCommand('copy');
+                        document.body.removeChild(textarea);
+                    }
+                    showToast("Copied word definition to clipboard!");
+                } catch (err) {
+                    showToast("Failed to copy text");
+                }
+            });
+
+            btnShare.addEventListener('click', async () => {
+                if (!currentWordObj) return;
+                const text = `Word of the Day: ${currentWordObj.word} - ${currentWordObj.definition}`;
+                if (navigator.share) {
+                    try {
+                        await navigator.share({ title: 'Word of the Day', text: text, url: window.location.href });
+                        showToast("Shared successfully");
+                    } catch (e) {
+                        if (e.name !== 'AbortError') showToast("Could not share");
+                    }
+                } else {
+                    btnCopy.click();
+                }
+            });
+
+            function showToast(message) {
+                toast.textContent = message;
+                toast.classList.remove('toast-exit');
+                toast.classList.add('toast-enter');
+                if (toastTimeout) clearTimeout(toastTimeout);
+                toastTimeout = setTimeout(() => {
+                    toast.classList.remove('toast-enter');
+                    toast.classList.add('toast-exit');
+                }, 3000);
+            }
+
+            // Event Listeners for Date & Navigation
+            btnPrevDay.addEventListener('click', () => {
+                currentDateOffset -= 1;
+                fetchWordForOffset(currentDateOffset);
+            });
+
+            btnNextDay.addEventListener('click', () => {
+                if (currentDateOffset < 0) {
+                    currentDateOffset += 1;
+                    fetchWordForOffset(currentDateOffset);
+                }
+            });
+
+            btnRandom.addEventListener('click', () => {
+                const randomWord = CURATED_WORDS[Math.floor(Math.random() * CURATED_WORDS.length)];
+                currentWordObj = randomWord;
+                renderWordCard(currentWordObj);
+                currentDateText.textContent = `Random Word Discovery`;
+                btnNextDay.disabled = false;
+            });
+
+            btnRetry.addEventListener('click', () => fetchWordForOffset(currentDateOffset));
+
+            // Drawer listeners
+            btnOpenDrawer.addEventListener('click', openDrawer);
+            btnCloseDrawer.addEventListener('click', closeDrawer);
+            drawerBackdrop.addEventListener('click', closeDrawer);
+            drawerSearch.addEventListener('input', renderFavoritesList);
+            btnClearFavorites.addEventListener('click', () => {
+                if (favorites.length === 0) return;
+                favorites = [];
+                saveFavorites();
+                updateFavButtonState();
+                showToast("Cleared all saved words");
+            });
+
+            // Quiz Modal listeners
+            btnOpenQuiz.addEventListener('click', openQuizModal);
+            btnCloseQuiz.addEventListener('click', closeQuizModal);
+            quizModalBackdrop.addEventListener('click', e => { if (e.target === quizModalBackdrop) closeQuizModal(); });
+            btnNextQuiz.addEventListener('click', () => {
+                if (currentQuizIndex >= quizQuestions.length) {
+                    openQuizModal();
+                } else {
+                    currentQuizIndex++;
+                    renderQuizQuestion();
+                }
+            });
+
+            // Card Modal listeners
+            btnExportCard.addEventListener('click', openCardModal);
+            btnCloseCardModal.addEventListener('click', closeCardModal);
+            btnCancelCard.addEventListener('click', closeCardModal);
+            cardModalBackdrop.addEventListener('click', e => { if (e.target === cardModalBackdrop) closeCardModal(); });
+            btnDownloadSocialCard.addEventListener('click', downloadSocialCardPNG);
+
+            // Global Keyboard Navigation
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    closeDrawer();
+                    closeQuizModal();
+                    closeCardModal();
+                }
+            });
+
+            // Initial load
+            fetchWordForOffset(0);
+        });
+    </script>
+</body>
+</html>

@@ -16,43 +16,50 @@ export default function HomePage() {
     <>
       <header className="site-header">
         <div className="site-header-inner">
-          <span className="wordmark mono">base31.org</span>
-          <span className="header-meta mono">
-            {visibleSites.length} site{visibleSites.length === 1 ? "" : "s"}
+          <a className="wordmark mono" href="/" aria-label="base31.org home">
+            base31.org
+          </a>
+          <span className="header-meta mono" aria-label={`${visibleSites.length} listed sites`}>
+            {String(visibleSites.length).padStart(2, "0")} / sites
           </span>
         </div>
       </header>
 
       <main>
-        <h1>Directory</h1>
-        <p className="subtitle">Everything currently deployed on this domain.</p>
+        <section className="intro" aria-labelledby="page-title">
+          <p className="eyebrow mono">base31.org</p>
+          <h1 id="page-title">Directory</h1>
+          <p className="subtitle">A collection of things built and deployed here.</p>
+        </section>
 
         {visibleSites.length === 0 ? (
           <div className="empty">No sites deployed yet.</div>
         ) : (
-          <div className="site-list">
+          <div className="site-list" aria-label="Deployed sites">
             {visibleSites.map((site) => (
-              <a key={site.subdomain} href={site.url} className="site-card">
+              <a
+                key={site.subdomain}
+                href={site.url}
+                className="site-card"
+                target="_blank"
+                rel="noreferrer"
+              >
                 <div className="site-card-top">
                   <div className="site-name-row">
                     <span className="live-dot" aria-hidden="true" />
                     <span className="site-name">{site.name}</span>
                   </div>
                   <span className="site-arrow mono" aria-hidden="true">
-                    →
+                    ↗
                   </span>
                 </div>
 
-                <p className="site-url mono">
-                  {site.url.replace(/^https?:\/\//, "")}
-                </p>
+                <p className="site-url mono">{site.url.replace(/^https?:\/\//, "")}</p>
 
-                {site.description && (
-                  <p className="site-description">{site.description}</p>
-                )}
+                {site.description && <p className="site-description">{site.description}</p>}
 
                 {site.tags && site.tags.length > 0 && (
-                  <div className="tags">
+                  <div className="tags" aria-label="Tags">
                     {site.tags.map((tag) => (
                       <span key={tag} className="tag mono">
                         {tag}
@@ -65,6 +72,10 @@ export default function HomePage() {
           </div>
         )}
       </main>
+
+      <footer className="site-footer">
+        <div className="site-footer-inner mono">© {new Date().getFullYear()} base31.org</div>
+      </footer>
     </>
   );
 }

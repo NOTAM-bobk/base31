@@ -1,1 +1,621 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Donation Nation | Support Open Web</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.263.1/umd/lucide.min.js"></script>
+    
+    <style>
+        :root {
+            --brutal-black: #111;
+            --brutal-white: #fff;
+            --brutal-yellow: #fcd34d;
+            --brutal-pink: #f9a8d4;
+            --brutal-blue: #93c5fd;
+            --brutal-green: #86efac;
+        }
 
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #fafafa;
+            color: var(--brutal-black);
+            overflow-x: hidden;
+        }
+        
+        /* Brutalist Utilities */
+        .brutal-border { border: 3px solid var(--brutal-black); }
+        .brutal-shadow {
+            box-shadow: 6px 6px 0px var(--brutal-black);
+            transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+        .brutal-shadow:hover {
+            transform: translate(2px, 2px);
+            box-shadow: 4px 4px 0px var(--brutal-black);
+        }
+        .brutal-shadow:active, .brutal-shadow-active:active {
+            transform: translate(6px, 6px);
+            box-shadow: 0px 0px 0px var(--brutal-black);
+        }
+
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 3px solid var(--brutal-black);
+        }
+
+        /* Grid Background */
+        .bg-grid {
+            background-image: linear-gradient(to right, rgba(0,0,0,0.05) 1px, transparent 1px),
+                              linear-gradient(to bottom, rgba(0,0,0,0.05) 1px, transparent 1px);
+            background-size: 30px 30px;
+        }
+
+        /* Animations */
+        .fade-up {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .fade-up.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .delay-100 { transition-delay: 100ms; }
+        .delay-200 { transition-delay: 200ms; }
+        .delay-300 { transition-delay: 300ms; }
+
+        @keyframes float {
+            0% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(5deg); }
+            100% { transform: translateY(0px) rotate(0deg); }
+        }
+        .animate-float { animation: float 6s ease-in-out infinite; }
+        .animate-float-delayed { animation: float 6s ease-in-out 3s infinite; }
+
+        @keyframes marquee {
+            0% { transform: translateX(0%); }
+            100% { transform: translateX(-100%); }
+        }
+        .marquee-container {
+            overflow: hidden;
+            white-space: nowrap;
+            position: relative;
+        }
+        .marquee-content {
+            display: inline-block;
+            animation: marquee 15s linear infinite;
+        }
+        
+        /* Modal scroll fix */
+        body.modal-open { overflow: hidden; }
+    </style>
+</head>
+<body class="bg-grid min-h-screen antialiased selection:bg-black selection:text-white relative">
+
+    <!-- Uptime Marquee Banner -->
+    <div class="fixed top-0 w-full z-[60] bg-yellow-300 brutal-border border-l-0 border-r-0 border-t-0 marquee-container py-1.5 flex items-center h-10">
+        <div class="marquee-content font-mono text-sm font-bold flex gap-8 items-center" id="marquee-content">
+            <!-- Content duplicated in JS for seamless loop -->
+            <span>🚀 LIVE UPTIME: <span id="uptime-timer" class="bg-black text-white px-2 py-0.5 rounded-sm mx-1">00:00:00</span> SINCE 5:00 PM 🚀</span>
+            <span>SUPPORT BASE31.ORG</span>
+            <span>🚀 LIVE UPTIME: <span id="uptime-timer-2" class="bg-black text-white px-2 py-0.5 rounded-sm mx-1">00:00:00</span> SINCE 5:00 PM 🚀</span>
+            <span>SUPPORT BASE31.ORG</span>
+            <span>🚀 LIVE UPTIME: <span id="uptime-timer-3" class="bg-black text-white px-2 py-0.5 rounded-sm mx-1">00:00:00</span> SINCE 5:00 PM 🚀</span>
+            <span>SUPPORT BASE31.ORG</span>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="fixed top-10 w-full z-50 glass-panel transition-transform duration-300" id="navbar">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex-shrink-0 flex items-center gap-2 cursor-pointer group">
+                    <div class="w-8 h-8 bg-black rounded-sm flex items-center justify-center brutal-shadow group-hover:bg-yellow-300 group-hover:rotate-12 transition-all">
+                        <i data-lucide="zap" class="w-5 h-5 text-white group-hover:text-black"></i>
+                    </div>
+                    <span class="font-black text-xl tracking-tighter uppercase">Donation Nation</span>
+                </div>
+                <div class="hidden md:flex space-x-8 items-center font-bold">
+                    <a href="#about" class="text-sm hover:text-blue-600 hover:-translate-y-1 inline-block transition-transform">About</a>
+                    <a href="#github-stats" class="text-sm hover:text-pink-600 hover:-translate-y-1 inline-block transition-transform">Repo</a>
+                    <a href="#donate" class="text-sm bg-black text-white px-5 py-2 rounded-sm brutal-shadow hover:bg-yellow-300 hover:text-black transition-colors">Donate Now</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <main class="pt-40 pb-16 sm:pt-48 sm:pb-24 lg:pb-32 px-4 mx-auto max-w-6xl text-center relative">
+        <!-- Playful Background Shapes -->
+        <div class="absolute top-20 left-10 w-24 h-24 bg-pink-300 rounded-full brutal-border brutal-shadow animate-float -z-10 hidden md:block"></div>
+        <div class="absolute bottom-10 right-10 w-32 h-32 bg-blue-300 brutal-border brutal-shadow animate-float-delayed transform rotate-12 -z-10 hidden md:block"></div>
+        <div class="absolute top-40 right-20 w-16 h-16 bg-yellow-300 rounded-sm brutal-border brutal-shadow animate-float -z-10 hidden md:block" style="animation-duration: 4s;"></div>
+
+        <h1 class="fade-up mx-auto max-w-5xl font-black text-6xl tracking-tighter sm:text-8xl leading-none uppercase">
+            Fuel the <br/>
+            <span class="relative inline-block mt-4">
+                <span class="absolute inset-0 bg-green-400 transform -rotate-2 brutal-border brutal-shadow"></span>
+                <span class="relative px-4 py-2 text-white mix-blend-difference">Open Web</span>
+            </span>
+        </h1>
+        <p class="fade-up delay-100 mx-auto mt-10 max-w-2xl text-xl font-medium tracking-tight text-gray-700">
+            I build accessible, high-performance tools like <strong>base31.org</strong>. Your support pays for server costs, domain renewals, and keeps the code flowing.
+        </p>
+        <div class="fade-up delay-200 mt-12 flex flex-col sm:flex-row justify-center gap-4 sm:gap-6">
+            <a href="#donate" class="group inline-flex items-center justify-center rounded-sm py-4 px-8 text-lg font-black bg-black text-white brutal-shadow hover:bg-pink-400 hover:text-black transition-colors">
+                Support the Mission
+                <i data-lucide="flame" class="ml-2 w-5 h-5 group-hover:scale-125 transition-transform"></i>
+            </a>
+            <a href="#projects" class="group inline-flex items-center justify-center rounded-sm py-4 px-8 text-lg font-black brutal-border bg-white text-black brutal-shadow hover:bg-blue-300 transition-colors">
+                Explore Base31
+            </a>
+        </div>
+    </main>
+
+    <!-- GitHub Live Stats Section -->
+    <section id="github-stats" class="py-12 max-w-6xl mx-auto px-4 fade-up">
+        <div class="bg-white brutal-border p-8 rounded-sm brutal-shadow relative overflow-hidden group">
+            <div class="absolute -right-10 -top-10 w-40 h-40 bg-gray-100 rounded-full mix-blend-multiply group-hover:scale-150 transition-transform duration-700"></div>
+            
+            <div class="relative z-10 flex flex-col md:flex-row justify-between items-center gap-8">
+                <div>
+                    <h2 class="text-3xl font-black uppercase flex items-center gap-3 mb-2">
+                        <i data-lucide="github" class="w-8 h-8"></i> NOTAM-bobk/base31
+                    </h2>
+                    <p class="text-gray-600 font-medium">Live stats straight from the repository.</p>
+                </div>
+                
+                <div class="flex gap-4 flex-wrap justify-center">
+                    <div class="bg-[#F3F4F6] brutal-border px-6 py-4 rounded-sm flex flex-col items-center min-w-[100px] hover:-translate-y-1 transition-transform">
+                        <i data-lucide="star" class="w-6 h-6 text-yellow-500 mb-1"></i>
+                        <span id="gh-stars" class="text-2xl font-black">--</span>
+                        <span class="text-xs font-bold uppercase text-gray-500">Stars</span>
+                    </div>
+                    <div class="bg-[#F3F4F6] brutal-border px-6 py-4 rounded-sm flex flex-col items-center min-w-[100px] hover:-translate-y-1 transition-transform">
+                        <i data-lucide="git-fork" class="w-6 h-6 text-blue-500 mb-1"></i>
+                        <span id="gh-forks" class="text-2xl font-black">--</span>
+                        <span class="text-xs font-bold uppercase text-gray-500">Forks</span>
+                    </div>
+                    <div class="bg-[#F3F4F6] brutal-border px-6 py-4 rounded-sm flex flex-col items-center min-w-[100px] hover:-translate-y-1 transition-transform">
+                        <i data-lucide="circle-dot" class="w-6 h-6 text-green-500 mb-1"></i>
+                        <span id="gh-issues" class="text-2xl font-black">--</span>
+                        <span class="text-xs font-bold uppercase text-gray-500">Issues</span>
+                    </div>
+                </div>
+                
+                <a href="https://github.com/NOTAM-bobk/base31/tree/main" target="_blank" rel="noopener noreferrer" class="bg-black text-white brutal-border font-bold py-3 px-6 rounded-sm hover:bg-yellow-300 hover:text-black transition-colors flex items-center gap-2 brutal-shadow">
+                    View Code <i data-lucide="external-link" class="w-4 h-4"></i>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Impact Section -->
+    <section id="projects" class="py-20 bg-black text-white relative overflow-hidden mt-10">
+        <div class="max-w-6xl mx-auto px-4 relative z-10">
+            <div class="text-center mb-16 fade-up">
+                <h2 class="text-4xl font-black tracking-tight sm:text-6xl mb-4 uppercase">The Ecosystem</h2>
+                <p class="text-gray-400 max-w-2xl mx-auto text-xl font-medium">Your donations keep these subdomains alive and ad-free.</p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Base31 Project Card -->
+                <div class="bg-zinc-900 brutal-border border-white p-8 rounded-sm brutal-shadow fade-up delay-100 group hover:-translate-y-2 transition-transform" style="box-shadow: 8px 8px 0px #fff;">
+                    <div class="flex justify-between items-start mb-6">
+                        <div class="w-14 h-14 bg-blue-500 rounded-sm brutal-border border-white flex items-center justify-center">
+                            <i data-lucide="globe-2" class="w-8 h-8 text-black"></i>
+                        </div>
+                        <span class="text-xs font-black bg-white text-black px-3 py-1 rounded-sm uppercase tracking-widest brutal-border">Flagship</span>
+                    </div>
+                    <h3 class="text-4xl font-black mb-4 tracking-tighter">base31.org</h3>
+                    
+                    <div class="space-y-3 mb-8">
+                        <a href="#" class="flex items-center justify-between p-3 rounded-sm border-2 border-zinc-700 hover:border-white hover:bg-zinc-800 transition-all group/link">
+                            <span class="text-blue-400 font-mono font-bold text-lg">tools.base31.org</span>
+                            <i data-lucide="arrow-up-right" class="w-5 h-5 text-gray-500 group-hover/link:text-white group-hover/link:translate-x-1 group-hover/link:-translate-y-1 transition-transform"></i>
+                        </a>
+                        <a href="#" class="flex items-center justify-between p-3 rounded-sm border-2 border-zinc-700 hover:border-white hover:bg-zinc-800 transition-all group/link">
+                            <span class="text-green-400 font-mono font-bold text-lg">docs.base31.org</span>
+                            <i data-lucide="arrow-up-right" class="w-5 h-5 text-gray-500 group-hover/link:text-white group-hover/link:translate-x-1 group-hover/link:-translate-y-1 transition-transform"></i>
+                        </a>
+                        <a href="#" class="flex items-center justify-between p-3 rounded-sm border-2 border-zinc-700 hover:border-white hover:bg-zinc-800 transition-all group/link">
+                            <span class="text-pink-400 font-mono font-bold text-lg">labs.base31.org</span>
+                            <i data-lucide="arrow-up-right" class="w-5 h-5 text-gray-500 group-hover/link:text-white group-hover/link:translate-x-1 group-hover/link:-translate-y-1 transition-transform"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Dev Survival Card -->
+                <div class="bg-zinc-900 brutal-border border-white p-8 rounded-sm brutal-shadow fade-up delay-200 flex flex-col group hover:-translate-y-2 transition-transform" style="box-shadow: 8px 8px 0px #fcd34d;">
+                    <div class="w-14 h-14 bg-yellow-400 rounded-sm brutal-border border-white flex items-center justify-center mb-6">
+                        <i data-lucide="coffee" class="w-8 h-8 text-black"></i>
+                    </div>
+                    <h3 class="text-4xl font-black mb-4 tracking-tighter">Dev Survival</h3>
+                    <p class="text-gray-300 mb-6 text-lg font-medium leading-relaxed">Contributions directly support the creator. It buys coffee, pays for GitHub Copilot, covers Vercel overages, and keeps me motivated to build awesome stuff for free.</p>
+                    
+                    <div class="mt-auto bg-black p-4 brutal-border border-white">
+                        <h4 class="text-sm font-bold text-gray-400 uppercase tracking-widest mb-3">Recent Expenses</h4>
+                        <ul class="space-y-2 font-mono text-sm">
+                            <li class="flex justify-between border-b border-zinc-800 pb-1"><span>Domain Renewals</span> <span class="text-red-400">-$45.00</span></li>
+                            <li class="flex justify-between border-b border-zinc-800 pb-1"><span>Database Hosting</span> <span class="text-red-400">-$29.00</span></li>
+                            <li class="flex justify-between"><span>Caffeine</span> <span class="text-red-400">-$TOO_MUCH</span></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Donation Section -->
+    <section id="donate" class="py-24 max-w-6xl mx-auto px-4">
+        <div class="text-center mb-16 fade-up">
+            <h2 class="text-5xl font-black tracking-tighter sm:text-7xl mb-4 uppercase">Choose Your Tier</h2>
+            <div class="w-24 h-2 bg-black mx-auto mb-6"></div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            
+            <!-- Tier 1 -->
+            <div class="bg-white brutal-border p-8 rounded-sm brutal-shadow flex flex-col fade-up hover:bg-blue-50 transition-colors">
+                <h3 class="text-2xl font-black uppercase text-gray-900">The Spotter</h3>
+                <div class="my-6 flex items-baseline gap-1">
+                    <span class="text-5xl font-black">$5</span>
+                    <span class="text-gray-500 font-bold">/once</span>
+                </div>
+                <ul class="space-y-4 text-gray-700 font-medium mb-8 flex-grow">
+                    <li class="flex items-start gap-3"><i data-lucide="check-square" class="w-5 h-5 text-blue-500 shrink-0"></i> One-time boost</li>
+                    <li class="flex items-start gap-3"><i data-lucide="check-square" class="w-5 h-5 text-blue-500 shrink-0"></i> Warm fuzzy feeling</li>
+                </ul>
+                <a href="#" class="w-full text-center bg-white brutal-border text-black font-black text-lg py-4 rounded-sm hover:bg-blue-300 transition-colors brutal-shadow">Donate $5</a>
+            </div>
+
+            <!-- Tier 2 (Highlighted) -->
+            <div class="bg-yellow-300 brutal-border p-8 rounded-sm flex flex-col relative transform md:-translate-y-4 fade-up delay-100" style="box-shadow: 8px 8px 0px #000;">
+                <div class="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-black text-white text-xs font-black uppercase tracking-widest px-4 py-1.5 rounded-sm brutal-border border-white">Legend Status</div>
+                <h3 class="text-2xl font-black uppercase text-gray-900 mt-2">The Architect</h3>
+                <div class="my-6 flex items-baseline gap-1">
+                    <span class="text-5xl font-black">$15</span>
+                    <span class="text-gray-700 font-bold">/month</span>
+                </div>
+                <ul class="space-y-4 text-gray-800 font-medium mb-8 flex-grow">
+                    <li class="flex items-start gap-3"><i data-lucide="zap" class="w-5 h-5 text-black shrink-0"></i> Keeps the servers running</li>
+                    <li class="flex items-start gap-3"><i data-lucide="zap" class="w-5 h-5 text-black shrink-0"></i> Vote on new features</li>
+                    <li class="flex items-start gap-3"><i data-lucide="zap" class="w-5 h-5 text-black shrink-0"></i> Discord VIP Role</li>
+                </ul>
+                <a href="#" class="w-full text-center bg-black text-white font-black text-lg py-4 rounded-sm hover:bg-pink-400 hover:text-black brutal-border border-black transition-colors brutal-shadow-active">Subscribe Now</a>
+            </div>
+
+            <!-- Tier 3 -->
+            <div class="bg-white brutal-border p-8 rounded-sm brutal-shadow flex flex-col fade-up delay-200 hover:bg-pink-50 transition-colors">
+                <h3 class="text-2xl font-black uppercase text-gray-900">The Whale</h3>
+                <div class="my-6 flex items-baseline gap-1">
+                    <span class="text-5xl font-black">Custom</span>
+                </div>
+                <ul class="space-y-4 text-gray-700 font-medium mb-8 flex-grow">
+                    <li class="flex items-start gap-3"><i data-lucide="bitcoin" class="w-5 h-5 text-pink-500 shrink-0"></i> Crypto accepted</li>
+                    <li class="flex items-start gap-3"><i data-lucide="check-square" class="w-5 h-5 text-pink-500 shrink-0"></i> Sponsor a specific domain</li>
+                </ul>
+                <button onclick="openModal('crypto-modal')" class="w-full text-center bg-white brutal-border text-black font-black text-lg py-4 rounded-sm hover:bg-pink-300 transition-colors brutal-shadow">View Crypto</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="border-t-4 border-black bg-white pt-16 pb-8 relative z-10">
+        <div class="max-w-6xl mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
+                <div class="md:col-span-2">
+                    <div class="flex items-center gap-2 mb-4 group cursor-pointer w-max">
+                        <div class="w-8 h-8 bg-black rounded-sm flex items-center justify-center group-hover:bg-yellow-300 transition-colors">
+                            <i data-lucide="flame" class="w-4 h-4 text-white group-hover:text-black"></i>
+                        </div>
+                        <span class="font-black text-xl tracking-tighter uppercase">DONATION NATION</span>
+                    </div>
+                    <p class="text-gray-600 font-medium max-w-sm mb-6">
+                        Building the open web without paywalls. Powered by caffeine and your generous support.
+                    </p>
+                    <div class="flex gap-4">
+                        <a href="#" class="w-12 h-12 rounded-sm brutal-border flex items-center justify-center brutal-shadow hover:bg-blue-300 transition-colors">
+                            <i data-lucide="twitter" class="w-6 h-6 text-black"></i>
+                        </a>
+                        <a href="https://github.com/NOTAM-bobk/base31" target="_blank" rel="noopener noreferrer" class="w-12 h-12 rounded-sm brutal-border flex items-center justify-center brutal-shadow hover:bg-gray-300 transition-colors">
+                            <i data-lucide="github" class="w-6 h-6 text-black"></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <div>
+                    <h3 class="font-black text-gray-900 mb-4 uppercase">Ecosystem</h3>
+                    <ul class="space-y-3 font-bold text-gray-600">
+                        <li><a href="#" class="hover:text-black hover:underline decoration-2 underline-offset-4">base31.org</a></li>
+                        <li><a href="#" class="hover:text-black hover:underline decoration-2 underline-offset-4">tools.base31</a></li>
+                        <li><a href="#" class="hover:text-black hover:underline decoration-2 underline-offset-4">docs.base31</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h3 class="font-black text-gray-900 mb-4 uppercase">Legal</h3>
+                    <ul class="space-y-3 font-bold text-gray-600">
+                        <li><button onclick="openModal('privacy-modal')" class="hover:text-black hover:underline decoration-2 underline-offset-4">Privacy Policy</button></li>
+                        <li><button onclick="openModal('tos-modal')" class="hover:text-black hover:underline decoration-2 underline-offset-4">Terms of Service</button></li>
+                        <li><button onclick="openModal('cookie-modal')" class="hover:text-black hover:underline decoration-2 underline-offset-4">Cookie Policy</button></li>
+                        <li><button onclick="openModal('contact-modal')" class="hover:text-black hover:underline decoration-2 underline-offset-4">Contact</button></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="border-t-2 border-black pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
+                <p class="font-bold text-gray-600">
+                    © <span id="current-year"></span> base31.org ecosystem.
+                </p>
+                <div class="flex items-center gap-2 font-bold text-black bg-green-100 px-4 py-2 brutal-border rounded-sm">
+                    <span class="w-3 h-3 rounded-full bg-green-500 animate-pulse brutal-border"></span> All Systems Nominal
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- MODALS -->
+    
+    <!-- Crypto Modal -->
+    <div id="crypto-modal" class="fixed inset-0 bg-black/60 z-[70] hidden flex items-center justify-center p-4 backdrop-blur-sm opacity-0 transition-opacity duration-300">
+        <div class="bg-white p-8 max-w-md w-full brutal-border brutal-shadow relative transform scale-95 transition-transform duration-300 modal-content">
+            <button onclick="closeModal('crypto-modal')" class="absolute -top-4 -right-4 w-10 h-10 bg-red-500 text-white brutal-border brutal-shadow flex items-center justify-center hover:bg-red-600 z-10">
+                <i data-lucide="x" class="w-6 h-6"></i>
+            </button>
+            <h3 class="text-3xl font-black uppercase mb-6">Crypto Wallets</h3>
+            <div class="space-y-6">
+                <div>
+                    <label class="text-sm font-black text-gray-700 uppercase tracking-wide">Ethereum (ERC20)</label>
+                    <div class="flex mt-2">
+                        <input type="text" value="0x71C...8947" readonly class="flex-grow bg-gray-50 border-2 border-r-0 border-black px-3 py-3 text-sm font-mono font-bold focus:outline-none">
+                        <button onclick="copyToClipboard('0x71C...8947', this)" class="bg-black text-white px-6 border-2 border-black font-black uppercase text-sm hover:bg-yellow-300 hover:text-black transition-colors">Copy</button>
+                    </div>
+                </div>
+                <div>
+                    <label class="text-sm font-black text-gray-700 uppercase tracking-wide">Bitcoin</label>
+                    <div class="flex mt-2">
+                        <input type="text" value="bc1q...x2v9" readonly class="flex-grow bg-gray-50 border-2 border-r-0 border-black px-3 py-3 text-sm font-mono font-bold focus:outline-none">
+                        <button onclick="copyToClipboard('bc1q...x2v9', this)" class="bg-black text-white px-6 border-2 border-black font-black uppercase text-sm hover:bg-yellow-300 hover:text-black transition-colors">Copy</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Privacy Modal -->
+    <div id="privacy-modal" class="fixed inset-0 bg-black/60 z-[70] hidden flex items-center justify-center p-4 backdrop-blur-sm opacity-0 transition-opacity duration-300">
+        <div class="bg-white p-8 max-w-2xl w-full max-h-[80vh] overflow-y-auto brutal-border brutal-shadow relative transform scale-95 transition-transform duration-300 modal-content">
+            <button onclick="closeModal('privacy-modal')" class="absolute top-4 right-4 w-10 h-10 bg-yellow-300 text-black brutal-border brutal-shadow flex items-center justify-center hover:bg-yellow-400 z-10">
+                <i data-lucide="x" class="w-6 h-6"></i>
+            </button>
+            <h3 class="text-4xl font-black uppercase mb-6 border-b-4 border-black pb-2 inline-block">Privacy Policy</h3>
+            <div class="prose prose-lg font-medium text-gray-800 space-y-4">
+                <p><strong>Effective Date:</strong> Today.</p>
+                <p>Listen, we are developers building tools for the open web. We don't want to track you. We don't want your data. We just want to build cool stuff.</p>
+                <h4 class="text-2xl font-black uppercase mt-6 mb-2">1. Data Collection</h4>
+                <p>We collect exactly zero personal data unless you explicitly give it to us (like your email if you use a contact form or subscribe to a tier). If you donate via Stripe, they handle the payment data. We never see your credit card number.</p>
+                <h4 class="text-2xl font-black uppercase mt-6 mb-2">2. Analytics</h4>
+                <p>We might use a privacy-respecting analytics tool (like Plausible or basic Vercel analytics) just to see if anyone is actually visiting base31.org, but it's completely anonymized. No cookies required.</p>
+                <h4 class="text-2xl font-black uppercase mt-6 mb-2">3. Third Parties</h4>
+                <p>We don't sell data. Period. The only third parties involved are hosting providers (Vercel) and payment processors (Stripe/GitHub Sponsors).</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOS Modal -->
+    <div id="tos-modal" class="fixed inset-0 bg-black/60 z-[70] hidden flex items-center justify-center p-4 backdrop-blur-sm opacity-0 transition-opacity duration-300">
+        <div class="bg-blue-50 p-8 max-w-2xl w-full max-h-[80vh] overflow-y-auto brutal-border brutal-shadow relative transform scale-95 transition-transform duration-300 modal-content">
+            <button onclick="closeModal('tos-modal')" class="absolute top-4 right-4 w-10 h-10 bg-white text-black brutal-border brutal-shadow flex items-center justify-center hover:bg-gray-100 z-10">
+                <i data-lucide="x" class="w-6 h-6"></i>
+            </button>
+            <h3 class="text-4xl font-black uppercase mb-6 border-b-4 border-black pb-2 inline-block">Terms of Service</h3>
+            <div class="prose prose-lg font-medium text-gray-800 space-y-4">
+                <p>By using base31.org or donating, you agree to these extremely simple terms.</p>
+                <h4 class="text-2xl font-black uppercase mt-6 mb-2">Rule #1: Be Cool</h4>
+                <p>Don't use our tools for malicious purposes, spamming, or anything illegal. The open web relies on people being decent to each other.</p>
+                <h4 class="text-2xl font-black uppercase mt-6 mb-2">Donations are Final</h4>
+                <p>Donations are given freely to support development. They are non-refundable unless there was a massive technical glitch on our end. Think of it like buying a coffee—you can't return the coffee once it's brewed.</p>
+                <h4 class="text-2xl font-black uppercase mt-6 mb-2">Uptime Guarantees</h4>
+                <p>We try our best, but this is an indie project. Sometimes things break. We offer no strict SLAs or uptime guarantees. Use tools.base31.org at your own risk (though we try to keep it safe and stable!).</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cookie Modal -->
+    <div id="cookie-modal" class="fixed inset-0 bg-black/60 z-[70] hidden flex items-center justify-center p-4 backdrop-blur-sm opacity-0 transition-opacity duration-300">
+        <div class="bg-pink-50 p-8 max-w-2xl w-full brutal-border brutal-shadow relative transform scale-95 transition-transform duration-300 modal-content">
+            <button onclick="closeModal('cookie-modal')" class="absolute top-4 right-4 w-10 h-10 bg-black text-white brutal-border brutal-shadow flex items-center justify-center hover:bg-gray-800 z-10">
+                <i data-lucide="x" class="w-6 h-6"></i>
+            </button>
+            <h3 class="text-4xl font-black uppercase mb-6 border-b-4 border-black pb-2 inline-block">Cookie Policy</h3>
+            <div class="prose prose-lg font-medium text-gray-800 space-y-4">
+                <div class="flex items-center gap-4 mb-6">
+                    <i data-lucide="cookie" class="w-16 h-16 text-pink-600"></i>
+                    <p class="text-xl font-bold">We prefer real chocolate chip cookies.</p>
+                </div>
+                <p>This site does not use any intrusive tracking cookies. The only cookies that might be set are essential ones from our payment providers (like Stripe) if you initiate a donation, to ensure the transaction goes through securely.</p>
+                <p>We don't use marketing pixels, retargeting cookies, or anything creepy. Enjoy your ad-free browsing experience.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contact Modal -->
+    <div id="contact-modal" class="fixed inset-0 bg-black/60 z-[70] hidden flex items-center justify-center p-4 backdrop-blur-sm opacity-0 transition-opacity duration-300">
+        <div class="bg-white p-8 max-w-md w-full brutal-border brutal-shadow relative transform scale-95 transition-transform duration-300 modal-content">
+            <button onclick="closeModal('contact-modal')" class="absolute top-4 right-4 w-10 h-10 bg-white text-black brutal-border brutal-shadow flex items-center justify-center hover:bg-gray-100 z-10">
+                <i data-lucide="x" class="w-6 h-6"></i>
+            </button>
+            <h3 class="text-4xl font-black uppercase mb-6 border-b-4 border-black pb-2 inline-block">Hit Me Up</h3>
+            <p class="font-medium text-gray-700 mb-6">Got a question about a donation, a bug report for base31, or just want to say hi?</p>
+            
+            <div class="space-y-4">
+                <a href="mailto:hello@base31.org" class="flex items-center gap-4 p-4 brutal-border hover:bg-yellow-300 transition-colors group">
+                    <i data-lucide="mail" class="w-6 h-6 group-hover:scale-110 transition-transform"></i>
+                    <span class="font-black text-lg">hello@base31.org</span>
+                </a>
+                <a href="https://twitter.com/yourhandle" target="_blank" class="flex items-center gap-4 p-4 brutal-border hover:bg-blue-300 transition-colors group">
+                    <i data-lucide="twitter" class="w-6 h-6 group-hover:scale-110 transition-transform"></i>
+                    <span class="font-black text-lg">@yourhandle</span>
+                </a>
+                <a href="https://github.com/NOTAM-bobk" target="_blank" class="flex items-center gap-4 p-4 brutal-border hover:bg-gray-200 transition-colors group">
+                    <i data-lucide="github" class="w-6 h-6 group-hover:scale-110 transition-transform"></i>
+                    <span class="font-black text-lg">GitHub Issues</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Set dynamic year
+        document.getElementById('current-year').textContent = new Date().getFullYear();
+
+        // Initialize Icons
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
+
+        // --- Uptime Timer Logic (From 5:00 PM Today) ---
+        function updateTimer() {
+            const now = new Date();
+            const target = new Date();
+            // Set target to 5:00 PM (17:00:00) today
+            target.setHours(17, 0, 0, 0);
+
+            // If it's before 5:00 PM today, count from yesterday 5:00 PM to keep it counting up
+            if (now < target) {
+                target.setDate(target.getDate() - 1);
+            }
+
+            const diff = now - target;
+            const hours = Math.floor(diff / (1000 * 60 * 60));
+            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+            const formatted = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            
+            // Update all timer spans in the marquee
+            document.getElementById('uptime-timer').textContent = formatted;
+            document.getElementById('uptime-timer-2').textContent = formatted;
+            document.getElementById('uptime-timer-3').textContent = formatted;
+        }
+        
+        // Initial call and set interval
+        updateTimer();
+        setInterval(updateTimer, 1000);
+
+        // --- GitHub Stats Fetch ---
+        async function fetchGitHubStats() {
+            try {
+                const response = await fetch('https://api.github.com/repos/NOTAM-bobk/base31');
+                if (!response.ok) throw new Error('Network response was not ok');
+                const data = await response.json();
+                
+                // Animate numbers counting up
+                animateValue('gh-stars', 0, data.stargazers_count || 0, 1500);
+                animateValue('gh-forks', 0, data.forks_count || 0, 1500);
+                animateValue('gh-issues', 0, data.open_issues_count || 0, 1500);
+            } catch (error) {
+                console.error('Error fetching GitHub stats:', error);
+                document.getElementById('gh-stars').textContent = '24'; // Fallback
+                document.getElementById('gh-forks').textContent = '5';
+                document.getElementById('gh-issues').textContent = '2';
+            }
+        }
+
+        function animateValue(id, start, end, duration) {
+            if (start === end) {
+                document.getElementById(id).textContent = end;
+                return;
+            }
+            let startTimestamp = null;
+            const step = (timestamp) => {
+                if (!startTimestamp) startTimestamp = timestamp;
+                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                document.getElementById(id).textContent = Math.floor(progress * (end - start) + start);
+                if (progress < 1) {
+                    window.requestAnimationFrame(step);
+                } else {
+                    document.getElementById(id).textContent = end;
+                }
+            };
+            window.requestAnimationFrame(step);
+        }
+
+        // Fetch stats immediately
+        fetchGitHubStats();
+
+        // --- Scroll Animations ---
+        document.addEventListener('DOMContentLoaded', () => {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                    }
+                });
+            }, { threshold: 0.1 });
+
+            document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+        });
+
+        // --- Modal Logic ---
+        function openModal(id) {
+            const modal = document.getElementById(id);
+            const content = modal.querySelector('.modal-content');
+            
+            modal.classList.remove('hidden');
+            document.body.classList.add('modal-open');
+            
+            // Trigger animation
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                content.classList.remove('scale-95');
+                content.classList.add('scale-100');
+            }, 10);
+        }
+
+        function closeModal(id) {
+            const modal = document.getElementById(id);
+            const content = modal.querySelector('.modal-content');
+            
+            modal.classList.add('opacity-0');
+            content.classList.remove('scale-100');
+            content.classList.add('scale-95');
+            
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                document.body.classList.remove('modal-open');
+            }, 300); // Wait for transition
+        }
+
+        // Close modal on outside click
+        document.querySelectorAll('[id$="-modal"]').forEach(modal => {
+            modal.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeModal(this.id);
+                }
+            });
+        });
+
+        // --- Copy to Clipboard ---
+        function copyToClipboard(text, btn) {
+            const input = btn.previousElementSibling;
+            input.select();
+            document.execCommand('copy');
+            
+            const originalText = btn.innerText;
+            btn.innerText = 'COPIED!';
+            btn.classList.add('bg-green-400', 'text-black');
+            
+            setTimeout(() => {
+                btn.innerText = originalText;
+                btn.classList.remove('bg-green-400', 'text-black');
+            }, 2000);
+        }
+    </script>
+</body>
+</html>

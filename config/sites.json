@@ -8,6 +8,14 @@
     "show": false
   },
   {
+    "name": "Donation Nation",
+    "subdomain": "donation",
+    "url": "https://donation.base31.org",
+    "tags": ["donation", "plz", "THANKS"],
+    "description": "A donation page for base31.org Thanks!",
+    "show": true
+  },
+  {
     "name": "Chat With Your Data Garmin",
     "subdomain": "chatwithyourdatagarmin",
     "url": "https://chatwithyourdatagarmin.base31.org",

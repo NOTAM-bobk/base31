@@ -8,7 +8,7 @@
     "show": false
   },
   {
-    "name": "Donation Nation",
+    "name": "donationpage",
     "subdomain": "donation",
     "url": "https://donation.base31.org",
     "tags": ["donation", "plz", "THANKS"],

@@ -5,7 +5,7 @@
     "url": "https://appscreenshot.base31.org",
     "tags": ["utility", "screenshot", "tools"],
     "description": "Generate and customize app screenshots for showcase and presentation.",
-    "show": true
+    "show": false
   },
   {
     "name": "Chat With Your Data Garmin",
@@ -13,7 +13,7 @@
     "url": "https://chatwithyourdatagarmin.base31.org",
     "tags": ["ai", "garmin", "data", "fitness"],
     "description": "Interactive AI chat interface to analyze and query Garmin fitness data.",
-    "show": true
+    "show": false
   },
   {
     "name": "CompMails",
@@ -45,7 +45,7 @@
     "url": "https://focuscanvas.base31.org",
     "tags": ["productivity", "canvas", "utility"],
     "description": "A visual productivity canvas for focused work and brainstorming.",
-    "show": true
+    "show": false
   },
   {
     "name": "Is It Down",
@@ -69,7 +69,7 @@
     "url": "https://voicetransrib.base31.org",
     "tags": ["audio", "transcription", "utility"],
     "description": "Transcribe voice audio into text quickly and accurately.",
-    "show": true
+    "show": false
   },
   {
     "name": "What's My Device",
@@ -77,6 +77,14 @@
     "url": "https://whatsmydevice.base31.org",
     "tags": ["utility", "device", "info"],
     "description": "Inspect system specifications, browser details, and device attributes.",
+    "show": false
+  },
+  {
+    "name": "snip.fm",
+    "subdomain": "snipfm",
+    "url": "https://snipfm.base31.org",
+    "tags": ["music", "discovery", "social"],
+    "description": "find music through tiktok style feed.",
     "show": true
   },
   {

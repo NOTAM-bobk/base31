@@ -81,3 +81,12 @@ npm run dev
 Subdomains don't resolve on `localhost` by default. To test one locally,
 visit `http://example.localhost:3000` (the middleware treats `*.localhost`
 the same way it treats `*.base31.org`).
+
+
+<script type="text/javascript">
+    (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "ylsxc7fokm");
+</script>

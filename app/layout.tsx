@@ -66,20 +66,24 @@ export const metadata: Metadata = {
   },
 };
 
-export const viewport: Viewport = { themeColor: "#000000", colorScheme: "dark" };
+export const viewport: Viewport = { themeColor: "#000000", colorScheme: "light dark" };
+
+// Applied before paint so a saved light theme never flashes dark.
+const themeScript = `try{if(localStorage.getItem("base31-theme")==="light"){document.documentElement.setAttribute("data-theme","light")}}catch(e){}`;
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
       <head>
+        <script id="base31-theme" dangerouslySetInnerHTML={{ __html: themeScript }} />
         <script
           id="microsoft-clarity"
           type="text/javascript"
           dangerouslySetInnerHTML={{ __html: clarityScript }}
         />
-        {/* Without JS the loader can never clear itself, so hide it entirely. */}
+        {/* Without JS these never clear themselves, so hide them entirely. */}
         <noscript>
-          <style>{`#page-skeleton{display:none!important}`}</style>
+          <style>{`.site-skeleton,.cursor-layer{display:none!important}`}</style>
         </noscript>
       </head>
       <body>{children}</body>

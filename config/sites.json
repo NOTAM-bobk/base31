@@ -1,11 +1,11 @@
 [
   {
-    "name": "App Screenshot",
+    "name": "appscreenshot",
     "subdomain": "appscreenshot",
     "url": "https://appscreenshot.base31.org",
     "tags": ["utility", "screenshot", "tools"],
     "description": "Generate and customize app screenshots for showcase and presentation.",
-    "show": false
+    "show": true
   },
   {
     "name": "donationpage",

@@ -101,7 +101,7 @@
     "url": "https://snipfm.base31.org",
     "tags": ["music", "discovery", "social"],
     "description": "find music through tiktok style feed.",
-    "show": true
+    "show": false
   },
   {
     "name": "Word of the Day",

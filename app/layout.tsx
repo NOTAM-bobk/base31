@@ -4,6 +4,14 @@ import "./globals.css";
 
 const siteUrl = "https://base31.org";
 
+// Microsoft Clarity analytics snippet, injected into the document <head>.
+const clarityTag = "ylsxc7fokm";
+const clarityScript = `(function(c,l,a,r,i,t,y){
+  c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+  t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+  y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+})(window, document, "clarity", "script", "${clarityTag}");`;
+
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: "base31.org — A Directory of Cool Sites and Fun Websites",
@@ -12,11 +20,17 @@ export const metadata: Metadata = {
   alternates: { canonical: "/" },
   icons: {
     icon: [
-      { url: "/favicon.ico" },
+      { url: "/favicon.ico", sizes: "any" },
       { url: "/favicon-16.png", sizes: "16x16", type: "image/png" },
       { url: "/favicon-32.png", sizes: "32x32", type: "image/png" },
+      // Google Search only renders favicons that are square and a multiple of
+      // 48px, so the 48/96/192px assets below are the ones it actually uses.
+      { url: "/favicon-48.png", sizes: "48x48", type: "image/png" },
+      { url: "/favicon-96.png", sizes: "96x96", type: "image/png" },
+      { url: "/icons/base31-icon-192.png", sizes: "192x192", type: "image/png" },
     ],
-    apple: "/icons/apple-touch-icon.png",
+    shortcut: ["/favicon.ico"],
+    apple: [{ url: "/icons/apple-touch-icon.png", sizes: "180x180", type: "image/png" }],
   },
   manifest: "/manifest.webmanifest",
   keywords: [
@@ -57,6 +71,17 @@ export const viewport: Viewport = { themeColor: "#000000", colorScheme: "dark" }
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
+      <head>
+        <script
+          id="microsoft-clarity"
+          type="text/javascript"
+          dangerouslySetInnerHTML={{ __html: clarityScript }}
+        />
+        {/* Without JS the loader can never clear itself, so hide it entirely. */}
+        <noscript>
+          <style>{`#page-skeleton{display:none!important}`}</style>
+        </noscript>
+      </head>
       <body>{children}</body>
     </html>
   );

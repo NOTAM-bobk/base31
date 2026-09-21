@@ -516,7 +516,7 @@ export default function HomePage() {
             </div>
             <div className="modal-actions">
               <button type="button" className="primary" onClick={nativeShare}>Share…</button>
-              <button type="button" onClick={copyLink}>Copy link</button>
+              <button type="button" onClick={() => copyLink()}>Copy link</button>
               <a href={`https://twitter.com/intent/tweet?text=${shareText}&url=${shareUrl}`} target="_blank" rel="noreferrer">X</a>
               <a href={`https://www.facebook.com/sharer/sharer.php?u=${shareUrl}`} target="_blank" rel="noreferrer">Facebook</a>
               <a href={`mailto:?subject=${shareText}&body=${shareUrl}`}>Email</a>

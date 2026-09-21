@@ -1,0 +1,15 @@
+{
+  "name": "Support base31.org",
+  "short_name": "base31 support",
+  "description": "Support independent tools, experiments, and useful corners of the open web.",
+  "start_url": "https://donation.base31.org/",
+  "scope": "https://donation.base31.org/",
+  "display": "standalone",
+  "background_color": "#f6f4ef",
+  "theme_color": "#f6f4ef",
+  "icons": [
+    { "src": "https://donation.base31.org/donation-icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" },
+    { "src": "https://base31.org/icons/base31-icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "https://base31.org/icons/base31-icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}

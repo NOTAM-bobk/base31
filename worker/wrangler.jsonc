@@ -1,0 +1,20 @@
+{
+  "$schema": "https://unpkg.com/wrangler@latest/config-schema.json",
+  "name": "base31-directory-counter",
+  "main": "src/index.ts",
+  "compatibility_date": "2024-12-02",
+  "workers_dev": true,
+  "kv_namespaces": [
+    {
+      // BASE31_DIRECTORY_VIEWS — pinned so deploys reuse the namespace that
+      // already holds the live view count. Removing `id` makes wrangler
+      // auto-provision a *new* namespace, which would reset the counter to 0.
+      "binding": "VIEW_COUNTER",
+      "id": "372b1ef63c154e8a98b35e5f9385b1ab"
+    }
+  ],
+  // No `vars` block on purpose: COUNTER_SECRET is a *secret*, set with
+  // `npx wrangler secret put COUNTER_SECRET`. Wrangler rejects a var and a
+  // secret that share a name, so leaving it out of `vars` keeps deploys
+  // working whether or not the secret is set. Unset = counter stays open.
+}

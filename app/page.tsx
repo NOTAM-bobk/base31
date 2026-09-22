@@ -6,10 +6,18 @@ import sites from "@/config/sites.json";
 
 type Site = { name: string; subdomain: string; url: string; tags?: string[]; description?: string; show?: boolean };
 type Theme = "dark" | "light";
+// This visitor's own choice, stored locally.
 type Vote = 1 | -1;
+// Every choice the worker understands: 1 = up, -1 = down, 0 = cleared.
+type VoteValue = 1 | 0 | -1;
+type VoteTotals = { up: number; down: number };
 
 const siteUrl = "https://base31.org";
-const counterUrl = "https://base31-directory-counter.sawyerbobk563.workers.dev";
+// Cloudflare Worker deployed from `worker/`. It serves the KV-backed view
+// counter (`GET /?key=`) and the shared thumbs up/down totals (`GET /votes`,
+// `POST /vote`). Override with NEXT_PUBLIC_COUNTER_URL to point at a different
+// deployment; the fallback is the live production worker.
+const counterUrl = process.env.NEXT_PUBLIC_COUNTER_URL || "https://base31-directory-counter.sawyerbobk563.workers.dev";
 const donationUrl = "https://donation.base31.org";
 
 const visibleSites = (sites as Site[]).filter((site) => site.show !== false);
@@ -97,6 +105,7 @@ export default function HomePage() {
   const [query, setQuery] = useState("");
   const [favorites, setFavorites] = useState<string[]>([]);
   const [votes, setVotes] = useState<Record<string, Vote>>({});
+  const [voteTotals, setVoteTotals] = useState<Record<string, VoteTotals>>({});
   const [theme, setTheme] = useState<Theme>("dark");
   const [views, setViews] = useState<number | null>(null);
   const [bump, setBump] = useState(false);
@@ -183,6 +192,24 @@ export default function HomePage() {
     };
   }, []);
 
+  // Shared vote totals from the worker, so thumbs show real community counts.
+  useEffect(() => {
+    const controller = new AbortController();
+    const timer = window.setTimeout(() => controller.abort(), 3000);
+    const keys = visibleSites.map((site) => site.subdomain).join(",");
+    fetch(`${counterUrl}/votes?keys=${encodeURIComponent(keys)}`, { signal: controller.signal })
+      .then((response) => (response.ok ? response.json() : Promise.reject(new Error("bad response"))))
+      .then((data) => {
+        if (data?.votes && typeof data.votes === "object") setVoteTotals(data.votes as Record<string, VoteTotals>);
+      })
+      .catch(() => {})
+      .finally(() => window.clearTimeout(timer));
+    return () => {
+      controller.abort();
+      window.clearTimeout(timer);
+    };
+  }, []);
+
   // Confetti when a milestone fires.
   useEffect(() => {
     if (milestone == null) return;
@@ -251,14 +278,44 @@ export default function HomePage() {
     setFavorites((current) => (current.includes(key) ? current.filter((item) => item !== key) : [...current, key]));
   }, []);
 
-  const castVote = useCallback((key: string, direction: Vote) => {
-    setVotes((current) => {
-      const next = { ...current };
-      if (next[key] === direction) delete next[key];
-      else next[key] = direction;
-      return next;
-    });
+  // Push the choice change to the worker. Totals come back authoritative; if
+  // the worker is unreachable the vote still works locally.
+  const sendVote = useCallback(async (key: string, from: VoteValue, to: VoteValue) => {
+    try {
+      const response = await fetch(`${counterUrl}/vote`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ key, from, to }),
+      });
+      if (!response.ok) return;
+      const data = await response.json();
+      if (!Number.isFinite(data?.up) || !Number.isFinite(data?.down)) return;
+      setVoteTotals((current) => ({ ...current, [key]: { up: Number(data.up), down: Number(data.down) } }));
+    } catch {}
   }, []);
+
+  const castVote = useCallback((key: string, direction: Vote) => {
+    const previous: VoteValue = votes[key] ?? 0;
+    const next: VoteValue = previous === direction ? 0 : direction;
+    setVotes((current) => {
+      const updated = { ...current };
+      if (next === 0) delete updated[key];
+      else updated[key] = next === 1 ? 1 : -1;
+      return updated;
+    });
+    if (previous === next) return;
+    // Optimistic count so the number moves on click, corrected by the worker.
+    setVoteTotals((current) => {
+      const base = current[key] ?? { up: 0, down: 0 };
+      const updated: VoteTotals = { up: base.up, down: base.down };
+      if (previous === 1) updated.up = Math.max(0, updated.up - 1);
+      if (previous === -1) updated.down = Math.max(0, updated.down - 1);
+      if (next === 1) updated.up += 1;
+      if (next === -1) updated.down += 1;
+      return { ...current, [key]: updated };
+    });
+    void sendVote(key, previous, next);
+  }, [sendVote, votes]);
 
   const list = useMemo(() => {
     const needle = query.trim().toLowerCase();
@@ -391,6 +448,7 @@ export default function HomePage() {
             {list.map((site, index) => {
               const pinned = favorites.includes(site.subdomain);
               const vote = votes[site.subdomain];
+              const totals = voteTotals[site.subdomain];
               return (
                 <article
                   key={site.subdomain}
@@ -420,18 +478,21 @@ export default function HomePage() {
                         className={`vote-button up${vote === 1 ? " is-active" : ""}`}
                         onClick={() => castVote(site.subdomain, 1)}
                         aria-pressed={vote === 1}
-                        aria-label={`Thumbs up ${site.name}`}
+                        aria-label={`Thumbs up ${site.name}${totals ? `, ${totals.up} up` : ""}`}
                       >
                         <ThumbIcon />
+                        {/* keyed so the count replays its pop animation on change */}
+                        <span key={totals ? totals.up : "none"} className="vote-count mono">{totals ? totals.up : "–"}</span>
                       </button>
                       <button
                         type="button"
                         className={`vote-button down${vote === -1 ? " is-active" : ""}`}
                         onClick={() => castVote(site.subdomain, -1)}
                         aria-pressed={vote === -1}
-                        aria-label={`Thumbs down ${site.name}`}
+                        aria-label={`Thumbs down ${site.name}${totals ? `, ${totals.down} down` : ""}`}
                       >
                         <ThumbIcon down />
+                        <span key={totals ? totals.down : "none"} className="vote-count mono">{totals ? totals.down : "–"}</span>
                       </button>
                     </div>
                   </div>

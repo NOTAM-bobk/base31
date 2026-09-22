@@ -125,10 +125,14 @@ h1 { max-width: 620px; margin: 0; color: var(--text-strong); font-size: clamp(36
 /* Card actions ------------------------------------------------------- */
 .site-actions { display: flex; align-items: center; gap: 5px; flex: 0 0 auto; }
 .favorite-button, .vote-button {
-  width: 27px; height: 27px; display: inline-flex; align-items: center; justify-content: center;
+  min-width: 27px; height: 27px; display: inline-flex; align-items: center; justify-content: center;
   border: 1px solid var(--line); border-radius: 7px; background: transparent; color: var(--muted);
   cursor: pointer; transition: transform 140ms ease, color 140ms ease, border-color 140ms ease, background 140ms ease;
 }
+/* Vote buttons grow to fit their shared count. */
+.vote-button { gap: 4px; padding: 0 7px; }
+.vote-count { font-size: 10px; line-height: 1; font-variant-numeric: tabular-nums; animation: vote-pop 0.32s cubic-bezier(0.2, 0.8, 0.2, 1); }
+@keyframes vote-pop { from { opacity: 0.2; transform: translateY(-4px) scale(0.8); } to { opacity: 1; transform: none; } }
 .favorite-button:hover, .vote-button:hover { border-color: var(--line-strong); color: var(--text-strong); }
 .favorite-button:active, .vote-button:active { transform: scale(0.86); }
 .favorite-button:hover { color: var(--danger); }
@@ -337,7 +341,8 @@ html.has-custom-cursor, html.has-custom-cursor * { cursor: none !important; }
   .search-wrap { max-width: none; margin-top: 28px; min-height: 46px; }
   .site-card { padding: 13px; }
   .site-description { font-size: 12px; }
-  .favorite-button, .vote-button { width: 30px; height: 30px; }
+  .favorite-button, .vote-button { min-width: 30px; height: 30px; }
+  .vote-button { padding: 0 6px; }
   .about-section { margin-top: 80px; }
   .footer-links { justify-content: flex-start; }
   .site-footer-inner { align-items: flex-start; flex-direction: column; }
@@ -353,7 +358,7 @@ html.has-custom-cursor, html.has-custom-cursor * { cursor: none !important; }
   html { scroll-behavior: auto; }
   *, *::before, *::after { transition-duration: 0.01ms !important; }
   .site-header, .intro > *, .site-card, .live-dot, .intro::before, .view-counter, .donation-board,
-  .site-card:hover .site-arrow, .skeleton-card, .modal, .modal-backdrop, .toast { animation: none; }
+  .site-card:hover .site-arrow, .skeleton-card, .modal, .modal-backdrop, .toast, .vote-count { animation: none; }
   .site-nav a::after { transition: none; }
   .confetti-piece { display: none; }
 }

@@ -80,7 +80,66 @@ npm run dev
 
 Subdomains don't resolve on `localhost` by default. To test one locally,
 visit `http://example.localhost:3000` (the middleware treats `*.localhost`
-the same way it treats `*.base31.org`).
+the same way it treats `*.base31.org`).## Counters and votes (Cloudflare Workers)
+
+The directory's live view counter and the shared thumbs up/down totals are
+served by a small Cloudflare Worker backed by Cloudflare KV, deployed from
+`worker/` with Wrangler.
+
+### Files
+
+- `worker/src/index.ts` — the worker (routes below)
+- `worker/wrangler.jsonc` — worker config; the KV namespace auto-provisions
+  on first deploy and wrangler writes the generated ID back into this file
+
+### Routes
+
+| Route | Purpose |
+| --- | --- |
+| `GET /?key=<name>` | Increments the view counter, returns `{ "views": n }` |
+| `GET /votes?keys=a,b,c` | Reads totals without incrementing, returns `{ "votes": { a: { up, down }, … } }` |
+| `POST /vote` | Body `{ key, from, to }` where each of `from`/`to` is `1`, `-1` or `0`; returns the key's new `{ key, up, down }` |
+
+Views are stored under the key itself (so existing counts keep working) and
+votes under `votes:<key>:up` / `votes:<key>:down`. Votes are per browser:
+the visitor's own choice lives in `localStorage` and the worker only keeps the
+shared totals, so the same person cannot stack votes by reloading but also
+cannot be counted twice across devices. The client sends both its previous and
+its new choice, which keeps switching or clearing a vote from double-counting.
+
+### Environment variables
+
+| Key | Where | Purpose |
+| --- | --- | --- |
+| `CLOUDFLARE_API_TOKEN` | Vercel / Keys tab | Token with **Workers Scripts: Edit** + **Workers KV Storage: Edit** |
+| `CLOUDFLARE_ACCOUNT_ID` | Vercel / Keys tab | Cloudflare account ID (dashboard sidebar) |
+| `NEXT_PUBLIC_COUNTER_URL` | Vercel / Keys tab | Optional override for the deployed worker URL the homepage calls |
+| `COUNTER_SECRET` | Worker secret (`wrangler secret put`) | Optional; when set, requests must send `x-counter-secret` |
+
+### Deploying
+
+```bash
+# authenticate non-interactively via env vars (or wrangler login)
+export CLOUDFLARE_API_TOKEN=...   # token with Workers + KV edit permissions
+export CLOUDFLARE_ACCOUNT_ID=...
+
+npm run deploy:worker
+```
+
+Optional hardening:
+
+```bash
+cd worker && npx wrangler secret put COUNTER_SECRET
+# requests must then send: x-counter-secret: <value>
+```
+
+The homepage reads the worker URL from `NEXT_PUBLIC_COUNTER_URL`, falling back
+to the live `*.workers.dev` deployment when it is unset. Set the variable (and
+redeploy) if you host the worker on a custom domain.
+
+> The vote routes only exist once the worker has been redeployed. Until then
+the thumbs fall back to local-only voting — the counts show `–` and the click
+still registers in `localStorage` without erroring.
 
 
 <script type="text/javascript">

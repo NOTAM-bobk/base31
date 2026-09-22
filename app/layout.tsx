@@ -1,4 +1,4 @@
-import type { Metadata, Viewport } from "next";
+import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import Script from "next/script";
 import "./globals.css";
@@ -29,14 +29,12 @@ export const metadata: Metadata = {
       { url: "/favicon.ico", sizes: "any" },
       { url: "/favicon-16.png", sizes: "16x16", type: "image/png" },
       { url: "/favicon-32.png", sizes: "32x32", type: "image/png" },
-      // Google Search only renders favicons that are square and a multiple of
-      // 48px, so the 48/96/192px assets below are the ones it actually uses.
       { url: "/favicon-48.png", sizes: "48x48", type: "image/png" },
       { url: "/favicon-96.png", sizes: "96x96", type: "image/png" },
       { url: "/icons/base31-icon-192.png", sizes: "192x192", type: "image/png" },
     ],
     shortcut: ["/favicon.ico"],
-    apple: [{ url: "/icons/apple-touch-icon.png", sizes: "180x180", type: "image/png" }],
+    apple: [{ url: "/icons/apple-touch-icon.png", sizes: "180x180" }],
   },
   manifest: "/manifest.webmanifest",
   keywords: [
@@ -56,14 +54,12 @@ export const metadata: Metadata = {
       "A curated directory of cool sites, fun websites, creative projects, and useful tools on the open web.",
     siteName: "base31.org",
     locale: "en_US",
-    images: [{ url: "/icons/base31-icon-512.png", width: 512, height: 512, alt: "base31 geometric mark" }],
   },
   twitter: {
-    card: "summary",
+    card: "summary_large_image",
     title: "base31.org — Cool Sites and Fun Websites",
     description:
       "Discover creative web projects, useful tools, and fun websites in the base31.org directory.",
-    images: ["/icons/base31-icon-512.png"],
   },
   robots: {
     index: true,
@@ -72,7 +68,7 @@ export const metadata: Metadata = {
   },
 };
 
-export const viewport: Viewport = { themeColor: "#000000", colorScheme: "light dark", viewportFit: "cover" };
+export const viewport = { themeColor: "#000000", colorScheme: "light dark" as const, viewportFit: "cover" as const };
 
 // Applied before paint so a saved light theme never flashes dark.
 const themeScript = `try{if(localStorage.getItem("base31-theme")==="light"){document.documentElement.setAttribute("data-theme","light")}}catch(e){}`;
@@ -82,12 +78,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     <html lang="en">
       <head>
         <script id="base31-theme" dangerouslySetInnerHTML={{ __html: themeScript }} />
-        <script
-          id="microsoft-clarity"
-          type="text/javascript"
-          dangerouslySetInnerHTML={{ __html: clarityScript }}
-        />
-        {/* Without JS these never clear themselves, so hide them entirely. */}
+        <script id="microsoft-clarity" type="text/javascript" dangerouslySetInnerHTML={{ __html: clarityScript }} />
         <noscript>
           <style>{`.site-skeleton,.cursor-layer{display:none!important}`}</style>
         </noscript>

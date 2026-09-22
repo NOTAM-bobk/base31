@@ -1,34 +1,34 @@
 [
   {
-    "name": "appscreenshot",
+    "name": "App Screenshot",
     "subdomain": "appscreenshot",
     "url": "https://appscreenshot.base31.org",
     "tags": ["utility", "screenshot", "tools"],
-    "description": "Generate and customize app screenshots for showcase and presentation.",
+    "description": "Generate polished app screenshots for product pages, portfolios, and presentations.",
     "show": true
   },
   {
-    "name": "donation",
+    "name": "Donation",
     "subdomain": "donation",
     "url": "https://donation.base31.org",
-    "tags": ["donation", "plz", "THANKS"],
-    "description": "A donation page for base31.org Thanks!",
+    "tags": ["donations", "support", "base31"],
+    "description": "Support the independent tools and experiments hosted by base31.org.",
     "show": true
   },
   {
-    "name": "Chat With Your Data Garmin",
+    "name": "Chat With Your Garmin Data",
     "subdomain": "chatwithyourdatagarmin",
     "url": "https://chatwithyourdatagarmin.base31.org",
     "tags": ["ai", "garmin", "data", "fitness"],
-    "description": "Interactive AI chat interface to analyze and query Garmin fitness data.",
+    "description": "Ask questions about Garmin activity data through an interactive AI chat interface.",
     "show": false
   },
   {
-    "name": "Share Files - Uplode get URL",
+    "name": "Share Files",
     "subdomain": "share",
     "url": "https://share.base31.org",
-    "tags": ["utlity", "free", "online", "files"],
-    "description": "Share files online, uplode get url share ",
+    "tags": ["utility", "free", "online", "files"],
+    "description": "Upload a file and get a shareable link without creating an account.",
     "show": true
   },
   {
@@ -36,15 +36,15 @@
     "subdomain": "compmails",
     "url": "https://compmails.base31.org",
     "tags": ["email", "privacy", "utility"],
-    "description": "A fast disposable email client for temporary inboxes and quick online signups.",
+    "description": "Use a disposable inbox for temporary signups and quick online testing.",
     "show": true
   },
   {
-    "name": "Daily Wordel",
+    "name": "Daily Wordle",
     "subdomain": "dailywordel",
     "url": "https://dailywordel.base31.org",
     "tags": ["game", "word", "puzzle"],
-    "description": "A daily word puzzle game to test your vocabulary.",
+    "description": "Solve a fresh daily word puzzle and test your vocabulary.",
     "show": true
   },
   {
@@ -52,7 +52,7 @@
     "subdomain": "example",
     "url": "https://example.base31.org",
     "tags": ["demo", "starter"],
-    "description": "A placeholder site showing how a new subdomain gets added to the directory.",
+    "description": "A starter example showing how to add a static site to base31.org.",
     "show": false
   },
   {
@@ -60,7 +60,7 @@
     "subdomain": "focuscanvas",
     "url": "https://focuscanvas.base31.org",
     "tags": ["productivity", "canvas", "utility"],
-    "description": "A visual productivity canvas for focused work and brainstorming.",
+    "description": "Plan focused work and explore ideas on a visual productivity canvas.",
     "show": false
   },
   {
@@ -68,7 +68,7 @@
     "subdomain": "isitdown",
     "url": "https://isitdown.base31.org",
     "tags": ["utility", "network", "status"],
-    "description": "Check website status and verify service availability.",
+    "description": "Check whether a website is reachable and verify its current status.",
     "show": true
   },
   {
@@ -76,7 +76,7 @@
     "subdomain": "jokegenrator",
     "url": "https://jokegenrator.base31.org",
     "tags": ["entertainment", "fun", "utility"],
-    "description": "A lighthearted tool for generating quick jokes and humor.",
+    "description": "Generate a quick joke whenever you need a little entertainment.",
     "show": true
   },
   {
@@ -84,15 +84,15 @@
     "subdomain": "voicetransrib",
     "url": "https://voicetransrib.base31.org",
     "tags": ["audio", "transcription", "utility"],
-    "description": "Transcribe voice audio into text quickly and accurately.",
+    "description": "Turn spoken audio into text quickly with a simple transcription tool.",
     "show": false
   },
   {
     "name": "What's My Device",
     "subdomain": "whatsmydevice",
     "url": "https://whatsmydevice.base31.org",
-    "tags": ["utility", "device", "info"],
-    "description": "Inspect system specifications, browser details, and device attributes.",
+    "tags": ["utility", "device", "privacy"],
+    "description": "View your browser, device, screen, and system details in one place.",
     "show": false
   },
   {
@@ -100,7 +100,7 @@
     "subdomain": "snipfm",
     "url": "https://snipfm.base31.org",
     "tags": ["music", "discovery", "social"],
-    "description": "find music through tiktok style feed.",
+    "description": "Discover music through a short-form, swipeable feed.",
     "show": false
   },
   {
@@ -108,7 +108,7 @@
     "subdomain": "wordoftheday",
     "url": "https://wordoftheday.base31.org",
     "tags": ["education", "vocabulary", "learning"],
-    "description": "Learn new words daily with definitions and example usages.",
+    "description": "Learn a new word each day with definitions and example sentences.",
     "show": true
   }
 ]

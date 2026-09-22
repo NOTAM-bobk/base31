@@ -1,16 +1,18 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import type { CSSProperties } from "react";
+import type { CSSProperties, FormEvent } from "react";
 import sites from "@/config/sites.json";
 
-type Site = { name: string; subdomain: string; url: string; tags?: string[]; description?: string; show?: boolean };
+type Site = { name: string; subdomain: string; url: string; tags?: string[]; description?: string; show?: boolean; community?: boolean };
 type Theme = "dark" | "light";
 // This visitor's own choice, stored locally.
 type Vote = 1 | -1;
 // Every choice the worker understands: 1 = up, -1 = down, 0 = cleared.
 type VoteValue = 1 | 0 | -1;
 type VoteTotals = { up: number; down: number };
+// A site a visitor uploaded. The worker hosts its files from Cloudflare KV.
+type PublishedSite = { slug: string; title: string; description: string; tags: string[]; url: string; createdAt: number };
 
 const siteUrl = "https://base31.org";
 // Cloudflare Worker deployed from `worker/`. It serves the KV-backed view
@@ -23,6 +25,47 @@ const donationUrl = "https://donation.base31.org";
 const visibleSites = (sites as Site[]).filter((site) => site.show !== false);
 const searchIndex = (site: Site) =>
   `${site.name} ${site.subdomain} ${(site.tags || []).join(" ")} ${site.description || ""}`.toLowerCase();
+
+const MAX_UPLOAD_FILES = 40;
+const MAX_UPLOAD_FILE_BYTES = 2 * 1024 * 1024;
+
+const slugifyClient = (text: string) =>
+  text
+    .toLowerCase()
+    .normalize("NFKD")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 32)
+    .replace(/-+$/g, "");
+
+// A folder upload arrives as "my-site/index.html"; remembering the relative
+// path keeps the site's structure, so only the bare filename needs stripping.
+const uploadedFilePath = (file: File) =>
+  ((file as File & { webkitRelativePath?: string }).webkitRelativePath || file.name).replace(/^\/+/, "");
+
+const readFileBase64 = (file: File) =>
+  new Promise<string>((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const result = String(reader.result || "");
+      const comma = result.indexOf(",");
+      resolve(comma === -1 ? "" : result.slice(comma + 1));
+    };
+    reader.onerror = () => reject(new Error(`Couldn't read ${file.name}`));
+    reader.readAsDataURL(file);
+  });
+
+// Picking a folder yields "my-site/index.html" for every file, so drop the
+// shared top folder and land index.html at the site root.
+const stripCommonFolder = (entries: { path: string; data: string }[]) => {
+  if (entries.length < 2 && !entries[0]?.path.includes("/")) return entries;
+  const first = entries[0]?.path.split("/")[0];
+  if (!first || !entries.every((entry) => entry.path.startsWith(`${first}/`))) return entries;
+  return entries.map((entry) => ({ ...entry, path: entry.path.slice(first.length + 1) }));
+};
+
+const formatBytes = (bytes: number) =>
+  bytes < 1024 ? `${bytes} B` : bytes < 1024 * 1024 ? `${(bytes / 1024).toFixed(0)} KB` : `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 
 function SunIcon() {
   return (
@@ -55,6 +98,78 @@ function ThumbIcon({ down }: { down?: boolean }) {
       <path d="M7 10v10H4a1 1 0 0 1-1-1v-8a1 1 0 0 1 1-1h3Z" />
       <path d="M7 10l4.3-6.6a1.8 1.8 0 0 1 3.3 1.1L13.7 8H18a2 2 0 0 1 2 2.4l-1 6.2a2 2 0 0 1-2 1.4H7" />
     </svg>
+  );
+}
+
+// Words the headline cycles through on load. The first one is server-rendered,
+// so the sentence still reads (and indexes) without JavaScript.
+const ROTATING_WORDS = ["curious", "cool", "amazing", "interested", "creative", "restless", "adventurous"];
+
+function WordRotator({ words = ROTATING_WORDS }: { words?: string[] }) {
+  const [index, setIndex] = useState(0);
+
+  useEffect(() => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const id = window.setInterval(() => setIndex((current) => (current + 1) % words.length), 2600);
+    return () => window.clearInterval(id);
+  }, [words.length]);
+
+  const word = words[index] ?? words[0];
+
+  return (
+    <span className="rotator">
+      {/* keyed so the word replays its slide-in on every switch */}
+      <span key={word} className="rotator-word">{word}</span>
+    </span>
+  );
+}
+
+// A live odometer-style clock counting up from base31's launch (5 PM
+// yesterday). Rendered client-only — the elapsed value starts null so the
+// server and first client render match.
+function LaunchClock() {
+  const [elapsed, setElapsed] = useState<number | null>(null);
+
+  useEffect(() => {
+    const launched = new Date();
+    launched.setDate(launched.getDate() - 1);
+    launched.setHours(17, 0, 0, 0);
+    const startedAt = launched.getTime();
+    const tick = () => setElapsed(Math.max(0, Date.now() - startedAt));
+    tick();
+    const id = window.setInterval(tick, 1000);
+    return () => window.clearInterval(id);
+  }, []);
+
+  const totalSeconds = Math.floor((elapsed ?? 0) / 1000);
+  const pad = (value: number) => String(value).padStart(2, "0");
+  const units = [
+    { label: "days", value: pad(Math.floor(totalSeconds / 86400)) },
+    { label: "hours", value: pad(Math.floor((totalSeconds % 86400) / 3600)) },
+    { label: "minutes", value: pad(Math.floor((totalSeconds % 3600) / 60)) },
+    { label: "seconds", value: pad(totalSeconds % 60) },
+  ];
+
+  return (
+    <section className="launch-block" aria-label="Time since base31 launched">
+      <div className="launch-head mono">
+        <span className="live-dot" aria-hidden="true" />
+        live since launch
+      </div>
+      <h2>base31 has been running for</h2>
+      <div className="clock-row" role="timer" aria-live="off">
+        {units.map((unit) => (
+          <span key={unit.label} className="clock-unit">
+            <span className="clock-value mono">
+              {/* keyed so the digit replays its flip as it ticks over */}
+              <span key={unit.value} className="clock-digit">{elapsed == null ? "--" : unit.value}</span>
+            </span>
+            <span className="clock-label mono">{unit.label}</span>
+          </span>
+        ))}
+      </div>
+      <p className="clock-note">Started at 5:00 PM yesterday and counting, one second at a time.</p>
+    </section>
   );
 }
 
@@ -115,6 +230,12 @@ export default function HomePage() {
   const [consentNeeded, setConsentNeeded] = useState(false);
   const [booting, setBooting] = useState(true);
   const [hydrated, setHydrated] = useState(false);
+  const [userSites, setUserSites] = useState<PublishedSite[]>([]);
+  const [submitOpen, setSubmitOpen] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [uploadFiles, setUploadFiles] = useState<File[]>([]);
+  const [form, setForm] = useState({ title: "", description: "", tags: "", slug: "" });
   const searchRef = useRef<HTMLInputElement>(null);
   const toastTimer = useRef<number | null>(null);
 
@@ -198,11 +319,32 @@ export default function HomePage() {
     };
   }, []);
 
+  // Community-published sites, hosted by the worker. If there are none yet —
+  // or the worker is unreachable — the built-in directory still renders.
+  useEffect(() => {
+    const controller = new AbortController();
+    const timer = window.setTimeout(() => controller.abort(), 3500);
+    fetch(`${counterUrl}/sites`, { signal: controller.signal })
+      .then((response) => (response.ok ? response.json() : Promise.reject(new Error("bad response"))))
+      .then((data) => {
+        if (Array.isArray(data?.sites)) setUserSites(data.sites as PublishedSite[]);
+      })
+      .catch(() => {})
+      .finally(() => window.clearTimeout(timer));
+    return () => {
+      controller.abort();
+      window.clearTimeout(timer);
+    };
+  }, []);
+
   // Shared vote totals from the worker, so thumbs show real community counts.
+  // Uploaded sites share the same vote keys, so they rank alongside the rest.
   useEffect(() => {
     const controller = new AbortController();
     const timer = window.setTimeout(() => controller.abort(), 3000);
-    const keys = visibleSites.map((site) => site.subdomain).join(",");
+    const keys = [...visibleSites.map((site) => site.subdomain), ...userSites.map((site) => site.slug)]
+      .slice(0, 100)
+      .join(",");
     fetch(`${counterUrl}/votes?keys=${encodeURIComponent(keys)}`, { signal: controller.signal })
       .then((response) => (response.ok ? response.json() : Promise.reject(new Error("bad response"))))
       .then((data) => {
@@ -214,7 +356,7 @@ export default function HomePage() {
       controller.abort();
       window.clearTimeout(timer);
     };
-  }, []);
+  }, [userSites]);
 
   // A quick burst of confetti. Shared by milestone popups and hearting a site.
   const launchConfetti = useCallback((count = 28, hearts = false) => {
@@ -244,6 +386,7 @@ export default function HomePage() {
       const typing = !!target && (target.tagName === "INPUT" || target.tagName === "TEXTAREA" || target.isContentEditable);
       if (event.key === "Escape") {
         setShareOpen(false);
+        setSubmitOpen(false);
         setMilestone(null);
         if (searchRef.current && document.activeElement === searchRef.current) {
           setQuery("");
@@ -255,25 +398,49 @@ export default function HomePage() {
       if (event.key === "/") {
         event.preventDefault();
         searchRef.current?.focus();
-      } else if (event.key.toLowerCase() === "s" && !shareOpen && milestone == null) {
+      } else if (event.key.toLowerCase() === "s" && !shareOpen && !submitOpen && milestone == null) {
         event.preventDefault();
         setShareOpen(true);
       }
     };
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [milestone, shareOpen]);
+  }, [milestone, shareOpen, submitOpen]);
+
+  // Hide the floating support affordance once the visitor reaches the bottom
+  // of the page, where the real donation board and support button live.
+  useEffect(() => {
+    let frame = 0;
+    const update = () => {
+      frame = 0;
+      const scrolled = window.scrollY + window.innerHeight;
+      const total = document.documentElement.scrollHeight;
+      document.documentElement.classList.toggle("at-bottom", total - scrolled < 160);
+    };
+    const onScroll = () => {
+      if (!frame) frame = window.requestAnimationFrame(update);
+    };
+    update();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll);
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+      if (frame) window.cancelAnimationFrame(frame);
+      document.documentElement.classList.remove("at-bottom");
+    };
+  }, []);
 
   // Lock background scroll while a modal is open.
   useEffect(() => {
-    const open = shareOpen || milestone != null;
+    const open = shareOpen || submitOpen || milestone != null;
     if (!open) return;
     const previous = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     return () => {
       document.body.style.overflow = previous;
     };
-  }, [shareOpen, milestone]);
+  }, [shareOpen, submitOpen, milestone]);
 
   const notify = useCallback((message: string) => {
     setToast(message);
@@ -327,6 +494,20 @@ export default function HomePage() {
     void sendVote(key, previous, next);
   }, [sendVote, votes]);
 
+  // The built-in directory plus everything visitors have published.
+  const allSites = useMemo<Site[]>(() => [
+    ...visibleSites,
+    ...userSites.map((site) => ({
+      name: site.title,
+      subdomain: site.slug,
+      url: site.url,
+      tags: site.tags,
+      description: site.description,
+      show: true,
+      community: true,
+    })),
+  ], [userSites]);
+
   // Ranking: hearted (pinned) sites stay on top, then everything sorts by how
   // liked it is — net thumbs (up minus down), then raw upvotes, then name.
   const netLikes = useCallback(
@@ -340,7 +521,7 @@ export default function HomePage() {
 
   const list = useMemo(() => {
     const needle = query.trim().toLowerCase();
-    const matched = visibleSites.filter((site) => !needle || searchIndex(site).includes(needle));
+    const matched = allSites.filter((site) => !needle || searchIndex(site).includes(needle));
     const rankValue = (key: string) => netLikes(key);
     return [...matched].sort((a, b) => {
       const pinnedA = favorites.includes(a.subdomain) ? 1 : 0;
@@ -356,7 +537,87 @@ export default function HomePage() {
       if (upA !== upB) return upB - upA;
       return a.name.localeCompare(b.name);
     });
-  }, [query, favorites, netLikes, voteTotals]);
+  }, [query, favorites, allSites, netLikes, voteTotals]);
+
+  const openSubmit = useCallback(() => {
+    setForm({ title: "", description: "", tags: "", slug: "" });
+    setUploadFiles([]);
+    setSubmitError(null);
+    setSubmitOpen(true);
+  }, []);
+
+  const addFiles = useCallback((picked: FileList | null) => {
+    if (!picked || picked.length === 0) return;
+    setUploadFiles((current) => {
+      const byPath = new Map(current.map((file) => [uploadedFilePath(file), file]));
+      for (const file of Array.from(picked)) {
+        const path = uploadedFilePath(file);
+        // Skip editor and OS cruft like .DS_Store.
+        if (path.split("/").some((part) => part.startsWith("."))) continue;
+        byPath.set(path, file);
+      }
+      return Array.from(byPath.values());
+    });
+  }, []);
+
+  const removeFile = useCallback((path: string) => {
+    setUploadFiles((current) => current.filter((file) => uploadedFilePath(file) !== path));
+  }, []);
+
+  // Read every file, then hand the whole site to the worker, which stores it
+  // in KV and starts serving it at a public URL.
+  const publishSite = useCallback(async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (submitting) return;
+    setSubmitError(null);
+
+    if (!form.title.trim()) {
+      setSubmitError("Give your site a title.");
+      return;
+    }
+    if (uploadFiles.length === 0) {
+      setSubmitError("Add your site's files — an index.html at least.");
+      return;
+    }
+    if (uploadFiles.length > MAX_UPLOAD_FILES) {
+      setSubmitError(`Too many files — the limit is ${MAX_UPLOAD_FILES}.`);
+      return;
+    }
+    const oversized = uploadFiles.find((file) => file.size > MAX_UPLOAD_FILE_BYTES);
+    if (oversized) {
+      setSubmitError(`${uploadedFilePath(oversized)} is larger than 2 MB.`);
+      return;
+    }
+
+    setSubmitting(true);
+    try {
+      const read = await Promise.all(
+        uploadFiles.map(async (file) => ({ path: uploadedFilePath(file), data: await readFileBase64(file) })),
+      );
+      const response = await fetch(`${counterUrl}/submit`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title: form.title.trim(),
+          description: form.description.trim(),
+          tags: form.tags.split(",").map((tag) => tag.trim()).filter(Boolean),
+          slug: form.slug.trim(),
+          files: stripCommonFolder(read),
+        }),
+      });
+      const data = await response.json().catch(() => null);
+      if (!response.ok) throw new Error(data?.error || "Couldn't publish that site.");
+      // KV list is eventually consistent, so show it right away for its author.
+      if (data?.site) setUserSites((current) => [data.site as PublishedSite, ...current]);
+      setSubmitOpen(false);
+      setUploadFiles([]);
+      notify("Your site is live");
+    } catch (error) {
+      setSubmitError(error instanceof Error ? error.message : "Couldn't publish that site.");
+    } finally {
+      setSubmitting(false);
+    }
+  }, [form, notify, submitting, uploadFiles]);
 
   const copyLink = useCallback(async (text = siteUrl) => {
     try {
@@ -394,6 +655,7 @@ export default function HomePage() {
     setConsentNeeded(false);
   }, []);
 
+  const slugPreview = slugifyClient(form.slug.trim() || form.title.trim());
   const shareText = encodeURIComponent("Cool sites for curious people — base31.org");
   const shareUrl = encodeURIComponent(siteUrl);
 
@@ -446,7 +708,7 @@ export default function HomePage() {
       <main>
         <section className="intro" aria-labelledby="page-title">
           <p className="eyebrow mono">the independent web directory</p>
-          <h1 id="page-title">Cool sites for curious people.</h1>
+          <h1 id="page-title">Cool sites for <WordRotator /> people.</h1>
           <p className="subtitle">Discover fun websites, useful online tools, and creative web projects built on base31.org and the open web.</p>
           <div className="intro-links">
             <a className="text-link" href="#sites">Browse all sites <span aria-hidden="true">↓</span></a>
@@ -470,9 +732,11 @@ export default function HomePage() {
         <section id="sites" className="directory-section" aria-labelledby="sites-heading">
           <div className="section-heading">
             <h2 id="sites-heading">Featured sites</h2>
-            <span className="section-count mono">
-              {query.trim() ? `${list.length} match${list.length === 1 ? "" : "es"}` : `${visibleSites.length} live`} · most liked first
-            </span>
+            {query.trim() && (
+              <span className="section-count mono">
+                {list.length} match{list.length === 1 ? "" : "es"}
+              </span>
+            )}
           </div>
           <div className="site-list" aria-label="Deployed sites">
             {list.length === 0 && <p className="empty">No sites match “{query.trim()}”. Try another search.</p>}
@@ -491,6 +755,7 @@ export default function HomePage() {
                       <span className="site-name-row">
                         <span className="live-dot" aria-hidden="true" />
                         <span className="site-name">{site.name}</span>
+                        {site.community && <span className="site-badge mono">community</span>}
                         <span className="site-arrow mono" aria-hidden="true">↗</span>
                       </span>
                     </a>
@@ -539,6 +804,16 @@ export default function HomePage() {
                 </article>
               );
             })}
+            {!query.trim() && (
+              <button type="button" className="upload-card" onClick={openSubmit}>
+                <span className="upload-card-icon mono" aria-hidden="true">＋</span>
+                <span className="upload-card-body">
+                  <span className="upload-card-title">Add your own site</span>
+                  <span className="upload-card-text">Upload your HTML files — we host them here for free, and visitors can browse and vote on your site.</span>
+                </span>
+                <span className="upload-card-arrow mono" aria-hidden="true">↗</span>
+              </button>
+            )}
             {booting && (
               <div className="site-skeleton" aria-hidden="true">
                 {visibleSites.map((site) => <div key={site.subdomain} className="skeleton-card" />)}
@@ -582,12 +857,16 @@ export default function HomePage() {
           <span className="support-ad-text">Want to support base31? Click this button to help</span>
           <span className="support-ad-arrow mono" aria-hidden="true">↗</span>
         </a>
+
+        {/* Live count-up from the launch of base31, right above the footer. */}
+        <LaunchClock />
       </main>
 
       <footer className="site-footer">
         <div className="site-footer-inner mono">
           <span>© {new Date().getFullYear()} base31.org · built by Sawyer Schulz</span>
           <nav className="footer-links" aria-label="Footer navigation">
+            <a href="/blog">Blog</a>
             <a href="/about">About</a>
             <a href="/terms">Terms of service</a>
             <a href="/privacy">Privacy</a>
@@ -673,6 +952,116 @@ export default function HomePage() {
                 Download certificate
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {submitOpen && (
+        <div className="modal-backdrop" onClick={(event) => event.target === event.currentTarget && setSubmitOpen(false)}>
+          <div className="modal submit-sheet" role="dialog" aria-modal="true" aria-labelledby="submit-title">
+            <button type="button" className="modal-close" onClick={() => setSubmitOpen(false)} aria-label="Close upload form">×</button>
+            <p className="eyebrow mono">publish your site</p>
+            <h2 id="submit-title">Add your site to the directory.</h2>
+            <p>Upload your HTML, CSS, and JavaScript files. We host them for free and visitors can browse and vote on your site.</p>
+
+            <form className="submit-form" onSubmit={publishSite}>
+              <label className="submit-field">
+                <span>Title</span>
+                <input
+                  value={form.title}
+                  onChange={(event) => setForm((current) => ({ ...current, title: event.target.value }))}
+                  maxLength={80}
+                  placeholder="My cool site"
+                  required
+                />
+              </label>
+
+              <label className="submit-field">
+                <span>Description</span>
+                <textarea
+                  value={form.description}
+                  onChange={(event) => setForm((current) => ({ ...current, description: event.target.value }))}
+                  maxLength={300}
+                  placeholder="What does your site do?"
+                />
+              </label>
+
+              <label className="submit-field">
+                <span>Tags</span>
+                <input
+                  value={form.tags}
+                  onChange={(event) => setForm((current) => ({ ...current, tags: event.target.value }))}
+                  placeholder="game, tool, art"
+                />
+              </label>
+
+              <label className="submit-field">
+                <span>Web address</span>
+                <input
+                  value={form.slug}
+                  onChange={(event) => setForm((current) => ({ ...current, slug: event.target.value }))}
+                  maxLength={32}
+                  placeholder="auto from the title"
+                />
+                <span className="field-hint mono">{counterUrl.replace(/^https?:\/\//, "")}/s/{slugPreview || "your-site"}/</span>
+              </label>
+
+              <div className="submit-files">
+                <span className="submit-label">Files</span>
+                <div className="file-drop">
+                  <label className="file-button" htmlFor="site-files">Choose files</label>
+                  <input
+                    id="site-files"
+                    type="file"
+                    multiple
+                    onChange={(event) => {
+                      addFiles(event.target.files);
+                      event.target.value = "";
+                    }}
+                  />
+                  <label className="file-button" htmlFor="site-folder">Upload a folder</label>
+                  <input
+                    id="site-folder"
+                    type="file"
+                    multiple
+                    onChange={(event) => {
+                      addFiles(event.target.files);
+                      event.target.value = "";
+                    }}
+                    {...({ webkitdirectory: "", directory: "" } as Record<string, string>)}
+                  />
+                </div>
+                {uploadFiles.length === 0 ? (
+                  <p className="form-note">
+                    Include an <span className="mono">index.html</span> at the root — CSS, JS, and images can sit beside it. Up to 40 files, 2 MB each.
+                  </p>
+                ) : (
+                  <ul className="file-list">
+                    {uploadFiles.map((file) => {
+                      const path = uploadedFilePath(file);
+                      return (
+                        <li key={path} className="file-item">
+                          <span className="file-item-path mono">{path}</span>
+                          <span className="file-item-right">
+                            <span className="file-size mono">{formatBytes(file.size)}</span>
+                            <button type="button" onClick={() => removeFile(path)} aria-label={`Remove ${path}`}>×</button>
+                          </span>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                )}
+              </div>
+
+              {submitError && <p className="form-error" role="alert">{submitError}</p>}
+
+              <div className="modal-actions">
+                <button type="submit" className="primary" disabled={submitting}>
+                  {submitting ? "Publishing…" : "Publish site"}
+                </button>
+                <button type="button" onClick={() => setSubmitOpen(false)} disabled={submitting}>Cancel</button>
+              </div>
+            </form>
           </div>
         </div>
       )}

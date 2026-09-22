@@ -83,6 +83,11 @@ main { width: min(100% - 48px, 720px); min-height: calc(100vh - 129px); margin: 
 .eyebrow { margin: 0 0 18px; color: var(--subtle); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; }
 h1 { max-width: 620px; margin: 0; color: var(--text-strong); font-size: clamp(36px, 7vw, 58px); font-weight: 600; letter-spacing: -0.065em; line-height: 1.02; }
 .subtitle { max-width: 510px; margin: 18px 0 0; color: var(--muted); font-size: 16px; line-height: 1.6; }
+
+/* Rotating headline word --------------------------------------------- */
+.rotator { display: inline-block; }
+.rotator-word { display: inline-block; white-space: nowrap; animation: word-in 0.55s cubic-bezier(0.2, 0.8, 0.2, 1); }
+@keyframes word-in { from { transform: translateY(0.42em); opacity: 0; } to { transform: none; opacity: 1; } }
 .intro-links { display: flex; flex-wrap: wrap; gap: 20px; margin-top: 26px; }
 .text-link { color: var(--text-strong); font-size: 13px; font-weight: 500; text-underline-offset: 4px; }
 .text-link:hover { color: var(--live); }
@@ -146,6 +151,24 @@ h1 { max-width: 620px; margin: 0; color: var(--text-strong); font-size: clamp(36
 .vote-button.down.is-active { border-color: rgb(255 59 92 / 45%); background: rgb(255 59 92 / 12%); color: var(--danger); }
 .site-card.is-pinned { border-color: var(--line-strong); background: var(--pinned-bg); }
 .site-card.is-pinned::before { position: absolute; top: 0; left: 16px; width: 26px; height: 2px; background: var(--text-strong); content: ""; }
+.site-badge { flex: 0 0 auto; padding: 1px 6px; border: 1px solid var(--line-strong); border-radius: 999px; color: var(--subtle); font-size: 8px; letter-spacing: 0.08em; text-transform: uppercase; }
+
+/* Upload / publish --------------------------------------------------- */
+.upload-card {
+  display: flex; align-items: center; gap: 14px; width: 100%; margin-top: 2px; padding: 16px;
+  border: 1px dashed var(--line-strong); border-radius: var(--radius); background: transparent;
+  font: inherit; color: var(--muted); text-align: left; cursor: pointer;
+  animation: card-in 0.42s cubic-bezier(0.2, 0.7, 0.2, 1) 0.1s backwards;
+  transition: border-color 160ms ease, background 160ms ease, color 160ms ease, transform 160ms ease, box-shadow 160ms ease;
+}
+.upload-card:hover, .upload-card:focus-visible { border-color: var(--text-strong); background: var(--surface); color: var(--text); transform: translateY(-2px); box-shadow: var(--shadow); }
+.upload-card:focus-visible { outline: 2px solid var(--text-strong); outline-offset: 3px; }
+.upload-card-icon { display: inline-flex; align-items: center; justify-content: center; width: 34px; height: 34px; flex: 0 0 auto; border: 1px solid var(--line-strong); border-radius: 9px; color: var(--text-strong); font-size: 17px; }
+.upload-card-body { display: flex; flex: 1; min-width: 0; flex-direction: column; gap: 3px; }
+.upload-card-title { color: var(--text-strong); font-size: 13.5px; font-weight: 500; letter-spacing: -0.015em; }
+.upload-card-text { color: var(--subtle); font-size: 11.5px; line-height: 1.45; }
+.upload-card-arrow { flex: 0 0 auto; color: var(--subtle); font-size: 15px; transition: color 160ms ease, transform 160ms ease; }
+.upload-card:hover .upload-card-arrow { color: var(--text-strong); transform: translate(2px, -2px); }
 
 /* About -------------------------------------------------------------- */
 .about-section { max-width: 600px; margin-top: 108px; padding-top: 34px; border-top: 1px solid var(--line); scroll-margin-top: 32px; }
@@ -176,6 +199,7 @@ h1 { max-width: 620px; margin: 0; color: var(--text-strong); font-size: clamp(36
   position: fixed; top: 50%; right: 20px; z-index: 15; width: 216px; transform: translateY(-50%);
   display: flex; flex-direction: column; gap: 12px; padding: 18px;
   border: 1px solid var(--line); border-radius: 14px; background: var(--surface); box-shadow: var(--shadow);
+  transition: opacity 240ms ease, transform 240ms ease;
 }
 .donation-cta {
   display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 9px 12px;
@@ -201,6 +225,39 @@ h1 { max-width: 620px; margin: 0; color: var(--text-strong); font-size: clamp(36
 .support-ad-text { flex: 1; min-width: 0; }
 .support-ad-arrow { flex: 0 0 auto; color: var(--subtle); transition: color 160ms ease, transform 160ms ease; }
 .support-ad:hover .support-ad-arrow { color: var(--text-strong); transform: translate(1px, -1px); }
+
+/* Launch count-up clock ---------------------------------------------- */
+.launch-block {
+  margin-top: 72px; padding: 30px 24px; border: 1px solid var(--line); border-radius: 18px;
+  background: var(--surface); text-align: center;
+}
+.launch-head { display: inline-flex; align-items: center; gap: 8px; color: var(--subtle); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; }
+.launch-block h2 { margin: 12px 0 0; color: var(--text-strong); font-size: 20px; font-weight: 500; letter-spacing: -0.035em; }
+.clock-row { display: flex; justify-content: center; gap: 14px; margin-top: 24px; }
+.clock-unit { position: relative; display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.clock-unit + .clock-unit::before {
+  position: absolute; top: 15px; left: -11px; color: var(--subtle);
+  font-size: 22px; font-weight: 500; line-height: 1; content: ":";
+}
+.clock-value {
+  position: relative; display: flex; align-items: center; justify-content: center;
+  min-width: 64px; height: 58px; padding: 0 10px; perspective: 340px;
+  border: 1px solid var(--line-strong); border-radius: 12px;
+  background: linear-gradient(180deg, var(--surface-hover), var(--surface));
+  color: var(--text-strong); font-size: 30px; font-weight: 600; letter-spacing: -0.02em;
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 4%), var(--shadow);
+}
+/* Odometer hinge across the middle of each tile. */
+.clock-value::after { position: absolute; inset: 50% 6px auto; height: 1px; background: var(--line); content: ""; opacity: 0.5; }
+.clock-digit { display: block; transform-origin: center top; animation: flip-in 0.5s cubic-bezier(0.2, 0.8, 0.2, 1); }
+@keyframes flip-in { from { transform: rotateX(-88deg); opacity: 0.25; } to { transform: none; opacity: 1; } }
+.clock-label { color: var(--subtle); font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; }
+.clock-note { margin: 20px 0 0; color: var(--subtle); font-size: 11px; }
+
+/* The floating support affordance steps aside at the very bottom. */
+@media (min-width: 1200px) {
+  html.at-bottom .donation-board { opacity: 0; transform: translateY(-50%) translateX(18px); pointer-events: none; }
+}
 
 /* Cookie consent -----------------------------------------------------
    Pinned to the very bottom edge and stacked above the rest of the UI. */
@@ -253,6 +310,39 @@ h1 { max-width: 620px; margin: 0; color: var(--text-strong); font-size: clamp(36
 .share-mark { display: inline-flex; align-items: center; justify-content: center; width: 38px; height: 38px; flex: 0 0 auto; border: 1px solid var(--line-strong); border-radius: 9px; background: var(--invert-bg); color: var(--invert-fg); font-size: 12px; font-weight: 700; letter-spacing: -0.03em; }
 .share-preview p { margin: 0; overflow: hidden; color: var(--muted); font-size: 11px; text-overflow: ellipsis; white-space: nowrap; }
 .share-preview strong { display: block; color: var(--text-strong); font-size: 13px; font-weight: 500; }
+
+/* Publish form ------------------------------------------------------- */
+.submit-sheet { width: min(520px, 100%); max-height: min(88vh, 780px); overflow-y: auto; }
+.submit-form { display: flex; flex-direction: column; gap: 14px; margin-top: 18px; }
+.submit-field, .submit-files { display: flex; flex-direction: column; gap: 7px; }
+.submit-field > span:first-child, .submit-label { color: var(--muted); font-size: 10.5px; letter-spacing: 0.06em; text-transform: uppercase; }
+.submit-field input, .submit-field textarea {
+  width: 100%; padding: 10px 12px; border: 1px solid var(--line); border-radius: 9px;
+  background: var(--input-bg); color: var(--text-strong); font: inherit; font-size: 13px;
+  transition: border-color 150ms ease, box-shadow 150ms ease;
+}
+.submit-field textarea { min-height: 76px; resize: vertical; line-height: 1.5; }
+.submit-field input:focus, .submit-field textarea:focus { outline: 0; border-color: var(--line-strong); box-shadow: 0 0 0 3px rgb(127 127 127 / 12%); }
+.submit-field input::placeholder, .submit-field textarea::placeholder { color: var(--subtle); }
+.field-hint { color: var(--subtle) !important; font-size: 10px !important; letter-spacing: 0 !important; text-transform: none !important; word-break: break-all; }
+.file-drop { display: flex; flex-wrap: wrap; gap: 8px; }
+.file-drop input[type="file"] { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+.file-button {
+  display: inline-flex; align-items: center; gap: 6px; padding: 9px 13px; border: 1px solid var(--line-strong);
+  border-radius: 9px; color: var(--text); font-size: 12px; cursor: pointer;
+  transition: border-color 150ms ease, color 150ms ease, background 150ms ease;
+}
+.file-button:hover { border-color: var(--text-strong); background: var(--surface-hover); }
+.file-list { display: flex; flex-direction: column; gap: 6px; max-height: 180px; margin: 2px 0 0; padding: 0; overflow-y: auto; list-style: none; }
+.file-item { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 7px 10px; border: 1px solid var(--line); border-radius: 8px; color: var(--muted); font-size: 11px; }
+.file-item-path { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.file-item-right { display: inline-flex; align-items: center; flex: 0 0 auto; gap: 8px; }
+.file-size { color: var(--subtle); font-size: 10px; }
+.file-item button { display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; border: 0; border-radius: 5px; background: transparent; color: var(--subtle); font-size: 14px; line-height: 1; cursor: pointer; }
+.file-item button:hover { background: var(--surface-hover); color: var(--danger); }
+.form-note { margin: 0; color: var(--subtle); font-size: 11px; line-height: 1.5; }
+.form-error { margin: 0; padding: 9px 11px; border: 1px solid rgb(255 59 92 / 40%); border-radius: 8px; background: rgb(255 59 92 / 10%); color: var(--danger); font-size: 12px; line-height: 1.45; }
+.modal-actions button:disabled { opacity: 0.6; cursor: progress; }
 .toast {
   position: fixed; left: 50%; bottom: 28px; z-index: 90; transform: translateX(-50%);
   padding: 10px 16px; border: 1px solid var(--line-strong); border-radius: 999px;
@@ -327,7 +417,10 @@ html.has-custom-cursor, html.has-custom-cursor * { cursor: none !important; }
 .view-counter.is-bumped strong { animation: count-pop 0.5s ease; }
 @keyframes count-pop { 0% { transform: scale(1); } 40% { transform: scale(1.28); } 100% { transform: scale(1); } }
 
-.donation-board { animation: fade-up 0.6s cubic-bezier(0.2, 0.7, 0.2, 1) 0.3s both; }
+/* `backwards` so the finished entrance stops overriding the state styles
+   (top:50% centring and the at-bottom hide). */
+.donation-board { animation: board-in 0.6s cubic-bezier(0.2, 0.7, 0.2, 1) 0.3s backwards; }
+@keyframes board-in { from { opacity: 0; transform: translateY(calc(-50% + 14px)); } to { opacity: 1; transform: translateY(-50%); } }
 
 /* Privacy / about pages ---------------------------------------------- */
 .privacy-page { min-height: 100vh; width: min(100% - 48px, 680px); margin: 0 auto; padding: 64px 0 100px; }
@@ -339,6 +432,26 @@ html.has-custom-cursor, html.has-custom-cursor * { cursor: none !important; }
 .privacy-copy h2 { margin: 36px 0 10px; color: var(--text-strong); font-size: 16px; font-weight: 500; letter-spacing: -0.02em; }
 .privacy-copy h2:first-child { margin-top: 0; }
 .privacy-copy p { margin: 0; color: var(--muted); font-size: 14px; line-height: 1.7; }
+
+/* Blog --------------------------------------------------------------- */
+.blog-page h1 { font-size: clamp(30px, 6vw, 46px); }
+.blog-list { display: grid; gap: 18px; margin-top: 56px; }
+.blog-card { padding: 22px; border: 1px solid var(--line); border-radius: 16px; background: var(--surface); transition: border-color 160ms ease, transform 160ms ease, box-shadow 160ms ease; }
+.blog-card:hover { border-color: var(--line-strong); transform: translateY(-2px); box-shadow: var(--shadow); }
+.blog-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; color: var(--subtle); font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; }
+.blog-tags { color: var(--subtle); }
+.blog-card h2 { margin: 12px 0 0; font-size: 20px; font-weight: 500; letter-spacing: -0.03em; }
+.blog-card h2 a { color: var(--text-strong); text-decoration: none; }
+.blog-card h2 a:hover { color: var(--live); }
+.blog-card p { margin: 10px 0 0; color: var(--muted); font-size: 13px; line-height: 1.6; }
+.blog-read { display: inline-block; margin-top: 14px; color: var(--muted); font-size: 11px; text-decoration: none; }
+.blog-read:hover { color: var(--text-strong); }
+/* The shared prose styles give paragraphs no margin; a post needs rhythm. */
+.blog-article p { margin: 0 0 16px; }
+.blog-article ul { margin: 0 0 18px; padding-left: 20px; }
+.blog-article li { margin: 0 0 8px; color: var(--muted); font-size: 14px; line-height: 1.7; }
+.blog-article li::marker { color: var(--subtle); }
+.blog-footer { display: flex; flex-wrap: wrap; gap: 8px 20px; margin-top: 48px; padding-top: 24px; border-top: 1px solid var(--line); }
 
 /* Responsive --------------------------------------------------------- */
 @media (max-width: 1199px) {
@@ -354,6 +467,7 @@ html.has-custom-cursor, html.has-custom-cursor * { cursor: none !important; }
     padding: 12px 16px; box-shadow: var(--shadow);
   }
   html.has-consent .donation-cta { bottom: calc(148px + env(safe-area-inset-bottom)); }
+  html.at-bottom .donation-cta { opacity: 0; transform: translateY(14px); pointer-events: none; }
   html.has-consent .view-counter { opacity: 0; pointer-events: none; }
   .view-counter { bottom: calc(76px + env(safe-area-inset-bottom)); }
   .toast { bottom: calc(88px + env(safe-area-inset-bottom)); }
@@ -410,13 +524,26 @@ html.has-custom-cursor, html.has-custom-cursor * { cursor: none !important; }
   .share-button > span:first-child { display: none; }
   .share-button .shortcut-hint { display: none; }
   .support-ad { padding: 11px 12px; font-size: 11.5px; }
+  .site-name-row { gap: 7px; }
+  .launch-block { margin-top: 56px; padding: 22px 14px; }
+  .clock-row { gap: 9px; margin-top: 20px; }
+  .clock-unit + .clock-unit::before { top: 12px; left: -7px; font-size: 18px; }
+  .clock-value { min-width: 48px; height: 46px; padding: 0 7px; font-size: 23px; }
+  .clock-label { font-size: 8px; letter-spacing: 0.1em; }
+  .upload-card { gap: 11px; padding: 14px; }
+  .upload-card-icon { width: 30px; height: 30px; }
+  .blog-list { margin-top: 40px; }
+  .blog-card { padding: 18px; }
+  .submit-sheet { padding: 20px; }
+  .file-button { flex: 1; justify-content: center; }
 }
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   *, *::before, *::after { transition-duration: 0.01ms !important; }
   .site-header, .intro > *, .site-card, .live-dot, .intro::before, .view-counter, .donation-board, .cookie-consent,
-  .site-card:hover .site-arrow, .skeleton-card, .modal, .modal-backdrop, .toast, .vote-count { animation: none; }
+  .upload-card, .site-card:hover .site-arrow, .skeleton-card, .modal, .modal-backdrop, .toast, .vote-count,
+  .launch-block, .clock-digit, .rotator-word, .blog-card { animation: none; }
   .site-nav a::after { transition: none; }
   .confetti-piece { display: none; }
 }

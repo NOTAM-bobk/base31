@@ -99,6 +99,33 @@ served by a small Cloudflare Worker backed by Cloudflare KV, deployed from
 | `GET /?key=<name>` | Increments the view counter, returns `{ "views": n }` |
 | `GET /votes?keys=a,b,c` | Reads totals without incrementing, returns `{ "votes": { a: { up, down }, … } }` |
 | `POST /vote` | Body `{ key, from, to }` where each of `from`/`to` is `1`, `-1` or `0`; returns the key's new `{ key, up, down }` |
+| `GET /sites` | Lists community-published sites, newest first |
+| `POST /submit` | Body `{ title, description, tags, slug, files }`; publishes a site and returns it |
+| `GET /s/<slug>/…` | Serves a published site (and its assets) from KV |
+
+### Community sites
+
+The last card in the directory is an upload form: a visitor sets a title,
+description, tags, and web address, then picks their HTML/CSS/JS files (or a
+whole folder). The homepage posts them to `POST /submit`, the worker stores
+them in the same KV namespace, and the site is live at
+`<worker>/s/<slug>/` — listed in the directory like any other entry and
+votable under its slug.
+
+- Metadata lives under `pub:<slug>`; each file body (base64) under
+  `pubfile:<slug>:<path>`. Requests arriving at `/s/<slug>` are redirected to
+  `/s/<slug>/` so relative asset links resolve correctly.
+- Limits: 40 files, 2 MB per file, 8 MB per upload, `index.html` required
+  (otherwise the first `.html` file becomes the entry point). Slugs are
+  lowercase letters, numbers, and dashes, and must be unique.
+- Cloudflare KV list is **eventually consistent**, so a freshly published site
+  can take up to ~60s to appear in `GET /sites`. The homepage inserts the
+  returned site into the list immediately so its author sees it right away.
+- Uploads are open and unmoderated. User HTML runs on the worker's own origin
+  (not `base31.org`), so it cannot reach the directory's cookies or storage,
+  but it can call the worker's own API. If this ever needs locking down, set
+  `COUNTER_SECRET` as a worker secret and/or move the publish endpoint behind
+  auth.
 
 Views are stored under the key itself (so existing counts keep working) and
 votes under `votes:<key>:up` / `votes:<key>:down`. Votes are per browser:

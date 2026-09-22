@@ -1,0 +1,27 @@
+[
+  {
+    "slug": "where-to-find-cool-websites",
+    "title": "Where to Find Cool Websites in 2026",
+    "description": "A practical guide to finding cool websites and fun websites in 2026 — hand-made directories, webrings, and indie web communities that algorithms tend to bury.",
+    "date": "2026-09-22",
+    "tags": ["cool sites", "fun websites", "web directory", "indie web"],
+    "body": [
+      "The best websites are rarely the ones a feed shows you. Algorithms reward whatever keeps you scrolling, so the fun, strange, and genuinely useful corners of the web stay buried unless you go looking for them on purpose.",
+      "## What makes a site worth bookmarking",
+      "A site earns a bookmark when it does one small thing well: a tool that finishes a task in a single screen, a game you can learn in ten seconds, or a personal page that feels like someone's actual desk. Those projects usually have no growth team and no app store listing, which is exactly what makes them worth keeping track of.",
+      "## Start with a directory, not a search engine",
+      "Search engines are built to answer questions, not to help you wander. A good directory flips that around: it lists projects by what they are, so you can browse instead of querying. base31.org exists for that reason — it collects live sites, tools, and experiments in one place and keeps the list short enough to actually read.",
+      "## Where to look for cool websites",
+      "- Hand-made directories like base31.org, which list small projects by description and tags instead of ranking them by ad spend.",
+      "- Webrings and personal blogrolls, where people link to the sites they actually read.",
+      "- Curated GitHub lists that collect tools, experiments, and demos by topic.",
+      "- Indie web communities such as Neocities, where hobbyists publish pages for the love of it.",
+      "- Newsletters that feature one small site per issue rather than a hundred links at once.",
+      "- Your own browser history: the sites you keep returning to are already a directory.",
+      "## How to spot a good one quickly",
+      "Load the page and look at what it asks of you. The best small sites load fast, explain themselves in one sentence, and let you use them without an account. If a project needs a signup before it shows you anything, it is probably not the fun kind of website.",
+      "## Keep exploring",
+      "Bookmark the ones you like, share them with someone who would use them, and check back on base31.org — new sites get added regularly, and you can publish your own static site to the directory too."
+    ]
+  }
+]

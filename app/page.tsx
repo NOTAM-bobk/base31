@@ -163,6 +163,12 @@ export default function HomePage() {
     document.querySelector('meta[name="theme-color"]')?.setAttribute("content", theme === "light" ? "#fafafa" : "#000000");
   }, [theme]);
 
+  // The cookie banner sits at the very bottom, so the floating action button
+  // needs to lift out of its way while it is visible.
+  useEffect(() => {
+    document.documentElement.classList.toggle("has-consent", consentNeeded);
+  }, [consentNeeded]);
+
   useEffect(() => {
     const timer = window.setTimeout(() => setBooting(false), 420);
     return () => window.clearTimeout(timer);
@@ -317,15 +323,36 @@ export default function HomePage() {
     void sendVote(key, previous, next);
   }, [sendVote, votes]);
 
+  // Ranking: hearted (pinned) sites stay on top, then everything sorts by how
+  // liked it is — net thumbs (up minus down), then raw upvotes, then name.
+  const netLikes = useCallback(
+    (key: string) => {
+      const totals = voteTotals[key];
+      if (!totals) return null;
+      return totals.up - totals.down;
+    },
+    [voteTotals],
+  );
+
   const list = useMemo(() => {
     const needle = query.trim().toLowerCase();
     const matched = visibleSites.filter((site) => !needle || searchIndex(site).includes(needle));
+    const rankValue = (key: string) => netLikes(key);
     return [...matched].sort((a, b) => {
       const pinnedA = favorites.includes(a.subdomain) ? 1 : 0;
       const pinnedB = favorites.includes(b.subdomain) ? 1 : 0;
-      return pinnedB - pinnedA || a.name.localeCompare(b.name);
+      if (pinnedA !== pinnedB) return pinnedB - pinnedA;
+      // Sites with no votes yet share a neutral score of 0 and fall back to
+      // alphabetical order beneath the ranked ones.
+      const scoreA = rankValue(a.subdomain) ?? 0;
+      const scoreB = rankValue(b.subdomain) ?? 0;
+      if (scoreA !== scoreB) return scoreB - scoreA;
+      const upA = voteTotals[a.subdomain]?.up ?? 0;
+      const upB = voteTotals[b.subdomain]?.up ?? 0;
+      if (upA !== upB) return upB - upA;
+      return a.name.localeCompare(b.name);
     });
-  }, [query, favorites]);
+  }, [query, favorites, netLikes, voteTotals]);
 
   const copyLink = useCallback(async (text = siteUrl) => {
     try {
@@ -440,7 +467,7 @@ export default function HomePage() {
           <div className="section-heading">
             <h2 id="sites-heading">Featured sites</h2>
             <span className="section-count mono">
-              {query.trim() ? `${list.length} match${list.length === 1 ? "" : "es"}` : `${visibleSites.length} live`} · pinned first
+              {query.trim() ? `${list.length} match${list.length === 1 ? "" : "es"}` : `${visibleSites.length} live`} · most liked first
             </span>
           </div>
           <div className="site-list" aria-label="Deployed sites">
@@ -528,6 +555,17 @@ export default function HomePage() {
             <a href="#sites">Useful online tools</a>
           </div>
         </section>
+
+        {/* Floating card on desktop; scrolls in-flow on mobile, where the CTA
+            detaches into a fixed button. */}
+        <aside className="donation-board" aria-label="Donation board">
+          <div className="donation-head">Donation board</div>
+          <p className="donation-empty">No entries yet.</p>
+          <p className="donation-note">Supporters of base31 show up here.</p>
+          <a className="donation-cta" href={donationUrl} target="_blank" rel="noreferrer">
+            Support base31 <span aria-hidden="true">↗</span>
+          </a>
+        </aside>
       </main>
 
       <footer className="site-footer">
@@ -547,20 +585,14 @@ export default function HomePage() {
         <strong>{views == null ? "—" : views.toLocaleString()}</strong>
       </div>
 
-      <aside className="donation-board" aria-label="Donation board">
-        <div className="donation-head">Donation board</div>
-        <p className="donation-empty">No entries yet.</p>
-        <a className="donation-cta" href={donationUrl} target="_blank" rel="noreferrer">
-          Support base31 <span aria-hidden="true">↗</span>
-        </a>
-      </aside>
-
       {consentNeeded && (
         <aside className="cookie-consent" aria-label="Cookie consent">
-          <p>We store a tiny preference to remember your choice. <a href="/privacy">Privacy policy</a>.</p>
-          <div className="cookie-actions">
-            <button type="button" className="cookie-button cookie-deny" onClick={() => acceptConsent("denied")}>Deny</button>
-            <button type="button" className="cookie-button cookie-confirm" onClick={() => acceptConsent("accepted")}>Confirm</button>
+          <div className="cookie-inner">
+            <p>We store a tiny preference to remember your choice. <a href="/privacy">Privacy policy</a>.</p>
+            <div className="cookie-actions">
+              <button type="button" className="cookie-button cookie-deny" onClick={() => acceptConsent("denied")}>Deny</button>
+              <button type="button" className="cookie-button cookie-confirm" onClick={() => acceptConsent("accepted")}>Confirm</button>
+            </div>
           </div>
         </aside>
       )}

@@ -45,7 +45,7 @@ html[data-theme="light"] { color-scheme: light; }
 body {
   min-height: 100vh; margin: 0; background: var(--background); color: var(--text);
   font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  -webkit-font-smoothing: antialiased;
+  -webkit-font-smoothing: antialiased; -webkit-tap-highlight-color: transparent;
 }
 a { color: inherit; }
 .mono { font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; }
@@ -173,21 +173,30 @@ h1 { max-width: 620px; margin: 0; color: var(--text-strong); font-size: clamp(36
   display: flex; flex-direction: column; gap: 12px; padding: 18px;
   border: 1px solid var(--line); border-radius: 14px; background: var(--surface); box-shadow: var(--shadow);
 }
-.donation-head { display: flex; align-items: center; gap: 8px; color: var(--text-strong); font-size: 12px; font-weight: 600; letter-spacing: -0.01em; }
-.donation-head::before { width: 6px; height: 6px; border-radius: 50%; background: var(--danger); content: ""; box-shadow: 0 0 0 4px rgb(255 59 92 / 12%); }
-.donation-empty { margin: 0; padding: 16px 12px; border: 1px dashed var(--line-strong); border-radius: 10px; color: var(--muted); font-size: 12px; text-align: center; }
 .donation-cta {
   display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 9px 12px;
   border: 1px solid var(--invert-bg); border-radius: 8px; background: var(--invert-bg); color: var(--invert-fg);
-  font-size: 11px; font-weight: 600; text-decoration: none; transition: opacity 150ms ease;
+  font-size: 11px; font-weight: 600; text-decoration: none; transition: opacity 150ms ease, transform 150ms ease, box-shadow 150ms ease;
 }
 .donation-cta:hover { opacity: 0.88; }
+.donation-head { display: flex; align-items: center; gap: 8px; color: var(--text-strong); font-size: 12px; font-weight: 600; letter-spacing: -0.01em; }
+.donation-head::before { width: 6px; height: 6px; border-radius: 50%; background: var(--danger); content: ""; box-shadow: 0 0 0 4px rgb(255 59 92 / 12%); }
+.donation-empty { margin: 0; padding: 16px 12px; border: 1px dashed var(--line-strong); border-radius: 10px; color: var(--muted); font-size: 12px; text-align: center; }
+.donation-note { margin: 0; color: var(--subtle); font-size: 11px; line-height: 1.45; }
 
-/* Cookie consent ----------------------------------------------------- */
-.cookie-consent { position: fixed; right: 16px; bottom: 66px; z-index: 20; width: min(360px, calc(100vw - 32px)); padding: 15px; border: 1px solid var(--line-strong); border-radius: 10px; background: var(--overlay); box-shadow: 0 16px 45px rgb(0 0 0 / 40%); backdrop-filter: blur(16px); }
+/* Cookie consent -----------------------------------------------------
+   Pinned to the very bottom edge and stacked above the rest of the UI. */
+.cookie-consent {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 70; width: auto;
+  padding: 14px 16px calc(14px + env(safe-area-inset-bottom));
+  border-top: 1px solid var(--line-strong); background: var(--overlay);
+  box-shadow: 0 -14px 44px rgb(0 0 0 / 35%); backdrop-filter: blur(16px);
+  animation: fade-up 0.3s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+.cookie-inner { display: flex; width: min(100%, 720px); margin: 0 auto; align-items: center; justify-content: space-between; gap: 14px; flex-wrap: wrap; }
 .cookie-consent p { margin: 0; color: var(--muted); font-size: 12px; line-height: 1.5; }
 .cookie-consent a { color: var(--text-strong); text-underline-offset: 3px; }
-.cookie-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 13px; }
+.cookie-actions { display: flex; gap: 8px; }
 .cookie-button { padding: 7px 11px; border: 1px solid var(--line); border-radius: 6px; font-size: 11px; cursor: pointer; }
 .cookie-deny { background: transparent; color: var(--muted); }
 .cookie-confirm { border-color: var(--invert-bg); background: var(--invert-bg); color: var(--invert-fg); }
@@ -295,7 +304,7 @@ html.has-custom-cursor, html.has-custom-cursor * { cursor: none !important; }
 .site-card:hover .site-arrow { animation: arrow-nudge 0.9s ease infinite; }
 @keyframes arrow-nudge { 0%, 100% { transform: translate(0, 0); } 50% { transform: translate(2px, -2px); } }
 
-.view-counter { animation: fade-up 0.5s cubic-bezier(0.2, 0.7, 0.2, 1) 0.25s both; }
+.view-counter { animation: fade-up 0.5s cubic-bezier(0.2, 0.7, 0.2, 1) 0.25s both; transition: opacity 180ms ease; }
 .view-counter.is-bumped strong { animation: count-pop 0.5s ease; }
 @keyframes count-pop { 0% { transform: scale(1); } 40% { transform: scale(1.28); } 100% { transform: scale(1); } }
 
@@ -314,18 +323,22 @@ html.has-custom-cursor, html.has-custom-cursor * { cursor: none !important; }
 
 /* Responsive --------------------------------------------------------- */
 @media (max-width: 1199px) {
+  /* Board scrolls in-flow with the page instead of sticking to the bottom… */
   .donation-board {
-    top: auto; right: 0; left: 0; bottom: 0; width: auto; transform: none;
-    flex-direction: row; align-items: center; justify-content: space-between; gap: 12px;
-    padding: 10px 16px; border-width: 1px 0 0; border-radius: 0; animation: none;
+    position: static; top: auto; right: auto; left: auto; bottom: auto; width: auto; transform: none;
+    flex-direction: column; align-items: stretch; gap: 12px; margin-top: 56px; padding: 18px;
+    border: 1px solid var(--line); border-radius: 14px; animation: none;
   }
-  .donation-head { font-size: 11px; }
-  .donation-empty { padding: 0; border: 0; text-align: left; }
-  .donation-cta { flex: 0 0 auto; }
-  .view-counter { bottom: 74px; }
-  .cookie-consent { bottom: 132px; }
-  .toast { bottom: 86px; }
-  main { padding-bottom: 128px; }
+  /* …while the support link stays a fixed button pinned to the bottom. */
+  .donation-cta {
+    position: fixed; left: 16px; right: 16px; bottom: calc(16px + env(safe-area-inset-bottom)); z-index: 15;
+    padding: 12px 16px; box-shadow: var(--shadow);
+  }
+  html.has-consent .donation-cta { bottom: calc(148px + env(safe-area-inset-bottom)); }
+  html.has-consent .view-counter { opacity: 0; pointer-events: none; }
+  .view-counter { bottom: calc(76px + env(safe-area-inset-bottom)); }
+  .toast { bottom: calc(88px + env(safe-area-inset-bottom)); }
+  main { padding-bottom: 132px; }
 }
 
 @media (max-width: 600px) {
@@ -346,18 +359,35 @@ html.has-custom-cursor, html.has-custom-cursor * { cursor: none !important; }
   .about-section { margin-top: 80px; }
   .footer-links { justify-content: flex-start; }
   .site-footer-inner { align-items: flex-start; flex-direction: column; }
-  .donation-board { padding: 9px 14px; }
+  .donation-board { padding: 16px; margin-top: 44px; }
   .donation-empty { font-size: 11px; }
-  .donation-cta { padding: 8px 10px; }
+  .donation-cta { padding: 11px 16px; font-size: 12px; }
+  .cookie-inner { flex-direction: column; align-items: stretch; }
+  .cookie-actions { width: 100%; }
+  .cookie-button { flex: 1; padding: 10px 11px; }
   .modal { padding: 22px; }
   .privacy-page { width: min(100% - 32px, 680px); padding-top: 40px; }
   .privacy-back { margin-bottom: 64px; }
 }
 
+/* Phones ------------------------------------------------------------- */
+@media (max-width: 600px) {
+  /* Cards keep tap targets comfortable and let the actions drop to their own
+     row when the site name and the buttons can't share one line. */
+  .site-card-top { flex-wrap: wrap; gap: 10px; }
+  .site-card-top > .site-link { min-width: 140px; }
+  .site-actions { flex: 1 1 auto; justify-content: flex-end; }
+  .favorite-button, .vote-button { min-width: 34px; height: 34px; }
+  .vote-count { font-size: 11px; }
+  .site-url { margin-left: 15px; }
+  .empty { padding: 22px; }
+  .donation-head { font-size: 13px; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   *, *::before, *::after { transition-duration: 0.01ms !important; }
-  .site-header, .intro > *, .site-card, .live-dot, .intro::before, .view-counter, .donation-board,
+  .site-header, .intro > *, .site-card, .live-dot, .intro::before, .view-counter, .donation-board, .cookie-consent,
   .site-card:hover .site-arrow, .skeleton-card, .modal, .modal-backdrop, .toast, .vote-count { animation: none; }
   .site-nav a::after { transition: none; }
   .confetti-piece { display: none; }

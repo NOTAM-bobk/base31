@@ -1,8 +1,14 @@
 import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
+import Script from "next/script";
 import "./globals.css";
 
 const siteUrl = "https://base31.org";
+
+// Adsterra site-wide ad unit. Loaded once from the root layout so every page
+// gets it, and via next/script so it never blocks render or hurts CWV.
+const adsterraScript =
+  "https://pl31451991.profitableratecpmnetwork.com/ea/93/a7/ea93a7aa7cba5d6e3c658cd19a0dded2.js";
 
 // Microsoft Clarity analytics snippet, injected into the document <head>.
 const clarityTag = "ylsxc7fokm";
@@ -66,7 +72,7 @@ export const metadata: Metadata = {
   },
 };
 
-export const viewport: Viewport = { themeColor: "#000000", colorScheme: "light dark" };
+export const viewport: Viewport = { themeColor: "#000000", colorScheme: "light dark", viewportFit: "cover" };
 
 // Applied before paint so a saved light theme never flashes dark.
 const themeScript = `try{if(localStorage.getItem("base31-theme")==="light"){document.documentElement.setAttribute("data-theme","light")}}catch(e){}`;
@@ -86,7 +92,10 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           <style>{`.site-skeleton,.cursor-layer{display:none!important}`}</style>
         </noscript>
       </head>
-      <body>{children}</body>
+      <body>
+        {children}
+        <Script id="adsterra" src={adsterraScript} strategy="afterInteractive" />
+      </body>
     </html>
   );
 }

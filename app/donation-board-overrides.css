@@ -1,0 +1,50 @@
+/* Donation board is an in-flow section immediately before the launch clock. */
+.donation-board {
+  position: static;
+  width: 100%;
+  margin: 48px 0 0;
+  transform: none;
+}
+
+html.at-bottom .donation-board {
+  opacity: 1;
+  transform: none;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.donation-entry {
+  padding: 8px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.donation-entry:last-child {
+  border-bottom: 0;
+}
+
+.donation-entry-copy strong {
+  font-size: 12px;
+}
+
+.donation-entry-copy small {
+  font-size: 10px;
+}
+
+@media (max-width: 1199px) {
+  body > .donation-board {
+    position: static;
+    width: 100%;
+    margin: 48px auto 0;
+    transform: none;
+  }
+
+  html.has-consent body > .donation-board {
+    bottom: auto;
+  }
+}
+
+@media (max-width: 600px) {
+  body > .donation-board {
+    margin-top: 40px;
+  }
+}

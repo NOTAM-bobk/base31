@@ -10,7 +10,9 @@ type Donation = {
 };
 
 export default function DonationBoard() {
-  const visibleDonations = (donations as Donation[]).filter((donation) => donation.show !== false && donation.name.trim() && donation.amount > 0);
+  const visibleDonations = (donations as Donation[]).filter(
+    (donation) => donation.show !== false && donation.name.trim() && donation.amount > 0,
+  );
   const total = visibleDonations.reduce((sum, donation) => sum + donation.amount, 0);
 
   return (
@@ -29,7 +31,6 @@ export default function DonationBoard() {
         <ul className="donation-list">
           {visibleDonations.slice(0, 5).map((donation) => (
             <li key={`${donation.name}-${donation.amount}`} className="donation-entry">
-              <span className="donation-avatar" aria-hidden="true">{donation.name.trim().charAt(0).toUpperCase()}</span>
               <span className="donation-entry-copy">
                 <strong>{donation.name}</strong>
                 {donation.message && <small>{donation.message}</small>}

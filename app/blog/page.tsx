@@ -38,7 +38,10 @@ export default function BlogIndexPage() {
       <p className="eyebrow mono">the base31 blog</p>
       <h1>Notes on the interesting internet.</h1>
       <p className="privacy-updated">
-        Guides and roundups about cool sites, fun websites, and the independent web.
+        Guides, field notes, and practical ideas for finding, building, and sharing better corners of the web.
+      </p>
+      <p className="blog-subscribe-note">
+        New articles cover independent websites, useful tools, static publishing, and the people making the web more personal.
       </p>
 
       <section className="blog-list" aria-label="Blog posts">
@@ -48,13 +51,9 @@ export default function BlogIndexPage() {
               <time dateTime={post.date}>{post.date}</time>
               {post.tags && post.tags.length > 0 && <span className="blog-tags">{post.tags.join(" · ")}</span>}
             </div>
-            <h2>
-              <Link href={`/blog/${post.slug}`}>{post.title}</Link>
-            </h2>
+            <h2><Link href={`/blog/${post.slug}`}>{post.title}</Link></h2>
             <p>{post.description}</p>
-            <Link className="blog-read mono" href={`/blog/${post.slug}`}>
-              Read the post →
-            </Link>
+            <Link className="blog-read mono" href={`/blog/${post.slug}`}>Read the post →</Link>
           </article>
         ))}
       </section>

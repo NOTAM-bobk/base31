@@ -216,25 +216,26 @@ export default function HomePage() {
     };
   }, []);
 
-  // Confetti when a milestone fires.
-  useEffect(() => {
-    if (milestone == null) return;
-    const pieces: HTMLElement[] = [];
-    for (let i = 0; i < 28; i++) {
+  // A quick burst of confetti. Shared by milestone popups and hearting a site.
+  const launchConfetti = useCallback((count = 28, hearts = false) => {
+    if (typeof window === "undefined" || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    for (let i = 0; i < count; i++) {
       const piece = document.createElement("i");
-      piece.className = "confetti-piece";
+      piece.className = hearts ? "confetti-piece heart" : "confetti-piece";
+      if (hearts) piece.textContent = "♥";
       piece.style.left = `${Math.random() * 100}%`;
       piece.style.animationDelay = `${Math.random() * 0.35}s`;
       piece.style.setProperty("--hue", String(Math.floor(Math.random() * 360)));
       document.body.appendChild(piece);
-      pieces.push(piece);
+      window.setTimeout(() => piece.remove(), 2100);
     }
-    const timer = window.setTimeout(() => pieces.forEach((piece) => piece.remove()), 1900);
-    return () => {
-      window.clearTimeout(timer);
-      pieces.forEach((piece) => piece.remove());
-    };
-  }, [milestone]);
+  }, []);
+
+  // Confetti when a milestone fires.
+  useEffect(() => {
+    if (milestone == null) return;
+    launchConfetti(28);
+  }, [milestone, launchConfetti]);
 
   // Keyboard shortcuts.
   useEffect(() => {
@@ -281,8 +282,11 @@ export default function HomePage() {
   }, []);
 
   const toggleFavorite = useCallback((key: string) => {
+    const pinned = favorites.includes(key);
+    // Celebrate pinning, not unpinning.
+    if (!pinned) launchConfetti(16, true);
     setFavorites((current) => (current.includes(key) ? current.filter((item) => item !== key) : [...current, key]));
-  }, []);
+  }, [favorites, launchConfetti]);
 
   // Push the choice change to the worker. Totals come back authoritative; if
   // the worker is unreachable the vote still works locally.
@@ -566,6 +570,18 @@ export default function HomePage() {
             Support base31 <span aria-hidden="true">↗</span>
           </a>
         </aside>
+
+        {/* Small sponsored button at the very bottom of the page. */}
+        <a
+          className="support-ad"
+          href="https://www.profitableratecpmnetwork.com/vsnt502b?key=014ca151909e76ba10dc8d6cfae88709"
+          target="_blank"
+          rel="noreferrer sponsored"
+        >
+          <span className="support-ad-tag mono">ad</span>
+          <span className="support-ad-text">Want to support base31? Click this button to help</span>
+          <span className="support-ad-arrow mono" aria-hidden="true">↗</span>
+        </a>
       </main>
 
       <footer className="site-footer">
@@ -588,7 +604,7 @@ export default function HomePage() {
       {consentNeeded && (
         <aside className="cookie-consent" aria-label="Cookie consent">
           <div className="cookie-inner">
-            <p>We store a tiny preference to remember your choice. <a href="/privacy">Privacy policy</a>.</p>
+            <p>We and our ad partners use cookies to show ads and remember your choice. <a href="/privacy">Privacy policy</a>.</p>
             <div className="cookie-actions">
               <button type="button" className="cookie-button cookie-deny" onClick={() => acceptConsent("denied")}>Deny</button>
               <button type="button" className="cookie-button cookie-confirm" onClick={() => acceptConsent("accepted")}>Confirm</button>

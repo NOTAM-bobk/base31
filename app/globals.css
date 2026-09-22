@@ -41,6 +41,10 @@ html[data-theme="light"] {
 
 * { box-sizing: border-box; }
 html { color-scheme: dark; scroll-behavior: smooth; }
+/* Ad partners inject iframes and overlays; keep them from creating a
+   horizontal scrollbar. */
+html, body { max-width: 100%; overflow-x: hidden; }
+img, svg, video, canvas, iframe { max-width: 100%; }
 html[data-theme="light"] { color-scheme: light; }
 body {
   min-height: 100vh; margin: 0; background: var(--background); color: var(--text);
@@ -184,6 +188,20 @@ h1 { max-width: 620px; margin: 0; color: var(--text-strong); font-size: clamp(36
 .donation-empty { margin: 0; padding: 16px 12px; border: 1px dashed var(--line-strong); border-radius: 10px; color: var(--muted); font-size: 12px; text-align: center; }
 .donation-note { margin: 0; color: var(--subtle); font-size: 11px; line-height: 1.45; }
 
+/* Sponsored support button ------------------------------------------- */
+.support-ad {
+  display: flex; align-items: center; gap: 10px; margin-top: 18px; padding: 12px 14px;
+  border: 1px dashed var(--line-strong); border-radius: 12px; background: var(--surface);
+  color: var(--muted); font-size: 12px; line-height: 1.4; text-decoration: none;
+  transition: border-color 160ms ease, color 160ms ease, transform 160ms ease, box-shadow 160ms ease;
+}
+.support-ad:hover { border-color: var(--text-strong); color: var(--text-strong); transform: translateY(-1px); box-shadow: var(--shadow); }
+.support-ad:focus-visible { outline: 2px solid var(--text-strong); outline-offset: 3px; }
+.support-ad-tag { flex: 0 0 auto; padding: 2px 6px; border: 1px solid var(--line-strong); border-radius: 5px; color: var(--subtle); font-size: 9px; letter-spacing: 0.08em; text-transform: uppercase; }
+.support-ad-text { flex: 1; min-width: 0; }
+.support-ad-arrow { flex: 0 0 auto; color: var(--subtle); transition: color 160ms ease, transform 160ms ease; }
+.support-ad:hover .support-ad-arrow { color: var(--text-strong); transform: translate(1px, -1px); }
+
 /* Cookie consent -----------------------------------------------------
    Pinned to the very bottom edge and stacked above the rest of the UI. */
 .cookie-consent {
@@ -242,6 +260,7 @@ h1 { max-width: 620px; margin: 0; color: var(--text-strong); font-size: clamp(36
   box-shadow: var(--shadow); animation: fade-up 0.2s ease both;
 }
 .confetti-piece { position: fixed; top: -12px; z-index: 100; width: 7px; height: 13px; background: hsl(var(--hue), 75%, 62%); animation: confetti-fall 1.7s linear forwards; pointer-events: none; }
+.confetti-piece.heart { width: auto; height: auto; background: none; color: hsl(var(--hue), 80%, 62%); font-size: 15px; line-height: 1; }
 @keyframes confetti-fall { to { transform: translateY(105vh) rotate(720deg); opacity: 0; } }
 
 /* Skeleton ----------------------------------------------------------- */
@@ -372,6 +391,11 @@ html.has-custom-cursor, html.has-custom-cursor * { cursor: none !important; }
 
 /* Phones ------------------------------------------------------------- */
 @media (max-width: 600px) {
+  /* Give the content a touch more room edge to edge. */
+  .site-header-inner, .site-footer-inner, main { width: min(100% - 24px, 720px); }
+  /* Keep the decorative glow inside the viewport so it can't add sideways
+     scroll on narrow phones. */
+  .intro::before { top: -90px; left: -42px; width: min(300px, 82vw); height: min(300px, 82vw); }
   /* Cards keep tap targets comfortable and let the actions drop to their own
      row when the site name and the buttons can't share one line. */
   .site-card-top { flex-wrap: wrap; gap: 10px; }
@@ -382,6 +406,10 @@ html.has-custom-cursor, html.has-custom-cursor * { cursor: none !important; }
   .site-url { margin-left: 15px; }
   .empty { padding: 22px; }
   .donation-head { font-size: 13px; }
+  /* The keyboard hint and label are noise on touch. */
+  .share-button > span:first-child { display: none; }
+  .share-button .shortcut-hint { display: none; }
+  .support-ad { padding: 11px 12px; font-size: 11.5px; }
 }
 
 @media (prefers-reduced-motion: reduce) {

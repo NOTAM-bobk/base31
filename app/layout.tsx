@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
 import "./globals.css";
+import "./overrides.css";
 import ConsentAwareAnalytics from "@/components/consent-aware-analytics";
 import PrivacyConsent from "@/components/privacy-consent";
 import StructuredData from "@/components/structured-data";
@@ -22,8 +23,16 @@ export const metadata: Metadata = {
     siteName: "base31.org",
     locale: "en_US",
   },
-  twitter: { card: "summary_large_image", title: "base31.org — Cool Sites and Fun Websites", description: "Discover creative web projects, useful tools, and fun websites in the base31.org directory." },
-  robots: { index: true, follow: true, googleBot: { index: true, follow: true, "max-image-preview": "large", "max-snippet": -1, "max-video-preview": -1 } },
+  twitter: {
+    card: "summary_large_image",
+    title: "base31.org — Cool Sites and Fun Websites",
+    description: "Discover creative web projects, useful tools, and fun websites in the base31.org directory.",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: { index: true, follow: true, "max-image-preview": "large", "max-snippet": -1, "max-video-preview": -1 },
+  },
 };
 
 export const viewport: Viewport = { themeColor: "#000000", colorScheme: "light dark", viewportFit: "cover" };

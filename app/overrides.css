@@ -1,0 +1,78 @@
+/* Visual and interaction fixes layered over the base stylesheet. */
+
+:root {
+  --font-sans: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-mono: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Monaco, "Courier New", monospace;
+}
+
+html,
+body,
+button,
+input,
+textarea,
+select {
+  font-family: var(--font-sans);
+}
+
+.mono,
+kbd,
+.mono input,
+.mono button {
+  font-family: var(--font-mono);
+}
+
+body {
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+}
+
+h1,
+h2,
+h3,
+p,
+button,
+input,
+textarea {
+  overflow-wrap: break-word;
+}
+
+/* Keep the rotating hero word readable and visibly branded. */
+.rotator-word {
+  color: var(--live);
+}
+
+/* The client scroll listener adds `at-bottom` when the footer is close. */
+.donation-cta {
+  transition: opacity 220ms ease, transform 220ms ease, visibility 220ms ease;
+}
+
+html.at-bottom .donation-cta {
+  opacity: 0;
+  transform: translateY(14px);
+  visibility: hidden;
+  pointer-events: none;
+}
+
+@media (min-width: 1200px) {
+  html.at-bottom .donation-board {
+    opacity: 0;
+    transform: translateY(-50%) translateX(18px);
+    pointer-events: none;
+  }
+}
+
+@media (max-width: 1199px) {
+  .donation-cta {
+    transition: opacity 220ms ease, transform 220ms ease, visibility 220ms ease;
+  }
+
+  html.at-bottom .donation-cta {
+    transform: translateY(14px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .donation-cta {
+    transition: none;
+  }
+}

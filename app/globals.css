@@ -45,6 +45,16 @@ html { color-scheme: dark; scroll-behavior: smooth; }
    horizontal scrollbar. */
 html, body { max-width: 100%; overflow-x: hidden; }
 img, svg, video, canvas, iframe { max-width: 100%; }
+
+/* Custom scrollbar --------------------------------------------------- */
+html { scrollbar-color: var(--line-strong) transparent; scrollbar-width: thin; }
+::-webkit-scrollbar { width: 12px; height: 12px; }
+::-webkit-scrollbar-track { background: transparent; }
+/* The border fakes padding so the thumb reads as a rounded pill. */
+::-webkit-scrollbar-thumb { border: 3px solid var(--background); border-radius: 999px; background: var(--line-strong); }
+::-webkit-scrollbar-thumb:hover { background: var(--muted); }
+::-webkit-scrollbar-thumb:active { background: var(--text-strong); }
+::-webkit-scrollbar-corner { background: transparent; }
 html[data-theme="light"] { color-scheme: light; }
 body {
   min-height: 100vh; margin: 0; background: var(--background); color: var(--text);
@@ -82,6 +92,9 @@ main { width: min(100% - 48px, 720px); min-height: calc(100vh - 129px); margin: 
 .intro { margin-bottom: 84px; }
 .eyebrow { margin: 0 0 18px; color: var(--subtle); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; }
 h1 { max-width: 620px; margin: 0; color: var(--text-strong); font-size: clamp(36px, 7vw, 58px); font-weight: 600; letter-spacing: -0.065em; line-height: 1.02; }
+/* The headline is three stacked lines; the middle one is the rotating word. */
+.h1-line { display: block; }
+.h1-rotator { min-height: 1.02em; }
 .subtitle { max-width: 510px; margin: 18px 0 0; color: var(--muted); font-size: 16px; line-height: 1.6; }
 
 /* Rotating headline word --------------------------------------------- */

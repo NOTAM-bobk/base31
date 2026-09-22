@@ -373,11 +373,22 @@ export default function HomePage() {
     }
   }, []);
 
+  // Light haptic feedback on meaningful actions, via the Vibration API. Does
+  // nothing on browsers/devices that lack it, and respects reduced motion.
+  const buzz = useCallback((pattern: number | number[]) => {
+    if (typeof navigator === "undefined" || typeof navigator.vibrate !== "function") return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    try {
+      navigator.vibrate(pattern);
+    } catch {}
+  }, []);
+
   // Confetti when a milestone fires.
   useEffect(() => {
     if (milestone == null) return;
     launchConfetti(28);
-  }, [milestone, launchConfetti]);
+    buzz([18, 60, 18, 60, 30]);
+  }, [buzz, milestone, launchConfetti]);
 
   // Keyboard shortcuts.
   useEffect(() => {
@@ -452,8 +463,9 @@ export default function HomePage() {
     const pinned = favorites.includes(key);
     // Celebrate pinning, not unpinning.
     if (!pinned) launchConfetti(16, true);
+    buzz(pinned ? 8 : 18);
     setFavorites((current) => (current.includes(key) ? current.filter((item) => item !== key) : [...current, key]));
-  }, [favorites, launchConfetti]);
+  }, [buzz, favorites, launchConfetti]);
 
   // Push the choice change to the worker. Totals come back authoritative; if
   // the worker is unreachable the vote still works locally.
@@ -474,6 +486,7 @@ export default function HomePage() {
   const castVote = useCallback((key: string, direction: Vote) => {
     const previous: VoteValue = votes[key] ?? 0;
     const next: VoteValue = previous === direction ? 0 : direction;
+    buzz(next === 0 ? 6 : 12);
     setVotes((current) => {
       const updated = { ...current };
       if (next === 0) delete updated[key];
@@ -492,7 +505,7 @@ export default function HomePage() {
       return { ...current, [key]: updated };
     });
     void sendVote(key, previous, next);
-  }, [sendVote, votes]);
+  }, [buzz, sendVote, votes]);
 
   // The built-in directory plus everything visitors have published.
   const allSites = useMemo<Site[]>(() => [
@@ -540,11 +553,12 @@ export default function HomePage() {
   }, [query, favorites, allSites, netLikes, voteTotals]);
 
   const openSubmit = useCallback(() => {
+    buzz(10);
     setForm({ title: "", description: "", tags: "", slug: "" });
     setUploadFiles([]);
     setSubmitError(null);
     setSubmitOpen(true);
-  }, []);
+  }, [buzz]);
 
   const addFiles = useCallback((picked: FileList | null) => {
     if (!picked || picked.length === 0) return;
@@ -609,6 +623,7 @@ export default function HomePage() {
       if (!response.ok) throw new Error(data?.error || "Couldn't publish that site.");
       // KV list is eventually consistent, so show it right away for its author.
       if (data?.site) setUserSites((current) => [data.site as PublishedSite, ...current]);
+      buzz([14, 50, 14, 50, 24]);
       setSubmitOpen(false);
       setUploadFiles([]);
       notify("Your site is live");
@@ -617,7 +632,7 @@ export default function HomePage() {
     } finally {
       setSubmitting(false);
     }
-  }, [form, notify, submitting, uploadFiles]);
+  }, [buzz, form, notify, submitting, uploadFiles]);
 
   const copyLink = useCallback(async (text = siteUrl) => {
     try {
@@ -634,11 +649,12 @@ export default function HomePage() {
         if (!document.execCommand("copy")) throw new Error("copy failed");
         input.remove();
       }
+      buzz([10, 40, 10]);
       notify("Link copied");
     } catch {
       notify("Couldn't copy");
     }
-  }, [notify]);
+  }, [buzz, notify]);
 
   const nativeShare = useCallback(async () => {
     const data = { title: "base31.org", text: "Cool sites for curious people.", url: siteUrl };
@@ -687,7 +703,7 @@ export default function HomePage() {
             <a href="#about">About</a>
           </nav>
           <div className="header-actions">
-            <button type="button" className="icon-button share-button mono" onClick={() => setShareOpen(true)} aria-label="Share base31.org">
+            <button type="button" className="icon-button share-button mono" onClick={() => { buzz(8); setShareOpen(true); }} aria-label="Share base31.org">
               <span>Share</span>
               <kbd className="shortcut-hint">S</kbd>
               <span aria-hidden="true">↗</span>
@@ -695,7 +711,7 @@ export default function HomePage() {
             <button
               type="button"
               className="icon-button theme-toggle"
-              onClick={() => setTheme((current) => (current === "dark" ? "light" : "dark"))}
+              onClick={() => { buzz(8); setTheme((current) => (current === "dark" ? "light" : "dark")); }}
               aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}
               title={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}
             >
@@ -708,7 +724,11 @@ export default function HomePage() {
       <main>
         <section className="intro" aria-labelledby="page-title">
           <p className="eyebrow mono">the independent web directory</p>
-          <h1 id="page-title">Cool sites for <WordRotator /> people.</h1>
+          <h1 id="page-title">
+            <span className="h1-line">Cool sites for</span>
+            <span className="h1-line h1-rotator"><WordRotator /></span>
+            <span className="h1-line">people.</span>
+          </h1>
           <p className="subtitle">Discover fun websites, useful online tools, and creative web projects built on base31.org and the open web.</p>
           <div className="intro-links">
             <a className="text-link" href="#sites">Browse all sites <span aria-hidden="true">↓</span></a>

@@ -1,78 +1,56 @@
-/* Visual and interaction fixes layered over the base stylesheet. */
-
+/* Typography and interaction overrides. */
 :root {
   --font-sans: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   --font-mono: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Monaco, "Courier New", monospace;
 }
 
-html,
-body,
-button,
-input,
-textarea,
-select {
-  font-family: var(--font-sans);
-}
+html, body, button, input, textarea, select { font-family: var(--font-sans); }
+.mono, kbd { font-family: var(--font-mono); }
+body { font-synthesis: none; text-rendering: optimizeLegibility; }
+.rotator-word { color: var(--live); }
 
-.mono,
-kbd,
-.mono input,
-.mono button {
-  font-family: var(--font-mono);
-}
-
-body {
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-}
-
-h1,
-h2,
-h3,
-p,
-button,
-input,
-textarea {
-  overflow-wrap: break-word;
-}
-
-/* Keep the rotating hero word readable and visibly branded. */
-.rotator-word {
-  color: var(--live);
-}
-
-/* The client scroll listener adds `at-bottom` when the footer is close. */
-.donation-cta {
+/* The new board is mounted from the server layout and reads config/donations.json. */
+body > .donation-board { display: flex; }
+main > .donation-board { display: none; }
+.donation-board {
+  position: fixed; top: 50%; right: 20px; z-index: 15; width: 248px; transform: translateY(-50%);
+  display: flex; flex-direction: column; gap: 14px; padding: 17px;
+  overflow: hidden; border: 1px solid color-mix(in srgb, var(--live) 28%, var(--line));
+  border-radius: 16px; background: linear-gradient(145deg, var(--surface), color-mix(in srgb, var(--surface) 78%, var(--live)));
+  box-shadow: 0 18px 55px rgb(0 0 0 / 32%), inset 0 1px 0 rgb(255 255 255 / 7%);
   transition: opacity 220ms ease, transform 220ms ease, visibility 220ms ease;
 }
-
-html.at-bottom .donation-cta {
-  opacity: 0;
-  transform: translateY(14px);
-  visibility: hidden;
-  pointer-events: none;
-}
-
-@media (min-width: 1200px) {
-  html.at-bottom .donation-board {
-    opacity: 0;
-    transform: translateY(-50%) translateX(18px);
-    pointer-events: none;
-  }
-}
+.donation-board-topline { position: absolute; inset: 0 18px auto; height: 2px; background: var(--live); opacity: .8; }
+.donation-head { display: flex; align-items: center; gap: 7px; color: var(--text-strong); font-size: 12px; font-weight: 600; letter-spacing: -.01em; }
+.donation-spark { color: var(--live); font-size: 15px; }
+.donation-live { margin-left: auto; color: var(--live); font-size: 8px; letter-spacing: .1em; text-transform: uppercase; }
+.donation-live::before { display: inline-block; width: 5px; height: 5px; margin-right: 5px; border-radius: 50%; background: var(--live); content: ""; vertical-align: 1px; }
+.donation-total { display: flex; align-items: end; justify-content: space-between; gap: 10px; padding: 12px; border: 1px solid var(--line); border-radius: 11px; background: rgb(0 0 0 / 12%); }
+.donation-total-label { color: var(--subtle); font-size: 8px; letter-spacing: .08em; text-transform: uppercase; }
+.donation-total strong { color: var(--live); font-size: 20px; font-weight: 600; letter-spacing: -.04em; }
+.donation-list { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.donation-entry { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.donation-avatar { display: inline-flex; width: 25px; height: 25px; flex: 0 0 auto; align-items: center; justify-content: center; border: 1px solid color-mix(in srgb, var(--live) 36%, var(--line)); border-radius: 8px; color: var(--live); font-size: 10px; font-weight: 600; }
+.donation-entry-copy { display: flex; min-width: 0; flex: 1; flex-direction: column; gap: 2px; }
+.donation-entry-copy strong { overflow: hidden; color: var(--text); font-size: 11px; font-weight: 500; text-overflow: ellipsis; white-space: nowrap; }
+.donation-entry-copy small { overflow: hidden; color: var(--subtle); font-size: 9px; text-overflow: ellipsis; white-space: nowrap; }
+.donation-amount { color: var(--muted); font-size: 10px; }
+.donation-board .donation-empty { margin: 0; padding: 12px; border: 1px dashed var(--line-strong); border-radius: 9px; color: var(--subtle); font-size: 11px; text-align: center; }
+.donation-board .donation-cta { position: static; display: inline-flex; width: 100%; align-items: center; justify-content: center; gap: 6px; padding: 10px 12px; border: 1px solid var(--invert-bg); border-radius: 9px; background: var(--invert-bg); color: var(--invert-fg); font-size: 11px; font-weight: 600; text-decoration: none; }
+html.at-bottom .donation-board { opacity: 0; transform: translateY(-50%) translateX(18px); visibility: hidden; pointer-events: none; }
 
 @media (max-width: 1199px) {
-  .donation-cta {
-    transition: opacity 220ms ease, transform 220ms ease, visibility 220ms ease;
-  }
+  body > .donation-board { position: fixed; top: auto; right: 16px; bottom: 16px; left: 16px; width: auto; transform: none; }
+  html.has-consent body > .donation-board { bottom: 148px; }
+  html.at-bottom .donation-board { transform: translateY(14px); }
+}
 
-  html.at-bottom .donation-cta {
-    transform: translateY(14px);
-  }
+@media (max-width: 600px) {
+  body > .donation-board { right: 12px; bottom: 12px; left: 12px; padding: 14px; }
+  html.has-consent body > .donation-board { bottom: 148px; }
+  .donation-list { grid-template-columns: 1fr 1fr; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .donation-cta {
-    transition: none;
-  }
+  .donation-board { transition: none; }
 }

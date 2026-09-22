@@ -17,10 +17,8 @@ export default function PageRuntimeFixes() {
       launchBlock.parentElement?.insertBefore(board, launchBlock);
     }
 
-    if (!launchBlock) return;
-
-    const heading = launchBlock.querySelector<HTMLElement>("h2");
-    const note = launchBlock.querySelector<HTMLElement>(".clock-note");
+    const heading = launchBlock?.querySelector<HTMLElement>("h2");
+    const note = launchBlock?.querySelector<HTMLElement>(".clock-note");
     if (heading) heading.textContent = "base31 has been running for";
     if (note) note.textContent = "Started at 5:00 PM on September 20, 2026 and counting, one second at a time.";
 
@@ -32,7 +30,8 @@ export default function PageRuntimeFixes() {
         formatUnit(Math.floor((totalSeconds % 3600) / 60)),
         formatUnit(totalSeconds % 60),
       ];
-      launchBlock.querySelectorAll<HTMLElement>(".clock-digit").forEach((element, index) => {
+
+      launchBlock?.querySelectorAll<HTMLElement>(".clock-digit").forEach((element, index) => {
         if (values[index]) element.textContent = values[index];
       });
     };

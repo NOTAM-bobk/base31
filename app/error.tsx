@@ -2,9 +2,8 @@
 
 import { useEffect } from "react";
 
-export default function GlobalError({ reset }: { error: Error & { digest?: string }; reset: () => void }) {
+export default function Error({ error, reset }: { error: Error & { digest?: string }; reset: () => void }) {
   useEffect(() => {
-    // Keep the error available to browser diagnostics without exposing details in the UI.
     console.error("base31.org route error", error);
   }, [error]);
 

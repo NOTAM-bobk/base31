@@ -14,7 +14,7 @@ export default function Error({ error, reset }: { error: Error & { digest?: stri
       <h1>That page could not load.</h1>
       <p className="page-state-copy">Try again, or return to the directory and keep exploring.</p>
       <div className="page-state-actions">
-        <button type="button" className="primary" onClick={() => reset()}>Try again</button>
+        <button type="button" className="primary" onClick={reset}>Try again</button>
         <a href="/">Back to base31.org</a>
       </div>
     </main>

@@ -1,70 +1,28 @@
-/* Donation board is now in-flow before the launch clock. */
-.donation-board {
-  position: static;
-  width: 100%;
-  margin: 48px 0 0;
-  transform: none;
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
+/* Ensure this server-layout board is ordinary page content, never a viewport overlay. */
+body > .donation-board,
+main > .donation-board {
+  position: static !important;
+  top: auto !important;
+  right: auto !important;
+  bottom: auto !important;
+  left: auto !important;
+  width: min(100% - 48px, 720px) !important;
+  margin: 48px auto 0 !important;
+  transform: none !important;
+  z-index: auto !important;
 }
 
-html.at-bottom .donation-board {
-  opacity: 1;
-  transform: none;
-  visibility: visible;
-  pointer-events: auto;
-}
-
-.donation-entry {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 8px 0;
-  border-bottom: 1px solid var(--line);
-}
-
-.donation-entry:last-child {
-  border-bottom: 0;
-}
-
-.donation-entry-copy {
-  display: flex;
-  min-width: 0;
-  flex: 1;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.donation-entry-copy strong {
-  font-size: 12px;
-}
-
-.donation-entry-copy small {
-  font-size: 10px;
-}
-
-.donation-amount {
-  flex-shrink: 0;
-  color: var(--muted);
-  font-size: 10px;
-}
-
-@media (max-width: 1199px) {
-  body > .donation-board {
-    position: static;
-    width: 100%;
-    margin: 48px auto 0;
-    transform: none;
-  }
-
-  html.has-consent body > .donation-board {
-    bottom: auto;
-  }
+html.at-bottom .donation-board,
+html.has-consent .donation-board {
+  opacity: 1 !important;
+  visibility: visible !important;
+  pointer-events: auto !important;
 }
 
 @media (max-width: 600px) {
-  body > .donation-board {
-    margin-top: 40px;
+  body > .donation-board,
+  main > .donation-board {
+    width: min(100% - 24px, 720px) !important;
+    margin-top: 40px !important;
   }
 }

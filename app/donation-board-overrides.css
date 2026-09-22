@@ -1,5 +1,4 @@
-/* Static, in-flow donation board. It is mounted after the page server-side
-   and moved before .launch-block once the page is hydrated. */
+/* Keep the donation board as ordinary page content, never a viewport overlay. */
 body > .donation-board,
 main > .donation-board {
   position: static !important;
@@ -11,10 +10,6 @@ main > .donation-board {
   margin: 48px auto 0 !important;
   transform: none !important;
   z-index: auto !important;
-}
-
-html.at-bottom .donation-board,
-html.has-consent .donation-board {
   opacity: 1 !important;
   visibility: visible !important;
   pointer-events: auto !important;

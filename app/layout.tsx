@@ -5,7 +5,6 @@ import "./overrides.css";
 import "./donation-board-overrides.css";
 import ConsentAwareAnalytics from "@/components/consent-aware-analytics";
 import DonationBoard from "@/components/donation-board";
-import PageRuntimeFixes from "@/components/page-runtime-fixes";
 import PrivacyConsent from "@/components/privacy-consent";
 import StructuredData from "@/components/structured-data";
 
@@ -44,7 +43,6 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <StructuredData />
         {children}
         <DonationBoard />
-        <PageRuntimeFixes />
         <PrivacyConsent />
         <ConsentAwareAnalytics />
       </body>

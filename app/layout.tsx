@@ -5,6 +5,7 @@ import "./overrides.css";
 import "./donation-board-overrides.css";
 import ConsentAwareAnalytics from "@/components/consent-aware-analytics";
 import DonationBoard from "@/components/donation-board";
+import PageRuntimeFixes from "@/components/page-runtime-fixes";
 import PrivacyConsent from "@/components/privacy-consent";
 import StructuredData from "@/components/structured-data";
 
@@ -18,23 +19,13 @@ export const metadata: Metadata = {
   manifest: "/manifest.webmanifest",
   keywords: ["website directory", "cool sites", "fun websites", "creative web projects", "indie web", "online tools", "interesting websites"],
   openGraph: {
-    type: "website",
-    url: siteUrl,
+    type: "website", url: siteUrl,
     title: "base31.org — A Directory of Cool Sites and Fun Websites",
     description: "A curated directory of cool sites, fun websites, creative projects, and useful tools on the open web.",
-    siteName: "base31.org",
-    locale: "en_US",
+    siteName: "base31.org", locale: "en_US",
   },
-  twitter: {
-    card: "summary_large_image",
-    title: "base31.org — Cool Sites and Fun Websites",
-    description: "Discover creative web projects, useful tools, and fun websites in the base31.org directory.",
-  },
-  robots: {
-    index: true,
-    follow: true,
-    googleBot: { index: true, follow: true, "max-image-preview": "large", "max-snippet": -1, "max-video-preview": -1 },
-  },
+  twitter: { card: "summary_large_image", title: "base31.org — Cool Sites and Fun Websites", description: "Discover creative web projects, useful tools, and fun websites in the base31.org directory." },
+  robots: { index: true, follow: true, googleBot: { index: true, follow: true, "max-image-preview": "large", "max-snippet": -1, "max-video-preview": -1 } },
 };
 
 export const viewport: Viewport = { themeColor: "#000000", colorScheme: "light dark", viewportFit: "cover" };
@@ -51,6 +42,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <StructuredData />
         {children}
         <DonationBoard />
+        <PageRuntimeFixes />
         <PrivacyConsent />
         <ConsentAwareAnalytics />
       </body>

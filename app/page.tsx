@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import type { CSSProperties, FormEvent } from "react";
+import type { CSSProperties, FormEvent, RefObject } from "react";
 import sites from "@/config/sites.json";
 import DonationBoard from "@/components/donation-board";
 import Faq from "@/components/faq";
@@ -28,6 +28,58 @@ const counterUrl = process.env.NEXT_PUBLIC_COUNTER_URL || "https://base31-direct
 const LAUNCHED_AT = new Date(2026, 8, 20, 17, 0, 0).getTime();
 // A community upload counts as "new" for this long after it is published.
 const NEW_WINDOW_MS = 14 * 24 * 60 * 60 * 1000;
+
+// How the directory can be ordered. Pinned sites stay on top in every mode.
+type SortMode = "liked" | "newest" | "az";
+const SORT_OPTIONS: { value: SortMode; label: string }[] = [
+  { value: "liked", label: "Most liked" },
+  { value: "newest", label: "Newest" },
+  { value: "az", label: "A–Z" },
+];
+const MAX_TAG_CHIPS = 12;
+
+// Keeps keyboard focus inside an open dialog, moves it in on open, and hands it
+// back to whatever opened the dialog on close.
+function useDialogFocus<T extends HTMLElement>(open: boolean, containerRef: RefObject<T>) {
+  useEffect(() => {
+    if (!open) return;
+    const container = containerRef.current;
+    if (!container) return;
+    const previous = document.activeElement as HTMLElement | null;
+    const selector = 'a[href], button:not([disabled]), input, select, textarea, [tabindex]:not([tabindex="-1"])';
+    const focusable = () =>
+      Array.from(container.querySelectorAll<HTMLElement>(selector)).filter((element) => element.offsetParent !== null);
+
+    (focusable()[0] ?? container).focus();
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key !== "Tab") return;
+      const items = focusable();
+      if (items.length === 0) return;
+      const first = items[0];
+      const last = items[items.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    };
+    // A stray click outside the trap should not strand focus behind it.
+    const onFocusIn = (event: FocusEvent) => {
+      if (!container.contains(event.target as Node)) (focusable()[0] ?? container).focus();
+    };
+
+    document.addEventListener("keydown", onKeyDown, true);
+    document.addEventListener("focusin", onFocusIn);
+    return () => {
+      document.removeEventListener("keydown", onKeyDown, true);
+      document.removeEventListener("focusin", onFocusIn);
+      previous?.focus?.();
+    };
+  }, [open, containerRef]);
+}
 
 const visibleSites = (sites as Site[]).filter((site) => site.show !== false);
 const searchIndex = (site: Site) =>
@@ -264,6 +316,8 @@ export default function HomePage() {
   const [bump, setBump] = useState(false);
   const [milestone, setMilestone] = useState<number | null>(null);
   const [exitNudge, setExitNudge] = useState<Site | null>(null);
+  const [activeTag, setActiveTag] = useState<string | null>(null);
+  const [sortMode, setSortMode] = useState<SortMode>("liked");
   const [shareOpen, setShareOpen] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
   // The banner lives in the layout; this page only needs to know the choice so
@@ -282,6 +336,15 @@ export default function HomePage() {
   // When this tab was opened, so the exit nudge can wait until the visitor has
   // actually had a chance to read something.
   const openedAt = useRef(Date.now());
+  const shareRef = useRef<HTMLDivElement>(null);
+  const milestoneRef = useRef<HTMLDivElement>(null);
+  const submitRef = useRef<HTMLDivElement>(null);
+  const exitRef = useRef<HTMLDivElement>(null);
+
+  useDialogFocus(shareOpen, shareRef);
+  useDialogFocus(milestone != null, milestoneRef);
+  useDialogFocus(submitOpen, submitRef);
+  useDialogFocus(exitNudge != null, exitRef);
 
   // Load saved preferences after mount so SSR markup stays stable.
   useEffect(() => {
@@ -602,14 +665,36 @@ export default function HomePage() {
     [voteTotals],
   );
 
+  // Every tag in the directory, most used first, for the filter chips.
+  const allTags = useMemo(() => {
+    const counts = new Map<string, number>();
+    for (const site of allSites) {
+      for (const tag of site.tags ?? []) counts.set(tag, (counts.get(tag) ?? 0) + 1);
+    }
+    return [...counts.entries()]
+      .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
+      .slice(0, MAX_TAG_CHIPS)
+      .map(([tag, count]) => ({ tag, count }));
+  }, [allSites]);
+
   const list = useMemo(() => {
     const needle = query.trim().toLowerCase();
-    const matched = allSites.filter((site) => !needle || searchIndex(site).includes(needle));
+    const matched = allSites.filter((site) => {
+      if (activeTag && !(site.tags ?? []).includes(activeTag)) return false;
+      return !needle || searchIndex(site).includes(needle);
+    });
     const rankValue = (key: string) => netLikes(key);
     return [...matched].sort((a, b) => {
       const pinnedA = favorites.includes(a.subdomain) ? 1 : 0;
       const pinnedB = favorites.includes(b.subdomain) ? 1 : 0;
       if (pinnedA !== pinnedB) return pinnedB - pinnedA;
+      if (sortMode === "az") return a.name.localeCompare(b.name);
+      if (sortMode === "newest") {
+        // Community uploads carry a date; the curated entries have none, so
+        // they settle underneath in alphabetical order.
+        const byDate = (b.createdAt ?? 0) - (a.createdAt ?? 0);
+        return byDate !== 0 ? byDate : a.name.localeCompare(b.name);
+      }
       // Sites with no votes yet share a neutral score of 0 and fall back to
       // alphabetical order beneath the ranked ones.
       const scoreA = rankValue(a.subdomain) ?? 0;
@@ -620,7 +705,7 @@ export default function HomePage() {
       if (upA !== upB) return upB - upA;
       return a.name.localeCompare(b.name);
     });
-  }, [query, favorites, allSites, netLikes, voteTotals]);
+  }, [query, activeTag, sortMode, favorites, allSites, netLikes, voteTotals]);
 
   // "Surprise me" opens a random entry from whatever is currently listed, so an
   // active search narrows the pool instead of being ignored.
@@ -797,6 +882,8 @@ export default function HomePage() {
       <Cursor />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
 
+      <a className="skip-link" href="#sites">Skip to the directory</a>
+
       <header className="site-header">
         <div className="site-header-inner">
           <a className="wordmark mono" href="/" aria-label="base31.org home">base31.org</a>
@@ -857,14 +944,64 @@ export default function HomePage() {
         <section id="sites" className="directory-section" aria-labelledby="sites-heading">
           <div className="section-heading" data-reveal>
             <h2 id="sites-heading">Featured sites</h2>
-            {query.trim() && (
-              <span className="section-count mono">
+            {(query.trim() || activeTag) && (
+              <span className="section-count mono" aria-live="polite">
                 {list.length} match{list.length === 1 ? "" : "es"}
               </span>
             )}
           </div>
-          <div className="site-list" aria-label="Deployed sites">
-            {list.length === 0 && <p className="empty">No sites match “{query.trim()}”. Try another search.</p>}
+
+          <div className="filter-bar" data-reveal>
+            <div className="tag-filters" role="group" aria-label="Filter by tag">
+              <button
+                type="button"
+                className={`tag-chip${activeTag === null ? " is-active" : ""}`}
+                aria-pressed={activeTag === null}
+                onClick={() => { buzz(6); setActiveTag(null); }}
+              >
+                All
+              </button>
+              {allTags.map(({ tag, count }) => (
+                <button
+                  key={tag}
+                  type="button"
+                  className={`tag-chip${activeTag === tag ? " is-active" : ""}`}
+                  aria-pressed={activeTag === tag}
+                  onClick={() => { buzz(6); setActiveTag(activeTag === tag ? null : tag); }}
+                >
+                  {tag} <span className="tag-chip-count mono">{count}</span>
+                </button>
+              ))}
+            </div>
+            <div className="sort-controls" role="group" aria-label="Sort sites">
+              {SORT_OPTIONS.map((option) => (
+                <button
+                  key={option.value}
+                  type="button"
+                  className={`sort-button${sortMode === option.value ? " is-active" : ""}`}
+                  aria-pressed={sortMode === option.value}
+                  onClick={() => { buzz(6); setSortMode(option.value); }}
+                >
+                  {option.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="site-list" role="list" aria-label="Deployed sites">
+            {list.length === 0 && (
+              <p className="empty">
+                No sites match{activeTag ? <> the tag <strong>{activeTag}</strong></> : null}
+                {query.trim() ? <> “{query.trim()}”</> : null}.{" "}
+                <button
+                  type="button"
+                  className="empty-reset"
+                  onClick={() => { setQuery(""); setActiveTag(null); }}
+                >
+                  Clear filters
+                </button>
+              </p>
+            )}
             {list.map((site, index) => {
               const pinned = favorites.includes(site.subdomain);
               const vote = votes[site.subdomain];
@@ -875,6 +1012,7 @@ export default function HomePage() {
                   key={site.subdomain}
                   className={`site-card${pinned ? " is-pinned" : ""}`}
                   data-reveal
+                  role="listitem"
                   style={{ "--i": index } as CSSProperties}
                 >
                   <div className="site-card-top">
@@ -1022,7 +1160,7 @@ export default function HomePage() {
 
       {shareOpen && (
         <div className="modal-backdrop" onClick={(event) => event.target === event.currentTarget && setShareOpen(false)}>
-          <div className="modal share-sheet" role="dialog" aria-modal="true" aria-labelledby="share-title">
+          <div ref={shareRef} tabIndex={-1} className="modal share-sheet" role="dialog" aria-modal="true" aria-labelledby="share-title">
             <button type="button" className="modal-close" onClick={() => setShareOpen(false)} aria-label="Close share screen">×</button>
             <p className="eyebrow mono">share the directory</p>
             <h2 id="share-title">Send base31 to a friend.</h2>
@@ -1043,7 +1181,7 @@ export default function HomePage() {
 
       {milestone != null && (
         <div className="modal-backdrop" onClick={(event) => event.target === event.currentTarget && setMilestone(null)}>
-          <div className="modal" role="dialog" aria-modal="true" aria-labelledby="milestone-title" aria-live="polite">
+          <div ref={milestoneRef} tabIndex={-1} className="modal" role="dialog" aria-modal="true" aria-labelledby="milestone-title" aria-live="polite">
             <button type="button" className="modal-close" onClick={() => setMilestone(null)} aria-label="Close milestone">×</button>
             <p className="eyebrow mono">directory milestone</p>
             <h2 id="milestone-title">You were visitor <strong>{milestone.toLocaleString()}</strong>.</h2>
@@ -1086,7 +1224,7 @@ export default function HomePage() {
 
       {submitOpen && (
         <div className="modal-backdrop" onClick={(event) => event.target === event.currentTarget && setSubmitOpen(false)}>
-          <div className="modal submit-sheet" role="dialog" aria-modal="true" aria-labelledby="submit-title">
+          <div ref={submitRef} tabIndex={-1} className="modal submit-sheet" role="dialog" aria-modal="true" aria-labelledby="submit-title">
             <button type="button" className="modal-close" onClick={() => setSubmitOpen(false)} aria-label="Close upload form">×</button>
             <p className="eyebrow mono">publish your site</p>
             <h2 id="submit-title">Add your site to the directory.</h2>
@@ -1196,7 +1334,7 @@ export default function HomePage() {
 
       {exitNudge && (
         <div className="modal-backdrop" onClick={(event) => event.target === event.currentTarget && setExitNudge(null)}>
-          <div className="modal exit-modal" role="dialog" aria-modal="true" aria-labelledby="exit-title">
+          <div ref={exitRef} tabIndex={-1} className="modal exit-modal" role="dialog" aria-modal="true" aria-labelledby="exit-title">
             <button type="button" className="modal-close" onClick={() => setExitNudge(null)} aria-label="Close">×</button>
             <p className="eyebrow mono">wait, one more thing</p>
             <h2 id="exit-title">Leaving already? Don&apos;t go yet.</h2>

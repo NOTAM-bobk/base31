@@ -216,6 +216,49 @@ html.anim .faq-item:nth-child(4) { --faq-i: 3; }
 html.anim .faq-item:nth-child(5) { --faq-i: 4; }
 html.anim .faq-item:nth-child(6) { --faq-i: 5; }
 
+/* Accessibility ------------------------------------------------------- 
+   globals.css ships no :focus-visible rule, so keyboard focus gets a clear
+   ring here, and the smallest labels get enough contrast to pass AA. */
+:focus-visible { outline: 2px solid var(--live); outline-offset: 2px; border-radius: 4px; }
+/* The custom cursor must not hide the caret while typing. */
+html.has-custom-cursor input,
+html.has-custom-cursor textarea,
+html.has-custom-cursor [contenteditable] { cursor: text !important; }
+html.has-custom-cursor select { cursor: pointer !important; }
+/* #777 on the dark surface is ~4.4:1 — a touch under AA for 9-10px text. */
+:root { --subtle: #8f8f8f; }
+html[data-theme="light"] { --subtle: #6b6b6b; }
+.skip-link {
+  position: fixed; top: 8px; left: 8px; z-index: 90; padding: 9px 14px;
+  border: 1px solid var(--line-strong); border-radius: 9px;
+  background: var(--invert-bg); color: var(--invert-fg); font-size: 12px;
+  transform: translateY(-220%); transition: transform 160ms ease;
+}
+.skip-link:focus { transform: none; }
+
+/* Directory filters ---------------------------------------------------- */
+.filter-bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 16px; }
+.tag-filters, .sort-controls { display: flex; flex-wrap: wrap; gap: 6px; }
+.tag-chip {
+  display: inline-flex; align-items: center; gap: 6px; padding: 5px 10px;
+  border: 1px solid var(--line); border-radius: 999px; background: transparent;
+  color: var(--muted); font-size: 11.5px; cursor: pointer;
+  transition: border-color 150ms ease, color 150ms ease, background 150ms ease;
+}
+.tag-chip:hover { border-color: var(--line-strong); color: var(--text-strong); }
+.tag-chip.is-active { border-color: color-mix(in srgb, var(--live) 55%, var(--line)); background: color-mix(in srgb, var(--live) 12%, transparent); color: var(--live); }
+.tag-chip-count { color: var(--subtle); font-size: 9.5px; }
+.tag-chip.is-active .tag-chip-count { color: var(--live); }
+.sort-controls { padding: 3px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); }
+.sort-button {
+  padding: 5px 10px; border: 0; border-radius: 7px; background: transparent;
+  color: var(--muted); font-size: 11px; cursor: pointer; transition: background 150ms ease, color 150ms ease;
+}
+.sort-button:hover { color: var(--text-strong); }
+.sort-button.is-active { background: var(--surface-hover); color: var(--text-strong); }
+.empty-reset { padding: 0; border: 0; background: none; color: var(--live); font: inherit; font-size: 13px; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+.empty-reset:hover { color: var(--text-strong); }
+
 /* Site cards: icon, badges, and the small pieces globals.css dropped. --- */
 .site-link-with-thumb { display: flex; align-items: center; gap: 11px; min-width: 0; }
 .site-thumb {
@@ -338,6 +381,22 @@ p a:hover, li a:hover, dd a:hover, .privacy-copy a:hover, .blog-article a:hover,
 .footer-links { align-items: center; }
 .footer-links a { padding: 2px 0; transition: color 150ms ease; }
 
+/* Desktop -------------------------------------------------------------- 
+   The shell was a single 720px column, so half of a wide screen sat empty.
+   The directory goes two-up (cards already stretch to their row height) and
+   the board and prose keep a readable measure. */
+@media (min-width: 1000px) {
+  main, .site-header-inner, .site-footer-inner { width: min(100% - 64px, 1080px); }
+  .donation-board, .support-ad { max-width: 720px; }
+  .site-list, .site-skeleton { grid-template-columns: 1fr 1fr; gap: 12px; }
+  .site-list > .upload-card, .site-list > .empty { grid-column: 1 / -1; }
+  .site-card { display: flex; flex-direction: column; }
+  .site-card .site-details { display: flex; flex: 1; flex-direction: column; }
+  .site-card .tags { margin-top: auto; }
+  /* Room for the card's action row next to a long site name. */
+  .site-card-top { gap: 10px; }
+}
+
 /* Narrow + touch ------------------------------------------------------ */
 @media (max-width: 1199px) {
   /* The board scrolls with the page; only its CTA detaches, so the support
@@ -383,6 +442,13 @@ p a:hover, li a:hover, dd a:hover, .privacy-copy a:hover, .blog-article a:hover,
   .blog-card h2 { font-size: 18px; }
   .blog-next { margin-top: 44px; }
   .site-thumb { width: 26px; height: 26px; }
+  /* Chips scroll sideways on a phone instead of stacking into a wall. */
+  .filter-bar { gap: 10px; margin-bottom: 14px; }
+  .tag-filters { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 2px; scrollbar-width: none; }
+  .tag-filters::-webkit-scrollbar { display: none; }
+  .tag-chip { flex: 0 0 auto; padding: 7px 12px; }
+  .sort-controls { width: 100%; }
+  .sort-button { flex: 1; padding: 7px 10px; }
 
   /* The footer links were stacking into a ragged column; give them a tidy
      two-column grid of tappable rows, with "Top ↑" spanning the width. */

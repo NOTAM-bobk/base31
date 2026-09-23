@@ -114,6 +114,27 @@ Run `npm run validate:content` to check `sites.json`, `blogs.json`,
   community uploads fresh within 14 days get a `new` badge.
 - "Surprise me" in the hero opens a random entry — from the current filter
   results when a search is active, otherwise from the whole directory.
+- The directory is filterable by tag (chips built from `config/sites.json`,
+  most used first, capped at `MAX_TAG_CHIPS`) and sortable by **Most liked**,
+  **Newest** or **A–Z**. Pinned sites stay on top in every mode, and a tag or
+  sort choice narrows what "Surprise me" picks from.
+- On a 1000px-and-wider screen the shell is 1080px and the directory is a
+  two-column grid; the donation board and prose stay capped at a readable
+  measure so the extra width goes to the cards.
+
+## Accessibility notes
+
+- Dialogs (share, milestone, publish, exit nudge) move focus in when they open,
+  keep Tab inside, and hand focus back to whatever opened them — see
+  `useDialogFocus` in `app/page.tsx`.
+- A "Skip to the directory" link is the first focusable element on the page.
+- `:focus-visible` gets a green ring; `globals.css` ships no focus rule at all.
+- `--subtle` is overridden to `#8f8f8f` (dark) / `#6b6b6b` (light) because the
+  original values sat just under 4.5:1 for the 9–10px labels.
+- The custom cursor keeps the native caret over inputs and textareas.
+- The Vibration API, confetti, flip clock, scroll reveals and carousel
+  auto-rotation are all skipped under `prefers-reduced-motion`, and the reveal
+  gate (`html.anim`) is never applied without JavaScript.
 - The blog ships an RSS feed at `/blog/feed.xml` and a JSON Feed 1.1 twin at
   `/blog/feed.json`, both generated from `lib/blogs.ts` and advertised with
   `<link rel="alternate">`. Posts also show a reading time and a "read next"

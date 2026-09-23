@@ -23,6 +23,7 @@ the sites themselves — all deployed together as one Vercel project.
 │   ├── donations.json     ← donation board entries
 │   └── referrals.json     ← sponsored referral carousel
 ├── public/
+│   ├── site-icons/        ← one favicon per directory entry
 │   └── sites/
 │       └── example/       ← one subfolder per subdomain
 │           └── index.html
@@ -81,8 +82,11 @@ labelled `ad`. It is driven by `config/referrals.json`:
 | `show` | no | `false` hides the entry |
 
 If `image` is omitted the card shows a live screenshot of the destination
-(WordPress mShots, no API key), falling back to the site's favicon and then a
-lettered tile, so a blocked image never leaves an empty box. Entries rotate
+(WordPress mShots, no API key), falling back to the destination's own favicon
+and then a lettered tile, so a blocked image never leaves an empty box. These
+previews load whatever the visitor answered in the cookie banner — the card is
+unusable without its picture, they set no cookies, and the privacy page says
+so. Entries rotate
 every 7 seconds (paused on hover or focus, and never auto-rotating when the
 visitor prefers reduced motion), with arrows, dots, arrow-key and swipe
 support.
@@ -123,14 +127,15 @@ Run `npm run validate:content` to check `sites.json`, `blogs.json`,
   window with a "wait, don't go" dialog suggesting a site they have not seen.
   It is desktop-pointer only, waits 8 seconds, shows at most once per session,
   and never appears over another dialog.
-- Every directory card leads with its own app icon. `SiteIcon` in
-  `app/page.tsx` hashes the site's `subdomain` (falling back to its name) to
-  to pick an HSL gradient and one glyph from `SITE_GLYPHS`, so each
-  entry looks distinct, keeps its icon across reloads, and works for community
-  uploads that ship no icon file. Nothing is fetched — this replaced the
-  DuckDuckGo favicon request, which was the last third-party call made before
-  consent. Add a glyph by appending to `SITE_GLYPHS`; the hash spreads across
-  whatever length the array has.
+- Every directory card leads with the site's own favicon. Kept sites serve it
+  from this project at `public/site-icons/<subdomain>.svg` — same-origin, so it
+  costs no third-party request — and `SiteIcon` in `app/page.tsx` falls back to
+  a generated tile if that image is missing or blocked. A community upload has
+  no icon here, so its card asks its own origin for `/favicon.ico`. Point an
+  entry somewhere else with `"icon": "/path.svg"`. `npm run validate:content`
+  fails if a site has no favicon file, so a new entry cannot ship without one.
+  The generated tile is `SITE_GLYPHS` + a hashed HSL gradient, kept as the
+  fallback; add a shape by appending to that array.
 - Community uploads fresh within 14 days get a `new` badge.
 - The "Featured sites" heading has a small chevron button that minimizes the
   directory (filters, sort and every card) without clearing the visitor's
@@ -154,14 +159,30 @@ Run `npm run validate:content` to check `sites.json`, `blogs.json`,
 - Dialogs (share, milestone, publish, exit nudge) move focus in when they open,
   keep Tab inside, and hand focus back to whatever opened them — see
   `useDialogFocus` in `app/page.tsx`.
+- `.sr-only` is defined in `app/overrides.css`. `globals.css` is hand-written
+  CSS with no Tailwind utilities layer, so every `sr-only` label in this
+  project would otherwise print into the page.
+- The search field is inside a `role="search"` landmark and names itself with
+  `aria-label="Search all sites"`. It used to be wrapped in a `<label>` whose
+  only text was the "/" shortcut hint, so the field was announced as "/".
+- The launch clock's ticking tiles are `aria-hidden`, with a static sentence
+  for assistive tech instead — otherwise a screen reader chases a number that
+  changes every second.
+- Vote counts are `aria-hidden` too; the button's own label already carries the
+  number, so they are not read twice.
+- External links (directory cards, referral cards) carry a visually hidden
+  "opens in a new tab" hint.
+- Pin and vote buttons grow from 27px to 38–40px under `(pointer: coarse)`
+  without changing their mouse appearance.
 - A "Skip to the directory" link is the first focusable element on the page.
 - `:focus-visible` gets a green ring; `globals.css` ships no focus rule at all.
 - `--subtle` is overridden to `#8f8f8f` (dark) / `#6b6b6b` (light) because the
   original values sat just under 4.5:1 for the 9–10px labels.
 - The custom cursor keeps the native caret over inputs and textareas.
-- The Vibration API, confetti, flip clock, scroll reveals and carousel
-  auto-rotation are all skipped under `prefers-reduced-motion`, and the reveal
-  gate (`html.anim`) is never applied without JavaScript.
+- The Vibration API, confetti, flip clock, scroll reveals, the exit-intent
+  nudge, `scroll-behavior: smooth` and carousel auto-rotation are all skipped
+  under `prefers-reduced-motion`, and the reveal gate (`html.anim`) is never
+  applied without JavaScript.
 - The blog ships an RSS feed at `/blog/feed.xml` and a JSON Feed 1.1 twin at
   `/blog/feed.json`, both generated from `lib/blogs.ts` and advertised with
   `<link rel="alternate">`. Posts also show a reading time and a "read next"
@@ -169,15 +190,17 @@ Run `npm run validate:content` to check `sites.json`, `blogs.json`,
 
 ## Cookies, ads and analytics
 
-Nothing third-party loads until the visitor answers the banner, and the answer
-is the single switch for everything:
+No analytics, ad script or ad cookie loads until the visitor answers the
+banner, and the answer is the single switch for all of it. The only things that
+load either way are the destination preview images described above and each
+community upload's own favicon — both decorative, both cookie-free:
 
 | Component | Runs when |
 | --- | --- |
 | `components/consent-aware-analytics.tsx` | Microsoft Clarity, only on `accepted` |
 | `components/consent-aware-ads.tsx` | The Adsterra site-wide unit, only on `accepted` |
 | `components/consent-aware-ads.tsx` → `AdsterraBanner` | The 160x300 display unit, only on `accepted` |
-| `components/referral-carousel.tsx` | Screenshot/favicon images, only on `accepted`; the sponsored links themselves are inert until clicked |
+| `components/referral-carousel.tsx` | Never gated: the destination preview image loads straight from the destination (or a screenshot service) because the card is unusable without it. It sets no cookies, the sponsored links stay inert until clicked, and the privacy page says so. |
 
 The 160x300 banner runs its `atOptions` config and `invoke.js` loader inside a
 sandboxed `srcdoc` iframe. Adsterra's loader writes its frame with

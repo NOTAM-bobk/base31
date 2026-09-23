@@ -78,15 +78,27 @@ export default function PrivacyPage() {
         </p>
         <p>
           The sponsored cards in the referral carousel are ordinary links: they request nothing from
-          a third party until you confirm, and nothing at all unless you click one. Once the ad
-          script is running, the network may use cookies, device identifiers, and similar
-          technologies to display ads, measure their performance, and limit how often you see them.
-          That data is collected by those partners under their own privacy policies, and we do not
-          control it. See the{" "}
+          a third party unless you click one. Each card does show a small preview image of where the
+          link goes — a screenshot or the destination’s favicon, loaded directly from that site (or a
+          screenshot service) so you can see what you are clicking. Those image requests are
+          decorative and set no cookies; if you would rather not make them, blocking third-party
+          images in your browser has no effect on anything else on the page. Once the ad script is
+          running, the network may use cookies, device identifiers, and similar technologies to
+          display ads, measure their performance, and limit how often you see them. That data is
+          collected by those partners under their own privacy policies, and we do not control it.
+          See the{" "}
           <a href="https://adsterra.com/privacy-policy/" target="_blank" rel="noreferrer">
             Adsterra privacy policy
           </a>{" "}
           for details.
+        </p>
+
+        <h2>Site icons</h2>
+        <p>
+          Every directory entry has a small favicon. The ones shipped with base31.org come from this
+          site itself and cost no extra request. A site uploaded by a visitor has no icon of its
+          own here, so its card asks that site for its favicon; if it does not have one, a generated
+          placeholder is shown instead.
         </p>
 
         <h2>Links to other sites</h2>

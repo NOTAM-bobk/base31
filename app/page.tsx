@@ -9,7 +9,7 @@ import ReferralCarousel from "@/components/referral-carousel";
 import { AdsterraBanner } from "@/components/consent-aware-ads";
 import { resetConsent, useConsent } from "@/lib/consent";
 
-type Site = { name: string; subdomain: string; url: string; tags?: string[]; description?: string; show?: boolean; community?: boolean; createdAt?: number };
+type Site = { name: string; subdomain: string; url: string; tags?: string[]; description?: string; show?: boolean; community?: boolean; createdAt?: number; icon?: string };
 type Theme = "dark" | "light";
 // This visitor's own choice, stored locally.
 type Vote = 1 | -1;
@@ -161,11 +161,12 @@ function ThumbIcon({ down }: { down?: boolean }) {
   );
 }
 
-// Every site gets its own app icon. Rather than pulling a favicon from a
-// third-party service (a request that used to fire before consent) each card
-// draws a rounded tile whose gradient and glyph come from hashing the site's
-// subdomain. The result is distinct per site, stable across reloads, works for
-// community uploads that have no icon file, and costs zero network requests.
+// Every kept site has a hand-made favicon at /site-icons/<subdomain>.svg, so
+// the directory shows a real icon rather than a placeholder. `SITE_GLYPHS`
+// stays as the fallback: if a favicon is missing or fails to load (and for any
+// new site that has not been given one yet) the card still draws a rounded
+// tile whose gradient and glyph come from hashing the subdomain, so a card
+// never ships an empty box.
 const SITE_GLYPHS: ReactNode[] = [
   // bolt
   <path key="bolt" d="M13 2 4.5 13.5H11l-1 8.5 8.5-11.5H12L13 2Z" />,
@@ -244,12 +245,30 @@ const hashKey = (value: string) => {
   return hash;
 };
 
+// The favicon shown on a site's card. Kept sites ship one with the directory
+// (a same-origin file, so nothing is requested from anyone else); a community
+// upload asks its own origin for `/favicon.ico`. Both fall back to the
+// generated tile if the image is missing or blocked.
+const siteFavicon = (site: Site) => {
+  if (site.icon) return site.icon;
+  if (site.community) {
+    try {
+      return `${new URL(site.url).origin}/favicon.ico`;
+    } catch {
+      return null;
+    }
+  }
+  return `/site-icons/${site.subdomain}.svg`;
+};
+
 function SiteIcon({ site }: { site: Site }) {
   const hash = hashKey(site.subdomain || site.name);
   const hue = hash % 360;
   // A second, independent slice of the hash picks the glyph so colour and
   // shape don't repeat together.
   const glyph = SITE_GLYPHS[(hash >> 3) % SITE_GLYPHS.length];
+  const src = siteFavicon(site);
+  const [failed, setFailed] = useState(false);
 
   return (
     <span
@@ -257,9 +276,21 @@ function SiteIcon({ site }: { site: Site }) {
       aria-hidden="true"
       style={{ backgroundImage: `linear-gradient(145deg, hsl(${hue} 70% 50%), hsl(${(hue + 38) % 360} 64% 33%))` }}
     >
-      <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
-        {glyph}
-      </svg>
+      {src && !failed ? (
+        <img
+          className="site-icon-img"
+          src={src}
+          alt=""
+          loading="lazy"
+          decoding="async"
+          referrerPolicy="no-referrer"
+          onError={() => setFailed(true)}
+        />
+      ) : (
+        <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
+          {glyph}
+        </svg>
+      )}
     </span>
   );
 }
@@ -316,7 +347,10 @@ function LaunchClock() {
         live since launch
       </div>
       <h2>base31 has been running for</h2>
-      <div className="clock-row" role="timer" aria-live="off">
+      {/* The tiles tick every second, so they are hidden from assistive tech —
+          otherwise a screen reader would try to read a number that changes
+          under it. The static description below is what actually gets read. */}
+      <div className="clock-row" role="timer" aria-hidden="true">
         {units.map((unit) => (
           <span key={unit.label} className="clock-unit">
             <span className="clock-value mono">
@@ -327,6 +361,7 @@ function LaunchClock() {
           </span>
         ))}
       </div>
+      <p className="sr-only">A live counter of how long base31 has been online.</p>
       <p className="clock-note">Live since 5:00 PM on September 20, 2026 — counting one second at a time.</p>
     </section>
   );
@@ -543,6 +578,7 @@ export default function HomePage() {
       piece.style.left = `${Math.random() * 100}%`;
       piece.style.animationDelay = `${Math.random() * 0.35}s`;
       piece.style.setProperty("--hue", String(Math.floor(Math.random() * 360)));
+      piece.setAttribute("aria-hidden", "true");
       document.body.appendChild(piece);
       window.setTimeout(() => piece.remove(), 2100);
     }
@@ -624,6 +660,7 @@ export default function HomePage() {
   // session, and never on top of another dialog.
   useEffect(() => {
     if (!window.matchMedia("(hover: hover) and (pointer: fine)").matches) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     if (shareOpen || submitOpen || milestone != null || exitNudge != null || consentNeeded) return;
     try {
       if (window.sessionStorage.getItem("base31-exit-nudge")) return;
@@ -969,7 +1006,7 @@ export default function HomePage() {
             <a href="#about">About</a>
           </nav>
           <div className="header-actions">
-            <button type="button" className="icon-button share-button mono" onClick={() => { buzz(8); setShareOpen(true); }} aria-label="Share base31.org">
+            <button type="button" className="icon-button share-button mono" onClick={() => { buzz(8); setShareOpen(true); }} aria-label="Share base31.org" aria-haspopup="dialog">
               <span>Share</span>
               <kbd className="shortcut-hint">S</kbd>
               <span aria-hidden="true">↗</span>
@@ -1007,7 +1044,9 @@ export default function HomePage() {
               <span className="surprise-label">Surprise me</span>
             </button>
           </div>
-          <label className="search-wrap" htmlFor="site-search">
+          {/* A search landmark with an explicit name: the wrapping label used
+              to name the field "/" (its only text was the shortcut hint). */}
+          <div className="search-wrap" role="search">
             <span className="search-icon mono" aria-hidden="true">⌕</span>
             <input
               id="site-search"
@@ -1016,10 +1055,13 @@ export default function HomePage() {
               value={query}
               onChange={(event) => { setQuery(event.target.value); setSitesCollapsed(false); }}
               placeholder="Search all sites..."
+              aria-label="Search all sites"
+              aria-describedby="site-search-hint"
               autoComplete="off"
             />
-            <kbd className="shortcut-hint">/</kbd>
-          </label>
+            <kbd className="shortcut-hint" aria-hidden="true">/</kbd>
+            <span id="site-search-hint" className="sr-only">Press the slash key to jump here from anywhere on the page.</span>
+          </div>
         </section>
 
         <section id="sites" className="directory-section" aria-labelledby="sites-heading">
@@ -1085,7 +1127,7 @@ export default function HomePage() {
             </div>
           </div>
 
-          <div className="site-list" role="list" aria-label="Deployed sites">
+          <div className="site-list" role="list" aria-label="Deployed sites" aria-busy={booting}>
             {list.length === 0 && (
               <p className="empty">
                 No sites match{activeTag ? <> the tag <strong>{activeTag}</strong></> : null}
@@ -1121,6 +1163,7 @@ export default function HomePage() {
                         {site.community && <span className="site-badge mono">community</span>}
                         {isNew && <span className="site-badge is-new mono">new</span>}
                         <span className="site-arrow mono" aria-hidden="true">↗</span>
+                        <span className="sr-only"> (opens in a new tab)</span>
                       </span>
                     </a>
                     <div className="site-actions">
@@ -1141,8 +1184,10 @@ export default function HomePage() {
                         aria-label={`Thumbs up ${site.name}${totals ? `, ${totals.up} up` : ""}`}
                       >
                         <ThumbIcon />
-                        {/* keyed so the count replays its pop animation on change */}
-                        <span key={totals ? totals.up : "none"} className="vote-count mono">{totals ? totals.up : "–"}</span>
+                        {/* keyed so the count replays its pop animation on change;
+                            the number is in the button's label, so this is
+                            decorative to avoid reading the same value twice. */}
+                        <span key={totals ? totals.up : "none"} className="vote-count mono" aria-hidden="true">{totals ? totals.up : "–"}</span>
                       </button>
                       <button
                         type="button"
@@ -1152,7 +1197,7 @@ export default function HomePage() {
                         aria-label={`Thumbs down ${site.name}${totals ? `, ${totals.down} down` : ""}`}
                       >
                         <ThumbIcon down />
-                        <span key={totals ? totals.down : "none"} className="vote-count mono">{totals ? totals.down : "–"}</span>
+                        <span key={totals ? totals.down : "none"} className="vote-count mono" aria-hidden="true">{totals ? totals.down : "–"}</span>
                       </button>
                     </div>
                   </div>
@@ -1169,7 +1214,7 @@ export default function HomePage() {
               );
             })}
             {!query.trim() && (
-              <button type="button" className="upload-card" data-reveal onClick={openSubmit}>
+              <button type="button" className="upload-card" data-reveal onClick={openSubmit} aria-haspopup="dialog">
                 <span className="upload-card-icon mono" aria-hidden="true">＋</span>
                 <span className="upload-card-body">
                   <span className="upload-card-title">Add your own site</span>

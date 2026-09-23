@@ -291,6 +291,9 @@ html[data-theme="light"] { --subtle: #6b6b6b; }
   background: linear-gradient(180deg, rgb(255 255 255 / 22%), rgb(255 255 255 / 0%) 58%);
 }
 .site-icon svg { position: relative; z-index: 1; filter: drop-shadow(0 1px 1px rgb(0 0 0 / 32%)); }
+/* The site's own favicon sits over the generated tile, which shows through
+   only if the image is missing or blocked. */
+.site-icon .site-icon-img { position: relative; z-index: 1; width: 100%; height: 100%; object-fit: cover; border-radius: inherit; }
 .site-card:hover .site-icon { transform: translateY(-1px) scale(1.05); }
 .site-badge {
   flex: 0 0 auto; padding: 2px 6px; border: 1px solid var(--line-strong); border-radius: 5px;
@@ -447,6 +450,29 @@ html[data-theme="light"] { --subtle: #6b6b6b; }
 .surprise-button:active .surprise-icon { transform: rotate(180deg) scale(1.18); }
 .surprise-label { display: inline-block; }
 @keyframes surprise-sheen { from { left: -60%; } to { left: 115%; } }
+
+/* Visually hidden, still read aloud -----------------------------------
+   globals.css is hand-written CSS with no Tailwind utilities layer, so
+   `.sr-only` is not a class that exists here. Without this rule every
+   screen-reader-only label would print into the page. */
+.sr-only {
+  position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0;
+  overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%);
+  border: 0; white-space: nowrap;
+}
+
+/* Touch targets -------------------------------------------------------
+   The pin and vote buttons are 27px tall: that clears WCAG 2.2 Target Size
+   (Minimum), but it is cramped under a thumb. Coarse pointers get a roomier
+   hit area without changing how the row looks with a mouse. */
+@media (pointer: coarse) {
+  .favorite-button, .vote-button { min-width: 40px; height: 38px; }
+  .site-actions { gap: 8px; }
+  .share-copy { min-height: 40px; }
+}
+
+/* In-page anchors glide instead of jumping, unless motion is unwelcome. */
+html { scroll-behavior: smooth; }
 
 /* The footer's "Cookie settings" control, styled like the links beside it. */
 .footer-link-button { padding: 2px 0; border: 0; background: none; color: var(--muted); font: inherit; font-size: 12px; cursor: pointer; transition: color 150ms ease; }
@@ -632,4 +658,6 @@ p a:hover, li a:hover, dd a:hover, .privacy-copy a:hover, .blog-article a:hover,
   .surprise-button:hover { transform: none; }
   .surprise-button:hover::after { animation: none; }
   html.anim [data-reveal] { opacity: 1; transform: none; transition: none; }
+  html { scroll-behavior: auto; }
+  .confetti-piece { display: none; }
 }

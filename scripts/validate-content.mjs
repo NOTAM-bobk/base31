@@ -34,6 +34,16 @@ for (const [index, site] of sites.entries()) {
   if (typeof site.url !== "string" || !https.test(site.url)) errors.push(`Site ${index + 1} needs an HTTPS URL`);
   if (typeof site.description !== "string" || site.description.trim().length < 20) errors.push(`Site ${index + 1} needs a useful description`);
   if (!Array.isArray(site.tags) || site.tags.length === 0) errors.push(`Site ${index + 1} needs at least one tag`);
+
+  // Every entry is expected to ship its own favicon, since base31.org is the
+  // one place that can serve it without a third-party request. Sites that
+  // point at their own image are trusted to have made it themselves.
+  const icon = typeof site.icon === "string" ? site.icon : `/site-icons/${site.subdomain}.svg`;
+  if (!icon.startsWith("/")) {
+    errors.push(`Site ${index + 1} has an icon outside this site (${icon}); use a path under public/`);
+  } else if (!fs.existsSync(path.join(root, "public", icon))) {
+    errors.push(`Site ${index + 1} is missing its favicon at public${icon} — add the file or set "icon"`);
+  }
 }
 
 for (const [index, post] of posts.entries()) {

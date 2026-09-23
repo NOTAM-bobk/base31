@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img" aria-label="Word of the Day">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#fdba74" />
+      <stop offset="1" stop-color="#c2410c" />
+    </linearGradient>
+  </defs>
+  <rect width="32" height="32" rx="8" fill="url(#bg)" />
+  <g transform="translate(4 4)" fill="none" stroke="#fff" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M3.6 4.2h6a2.2 2.2 0 0 1 2.2 2.2v13.8a2.2 2.2 0 0 0-2.2-2.2H3.6Z" />
+    <path d="M20.4 4.2h-6a2.2 2.2 0 0 0-2.2 2.2v13.8a2.2 2.2 0 0 1 2.2-2.2h6Z" />
+  </g>
+</svg>

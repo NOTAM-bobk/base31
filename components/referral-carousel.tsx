@@ -2,7 +2,6 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import referrals from "@/config/referrals.json";
-import { useConsent } from "@/lib/consent";
 
 type Referral = {
   name: string;
@@ -26,28 +25,36 @@ const hostOf = (url: string) => {
 };
 
 // A live screenshot of the destination (WordPress mShots needs no API key),
-// with the site's favicon as the fallback and a lettered tile as the last
-// resort — so a blocked or slow image never leaves an empty box.
+// with the site's own favicon as the fallback and a lettered tile as the last
+// resort — so a blocked or slow image never leaves an empty box. These are
+// plain destination previews, not tracking, so they load whatever the visitor
+// answered in the cookie banner; the links themselves stay inert until
+// clicked, exactly as before.
 const shotSrc = (referral: Referral) =>
   referral.image || `https://s0.wp.com/mshots/v1/${encodeURIComponent(referral.url)}?w=640&h=400`;
-const faviconSrc = (referral: Referral) =>
-  `https://www.google.com/s2/favicons?domain=${encodeURIComponent(hostOf(referral.url))}&sz=128`;
+const faviconSrc = (referral: Referral) => {
+  try {
+    return `${new URL(referral.url).origin}/favicon.ico`;
+  } catch {
+    return "";
+  }
+};
 
-// `allowImages` is only true once the visitor confirms in the cookie banner,
-// so a denied choice means the carousel never reaches out to the screenshot
-// and favicon services — the cards fall back to a monogram tile instead.
-function ReferralShot({ referral, allowImages }: { referral: Referral; allowImages: boolean }) {
+function ReferralShot({ referral }: { referral: Referral }) {
   const [stage, setStage] = useState<"shot" | "favicon" | "letter">("shot");
+  const favicon = faviconSrc(referral);
 
-  if (!allowImages || stage === "letter") {
+  if (stage === "letter" || (stage === "favicon" && !favicon)) {
     return <span className="referral-fallback mono" aria-hidden="true">{referral.name.slice(0, 1).toUpperCase()}</span>;
   }
 
   return (
     <img
       className={stage === "favicon" ? "is-favicon" : undefined}
-      src={stage === "shot" ? shotSrc(referral) : faviconSrc(referral)}
-      alt={stage === "shot" ? `${referral.name} preview` : ""}
+      src={stage === "shot" ? shotSrc(referral) : favicon}
+      /* The name, host and description sit right beside this, so the image is
+         decorative and stays out of the accessibility tree. */
+      alt=""
       loading="lazy"
       decoding="async"
       referrerPolicy="no-referrer"
@@ -62,7 +69,6 @@ export default function ReferralCarousel() {
     [],
   );
   const count = items.length;
-  const allowImages = useConsent() === "accepted";
   const [index, setIndex] = useState(0);
   const [paused, setPaused] = useState(false);
   const touchStart = useRef<number | null>(null);
@@ -153,7 +159,7 @@ export default function ReferralCarousel() {
       >
         <ul className="referral-track" style={{ transform: `translateX(-${index * 100}%)` }}>
           {items.map((item, itemIndex) => (
-            <li key={item.url} className="referral-slide" aria-hidden={itemIndex !== index}>
+            <li key={item.url} className="referral-slide" role="group" aria-roledescription="slide" aria-label={`${itemIndex + 1} of ${count}: ${item.name}`} aria-hidden={itemIndex !== index}>
               <a
                 className="referral-card"
                 href={item.url}
@@ -162,7 +168,7 @@ export default function ReferralCarousel() {
                 tabIndex={itemIndex === index ? 0 : -1}
               >
                 <span className="referral-shot">
-                  <ReferralShot referral={item} allowImages={allowImages} />
+                  <ReferralShot referral={item} />
                 </span>
                 <span className="referral-copy">
                   <span className="referral-name">
@@ -173,6 +179,7 @@ export default function ReferralCarousel() {
                   <span className="referral-desc">{item.description}</span>
                   <span className="referral-visit">
                     Visit {hostOf(item.url)} <span aria-hidden="true">↗</span>
+                    <span className="sr-only"> (opens in a new tab)</span>
                   </span>
                 </span>
               </a>
@@ -180,6 +187,12 @@ export default function ReferralCarousel() {
           ))}
         </ul>
       </div>
+
+      {/* Announces the slide the carousel moved to, for screen readers that
+          never see the (aria-hidden) off-screen slides. */}
+      <p className="sr-only" role="status">
+        {index + 1} of {count}: {items[index]?.name}
+      </p>
 
       {count > 1 && (
         <div className="referral-dots">
@@ -198,7 +211,6 @@ export default function ReferralCarousel() {
 
       <p className="referral-note mono">
         {index + 1} / {count} · sponsored link — we may earn something if you visit
-        {allowImages ? "" : " · preview images load after you confirm cookies"}
       </p>
     </section>
   );

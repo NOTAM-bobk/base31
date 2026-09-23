@@ -2,9 +2,7 @@ import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
 import "./globals.css";
 import "./overrides.css";
-import "./donation-board-overrides.css";
 import ConsentAwareAnalytics from "@/components/consent-aware-analytics";
-import DonationBoard from "@/components/donation-board";
 import PrivacyConsent from "@/components/privacy-consent";
 import StructuredData from "@/components/structured-data";
 
@@ -30,7 +28,11 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = { themeColor: "#000000", colorScheme: "light dark", viewportFit: "cover" };
-const themeScript = `try{if(localStorage.getItem("base31-theme")==="light"){document.documentElement.setAttribute("data-theme","light")}}catch(e){}`;
+// Runs before the first paint: restore the saved theme, and opt into the
+// scroll-reveal animations only when the visitor allows motion. Because the
+// flag lives on <html> and is set by this script, `[data-reveal]` content is
+// never hidden when JavaScript is unavailable.
+const themeScript = `try{if(localStorage.getItem("base31-theme")==="light"){document.documentElement.setAttribute("data-theme","light")}}catch(e){}try{if(!matchMedia("(prefers-reduced-motion: reduce)").matches){document.documentElement.classList.add("anim")}}catch(e){}try{addEventListener("error",function(){document.documentElement.classList.remove("anim")},true)}catch(e){}`;
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
@@ -42,7 +44,6 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       <body>
         <StructuredData />
         {children}
-        <DonationBoard />
         <PrivacyConsent />
         <ConsentAwareAnalytics />
       </body>

@@ -18,7 +18,10 @@ the sites themselves — all deployed together as one Vercel project.
 
 ```
 ├── config/
-│   └── sites.json         ← the directory's data (edit this)
+│   ├── sites.json         ← the directory's data (edit this)
+│   ├── blogs.json         ← SEO blog posts
+│   ├── donations.json     ← donation board entries
+│   └── referrals.json     ← sponsored referral carousel
 ├── public/
 │   └── sites/
 │       └── example/       ← one subfolder per subdomain
@@ -51,6 +54,61 @@ the sites themselves — all deployed together as one Vercel project.
 
 Set `"show": false` to keep a site live on its subdomain without listing it
 on the homepage.
+
+## Referral carousel
+
+The "Referrals worth a look" carousel sits just below the launch clock and is
+labelled `ad`. It is driven by `config/referrals.json`:
+
+```json
+{
+  "name": "Cloudflare",
+  "url": "https://www.cloudflare.com/?ref=your-code",
+  "description": "The edge network and DNS that keeps base31 fast.",
+  "tag": "referral",
+  "image": "https://example.com/custom-card.png",
+  "show": true
+}
+```
+
+| Field | Required | Notes |
+| --- | --- | --- |
+| `name` | yes | Shown on the card |
+| `url` | yes | `https://` destination; put your referral/affiliate link here. Cards open in a new tab with `rel="noreferrer sponsored"` |
+| `description` | yes | One sentence, at least 20 characters |
+| `tag` | no | Small badge next to the name |
+| `image` | no | Override the card image |
+| `show` | no | `false` hides the entry |
+
+If `image` is omitted the card shows a live screenshot of the destination
+(WordPress mShots, no API key), falling back to the site's favicon and then a
+lettered tile, so a blocked image never leaves an empty box. Entries rotate
+every 7 seconds (paused on hover or focus, and never auto-rotating when the
+visitor prefers reduced motion), with arrows, dots, arrow-key and swipe
+support.
+
+Add entries to the array and the carousel picks them up — no code changes.
+Run `npm run validate:content` to check `sites.json`, `blogs.json`,
+`referrals.json` and `donations.json` in one go.
+
+## Sitemap, FAQ and on-page extras
+
+- `app/sitemap.ts` is generated at build time from `lib/blogs.ts` (which reads
+  `config/blogs.json` plus the editorial posts) and `config/sites.json`, so a
+  new blog post or directory entry shows up in `/sitemap.xml` on the next
+  deploy with nothing to update by hand. Sites with `"show": false` are left
+  out, and community uploads are not listed (they are only known at runtime).
+- `components/faq.tsx` renders the FAQ above the footer together with its
+  matching `FAQPage` structured data. Edit the `FAQS` array there and both the
+  copy and the schema stay in sync.
+- Sections marked `data-reveal` fade in as they scroll into view. The gate is
+  the `anim` class that `app/layout.tsx` adds before first paint, so nothing is
+  ever hidden for visitors without JavaScript, and it is skipped entirely for
+  `prefers-reduced-motion`.
+- The homepage nudges visitors who move their pointer out of the top of the
+  window with a "wait, don't go" dialog suggesting a site they have not seen.
+  It is desktop-pointer only, waits 8 seconds, shows at most once per session,
+  and never appears over another dialog.
 
 > The `subdomain` value and the folder name under `public/sites/` must
 > match exactly.

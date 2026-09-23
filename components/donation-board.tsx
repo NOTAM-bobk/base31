@@ -16,7 +16,7 @@ export default function DonationBoard() {
   const total = visibleDonations.reduce((sum, donation) => sum + donation.amount, 0);
 
   return (
-    <aside className="donation-board" aria-label="Donation board">
+    <aside className="donation-board" data-reveal aria-label="Donation board">
       <div className="donation-board-topline" aria-hidden="true" />
       <div className="donation-head">
         <span className="donation-spark" aria-hidden="true">✦</span>

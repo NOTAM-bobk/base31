@@ -3,6 +3,9 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { CSSProperties, FormEvent } from "react";
 import sites from "@/config/sites.json";
+import DonationBoard from "@/components/donation-board";
+import Faq from "@/components/faq";
+import ReferralCarousel from "@/components/referral-carousel";
 
 type Site = { name: string; subdomain: string; url: string; tags?: string[]; description?: string; show?: boolean; community?: boolean };
 type Theme = "dark" | "light";
@@ -20,7 +23,8 @@ const siteUrl = "https://base31.org";
 // `POST /vote`). Override with NEXT_PUBLIC_COUNTER_URL to point at a different
 // deployment; the fallback is the live production worker.
 const counterUrl = process.env.NEXT_PUBLIC_COUNTER_URL || "https://base31-directory-counter.sawyerbobk563.workers.dev";
-const donationUrl = "https://donation.base31.org";
+// base31 went live at 5:00 PM on September 20, 2026 (local time).
+const LAUNCHED_AT = new Date(2026, 8, 20, 17, 0, 0).getTime();
 
 const visibleSites = (sites as Site[]).filter((site) => site.show !== false);
 const searchIndex = (site: Site) =>
@@ -124,18 +128,14 @@ function WordRotator({ words = ROTATING_WORDS }: { words?: string[] }) {
   );
 }
 
-// A live odometer-style clock counting up from base31's launch (5 PM
-// yesterday). Rendered client-only — the elapsed value starts null so the
-// server and first client render match.
+// A live odometer-style clock counting up from base31's launch
+// (`LAUNCHED_AT`). Rendered client-only — the elapsed value starts null so
+// the server and first client render match.
 function LaunchClock() {
   const [elapsed, setElapsed] = useState<number | null>(null);
 
   useEffect(() => {
-    const launched = new Date();
-    launched.setDate(launched.getDate() - 1);
-    launched.setHours(17, 0, 0, 0);
-    const startedAt = launched.getTime();
-    const tick = () => setElapsed(Math.max(0, Date.now() - startedAt));
+    const tick = () => setElapsed(Math.max(0, Date.now() - LAUNCHED_AT));
     tick();
     const id = window.setInterval(tick, 1000);
     return () => window.clearInterval(id);
@@ -151,7 +151,7 @@ function LaunchClock() {
   ];
 
   return (
-    <section className="launch-block" aria-label="Time since base31 launched">
+    <section className="launch-block" data-reveal aria-label="Time since base31 launched">
       <div className="launch-head mono">
         <span className="live-dot" aria-hidden="true" />
         live since launch
@@ -168,7 +168,7 @@ function LaunchClock() {
           </span>
         ))}
       </div>
-      <p className="clock-note">Started at 5:00 PM yesterday and counting, one second at a time.</p>
+      <p className="clock-note">Live since 5:00 PM on September 20, 2026 — counting one second at a time.</p>
     </section>
   );
 }
@@ -225,6 +225,7 @@ export default function HomePage() {
   const [views, setViews] = useState<number | null>(null);
   const [bump, setBump] = useState(false);
   const [milestone, setMilestone] = useState<number | null>(null);
+  const [exitNudge, setExitNudge] = useState<Site | null>(null);
   const [shareOpen, setShareOpen] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
   const [consentNeeded, setConsentNeeded] = useState(false);
@@ -238,6 +239,9 @@ export default function HomePage() {
   const [form, setForm] = useState({ title: "", description: "", tags: "", slug: "" });
   const searchRef = useRef<HTMLInputElement>(null);
   const toastTimer = useRef<number | null>(null);
+  // When this tab was opened, so the exit nudge can wait until the visitor has
+  // actually had a chance to read something.
+  const openedAt = useRef(Date.now());
 
   // Load saved preferences after mount so SSR markup stays stable.
   useEffect(() => {
@@ -399,6 +403,7 @@ export default function HomePage() {
         setShareOpen(false);
         setSubmitOpen(false);
         setMilestone(null);
+        setExitNudge(null);
         if (searchRef.current && document.activeElement === searchRef.current) {
           setQuery("");
           searchRef.current.blur();
@@ -442,16 +447,43 @@ export default function HomePage() {
     };
   }, []);
 
+  // A playful "wait, don't go" nudge when the pointer leaves through the top of
+  // the window — usually a sign that someone is reaching for the tab strip. It
+  // only fires for real pointers, only after a moment of reading, only once per
+  // session, and never on top of another dialog.
+  useEffect(() => {
+    if (!window.matchMedia("(hover: hover) and (pointer: fine)").matches) return;
+    if (shareOpen || submitOpen || milestone != null || exitNudge != null || consentNeeded) return;
+    try {
+      if (window.sessionStorage.getItem("base31-exit-nudge")) return;
+    } catch {}
+    const onMouseOut = (event: MouseEvent) => {
+      // A null relatedTarget means the pointer left the document entirely.
+      if (event.relatedTarget || event.clientY > 12) return;
+      if (Date.now() - openedAt.current < 8000) return;
+      const withCopy = visibleSites.filter((site) => site.description);
+      const pick = withCopy[Math.floor(Math.random() * withCopy.length)];
+      if (!pick) return;
+      try {
+        window.sessionStorage.setItem("base31-exit-nudge", "seen");
+      } catch {}
+      buzz([12, 40, 20]);
+      setExitNudge(pick);
+    };
+    document.addEventListener("mouseout", onMouseOut);
+    return () => document.removeEventListener("mouseout", onMouseOut);
+  }, [buzz, consentNeeded, exitNudge, milestone, shareOpen, submitOpen]);
+
   // Lock background scroll while a modal is open.
   useEffect(() => {
-    const open = shareOpen || submitOpen || milestone != null;
+    const open = shareOpen || submitOpen || milestone != null || exitNudge != null;
     if (!open) return;
     const previous = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     return () => {
       document.body.style.overflow = previous;
     };
-  }, [shareOpen, submitOpen, milestone]);
+  }, [shareOpen, submitOpen, milestone, exitNudge]);
 
   const notify = useCallback((message: string) => {
     setToast(message);
@@ -551,6 +583,31 @@ export default function HomePage() {
       return a.name.localeCompare(b.name);
     });
   }, [query, favorites, allSites, netLikes, voteTotals]);
+
+  // Fade each section in as it scrolls into view. The `anim` flag on <html> is
+  // set by the pre-paint script in the layout, so this can never leave content
+  // hidden for visitors without JavaScript.
+  useEffect(() => {
+    if (!document.documentElement.classList.contains("anim")) return;
+    const targets = Array.from(document.querySelectorAll<HTMLElement>("[data-reveal]:not(.is-revealed)"));
+    if (targets.length === 0) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (!entry.isIntersecting) continue;
+          entry.target.classList.add("is-revealed");
+          observer.unobserve(entry.target);
+        }
+      },
+      { rootMargin: "0px 0px -10% 0px", threshold: 0.06 },
+    );
+    for (const target of targets) {
+      // Whatever is already on screen shows straight away.
+      if (target.getBoundingClientRect().top < window.innerHeight * 0.92) target.classList.add("is-revealed");
+      else observer.observe(target);
+    }
+    return () => observer.disconnect();
+  }, [list.length]);
 
   const openSubmit = useCallback(() => {
     buzz(10);
@@ -750,7 +807,7 @@ export default function HomePage() {
         </section>
 
         <section id="sites" className="directory-section" aria-labelledby="sites-heading">
-          <div className="section-heading">
+          <div className="section-heading" data-reveal>
             <h2 id="sites-heading">Featured sites</h2>
             {query.trim() && (
               <span className="section-count mono">
@@ -768,6 +825,7 @@ export default function HomePage() {
                 <article
                   key={site.subdomain}
                   className={`site-card${pinned ? " is-pinned" : ""}`}
+                  data-reveal
                   style={{ "--i": index } as CSSProperties}
                 >
                   <div className="site-card-top">
@@ -825,7 +883,7 @@ export default function HomePage() {
               );
             })}
             {!query.trim() && (
-              <button type="button" className="upload-card" onClick={openSubmit}>
+              <button type="button" className="upload-card" data-reveal onClick={openSubmit}>
                 <span className="upload-card-icon mono" aria-hidden="true">＋</span>
                 <span className="upload-card-body">
                   <span className="upload-card-title">Add your own site</span>
@@ -842,7 +900,7 @@ export default function HomePage() {
           </div>
         </section>
 
-        <section id="about" className="about-section" aria-labelledby="about-heading">
+        <section id="about" className="about-section" data-reveal aria-labelledby="about-heading">
           <p className="eyebrow mono">about the directory</p>
           <h2 id="about-heading">A small home for the interesting internet.</h2>
           <p>base31.org is an independent collection of personal sites, experiments, tools, and other projects worth exploring. It is a hand-built alternative to noisy app lists: every link leads to a real project with something to see or use.</p>
@@ -855,20 +913,21 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* Floating card on desktop; scrolls in-flow on mobile, where the CTA
-            detaches into a fixed button. */}
-        <aside className="donation-board" aria-label="Donation board">
-          <div className="donation-head">Donation board</div>
-          <p className="donation-empty">No entries yet.</p>
-          <p className="donation-note">Supporters of base31 show up here.</p>
-          <a className="donation-cta" href={donationUrl} target="_blank" rel="noreferrer">
-            Support base31 <span aria-hidden="true">↗</span>
-          </a>
-        </aside>
+        {/* Supporters, dressed up like a pinboard. It sits directly above the
+            launch clock; on narrow screens only its CTA detaches into a fixed
+            button so the support link stays reachable. */}
+        <DonationBoard />
+
+        {/* Live count-up from the launch of base31. */}
+        <LaunchClock />
+
+        {/* Sponsored referral links, below the clock. */}
+        <ReferralCarousel />
 
         {/* Small sponsored button at the very bottom of the page. */}
         <a
           className="support-ad"
+          data-reveal
           href="https://www.profitableratecpmnetwork.com/vsnt502b?key=014ca151909e76ba10dc8d6cfae88709"
           target="_blank"
           rel="noreferrer sponsored"
@@ -878,8 +937,8 @@ export default function HomePage() {
           <span className="support-ad-arrow mono" aria-hidden="true">↗</span>
         </a>
 
-        {/* Live count-up from the launch of base31, right above the footer. */}
-        <LaunchClock />
+        {/* SEO FAQ — the last block in main, directly above the footer. */}
+        <Faq />
       </main>
 
       <footer className="site-footer">
@@ -1082,6 +1141,26 @@ export default function HomePage() {
                 <button type="button" onClick={() => setSubmitOpen(false)} disabled={submitting}>Cancel</button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {exitNudge && (
+        <div className="modal-backdrop" onClick={(event) => event.target === event.currentTarget && setExitNudge(null)}>
+          <div className="modal exit-modal" role="dialog" aria-modal="true" aria-labelledby="exit-title">
+            <button type="button" className="modal-close" onClick={() => setExitNudge(null)} aria-label="Close">×</button>
+            <p className="eyebrow mono">wait, one more thing</p>
+            <h2 id="exit-title">Leaving already? Don&apos;t go yet.</h2>
+            <p>
+              You haven&apos;t looked at <strong>{exitNudge.name}</strong> yet — {exitNudge.description}{" "}
+              There are more like it one scroll away, and most of them are far too strange to find on your own.
+            </p>
+            <div className="modal-actions">
+              <a className="primary" href={exitNudge.url} target="_blank" rel="noreferrer" onClick={() => buzz(10)}>
+                Show me {exitNudge.name}
+              </a>
+              <button type="button" onClick={() => setExitNudge(null)}>Fine, I&apos;ll stay</button>
+            </div>
           </div>
         </div>
       )}

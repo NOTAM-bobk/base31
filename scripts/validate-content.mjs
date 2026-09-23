@@ -1,16 +1,23 @@
+// Plain Node ESM — this file must stay JavaScript (no TypeScript syntax)
+// because it is run directly with `node`, not compiled.
 import fs from "node:fs";
 import path from "node:path";
 
 const root = process.cwd();
-const sites = JSON.parse(fs.readFileSync(path.join(root, "config/sites.json"), "utf8")) as Array<Record<string, unknown>>;
-const posts = JSON.parse(fs.readFileSync(path.join(root, "config/blogs.json"), "utf8")) as Array<Record<string, unknown>>;
+const read = (file) => JSON.parse(fs.readFileSync(path.join(root, "config", file), "utf8"));
+
+const sites = read("sites.json");
+const posts = read("blogs.json");
+const referrals = read("referrals.json");
+const donations = read("donations.json");
 
 const slug = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const date = /^\d{4}-\d{2}-\d{2}$/;
-const errors: string[] = [];
+const https = /^https:\/\//;
+const errors = [];
 
-const checkUnique = (values: string[], label: string) => {
-  const seen = new Set<string>();
+const checkUnique = (values, label) => {
+  const seen = new Set();
   for (const value of values) {
     if (seen.has(value)) errors.push(`Duplicate ${label}: ${value}`);
     seen.add(value);
@@ -19,11 +26,12 @@ const checkUnique = (values: string[], label: string) => {
 
 checkUnique(sites.map((site) => String(site.subdomain)), "site subdomain");
 checkUnique(posts.map((post) => String(post.slug)), "blog slug");
+checkUnique(referrals.map((referral) => String(referral.url)), "referral URL");
 
 for (const [index, site] of sites.entries()) {
   if (typeof site.name !== "string" || !site.name.trim()) errors.push(`Site ${index + 1} needs a name`);
   if (typeof site.subdomain !== "string" || !slug.test(site.subdomain)) errors.push(`Site ${index + 1} has an invalid subdomain`);
-  if (typeof site.url !== "string" || !/^https:\/\//.test(site.url)) errors.push(`Site ${index + 1} needs an HTTPS URL`);
+  if (typeof site.url !== "string" || !https.test(site.url)) errors.push(`Site ${index + 1} needs an HTTPS URL`);
   if (typeof site.description !== "string" || site.description.trim().length < 20) errors.push(`Site ${index + 1} needs a useful description`);
   if (!Array.isArray(site.tags) || site.tags.length === 0) errors.push(`Site ${index + 1} needs at least one tag`);
 }
@@ -36,9 +44,23 @@ for (const [index, post] of posts.entries()) {
   if (!Array.isArray(post.body) || post.body.length < 3) errors.push(`Blog post ${index + 1} needs more content`);
 }
 
+for (const [index, referral] of referrals.entries()) {
+  if (typeof referral.name !== "string" || !referral.name.trim()) errors.push(`Referral ${index + 1} needs a name`);
+  if (typeof referral.url !== "string" || !https.test(referral.url)) errors.push(`Referral ${index + 1} needs an HTTPS URL`);
+  if (typeof referral.description !== "string" || referral.description.trim().length < 20) errors.push(`Referral ${index + 1} needs a useful description`);
+  if (referral.image !== undefined && (typeof referral.image !== "string" || !https.test(referral.image))) errors.push(`Referral ${index + 1} has an invalid image URL`);
+}
+
+for (const [index, donation] of donations.entries()) {
+  if (typeof donation.name !== "string" || !donation.name.trim()) errors.push(`Donation ${index + 1} needs a name`);
+  if (typeof donation.amount !== "number" || donation.amount <= 0) errors.push(`Donation ${index + 1} needs a positive amount`);
+}
+
 if (errors.length > 0) {
   console.error(`Content validation failed:\n- ${errors.join("\n- ")}`);
   process.exitCode = 1;
 } else {
-  console.log(`Content validation passed: ${sites.length} sites, ${posts.length} JSON blog posts.`);
+  console.log(
+    `Content validation passed: ${sites.length} sites, ${posts.length} blog posts, ${referrals.length} referrals, ${donations.length} donations.`,
+  );
 }

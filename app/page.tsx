@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import type { CSSProperties, FormEvent, RefObject } from "react";
+import type { CSSProperties, FormEvent, ReactNode, RefObject } from "react";
 import sites from "@/config/sites.json";
 import DonationBoard from "@/components/donation-board";
 import Faq from "@/components/faq";
@@ -161,37 +161,105 @@ function ThumbIcon({ down }: { down?: boolean }) {
   );
 }
 
-// Site icons come from DuckDuckGo's icon service (no key, no cookies). A
-// missing icon falls back to the site's initial, so a card never renders a
-// broken image.
-const faviconFor = (url: string) => {
-  try {
-    return `https://icons.duckduckgo.com/ip3/${new URL(url).hostname}.ico`;
-  } catch {
-    return "";
+// Every site gets its own app icon. Rather than pulling a favicon from a
+// third-party service (a request that used to fire before consent) each card
+// draws a rounded tile whose gradient and glyph come from hashing the site's
+// subdomain. The result is distinct per site, stable across reloads, works for
+// community uploads that have no icon file, and costs zero network requests.
+const SITE_GLYPHS: ReactNode[] = [
+  // bolt
+  <path key="bolt" d="M13 2 4.5 13.5H11l-1 8.5 8.5-11.5H12L13 2Z" />,
+  // star
+  <path key="star" d="m12 3.5 2.6 5.6 6 .9-4.4 4.2 1.1 6-5.3-3.1-5.3 3.1 1.1-6-4.4-4.2 6-.9Z" />,
+  // globe
+  <g key="globe">
+    <circle cx="12" cy="12" r="9" />
+    <path d="M3 12h18M12 3c2.6 3 2.6 15 0 18M12 3c-2.6 3-2.6 15 0 18" />
+  </g>,
+  // open book
+  <g key="book">
+    <path d="M4 4.5h6a2 2 0 0 1 2 2V20a2 2 0 0 0-2-2H4Z" />
+    <path d="M20 4.5h-6a2 2 0 0 0-2 2V20a2 2 0 0 1 2-2h6Z" />
+  </g>,
+  // burst
+  <path key="burst" d="M12 3v5m0 8v5M3 12h5m8 0h5M6.2 6.2l3.2 3.2m5.2 5.2 3.2 3.2m0-11.6-3.2 3.2m-5.2 5.2-3.2 3.2" />,
+  // compass
+  <g key="compass">
+    <circle cx="12" cy="12" r="9" />
+    <path d="m15.8 8.2-2.3 5.3-5.3 2.3 2.3-5.3Z" />
+  </g>,
+  // camera
+  <g key="camera">
+    <path d="M3.5 8.5h3L8 6h8l1.5 2.5h3a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1h-17a1 1 0 0 1-1-1v-8a1 1 0 0 1 1-1Z" />
+    <circle cx="12" cy="13.5" r="3.1" />
+  </g>,
+  // music note
+  <g key="music">
+    <path d="M9 18V6.5l9-2V16" />
+    <circle cx="6.6" cy="18" r="2.4" />
+    <circle cx="15.6" cy="16" r="2.4" />
+  </g>,
+  // ghost
+  <g key="ghost">
+    <path d="M5 20V10a7 7 0 0 1 14 0v10l-2.4-1.9-2.4 1.9-2.2-1.9-2.4 1.9L7.4 18Z" />
+    <path d="M9.6 10h.01M14.4 10h.01" />
+  </g>,
+  // rocket
+  <g key="rocket">
+    <path d="M13.6 3.6c3.4.5 6.3 3.4 6.8 6.8-2.3 4.5-5.6 7.6-9.6 9.3L7 16.2c1.7-4 4.3-7.4 6.6-12.6Z" />
+    <path d="M9.6 15.4 6 19m3.6-10L5.4 12" />
+  </g>,
+  // leaf
+  <g key="leaf">
+    <path d="M20 4c0 8.2-5 13-11.2 13H5C5 8.8 10 4 16.2 4Z" />
+    <path d="M4 20c3.2-5 7.4-8.2 12.4-10.2" />
+  </g>,
+  // moon
+  <path key="moon" d="M20 14.6A8.6 8.6 0 0 1 9.4 4a8.6 8.6 0 1 0 10.6 10.6Z" />,
+  // coffee cup
+  <g key="cup">
+    <path d="M4 8h11v6a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5Z" />
+    <path d="M15 10h2a3 3 0 0 1 0 6h-2" />
+    <path d="M6.5 4.5c0 .9 1 1.3 1 2.2M10 4c0 1 1 1.5 1 2.4" />
+  </g>,
+  // terminal
+  <g key="terminal">
+    <rect x="3" y="4.5" width="18" height="15" rx="2.5" />
+    <path d="m7.2 9.5 2.8 2.8-2.8 2.8M12.8 15.2H17" />
+  </g>,
+  // cloud
+  <path key="cloud" d="M7 18.5h10a4.1 4.1 0 0 0 .4-8.2 5.6 5.6 0 0 0-10.8 1.3A3.5 3.5 0 0 0 7 18.5Z" />,
+  // dice
+  <g key="dice">
+    <rect x="3.5" y="3.5" width="17" height="17" rx="4.5" />
+    <path d="M8.5 8.5h.01M15.5 8.5h.01M12 12h.01M8.5 15.5h.01M15.5 15.5h.01" />
+  </g>,
+];
+
+const hashKey = (value: string) => {
+  let hash = 7;
+  for (let index = 0; index < value.length; index += 1) {
+    hash = (hash * 31 + value.charCodeAt(index)) % 1000003;
   }
+  return hash;
 };
 
-function SiteThumb({ site }: { site: Site }) {
-  const [failed, setFailed] = useState(false);
-  const src = faviconFor(site.url);
+function SiteIcon({ site }: { site: Site }) {
+  const hash = hashKey(site.subdomain || site.name);
+  const hue = hash % 360;
+  // A second, independent slice of the hash picks the glyph so colour and
+  // shape don't repeat together.
+  const glyph = SITE_GLYPHS[(hash >> 3) % SITE_GLYPHS.length];
 
   return (
-    <span className="site-thumb" aria-hidden="true">
-      {src && !failed ? (
-        <img
-          src={src}
-          alt=""
-          width={32}
-          height={32}
-          loading="lazy"
-          decoding="async"
-          referrerPolicy="no-referrer"
-          onError={() => setFailed(true)}
-        />
-      ) : (
-        <span className="site-thumb-letter mono">{site.name.slice(0, 1).toUpperCase()}</span>
-      )}
+    <span
+      className="site-icon"
+      aria-hidden="true"
+      style={{ backgroundImage: `linear-gradient(145deg, hsl(${hue} 70% 50%), hsl(${(hue + 38) % 360} 64% 33%))` }}
+    >
+      <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
+        {glyph}
+      </svg>
     </span>
   );
 }
@@ -319,6 +387,8 @@ export default function HomePage() {
   const [exitNudge, setExitNudge] = useState<Site | null>(null);
   const [activeTag, setActiveTag] = useState<string | null>(null);
   const [sortMode, setSortMode] = useState<SortMode>("liked");
+  // Lets a visitor fold the directory away without losing their filters.
+  const [sitesCollapsed, setSitesCollapsed] = useState(false);
   const [shareOpen, setShareOpen] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
   // The banner lives in the layout; this page only needs to know the choice so
@@ -944,7 +1014,7 @@ export default function HomePage() {
               ref={searchRef}
               type="search"
               value={query}
-              onChange={(event) => setQuery(event.target.value)}
+              onChange={(event) => { setQuery(event.target.value); setSitesCollapsed(false); }}
               placeholder="Search all sites..."
               autoComplete="off"
             />
@@ -954,7 +1024,22 @@ export default function HomePage() {
 
         <section id="sites" className="directory-section" aria-labelledby="sites-heading">
           <div className="section-heading" data-reveal>
-            <h2 id="sites-heading">Featured sites</h2>
+            <div className="section-heading-main">
+              <h2 id="sites-heading">Featured sites</h2>
+              <button
+                type="button"
+                className={`section-toggle${sitesCollapsed ? " is-collapsed" : ""}`}
+                onClick={() => { buzz(6); setSitesCollapsed((collapsed) => !collapsed); }}
+                aria-expanded={!sitesCollapsed}
+                aria-controls="sites-panel"
+                aria-label={sitesCollapsed ? "Show the featured sites" : "Hide the featured sites"}
+                title={sitesCollapsed ? "Show the sites" : "Minimize the sites"}
+              >
+                <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2.1" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <path d="m6 9 6 6 6-6" />
+                </svg>
+              </button>
+            </div>
             {(query.trim() || activeTag) && (
               <span className="section-count mono" aria-live="polite">
                 {list.length} match{list.length === 1 ? "" : "es"}
@@ -962,6 +1047,7 @@ export default function HomePage() {
             )}
           </div>
 
+          <div id="sites-panel" className="sites-panel" hidden={sitesCollapsed}>
           <div className="filter-bar" data-reveal>
             <div className="tag-filters" role="group" aria-label="Filter by tag">
               <button
@@ -1028,7 +1114,7 @@ export default function HomePage() {
                 >
                   <div className="site-card-top">
                     <a href={site.url} className="site-link site-link-with-thumb" target="_blank" rel="noreferrer">
-                      <SiteThumb site={site} />
+                      <SiteIcon site={site} />
                       <span className="site-name-row">
                         <span className="live-dot" aria-hidden="true" />
                         <span className="site-name">{site.name}</span>
@@ -1097,6 +1183,7 @@ export default function HomePage() {
                 {visibleSites.map((site) => <div key={site.subdomain} className="skeleton-card" />)}
               </div>
             )}
+          </div>
           </div>
         </section>
 

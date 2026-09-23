@@ -123,9 +123,19 @@ Run `npm run validate:content` to check `sites.json`, `blogs.json`,
   window with a "wait, don't go" dialog suggesting a site they have not seen.
   It is desktop-pointer only, waits 8 seconds, shows at most once per session,
   and never appears over another dialog.
-- Directory cards show each site's favicon (DuckDuckGo's icon service, no key,
-  `referrerPolicy="no-referrer"`, falling back to the site's initial), and
-  community uploads fresh within 14 days get a `new` badge.
+- Every directory card leads with its own app icon. `SiteIcon` in
+  `app/page.tsx` hashes the site's `subdomain` (falling back to its name) to
+  to pick an HSL gradient and one glyph from `SITE_GLYPHS`, so each
+  entry looks distinct, keeps its icon across reloads, and works for community
+  uploads that ship no icon file. Nothing is fetched — this replaced the
+  DuckDuckGo favicon request, which was the last third-party call made before
+  consent. Add a glyph by appending to `SITE_GLYPHS`; the hash spreads across
+  whatever length the array has.
+- Community uploads fresh within 14 days get a `new` badge.
+- The "Featured sites" heading has a small chevron button that minimizes the
+  directory (filters, sort and every card) without clearing the visitor's
+  search or tag. The panel is `<div id="sites-panel">` behind
+  `aria-expanded`/`aria-controls`, hidden with the `hidden` attribute.
 - "Surprise me" in the hero opens a random entry — from the current filter
   results when a search is active, otherwise from the whole directory. It is
   styled as a green pill with a bolt badge (`.surprise-button` in

@@ -29,12 +29,15 @@ body { font-synthesis: none; text-rendering: optimizeLegibility; }
 
 /* Scroll reveal -------------------------------------------------------
    `html.anim` is set before the first paint when motion is allowed, so
-   `[data-reveal]` content is never hidden without JavaScript. */
+   `[data-reveal]` content is never hidden without JavaScript.
+   The revealed state is an attribute, not a class: React rewrites `class`
+   whenever a card's className changes (pinning adds `is-pinned`), and that
+   would drop a class added here and strand the card at opacity 0. */
 html.anim [data-reveal] {
   opacity: 0; transform: translateY(24px);
   transition: opacity 0.6s ease, transform 0.65s cubic-bezier(0.2, 0.7, 0.2, 1);
 }
-html.anim [data-reveal].is-revealed { opacity: 1; transform: none; }
+html.anim [data-reveal][data-revealed] { opacity: 1; transform: none; }
 
 /* Donation board ------------------------------------------------------
    Ordinary page content sitting directly above the launch clock, dressed
@@ -283,6 +286,100 @@ html[data-theme="light"] { --subtle: #6b6b6b; }
   color: var(--muted); font-size: 13px; text-align: center;
 }
 
+/* Share sheet --------------------------------------------------------- 
+   `.share-sheet`, `.share-preview` and `.share-mark` had no rules at all, so
+   the dialog was running on browser defaults. It now reads as a small card:
+   a preview tile, an address row, and a grid of share targets. */
+.share-sheet { width: min(460px, 100%); }
+.share-lede { max-width: 380px; margin: 10px 0 0; color: var(--muted); font-size: 13px; line-height: 1.6; }
+
+.share-preview {
+  position: relative; display: flex; align-items: center; gap: 13px; overflow: hidden;
+  margin: 22px 0 0; padding: 15px;
+  border: 1px solid var(--line); border-radius: 14px; background: var(--input-bg);
+}
+/* A soft green wash from the corner, so the tile reads as a card not a box. */
+.share-preview::after {
+  position: absolute; top: -60%; right: -20%; width: 70%; height: 200%;
+  background: radial-gradient(circle, color-mix(in srgb, var(--live) 16%, transparent), transparent 70%);
+  content: ""; pointer-events: none;
+}
+.share-mark {
+  display: grid; width: 46px; height: 46px; flex: 0 0 auto; place-items: center;
+  border-radius: 13px; background: var(--invert-bg); color: var(--invert-fg);
+  font-size: 15px; font-weight: 600; letter-spacing: -0.02em;
+}
+.share-preview-copy { display: flex; min-width: 0; flex-direction: column; gap: 3px; }
+.share-preview-copy strong { color: var(--text-strong); font-size: 14px; font-weight: 600; }
+.share-preview-copy span { color: var(--muted); font-size: 12.5px; }
+
+.share-link {
+  display: flex; align-items: center; gap: 8px; margin-top: 12px;
+  padding: 6px 6px 6px 12px; border: 1px solid var(--line); border-radius: 11px; background: var(--surface);
+}
+.share-link-url { flex: 1; min-width: 0; overflow: hidden; color: var(--muted); font-size: 11.5px; text-overflow: ellipsis; white-space: nowrap; }
+.share-copy {
+  flex: 0 0 auto; padding: 7px 12px; border: 1px solid var(--line-strong); border-radius: 8px;
+  background: transparent; color: var(--text-strong); font-size: 10.5px; letter-spacing: 0.06em;
+  text-transform: uppercase; cursor: pointer;
+  transition: border-color 150ms ease, color 150ms ease, background 150ms ease;
+}
+.share-copy:hover { border-color: var(--live); background: color-mix(in srgb, var(--live) 12%, transparent); color: var(--live); }
+.share-copy:active { transform: scale(0.97); }
+
+.share-targets { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 16px; }
+.share-target {
+  display: flex; min-height: 44px; align-items: center; justify-content: center; gap: 8px;
+  padding: 10px 12px;
+  border: 1px solid var(--line); border-radius: 11px; background: transparent;
+  color: var(--muted); font: inherit; font-size: 12px; cursor: pointer;
+  transition: border-color 160ms ease, background 160ms ease, color 160ms ease, transform 160ms ease;
+}
+.share-target:hover { border-color: var(--line-strong); background: var(--surface-hover); color: var(--text-strong); transform: translateY(-1px); }
+.share-target:active { transform: translateY(0) scale(0.99); }
+.share-target-icon { color: var(--subtle); font-size: 12px; transition: color 160ms ease; }
+.share-target:hover .share-target-icon { color: var(--live); }
+/* The native share sheet is the one action worth promoting. */
+.share-target.is-primary {
+  grid-column: 1 / -1;
+  border-color: color-mix(in srgb, var(--live) 45%, var(--line));
+  background: color-mix(in srgb, var(--live) 11%, transparent);
+  color: var(--live); font-weight: 500;
+}
+.share-target.is-primary:hover { border-color: color-mix(in srgb, var(--live) 70%, var(--line)); background: color-mix(in srgb, var(--live) 18%, transparent); color: var(--live); }
+.share-target.is-primary .share-target-icon { color: var(--live); }
+.share-note { margin: 14px 0 0; color: var(--subtle); font-size: 9.5px; letter-spacing: 0.1em; text-align: center; text-transform: uppercase; }
+
+/* A round, rotatable close button, shared by every dialog. */
+.modal-close {
+  display: grid; width: 30px; height: 30px; place-items: center; padding: 0;
+  border: 1px solid var(--line); border-radius: 50%; background: transparent;
+  color: var(--muted); font-size: 15px; line-height: 1; cursor: pointer;
+  transition: border-color 160ms ease, color 160ms ease, transform 160ms ease;
+}
+.modal-close:hover { border-color: var(--line-strong); color: var(--text-strong); transform: rotate(90deg); }
+
+/* Ad slot ------------------------------------------------------------- 
+   The 160x300 unit sits in its own labelled panel so a "what is this"
+   question never comes up, and reserves its space before consent so the
+   page does not jump when the ad arrives. */
+.ad-slot {
+  display: flex; width: fit-content; min-width: 200px; flex-direction: column;
+  align-items: center; gap: 10px; margin: 40px auto 0; padding: 12px;
+  border: 1px solid var(--line); border-radius: 14px; background: var(--surface);
+}
+.ad-slot-head { display: flex; width: 100%; align-items: center; justify-content: space-between; gap: 10px; }
+.ad-slot-tag {
+  padding: 2px 6px; border: 1px solid var(--line-strong); border-radius: 5px;
+  color: var(--subtle); font-size: 8.5px; letter-spacing: 0.08em; text-transform: uppercase;
+}
+.ad-slot-note { color: var(--subtle); font-size: 9.5px; letter-spacing: 0.04em; }
+.ad-slot-frame { display: block; border: 0; background: transparent; }
+.ad-slot-placeholder {
+  width: 160px; height: 300px; border-radius: 8px;
+  background: repeating-linear-gradient(135deg, color-mix(in srgb, var(--line) 45%, transparent) 0 10px, transparent 10px 20px);
+}
+
 /* "Surprise me" button in the hero -------------------------------------
    The only real action in the hero, so it reads as a button rather than a
    third text link: a green pill with a bolt badge, a slow sheen that sweeps
@@ -508,7 +605,7 @@ p a:hover, li a:hover, dd a:hover, .privacy-copy a:hover, .blog-article a:hover,
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .donation-board, .donation-entry, .clock-digit, .referral-track, .modal, .modal-backdrop { transition: none; animation: none; }
+  .donation-board, .donation-entry, .clock-digit, .referral-track, .modal, .modal-backdrop, .ad-slot-frame { transition: none; animation: none; }
   .surprise-button, .surprise-button::before, .surprise-icon { transition: none; }
   .surprise-button:hover { transform: none; }
   .surprise-button:hover::after { animation: none; }

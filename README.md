@@ -114,6 +114,11 @@ Run `npm run validate:content` to check `sites.json`, `blogs.json`,
   the `anim` class that `app/layout.tsx` adds before first paint, so nothing is
   ever hidden for visitors without JavaScript, and it is skipped entirely for
   `prefers-reduced-motion`.
+- The "has been revealed" marker is the `data-revealed` **attribute**, not a
+  class. React rewrites `class` whenever a card's `className` prop changes —
+  pinning a site adds `is-pinned` — which wiped the observer's class and left
+  that card stuck at opacity 0 as a blank gap. Keep the marker off the
+  `className` string.
 - The homepage nudges visitors who move their pointer out of the top of the
   window with a "wait, don't go" dialog suggesting a site they have not seen.
   It is desktop-pointer only, waits 8 seconds, shows at most once per session,
@@ -160,8 +165,17 @@ is the single switch for everything:
 | Component | Runs when |
 | --- | --- |
 | `components/consent-aware-analytics.tsx` | Microsoft Clarity, only on `accepted` |
-| `components/consent-aware-ads.tsx` | The Adsterra ad unit, only on `accepted` |
+| `components/consent-aware-ads.tsx` | The Adsterra site-wide unit, only on `accepted` |
+| `components/consent-aware-ads.tsx` → `AdsterraBanner` | The 160x300 display unit, only on `accepted` |
 | `components/referral-carousel.tsx` | Screenshot/favicon images, only on `accepted`; the sponsored links themselves are inert until clicked |
+
+The 160x300 banner runs its `atOptions` config and `invoke.js` loader inside a
+sandboxed `srcdoc` iframe. Adsterra's loader writes its frame with
+`document.write`, which browsers drop once the surrounding document has
+finished parsing — inside a freshly-created child document it still runs, and
+the ad's markup never enters the directory's own DOM. The slot renders before
+consent as a labelled placeholder, so the page does not reflow when the ad
+appears.
 
 `lib/consent.ts` holds the `base31-consent` key, a `useConsent()` hook and the
 `base31-consent-change` event that keeps them in sync. `PrivacyConsent`

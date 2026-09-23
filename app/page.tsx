@@ -6,6 +6,7 @@ import sites from "@/config/sites.json";
 import DonationBoard from "@/components/donation-board";
 import Faq from "@/components/faq";
 import ReferralCarousel from "@/components/referral-carousel";
+import { AdsterraBanner } from "@/components/consent-aware-ads";
 import { resetConsent, useConsent } from "@/lib/consent";
 
 type Site = { name: string; subdomain: string; url: string; tags?: string[]; description?: string; show?: boolean; community?: boolean; createdAt?: number };
@@ -724,15 +725,22 @@ export default function HomePage() {
   // Fade each section in as it scrolls into view. The `anim` flag on <html> is
   // set by the pre-paint script in the layout, so this can never leave content
   // hidden for visitors without JavaScript.
+  //
+  // The marker is a `data-revealed` attribute rather than a class on purpose:
+  // React rewrites `class` whenever a card's className prop changes (pinning a
+  // site adds `is-pinned`), which would wipe a class the observer had added and
+  // leave that card stuck at opacity 0 — a blank gap in the list that nothing
+  // ever moves up to fill. React does not manage this attribute, so it sticks.
   useEffect(() => {
     if (!document.documentElement.classList.contains("anim")) return;
-    const targets = Array.from(document.querySelectorAll<HTMLElement>("[data-reveal]:not(.is-revealed)"));
+    const targets = Array.from(document.querySelectorAll<HTMLElement>("[data-reveal]:not([data-revealed])"));
     if (targets.length === 0) return;
+    const reveal = (element: Element) => element.setAttribute("data-revealed", "");
     const observer = new IntersectionObserver(
       (entries) => {
         for (const entry of entries) {
           if (!entry.isIntersecting) continue;
-          entry.target.classList.add("is-revealed");
+          reveal(entry.target);
           observer.unobserve(entry.target);
         }
       },
@@ -740,7 +748,7 @@ export default function HomePage() {
     );
     for (const target of targets) {
       // Whatever is already on screen shows straight away.
-      if (target.getBoundingClientRect().top < window.innerHeight * 0.92) target.classList.add("is-revealed");
+      if (target.getBoundingClientRect().top < window.innerHeight * 0.92) reveal(target);
       else observer.observe(target);
     }
     return () => observer.disconnect();
@@ -861,6 +869,7 @@ export default function HomePage() {
   const slugPreview = slugifyClient(form.slug.trim() || form.title.trim());
   const shareText = encodeURIComponent("Cool sites for curious people — base31.org");
   const shareUrl = encodeURIComponent(siteUrl);
+  const shareAddress = siteUrl.replace(/^https?:\/\//, "");
 
   // The WebSite/Organization graph ships site-wide from app/layout.tsx, so the
   // homepage only adds the part that is genuinely about this page: the list of
@@ -1115,6 +1124,10 @@ export default function HomePage() {
         {/* Sponsored referral links, below the clock. */}
         <ReferralCarousel />
 
+        {/* 160x300 display unit. It renders before consent too, so the page
+            does not reflow the moment an ad appears. */}
+        <AdsterraBanner />
+
         {/* Small sponsored button at the very bottom of the page. */}
         <a
           className="support-ad"
@@ -1166,17 +1179,43 @@ export default function HomePage() {
             <button type="button" className="modal-close" onClick={() => setShareOpen(false)} aria-label="Close share screen">×</button>
             <p className="eyebrow mono">share the directory</p>
             <h2 id="share-title">Send base31 to a friend.</h2>
-            <div className="share-preview">
+            <p className="share-lede">Hand-picked sites, tiny tools, and the odd strange corner of the web — one page, no feed to scroll.</p>
+
+            <div className="share-preview" aria-hidden="true">
               <span className="share-mark mono">31</span>
-              <p><strong>base31.org</strong>Cool sites for curious people.</p>
+              <span className="share-preview-copy">
+                <strong>base31.org</strong>
+                <span>Cool sites for curious people.</span>
+              </span>
             </div>
-            <div className="modal-actions">
-              <button type="button" className="primary" onClick={nativeShare}>Share…</button>
-              <button type="button" onClick={() => copyLink()}>Copy link</button>
-              <a href={`https://twitter.com/intent/tweet?text=${shareText}&url=${shareUrl}`} target="_blank" rel="noreferrer">X</a>
-              <a href={`https://www.facebook.com/sharer/sharer.php?u=${shareUrl}`} target="_blank" rel="noreferrer">Facebook</a>
-              <a href={`mailto:?subject=${shareText}&body=${shareUrl}`}>Email</a>
+
+            <div className="share-link">
+              <span className="share-link-url mono">{shareAddress}</span>
+              <button type="button" className="share-copy mono" onClick={() => copyLink()}>
+                copy
+              </button>
             </div>
+
+            <div className="share-targets">
+              <button type="button" className="share-target is-primary" onClick={nativeShare}>
+                <span className="share-target-icon" aria-hidden="true">↗</span>
+                Share…
+              </button>
+              <a className="share-target" href={`https://twitter.com/intent/tweet?text=${shareText}&url=${shareUrl}`} target="_blank" rel="noreferrer">
+                <span className="share-target-icon" aria-hidden="true">𝕏</span> X
+              </a>
+              <a className="share-target" href={`https://www.facebook.com/sharer/sharer.php?u=${shareUrl}`} target="_blank" rel="noreferrer">
+                <span className="share-target-icon" aria-hidden="true">f</span> Facebook
+              </a>
+              <a className="share-target" href={`https://www.reddit.com/submit?url=${shareUrl}&title=${shareText}`} target="_blank" rel="noreferrer">
+                <span className="share-target-icon" aria-hidden="true">▲</span> Reddit
+              </a>
+              <a className="share-target" href={`mailto:?subject=${shareText}&body=${shareUrl}`}>
+                <span className="share-target-icon" aria-hidden="true">@</span> Email
+              </a>
+            </div>
+
+            <p className="share-note mono">no account · no feed · just sites</p>
           </div>
         </div>
       )}

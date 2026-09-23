@@ -24,16 +24,15 @@ export default function PrivacyPage() {
 
         <h2>Cookies and your choice</h2>
         <p>
-          We only set our own preference after you choose. Selecting “Deny” leaves the directory
-          fully usable and you can change your mind at any time by clearing site data in your
-          browser.
+          We only set our own preference after you choose. Until then, no analytics and no
+          advertising script runs; the directory works exactly the same either way.
         </p>
         <p>
-          The directory is also supported by advertising, and ads are served by a third-party ad
-          network. Those partners may set their own cookies or device identifiers to show and
-          measure ads, and those cookies are not controlled by the preference you set here. Where
-          the law requires it, you can manage or withdraw consent for interest-based advertising
-          through your browser settings and the ad partner’s own tools.
+          Choosing “Confirm” allows Microsoft Clarity and our ad network to load. Choosing “Deny”
+          keeps both switched off — the only thing stored is the preference itself. You can change
+          your answer whenever you like with the{" "}
+          <strong>Cookie settings</strong> link in the footer, which brings the notice back so you
+          can choose again.
         </p>
 
         <h2>Page views</h2>
@@ -45,9 +44,10 @@ export default function PrivacyPage() {
 
         <h2>Analytics</h2>
         <p>
-          We use Microsoft Clarity to understand how the directory is used — which pages are viewed
-          and where visitors click — so we can improve it. Clarity may set cookies and record
-          aggregated interaction data. See the{" "}
+          If you confirm the cookie notice, we load Microsoft Clarity to understand how the
+          directory is used — which pages are viewed and where visitors click — so we can improve
+          it. Clarity may set cookies and record aggregated interaction data. If you deny, Clarity
+          is never loaded. See the{" "}
           <a href="https://privacy.microsoft.com/privacystatement" target="_blank" rel="noreferrer">
             Microsoft privacy statement
           </a>{" "}
@@ -56,10 +56,17 @@ export default function PrivacyPage() {
 
         <h2>Advertising</h2>
         <p>
-          base31.org is supported by ads served through Adsterra. Ad partners may use cookies,
-          device identifiers, and similar technologies to display ads, measure their performance,
-          and limit how often you see them. This data is collected by those partners under their own
-          privacy policies, and we do not control it. See the{" "}
+          base31.org is supported by ads served through Adsterra. The ad script only loads after you
+          confirm the cookie notice — deny it and no ad code, cookie, or tracking request from the
+          ad network is added to the page at all.
+        </p>
+        <p>
+          The sponsored cards in the referral carousel are ordinary links: they request nothing from
+          a third party until you confirm, and nothing at all unless you click one. Once the ad
+          script is running, the network may use cookies, device identifiers, and similar
+          technologies to display ads, measure their performance, and limit how often you see them.
+          That data is collected by those partners under their own privacy policies, and we do not
+          control it. See the{" "}
           <a href="https://adsterra.com/privacy-policy/" target="_blank" rel="noreferrer">
             Adsterra privacy policy
           </a>{" "}
@@ -75,8 +82,9 @@ export default function PrivacyPage() {
 
         <h2>Your choices</h2>
         <p>
-          You can deny the optional preference at any time by clearing site data in your browser.
-          The directory and its links remain usable if you deny consent.
+          Use <strong>Cookie settings</strong> in the footer to change or withdraw your answer at
+          any time; withdrawing it unloads the analytics and ad scripts again. Clearing site data in
+          your browser also works. The directory and every link in it stay fully usable either way.
         </p>
 
         <h2>Contact</h2>

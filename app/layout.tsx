@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
 import "./globals.css";
 import "./overrides.css";
+import ConsentAwareAds from "@/components/consent-aware-ads";
 import ConsentAwareAnalytics from "@/components/consent-aware-analytics";
 import PrivacyConsent from "@/components/privacy-consent";
 import StructuredData from "@/components/structured-data";
@@ -12,7 +13,10 @@ export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: "base31.org — A Directory of Cool Sites and Fun Websites",
   description: "Explore base31.org, an independent directory of cool sites, fun websites, creative web projects, and useful online tools built for the open web.",
-  alternates: { canonical: "/" },
+  alternates: {
+    canonical: "/",
+    types: { "application/rss+xml": "/blog/feed.xml", "application/feed+json": "/blog/feed.json" },
+  },
   manifest: "/manifest.webmanifest",
   keywords: ["website directory", "cool sites", "fun websites", "creative web projects", "indie web", "online tools", "interesting websites"],
   openGraph: {
@@ -47,6 +51,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         {children}
         <PrivacyConsent />
         <ConsentAwareAnalytics />
+        <ConsentAwareAds />
       </body>
     </html>
   );

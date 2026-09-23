@@ -6,8 +6,9 @@ import sites from "@/config/sites.json";
 import DonationBoard from "@/components/donation-board";
 import Faq from "@/components/faq";
 import ReferralCarousel from "@/components/referral-carousel";
+import { resetConsent, useConsent } from "@/lib/consent";
 
-type Site = { name: string; subdomain: string; url: string; tags?: string[]; description?: string; show?: boolean; community?: boolean };
+type Site = { name: string; subdomain: string; url: string; tags?: string[]; description?: string; show?: boolean; community?: boolean; createdAt?: number };
 type Theme = "dark" | "light";
 // This visitor's own choice, stored locally.
 type Vote = 1 | -1;
@@ -25,6 +26,8 @@ const siteUrl = "https://base31.org";
 const counterUrl = process.env.NEXT_PUBLIC_COUNTER_URL || "https://base31-directory-counter.sawyerbobk563.workers.dev";
 // base31 went live at 5:00 PM on September 20, 2026 (local time).
 const LAUNCHED_AT = new Date(2026, 8, 20, 17, 0, 0).getTime();
+// A community upload counts as "new" for this long after it is published.
+const NEW_WINDOW_MS = 14 * 24 * 60 * 60 * 1000;
 
 const visibleSites = (sites as Site[]).filter((site) => site.show !== false);
 const searchIndex = (site: Site) =>
@@ -102,6 +105,41 @@ function ThumbIcon({ down }: { down?: boolean }) {
       <path d="M7 10v10H4a1 1 0 0 1-1-1v-8a1 1 0 0 1 1-1h3Z" />
       <path d="M7 10l4.3-6.6a1.8 1.8 0 0 1 3.3 1.1L13.7 8H18a2 2 0 0 1 2 2.4l-1 6.2a2 2 0 0 1-2 1.4H7" />
     </svg>
+  );
+}
+
+// Site icons come from DuckDuckGo's icon service (no key, no cookies). A
+// missing icon falls back to the site's initial, so a card never renders a
+// broken image.
+const faviconFor = (url: string) => {
+  try {
+    return `https://icons.duckduckgo.com/ip3/${new URL(url).hostname}.ico`;
+  } catch {
+    return "";
+  }
+};
+
+function SiteThumb({ site }: { site: Site }) {
+  const [failed, setFailed] = useState(false);
+  const src = faviconFor(site.url);
+
+  return (
+    <span className="site-thumb" aria-hidden="true">
+      {src && !failed ? (
+        <img
+          src={src}
+          alt=""
+          width={32}
+          height={32}
+          loading="lazy"
+          decoding="async"
+          referrerPolicy="no-referrer"
+          onError={() => setFailed(true)}
+        />
+      ) : (
+        <span className="site-thumb-letter mono">{site.name.slice(0, 1).toUpperCase()}</span>
+      )}
+    </span>
   );
 }
 
@@ -228,7 +266,9 @@ export default function HomePage() {
   const [exitNudge, setExitNudge] = useState<Site | null>(null);
   const [shareOpen, setShareOpen] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
-  const [consentNeeded, setConsentNeeded] = useState(false);
+  // The banner lives in the layout; this page only needs to know the choice so
+  // the floating pieces can make room for it.
+  const consentNeeded = useConsent() === null;
   const [booting, setBooting] = useState(true);
   const [hydrated, setHydrated] = useState(false);
   const [userSites, setUserSites] = useState<PublishedSite[]>([]);
@@ -252,10 +292,7 @@ export default function HomePage() {
       if (storedVotes && typeof storedVotes === "object") setVotes(storedVotes as Record<string, Vote>);
       const storedTheme = localStorage.getItem("base31-theme");
       setTheme(storedTheme === "light" ? "light" : "dark");
-      if (!localStorage.getItem("base31-consent")) setConsentNeeded(true);
-    } catch {
-      setConsentNeeded(true);
-    }
+    } catch {}
     setHydrated(true);
   }, []);
 
@@ -550,6 +587,7 @@ export default function HomePage() {
       description: site.description,
       show: true,
       community: true,
+      createdAt: site.createdAt,
     })),
   ], [userSites]);
 
@@ -583,6 +621,20 @@ export default function HomePage() {
       return a.name.localeCompare(b.name);
     });
   }, [query, favorites, allSites, netLikes, voteTotals]);
+
+  // "Surprise me" opens a random entry from whatever is currently listed, so an
+  // active search narrows the pool instead of being ignored.
+  const surpriseMe = useCallback(() => {
+    const pool = list.length > 0 ? list : allSites;
+    if (pool.length === 0) return;
+    const pick = pool[Math.floor(Math.random() * pool.length)];
+    buzz(12);
+    launchConfetti(10);
+    notify(`Opening ${pick.name}`);
+    window.open(pick.url, "_blank", "noopener,noreferrer");
+  }, [allSites, buzz, launchConfetti, list, notify]);
+
+  const newCutoff = Date.now() - NEW_WINDOW_MS;
 
   // Fade each section in as it scrolls into view. The `anim` flag on <html> is
   // set by the pre-paint script in the layout, so this can never leave content
@@ -721,13 +773,6 @@ export default function HomePage() {
     } catch {}
   }, [copyLink]);
 
-  const acceptConsent = useCallback((value: "accepted" | "denied") => {
-    try {
-      localStorage.setItem("base31-consent", value);
-    } catch {}
-    setConsentNeeded(false);
-  }, []);
-
   const slugPreview = slugifyClient(form.slug.trim() || form.title.trim());
   const shareText = encodeURIComponent("Cool sites for curious people — base31.org");
   const shareUrl = encodeURIComponent(siteUrl);
@@ -790,6 +835,9 @@ export default function HomePage() {
           <div className="intro-links">
             <a className="text-link" href="#sites">Browse all sites <span aria-hidden="true">↓</span></a>
             <a className="text-link muted-link" href="#about">Why base31? <span aria-hidden="true">→</span></a>
+            <button type="button" className="text-link surprise-button" onClick={surpriseMe}>
+              Surprise me <span aria-hidden="true">↯</span>
+            </button>
           </div>
           <label className="search-wrap" htmlFor="site-search">
             <span className="search-icon mono" aria-hidden="true">⌕</span>
@@ -821,6 +869,7 @@ export default function HomePage() {
               const pinned = favorites.includes(site.subdomain);
               const vote = votes[site.subdomain];
               const totals = voteTotals[site.subdomain];
+              const isNew = !!site.createdAt && site.createdAt > newCutoff;
               return (
                 <article
                   key={site.subdomain}
@@ -829,11 +878,13 @@ export default function HomePage() {
                   style={{ "--i": index } as CSSProperties}
                 >
                   <div className="site-card-top">
-                    <a href={site.url} className="site-link" target="_blank" rel="noreferrer">
+                    <a href={site.url} className="site-link site-link-with-thumb" target="_blank" rel="noreferrer">
+                      <SiteThumb site={site} />
                       <span className="site-name-row">
                         <span className="live-dot" aria-hidden="true" />
                         <span className="site-name">{site.name}</span>
                         {site.community && <span className="site-badge mono">community</span>}
+                        {isNew && <span className="site-badge is-new mono">new</span>}
                         <span className="site-arrow mono" aria-hidden="true">↗</span>
                       </span>
                     </a>
@@ -949,6 +1000,16 @@ export default function HomePage() {
             <a href="/about">About</a>
             <a href="/terms">Terms of service</a>
             <a href="/privacy">Privacy</a>
+            <button
+              type="button"
+              className="footer-link-button"
+              onClick={() => {
+                buzz(8);
+                resetConsent();
+              }}
+            >
+              Cookie settings
+            </button>
             <a href="#page-title">Top ↑</a>
           </nav>
         </div>
@@ -958,18 +1019,6 @@ export default function HomePage() {
         <span>views</span>
         <strong>{views == null ? "—" : views.toLocaleString()}</strong>
       </div>
-
-      {consentNeeded && (
-        <aside className="cookie-consent" aria-label="Cookie consent">
-          <div className="cookie-inner">
-            <p>We and our ad partners use cookies to show ads and remember your choice. <a href="/privacy">Privacy policy</a>.</p>
-            <div className="cookie-actions">
-              <button type="button" className="cookie-button cookie-deny" onClick={() => acceptConsent("denied")}>Deny</button>
-              <button type="button" className="cookie-button cookie-confirm" onClick={() => acceptConsent("accepted")}>Confirm</button>
-            </div>
-          </div>
-        </aside>
-      )}
 
       {shareOpen && (
         <div className="modal-backdrop" onClick={(event) => event.target === event.currentTarget && setShareOpen(false)}>

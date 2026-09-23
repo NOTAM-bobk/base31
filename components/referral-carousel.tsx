@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import referrals from "@/config/referrals.json";
+import { useConsent } from "@/lib/consent";
 
 type Referral = {
   name: string;
@@ -32,10 +33,13 @@ const shotSrc = (referral: Referral) =>
 const faviconSrc = (referral: Referral) =>
   `https://www.google.com/s2/favicons?domain=${encodeURIComponent(hostOf(referral.url))}&sz=128`;
 
-function ReferralShot({ referral }: { referral: Referral }) {
+// `allowImages` is only true once the visitor confirms in the cookie banner,
+// so a denied choice means the carousel never reaches out to the screenshot
+// and favicon services — the cards fall back to a monogram tile instead.
+function ReferralShot({ referral, allowImages }: { referral: Referral; allowImages: boolean }) {
   const [stage, setStage] = useState<"shot" | "favicon" | "letter">("shot");
 
-  if (stage === "letter") {
+  if (!allowImages || stage === "letter") {
     return <span className="referral-fallback mono" aria-hidden="true">{referral.name.slice(0, 1).toUpperCase()}</span>;
   }
 
@@ -58,6 +62,7 @@ export default function ReferralCarousel() {
     [],
   );
   const count = items.length;
+  const allowImages = useConsent() === "accepted";
   const [index, setIndex] = useState(0);
   const [paused, setPaused] = useState(false);
   const touchStart = useRef<number | null>(null);
@@ -157,7 +162,7 @@ export default function ReferralCarousel() {
                 tabIndex={itemIndex === index ? 0 : -1}
               >
                 <span className="referral-shot">
-                  <ReferralShot referral={item} />
+                  <ReferralShot referral={item} allowImages={allowImages} />
                 </span>
                 <span className="referral-copy">
                   <span className="referral-name">
@@ -193,6 +198,7 @@ export default function ReferralCarousel() {
 
       <p className="referral-note mono">
         {index + 1} / {count} · sponsored link — we may earn something if you visit
+        {allowImages ? "" : " · preview images load after you confirm cookies"}
       </p>
     </section>
   );

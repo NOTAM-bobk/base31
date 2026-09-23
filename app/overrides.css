@@ -216,6 +216,57 @@ html.anim .faq-item:nth-child(4) { --faq-i: 3; }
 html.anim .faq-item:nth-child(5) { --faq-i: 4; }
 html.anim .faq-item:nth-child(6) { --faq-i: 5; }
 
+/* Site cards: icon, badges, and the small pieces globals.css dropped. --- */
+.site-link-with-thumb { display: flex; align-items: center; gap: 11px; min-width: 0; }
+.site-thumb {
+  display: grid; width: 30px; height: 30px; flex: 0 0 auto; place-items: center; overflow: hidden;
+  border: 1px solid var(--line); border-radius: 8px; background: var(--surface-hover);
+}
+.site-thumb img { width: 100%; height: 100%; object-fit: cover; }
+.site-thumb-letter { color: var(--live); font-size: 12px; font-weight: 600; }
+.site-badge {
+  flex: 0 0 auto; padding: 2px 6px; border: 1px solid var(--line-strong); border-radius: 5px;
+  color: var(--subtle); font-size: 8.5px; letter-spacing: 0.07em; text-transform: uppercase;
+}
+.site-badge.is-new { border-color: color-mix(in srgb, var(--live) 45%, var(--line)); color: var(--live); }
+.search-icon { color: var(--subtle); font-size: 13px; }
+.shortcut-hint {
+  flex: 0 0 auto; padding: 2px 6px; border: 1px solid var(--line); border-radius: 5px;
+  color: var(--subtle); font-size: 10px;
+}
+.muted-link { color: var(--muted); }
+.empty {
+  margin: 0; padding: 26px; border: 1px dashed var(--line-strong); border-radius: var(--radius);
+  color: var(--muted); font-size: 13px; text-align: center;
+}
+
+/* "Surprise me" button in the hero. */
+.surprise-button { padding: 0; border: 0; background: none; color: var(--text-strong); font: inherit; cursor: pointer; }
+.surprise-button span { display: inline-block; transition: transform 200ms ease; }
+.surprise-button:hover { color: var(--live); }
+.surprise-button:active span { transform: rotate(24deg) scale(1.15); }
+
+/* The footer's "Cookie settings" control, styled like the links beside it. */
+.footer-link-button { padding: 2px 0; border: 0; background: none; color: var(--muted); font: inherit; font-size: 12px; cursor: pointer; transition: color 150ms ease; }
+.footer-link-button:hover { color: var(--text-strong); }
+
+/* Blog extras: feed links, reading time and the "read next" cards. ------ */
+.blog-subscribe { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 18px 0 0; color: var(--subtle); font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; }
+.blog-subscribe a { color: var(--live); }
+.blog-subscribe a:hover { color: var(--text-strong); }
+.blog-reading { color: var(--subtle); }
+.blog-next { margin-top: 56px; padding-top: 30px; border-top: 1px solid var(--line); }
+.blog-next .eyebrow { margin-bottom: 16px; }
+.blog-next-grid { display: grid; gap: 12px; }
+.blog-next-card {
+  display: flex; flex-direction: column; gap: 6px; padding: 16px 18px;
+  border: 1px solid var(--line); border-radius: 14px; background: var(--surface);
+  transition: border-color 160ms ease, transform 160ms ease, box-shadow 160ms ease;
+}
+.blog-next-card:hover { border-color: var(--line-strong); transform: translateY(-2px); box-shadow: var(--shadow); }
+.blog-next-title { color: var(--text-strong); font-size: 15px; font-weight: 500; letter-spacing: -0.02em; }
+.blog-next-meta { color: var(--subtle); font-size: 10px; letter-spacing: 0.06em; text-transform: uppercase; }
+
 /* A thin green line across the very top of every page. --------------- */
 .top-accent {
   position: fixed; inset: 0 0 auto; z-index: 60; height: 2px;
@@ -330,6 +381,8 @@ p a:hover, li a:hover, dd a:hover, .privacy-copy a:hover, .blog-article a:hover,
   .blog-list { margin-top: 36px; }
   .blog-card { padding: 17px; }
   .blog-card h2 { font-size: 18px; }
+  .blog-next { margin-top: 44px; }
+  .site-thumb { width: 26px; height: 26px; }
 
   /* The footer links were stacking into a ragged column; give them a tidy
      two-column grid of tappable rows, with "Top ↑" spanning the width. */
@@ -342,6 +395,10 @@ p a:hover, li a:hover, dd a:hover, .privacy-copy a:hover, .blog-article a:hover,
   }
   .footer-links a:hover { border-color: var(--line-strong); color: var(--text-strong); }
   .footer-links a:last-child { grid-column: 1 / -1; }
+  .footer-links button.footer-link-button {
+    display: inline-flex; min-height: 42px; align-items: center; justify-content: center; padding: 0 12px;
+    border: 1px solid var(--line); border-radius: 10px; color: var(--muted); font-size: 11.5px;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

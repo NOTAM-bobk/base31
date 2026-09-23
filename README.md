@@ -109,6 +109,32 @@ Run `npm run validate:content` to check `sites.json`, `blogs.json`,
   window with a "wait, don't go" dialog suggesting a site they have not seen.
   It is desktop-pointer only, waits 8 seconds, shows at most once per session,
   and never appears over another dialog.
+- Directory cards show each site's favicon (DuckDuckGo's icon service, no key,
+  `referrerPolicy="no-referrer"`, falling back to the site's initial), and
+  community uploads fresh within 14 days get a `new` badge.
+- "Surprise me" in the hero opens a random entry — from the current filter
+  results when a search is active, otherwise from the whole directory.
+- The blog ships an RSS feed at `/blog/feed.xml` and a JSON Feed 1.1 twin at
+  `/blog/feed.json`, both generated from `lib/blogs.ts` and advertised with
+  `<link rel="alternate">`. Posts also show a reading time and a "read next"
+  list of the other posts.
+
+## Cookies, ads and analytics
+
+Nothing third-party loads until the visitor answers the banner, and the answer
+is the single switch for everything:
+
+| Component | Runs when |
+| --- | --- |
+| `components/consent-aware-analytics.tsx` | Microsoft Clarity, only on `accepted` |
+| `components/consent-aware-ads.tsx` | The Adsterra ad unit, only on `accepted` |
+| `components/referral-carousel.tsx` | Screenshot/favicon images, only on `accepted`; the sponsored links themselves are inert until clicked |
+
+`lib/consent.ts` holds the `base31-consent` key, a `useConsent()` hook and the
+`base31-consent-change` event that keeps them in sync. `PrivacyConsent`
+(`components/privacy-consent.tsx`) re-appears whenever the choice is cleared,
+which is what the footer's **Cookie settings** button does — so a visitor can
+withdraw or change consent later without clearing site data by hand.
 
 > The `subdomain` value and the folder name under `public/sites/` must
 > match exactly.

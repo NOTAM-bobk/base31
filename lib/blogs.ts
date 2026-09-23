@@ -77,6 +77,14 @@ export const blogPosts: BlogPost[] = [...(postsConfig as BlogPost[]), ...editori
 export const getBlogPost = (slug: string): BlogPost | undefined =>
   blogPosts.find((post) => post.slug === slug);
 
+/** Rough reading time for a post, at about 200 words a minute. */
+export const readingMinutes = (post: BlogPost): number =>
+  Math.max(1, Math.round(post.body.join(" ").split(/\s+/).filter(Boolean).length / 200));
+
+/** Other posts to link from the end of a post, newest first. */
+export const otherPosts = (slug: string, limit = 3): BlogPost[] =>
+  blogPosts.filter((post) => post.slug !== slug).slice(0, limit);
+
 export const toBlocks = (body: string[]): BlogBlock[] => {
   const blocks: BlogBlock[] = [];
   for (const raw of body) {

@@ -1,7 +1,7 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { blogPosts, getBlogPost, toBlocks } from "@/lib/blogs";
+import { blogPosts, getBlogPost, otherPosts, readingMinutes, toBlocks } from "@/lib/blogs";
 
 const siteUrl = "https://base31.org";
 
@@ -17,7 +17,10 @@ export function generateMetadata({ params }: { params: { slug: string } }): Meta
     title: `${post.title} — base31.org`,
     description: post.description,
     keywords: post.tags,
-    alternates: { canonical: `/blog/${post.slug}` },
+    alternates: {
+      canonical: `/blog/${post.slug}`,
+      types: { "application/rss+xml": "/blog/feed.xml", "application/feed+json": "/blog/feed.json" },
+    },
     openGraph: {
       type: "article",
       title: post.title,
@@ -55,7 +58,7 @@ export default function BlogPostPage({ params }: { params: { slug: string } }) {
       <p className="eyebrow mono">{post.tags?.[0] || "base31 blog"}</p>
       <h1>{post.title}</h1>
       <p className="privacy-updated">
-        <time dateTime={post.date}>{post.date}</time> · base31.org
+        <time dateTime={post.date}>{post.date}</time> · {readingMinutes(post)} min read · base31.org
       </p>
 
       <article className="privacy-copy blog-article">
@@ -73,9 +76,24 @@ export default function BlogPostPage({ params }: { params: { slug: string } }) {
         })}
       </article>
 
+      <section className="blog-next" aria-labelledby="read-next">
+        <p className="eyebrow mono" id="read-next">read next</p>
+        <div className="blog-next-grid">
+          {otherPosts(post.slug, 3).map((next) => (
+            <Link key={next.slug} className="blog-next-card" href={`/blog/${next.slug}`}>
+              <span className="blog-next-title">{next.title}</span>
+              <span className="blog-next-meta mono">
+                {next.date} · {readingMinutes(next)} min read
+              </span>
+            </Link>
+          ))}
+        </div>
+      </section>
+
       <div className="blog-footer">
         <Link className="blog-read mono" href="/#sites">Browse the directory →</Link>
         <Link className="blog-read mono" href="/blog">More posts →</Link>
+        <Link className="blog-read mono" href="/blog/feed.xml">RSS →</Link>
       </div>
     </main>
   );

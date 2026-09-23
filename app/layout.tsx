@@ -42,6 +42,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <noscript><style>{`.site-skeleton,.cursor-layer{display:none!important}`}</style></noscript>
       </head>
       <body>
+        <div className="top-accent" aria-hidden="true" />
         <StructuredData />
         {children}
         <PrivacyConsent />

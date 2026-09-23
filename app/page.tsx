@@ -756,7 +756,7 @@ export default function HomePage() {
         <div className="site-header-inner">
           <a className="wordmark mono" href="/" aria-label="base31.org home">base31.org</a>
           <nav className="site-nav" aria-label="Main navigation">
-            <a href="#sites">Sites</a>
+            <a href="/blog">Blog</a>
             <a href="#about">About</a>
           </nav>
           <div className="header-actions">

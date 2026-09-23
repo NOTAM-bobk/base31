@@ -101,6 +101,15 @@ Run `npm run validate:content` to check `sites.json`, `blogs.json`,
 - `components/faq.tsx` renders the FAQ above the footer together with its
   matching `FAQPage` structured data. Edit the `FAQS` array there and both the
   copy and the schema stay in sync.
+- Structured data is split so no graph is emitted twice:
+  `components/structured-data.tsx` is rendered once from the root layout and
+  holds the page-agnostic `Organization` + `WebSite` nodes (the site's
+  `publisher`), while `app/page.tsx` adds the directory's `ItemList`. Any new
+  schema belongs to exactly one of those, not both.
+- Setting `openGraph` in a page's `metadata` replaces the layout's object
+  rather than merging it, so `/about`, `/privacy`, `/terms` and the blog repeat
+  `siteName`, `locale` and a page-accurate `url` — otherwise `og:url` would
+  point at the homepage while `canonical` said otherwise.
 - Sections marked `data-reveal` fade in as they scroll into view. The gate is
   the `anim` class that `app/layout.tsx` adds before first paint, so nothing is
   ever hidden for visitors without JavaScript, and it is skipped entirely for
@@ -113,7 +122,10 @@ Run `npm run validate:content` to check `sites.json`, `blogs.json`,
   `referrerPolicy="no-referrer"`, falling back to the site's initial), and
   community uploads fresh within 14 days get a `new` badge.
 - "Surprise me" in the hero opens a random entry — from the current filter
-  results when a search is active, otherwise from the whole directory.
+  results when a search is active, otherwise from the whole directory. It is
+  styled as a green pill with a bolt badge (`.surprise-button` in
+  `app/overrides.css`) rather than a plain text link, and its sheen/spin is
+  disabled under `prefers-reduced-motion`.
 - The directory is filterable by tag (chips built from `config/sites.json`,
   most used first, capped at `MAX_TAG_CHIPS`) and sortable by **Most liked**,
   **Newest** or **A–Z**. Pinned sites stay on top in every mode, and a tag or

@@ -10,11 +10,20 @@ export const metadata: Metadata = {
     canonical: "/blog",
     types: { "application/rss+xml": "/blog/feed.xml", "application/feed+json": "/blog/feed.json" },
   },
+  // Setting openGraph replaces the layout's object entirely, so siteName and
+  // locale have to be repeated here or they disappear from the tags.
   openGraph: {
     type: "website",
     title: "base31.org Blog — Cool Sites and Fun Websites",
     description: "Guides about cool sites, useful tools, and the independent web.",
     url: "https://base31.org/blog",
+    siteName: "base31.org",
+    locale: "en_US",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "base31.org Blog — Cool Sites and Fun Websites",
+    description: "Guides about cool sites, useful tools, and the independent web.",
   },
 };
 

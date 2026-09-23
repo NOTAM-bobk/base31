@@ -4,6 +4,21 @@ export const metadata = {
   title: "Terms of Service — base31.org",
   description: "Terms of service for using the base31.org website directory.",
   alternates: { canonical: "/terms" },
+  // Otherwise the layout's openGraph leaks in and og:url points at the
+  // homepage, disagreeing with the canonical above.
+  openGraph: {
+    type: "website",
+    url: "https://base31.org/terms",
+    siteName: "base31.org",
+    locale: "en_US",
+    title: "Terms of Service — base31.org",
+    description: "Terms of service for using the base31.org website directory.",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Terms of Service — base31.org",
+    description: "Terms of service for using the base31.org website directory.",
+  },
 };
 
 export default function TermsPage() {

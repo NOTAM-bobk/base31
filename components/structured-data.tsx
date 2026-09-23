@@ -1,32 +1,31 @@
-import sites from "@/config/sites.json";
-
 const siteUrl = "https://base31.org";
 
-type Site = { name: string; url: string; show?: boolean };
-
+// Site-wide graph. It is rendered once from app/layout.tsx, so it must stay
+// page-agnostic: the WebSite node plus the Organization that publishes it.
+// The directory's ItemList is homepage-only and lives in app/page.tsx.
 export default function StructuredData() {
-  const visibleSites = (sites as Site[]).filter((site) => site.show !== false);
   const data = {
     "@context": "https://schema.org",
     "@graph": [
+      {
+        "@type": "Organization",
+        "@id": `${siteUrl}/#organization`,
+        name: "base31.org",
+        url: siteUrl,
+        description:
+          "An independent directory of cool sites, fun websites, creative web projects, and useful online tools.",
+        logo: `${siteUrl}/icons/base31-icon-512.png`,
+        sameAs: ["https://github.com/NOTAM-bobk/base31"],
+      },
       {
         "@type": "WebSite",
         "@id": `${siteUrl}/#website`,
         url: siteUrl,
         name: "base31.org",
-        description: "An independent directory of cool sites, fun websites, creative web projects, and useful online tools.",
-      },
-      {
-        "@type": "ItemList",
-        "@id": `${siteUrl}/#directory`,
-        name: "base31.org website directory",
-        numberOfItems: visibleSites.length,
-        itemListElement: visibleSites.map((site, index) => ({
-          "@type": "ListItem",
-          position: index + 1,
-          name: site.name,
-          url: site.url,
-        })),
+        description:
+          "An independent directory of cool sites, fun websites, creative web projects, and useful online tools.",
+        inLanguage: "en-US",
+        publisher: { "@id": `${siteUrl}/#organization` },
       },
     ],
   };

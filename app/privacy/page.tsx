@@ -5,6 +5,22 @@ export const metadata = {
   description:
     "How base31.org handles preferences, page views, analytics, and the cookies used by its third-party ad partners.",
   alternates: { canonical: "/privacy" },
+  // Otherwise the layout's openGraph leaks in and og:url points at the
+  // homepage, disagreeing with the canonical above.
+  openGraph: {
+    type: "website",
+    url: "https://base31.org/privacy",
+    siteName: "base31.org",
+    locale: "en_US",
+    title: "Privacy Policy — base31.org",
+    description:
+      "How base31.org handles preferences, page views, analytics, and the cookies used by its third-party ad partners.",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Privacy Policy — base31.org",
+    description: "How base31.org handles preferences, analytics, and ad cookies.",
+  },
 };
 
 export default function PrivacyPage() {

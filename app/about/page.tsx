@@ -4,6 +4,21 @@ export const metadata = {
   title: "About base31.org — An Independent Website Directory",
   description: "Learn what base31.org is: an independent directory of cool sites, fun websites, creative web projects, and useful online tools.",
   alternates: { canonical: "/about" },
+  // Without this the page would inherit the layout's openGraph, and og:url
+  // would point at the homepage while the canonical says /about.
+  openGraph: {
+    type: "website",
+    url: "https://base31.org/about",
+    siteName: "base31.org",
+    locale: "en_US",
+    title: "About base31.org — An Independent Website Directory",
+    description: "What base31.org is: an independent directory of cool sites, fun websites, creative web projects, and useful online tools.",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "About base31.org",
+    description: "An independent directory of cool sites, fun websites, and creative web projects.",
+  },
 };
 
 export default function AboutPage() {

@@ -862,19 +862,17 @@ export default function HomePage() {
   const shareText = encodeURIComponent("Cool sites for curious people — base31.org");
   const shareUrl = encodeURIComponent(siteUrl);
 
+  // The WebSite/Organization graph ships site-wide from app/layout.tsx, so the
+  // homepage only adds the part that is genuinely about this page: the list of
+  // directory entries. Emitting the WebSite node twice duplicates the graph.
   const structuredData = {
     "@context": "https://schema.org",
-    "@graph": [
-      { "@type": "WebSite", "@id": `${siteUrl}/#website`, url: siteUrl, name: "base31.org", description: "An independent directory of cool sites, fun websites, creative web projects, and useful online tools.", inLanguage: "en-US" },
-      {
-        "@type": "ItemList",
-        "@id": `${siteUrl}/#directory`,
-        name: "base31.org website directory",
-        description: "A list of live sites and web projects on base31.org.",
-        numberOfItems: visibleSites.length,
-        itemListElement: visibleSites.map((site, index) => ({ "@type": "ListItem", position: index + 1, name: site.name, url: site.url })),
-      },
-    ],
+    "@type": "ItemList",
+    "@id": `${siteUrl}/#directory`,
+    name: "base31.org website directory",
+    description: "A list of live sites and web projects on base31.org.",
+    numberOfItems: visibleSites.length,
+    itemListElement: visibleSites.map((site, index) => ({ "@type": "ListItem", position: index + 1, name: site.name, url: site.url })),
   };
 
   return (
@@ -913,17 +911,21 @@ export default function HomePage() {
       <main>
         <section className="intro" aria-labelledby="page-title">
           <p className="eyebrow mono">the independent web directory</p>
+          {/* The explicit spaces keep the heading readable as one sentence when
+              it is flattened to text (search snippets, screen readers), even
+              though each line is a block box visually. */}
           <h1 id="page-title">
-            <span className="h1-line">Cool sites for</span>
-            <span className="h1-line h1-rotator"><WordRotator /></span>
+            <span className="h1-line">Cool sites for </span>
+            <span className="h1-line h1-rotator"><WordRotator /> </span>
             <span className="h1-line">people.</span>
           </h1>
           <p className="subtitle">Discover fun websites, useful online tools, and creative web projects built on base31.org and the open web.</p>
           <div className="intro-links">
             <a className="text-link" href="#sites">Browse all sites <span aria-hidden="true">↓</span></a>
             <a className="text-link muted-link" href="#about">Why base31? <span aria-hidden="true">→</span></a>
-            <button type="button" className="text-link surprise-button" onClick={surpriseMe}>
-              Surprise me <span aria-hidden="true">↯</span>
+            <button type="button" className="surprise-button" onClick={surpriseMe} title="Open a random site from the directory">
+              <span className="surprise-icon" aria-hidden="true">↯</span>
+              <span className="surprise-label">Surprise me</span>
             </button>
           </div>
           <label className="search-wrap" htmlFor="site-search">

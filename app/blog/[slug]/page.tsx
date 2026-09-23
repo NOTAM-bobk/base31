@@ -26,10 +26,14 @@ export function generateMetadata({ params }: { params: { slug: string } }): Meta
       title: post.title,
       description: post.description,
       url: `${siteUrl}/blog/${post.slug}`,
+      siteName: "base31.org",
+      locale: "en_US",
       publishedTime: post.date,
       tags: post.tags,
     },
-    twitter: { card: "summary", title: post.title, description: post.description },
+    // The post has its own 1200x630 opengraph-image, so "summary" would crop it
+    // to a small square — large image is the correct card here.
+    twitter: { card: "summary_large_image", title: post.title, description: post.description },
   };
 }
 

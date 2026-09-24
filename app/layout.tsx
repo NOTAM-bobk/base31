@@ -42,7 +42,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
       <head>
-        <meta name="impact-site-verification" value="0c13bbc7-5a07-4070-84da-1b320feed539" />
+        <meta name="impact-site-verification" content="0c13bbc7-5a07-4070-84da-1b320feed539" />
         <script id="base31-theme" dangerouslySetInnerHTML={{ __html: themeScript }} />
         <noscript><style>{`.site-skeleton,.cursor-layer{display:none!important}`}</style></noscript>
       </head>

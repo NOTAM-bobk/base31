@@ -830,7 +830,7 @@ export default function HomePage() {
 
   const newCutoff = Date.now() - NEW_WINDOW_MS;
 
-  // Fade each section in as it scrolls into view. The `anim` flag on <html> is
+  // Fade each section in as it scrolls into view. The motion flag on <html> is
   // set by the pre-paint script in the layout, so this can never leave content
   // hidden for visitors without JavaScript.
   //
@@ -840,7 +840,7 @@ export default function HomePage() {
   // leave that card stuck at opacity 0 — a blank gap in the list that nothing
   // ever moves up to fill. React does not manage this attribute, so it sticks.
   useEffect(() => {
-    if (!document.documentElement.classList.contains("anim")) return;
+    if (document.documentElement.getAttribute("data-motion") !== "enabled") return;
     const targets = Array.from(document.querySelectorAll<HTMLElement>("[data-reveal]:not([data-revealed])"));
     if (targets.length === 0) return;
     const reveal = (element: Element) => element.setAttribute("data-revealed", "");

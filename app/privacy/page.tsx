@@ -29,7 +29,7 @@ export default function PrivacyPage() {
       <Link className="privacy-back mono" href="/">← base31.org</Link>
       <p className="eyebrow mono">privacy policy</p>
       <h1>Privacy, without the noise.</h1>
-      <p className="privacy-updated">Last updated: September 22, 2026</p>
+      <p className="privacy-updated">Last updated: September 24, 2026</p>
       <section className="privacy-copy">
         <h2>What we collect</h2>
         <p>
@@ -58,6 +58,21 @@ export default function PrivacyPage() {
           you and does not store your name, email address, or browsing history.
         </p>
 
+        <h2>Email updates, browser alerts, and bug reports</h2>
+        <p>
+          If you subscribe to community-site updates, your email address is stored by our Cloudflare Worker
+          until you unsubscribe. We send a confirmation message first; only confirmed subscribers receive
+          publication notices, and each notice includes an unsubscribe link. If you enable browser alerts,
+          this browser’s push subscription is stored so we can send an alert when a community site is
+          published. You can turn alerts off from the same control in the directory. These features are
+          optional and are separate from the cookie/analytics choice.
+        </p>
+        <p>
+          Bug reports are sent to the site operator through Resend. The report includes the message, the
+          page URL, and an email address only if you choose to provide one. Reports are retained in the
+          email provider’s systems; an optional reply address is used only to respond to the report.
+        </p>
+
         <h2>Analytics</h2>
         <p>
           If you confirm the cookie notice, we load Microsoft Clarity to understand how the
@@ -72,7 +87,7 @@ export default function PrivacyPage() {
 
         <h2>Advertising</h2>
         <p>
-          base31.org is supported by ads served through Adsterra. The ad script only loads after you
+          base31.org is supported by ads served through Adcash. The Adcash auto-tag only loads after you
           confirm the cookie notice — deny it and no ad code, cookie, or tracking request from the
           ad network is added to the page at all.
         </p>
@@ -87,8 +102,8 @@ export default function PrivacyPage() {
           display ads, measure their performance, and limit how often you see them. That data is
           collected by those partners under their own privacy policies, and we do not control it.
           See the{" "}
-          <a href="https://adsterra.com/privacy-policy/" target="_blank" rel="noreferrer">
-            Adsterra privacy policy
+          <a href="https://adcash.com/legal/" target="_blank" rel="noreferrer">
+            Adcash legal and privacy information
           </a>{" "}
           for details.
         </p>

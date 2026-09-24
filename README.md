@@ -198,17 +198,13 @@ community upload's own favicon — both decorative, both cookie-free:
 | Component | Runs when |
 | --- | --- |
 | `components/consent-aware-analytics.tsx` | Microsoft Clarity, only on `accepted` |
-| `components/consent-aware-ads.tsx` | The Adsterra site-wide unit, only on `accepted` |
-| `components/consent-aware-ads.tsx` → `AdsterraBanner` | The 160x300 display unit, only on `accepted` |
+| `components/consent-aware-ads.tsx` | Adcash auto-tag (`iy7zk7mmw`), only on `accepted` |
 | `components/referral-carousel.tsx` | Never gated: the destination preview image loads straight from the destination (or a screenshot service) because the card is unusable without it. It sets no cookies, the sponsored links stay inert until clicked, and the privacy page says so. |
 
-The 160x300 banner runs its `atOptions` config and `invoke.js` loader inside a
-sandboxed `srcdoc` iframe. Adsterra's loader writes its frame with
-`document.write`, which browsers drop once the surrounding document has
-finished parsing — inside a freshly-created child document it still runs, and
-the ad's markup never enters the directory's own DOM. The slot renders before
-consent as a labelled placeholder, so the page does not reflow when the ad
-appears.
+The Adcash script loader (`https://acscdn.com/script/aclib.js`) is inserted only
+after the visitor accepts, then runs the supplied auto-tag for zone
+`iy7zk7mmw`. Denying or withdrawing consent prevents the loader from being
+inserted (and removes its script element if consent changes after it loads).
 
 `lib/consent.ts` holds the `base31-consent` key, a `useConsent()` hook and the
 `base31-consent-change` event that keeps them in sync. `PrivacyConsent`
@@ -306,6 +302,12 @@ its new choice, which keeps switching or clearing a vote from double-counting.
 | `CLOUDFLARE_ACCOUNT_ID` | Vercel / Keys tab | Cloudflare account ID (dashboard sidebar) |
 | `NEXT_PUBLIC_COUNTER_URL` | Vercel / Keys tab | Optional override for the deployed worker URL the homepage calls |
 | `COUNTER_SECRET` | Worker secret (`wrangler secret put`) | Optional; when set, requests must send `x-counter-secret` |
+| `RESEND_API_KEY` | Next.js hosting environment + Worker secret | Resend API credential used for bug reports, confirmations, and publication emails |
+| `RESEND_FROM_EMAIL` | Next.js hosting environment + Worker secret | Verified sender address used by Resend for reports and directory emails |
+| `BUG_REPORT_TO` | Next.js hosting environment | Inbox that receives the bug-report form submissions |
+| `VAPID_PUBLIC_KEY` | Worker secret | Public VAPID key served to browsers for opt-in push notifications |
+| `VAPID_PRIVATE_KEY` | Worker secret | Private VAPID key used to sign push notifications; never expose it to the browser |
+| `VAPID_SUBJECT` | Worker secret | VAPID contact URI, for example a `mailto:` address |
 
 ### Deploying
 
@@ -327,6 +329,24 @@ cd worker && npx wrangler secret put COUNTER_SECRET
 The homepage reads the worker URL from `NEXT_PUBLIC_COUNTER_URL`, falling back
 to the live `*.workers.dev` deployment when it is unset. Set the variable (and
 redeploy) if you host the worker on a custom domain.
+
+### Email and browser notifications
+
+The directory already uses Resend for double-opt-in email updates and new-site
+publication notices. The `/api/bug-report` Next.js route sends the optional
+reply address, report text, and current page URL to `BUG_REPORT_TO`. Set
+`RESEND_API_KEY`, `RESEND_FROM_EMAIL`, and `BUG_REPORT_TO` in the hosting
+Settings → Environment before bug reports can be delivered. The sender must be
+verified with Resend. The Worker also needs `RESEND_API_KEY` and
+`RESEND_FROM_EMAIL` set as Worker secrets for subscriptions and publication
+notices. Configure push by generating a VAPID key pair and setting
+`VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, and `VAPID_SUBJECT` as Worker secrets;
+only the public key is returned to browsers. Push alerts are a separate,
+visitor-controlled opt-in and do not depend on the cookie banner.
+
+Do not commit credentials. Set Worker secrets with `wrangler secret put
+<KEY>` from `worker/`; add the Next.js variables in the hosting environment
+settings so they are available to the deployed app.
 
 > The vote routes only exist once the worker has been redeployed. Until then
 the thumbs fall back to local-only voting — the counts show `–` and the click

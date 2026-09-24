@@ -6,6 +6,7 @@ import ConsentAwareAds from "@/components/consent-aware-ads";
 import ConsentAwareAnalytics from "@/components/consent-aware-analytics";
 import PrivacyConsent from "@/components/privacy-consent";
 import StructuredData from "@/components/structured-data";
+import BlogTransitions from "@/components/blog-transitions";
 
 const siteUrl = "https://base31.org";
 
@@ -48,6 +49,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       <body>
         <div className="top-accent" aria-hidden="true" />
         <StructuredData />
+        <BlogTransitions />
         {children}
         <PrivacyConsent />
         <ConsentAwareAnalytics />

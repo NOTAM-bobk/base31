@@ -6,7 +6,7 @@ import sites from "@/config/sites.json";
 import DonationBoard from "@/components/donation-board";
 import Faq from "@/components/faq";
 import ReferralCarousel from "@/components/referral-carousel";
-import { AdsterraBanner } from "@/components/consent-aware-ads";
+import DirectoryNotifications from "@/components/directory-notifications";
 import { resetConsent, useConsent } from "@/lib/consent";
 
 type Site = { name: string; subdomain: string; url: string; tags?: string[]; description?: string; show?: boolean; community?: boolean; createdAt?: number; icon?: string };
@@ -87,6 +87,7 @@ const searchIndex = (site: Site) =>
   `${site.name} ${site.subdomain} ${(site.tags || []).join(" ")} ${site.description || ""}`.toLowerCase();
 
 const MAX_UPLOAD_FILES = 40;
+
 const MAX_UPLOAD_FILE_BYTES = 2 * 1024 * 1024;
 
 const slugifyClient = (text: string) =>
@@ -436,7 +437,7 @@ export default function HomePage() {
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [uploadFiles, setUploadFiles] = useState<File[]>([]);
-  const [form, setForm] = useState({ title: "", description: "", tags: "", slug: "" });
+  const [form, setForm] = useState({ title: "", description: "", tags: "", slug: "", email: "" });
   const searchRef = useRef<HTMLInputElement>(null);
   const toastTimer = useRef<number | null>(null);
   // When this tab was opened, so the exit nudge can wait until the visitor has
@@ -863,7 +864,7 @@ export default function HomePage() {
 
   const openSubmit = useCallback(() => {
     buzz(10);
-    setForm({ title: "", description: "", tags: "", slug: "" });
+    setForm({ title: "", description: "", tags: "", slug: "", email: "" });
     setUploadFiles([]);
     setSubmitError(null);
     setSubmitOpen(true);
@@ -925,6 +926,7 @@ export default function HomePage() {
           description: form.description.trim(),
           tags: form.tags.split(",").map((tag) => tag.trim()).filter(Boolean),
           slug: form.slug.trim(),
+          email: form.email.trim(),
           files: stripCommonFolder(read),
         }),
       });
@@ -1003,6 +1005,7 @@ export default function HomePage() {
           <a className="wordmark mono" href="/" aria-label="base31.org home">base31.org</a>
           <nav className="site-nav" aria-label="Main navigation">
             <a href="/blog">Blog</a>
+            <a href="#updates">Updates</a>
             <a href="#about">About</a>
           </nav>
           <div className="header-actions">
@@ -1250,28 +1253,17 @@ export default function HomePage() {
             button so the support link stays reachable. */}
         <DonationBoard />
 
+        <hr className="section-divider" aria-hidden="true" />
+
         {/* Live count-up from the launch of base31. */}
         <LaunchClock />
+
+        <hr className="section-divider" aria-hidden="true" />
 
         {/* Sponsored referral links, below the clock. */}
         <ReferralCarousel />
 
-        {/* 160x300 display unit. It renders before consent too, so the page
-            does not reflow the moment an ad appears. */}
-        <AdsterraBanner />
-
-        {/* Small sponsored button at the very bottom of the page. */}
-        <a
-          className="support-ad"
-          data-reveal
-          href="https://www.profitableratecpmnetwork.com/vsnt502b?key=014ca151909e76ba10dc8d6cfae88709"
-          target="_blank"
-          rel="noreferrer sponsored"
-        >
-          <span className="support-ad-tag mono">ad</span>
-          <span className="support-ad-text">Want to support base31? Click this button to help</span>
-          <span className="support-ad-arrow mono" aria-hidden="true">↗</span>
-        </a>
+        <DirectoryNotifications />
 
         {/* SEO FAQ — the last block in main, directly above the footer. */}
         <Faq />
@@ -1282,9 +1274,11 @@ export default function HomePage() {
           <span>© {new Date().getFullYear()} base31.org · built by Sawyer Schulz</span>
           <nav className="footer-links" aria-label="Footer navigation">
             <a href="/blog">Blog</a>
+            <a href="#updates">Updates</a>
             <a href="/about">About</a>
             <a href="/terms">Terms of service</a>
             <a href="/privacy">Privacy</a>
+            <a href="#updates">Bug report</a>
             <button
               type="button"
               className="footer-link-button"

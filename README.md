@@ -115,7 +115,7 @@ Run `npm run validate:content` to check `sites.json`, `blogs.json`,
   `siteName`, `locale` and a page-accurate `url` — otherwise `og:url` would
   point at the homepage while `canonical` said otherwise.
 - Sections marked `data-reveal` fade in as they scroll into view. The gate is
-  the `anim` class that `app/layout.tsx` adds before first paint, so nothing is
+  the `data-motion="enabled"` attribute that `app/layout.tsx` adds before first paint, so nothing is
   ever hidden for visitors without JavaScript, and it is skipped entirely for
   `prefers-reduced-motion`.
 - The "has been revealed" marker is the `data-revealed` **attribute**, not a
@@ -181,7 +181,7 @@ Run `npm run validate:content` to check `sites.json`, `blogs.json`,
 - The custom cursor keeps the native caret over inputs and textareas.
 - The Vibration API, confetti, flip clock, scroll reveals, the exit-intent
   nudge, `scroll-behavior: smooth` and carousel auto-rotation are all skipped
-  under `prefers-reduced-motion`, and the reveal gate (`html.anim`) is never
+  under `prefers-reduced-motion`, and the reveal gate (`html[data-motion="enabled"]`) is never
   applied without JavaScript.
 - The blog ships an RSS feed at `/blog/feed.xml` and a JSON Feed 1.1 twin at
   `/blog/feed.json`, both generated from `lib/blogs.ts` and advertised with

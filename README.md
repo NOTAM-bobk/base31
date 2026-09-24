@@ -153,6 +153,17 @@ Run `npm run validate:content` to check `sites.json`, `blogs.json`,
 - On a 1000px-and-wider screen the shell is 1080px and the directory is a
   two-column grid; the donation board and prose stay capped at a readable
   measure so the extra width goes to the cards.
+- The hero search is one solid control (`.search-wrap` in `app/overrides.css`):
+  a raised field, the glyph in its own tile, a green ring on focus, and a
+  clear button that takes the place of the `/` hint once there is a query.
+- `.section-divider` is the styled `<hr>` between the homepage's standalone
+  blocks (supporters, launch clock, referrals): a hairline that fades at both
+  edges with a diamond marker. It owns the gap on both sides through
+  `.section-divider + *`, so the blocks keep their own top margins only when
+  they are *not* following a divider — do not add spacing to those instead.
+- Every full-width block (donation board, launch clock, referrals and "stay in
+  the loop") shares one radius via the `--radius-card` token, so the page has a
+  single card silhouette.
 
 ## Accessibility notes
 
@@ -165,6 +176,9 @@ Run `npm run validate:content` to check `sites.json`, `blogs.json`,
 - The search field is inside a `role="search"` landmark and names itself with
   `aria-label="Search all sites"`. It used to be wrapped in a `<label>` whose
   only text was the "/" shortcut hint, so the field was announced as "/".
+- The search clear button is labelled "Clear the search" and hands focus back
+  to the field, so clearing never drops keyboard users off the input. The
+  browser's own clear glyph is suppressed in favour of it.
 - The launch clock's ticking tiles are `aria-hidden`, with a static sentence
   for assistive tech instead — otherwise a screen reader chases a number that
   changes every second.

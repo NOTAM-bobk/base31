@@ -1005,8 +1005,6 @@ export default function HomePage() {
           <a className="wordmark mono" href="/" aria-label="base31.org home">base31.org</a>
           <nav className="site-nav" aria-label="Main navigation">
             <a href="/blog">Blog</a>
-            <a href="#updates">Updates</a>
-            <a href="#about">About</a>
           </nav>
           <div className="header-actions">
             <button type="button" className="icon-button share-button mono" onClick={() => { buzz(8); setShareOpen(true); }} aria-label="Share base31.org" aria-haspopup="dialog">
@@ -1061,8 +1059,22 @@ export default function HomePage() {
               aria-label="Search all sites"
               aria-describedby="site-search-hint"
               autoComplete="off"
+              enterKeyHint="search"
             />
-            <kbd className="shortcut-hint" aria-hidden="true">/</kbd>
+            {/* The slash hint gives way to a clear button once there is
+                something to clear, so the field always ends in one action. */}
+            {query ? (
+              <button
+                type="button"
+                className="search-clear"
+                onClick={() => { buzz(6); setQuery(""); searchRef.current?.focus(); }}
+                aria-label="Clear the search"
+              >
+                <span aria-hidden="true">×</span>
+              </button>
+            ) : (
+              <kbd className="shortcut-hint" aria-hidden="true">/</kbd>
+            )}
             <span id="site-search-hint" className="sr-only">Press the slash key to jump here from anywhere on the page.</span>
           </div>
         </section>

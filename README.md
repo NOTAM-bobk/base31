@@ -164,6 +164,23 @@ Run `npm run validate:content` to check `sites.json`, `blogs.json`,
 - Every full-width block (donation board, launch clock, referrals and "stay in
   the loop") shares one radius via the `--radius-card` token, so the page has a
   single card silhouette.
+- The header is the app bar: `position: fixed` over a blurred, mostly opaque
+  background. `body:has(.site-header) { padding-top: 64px }` (58px on narrow
+  screens) gives the bar's height back to the flow, so nothing else moved when
+  it left the flow — keep those two numbers in sync if the bar's height
+  changes. The `:has()` scope matters: the blog, about, privacy and error pages
+  render no header, and must not inherit its offset. Every `[id]` carries a
+  matching `scroll-margin-top`, so in-page anchors still land below the bar.
+- `components/code-backdrop.tsx` is the typing-code wallpaper behind the page.
+  It is server rendered and CSS-only: no JavaScript, no timer, one stepped
+  width animation per line, staggered with negative delays so the lines never
+  restart in sync. It is `aria-hidden`, ignores pointer events, and every line
+  is measured in `ch` so it types exactly as wide as its own text.
+- A directory card is one link (`.site-card-body` — icon, name, host,
+  description, tags) plus a `.site-card-foot` bar holding the live marker, the
+  pin and the two votes. Keeping the buttons outside the link is what lets the
+  whole information block be clickable without nesting interactive elements.
+  Pinned cards get a green spine; `SiteIcon` is 38px (34px on phones).
 
 ## Accessibility notes
 
@@ -179,6 +196,9 @@ Run `npm run validate:content` to check `sites.json`, `blogs.json`,
 - The search clear button is labelled "Clear the search" and hands focus back
   to the field, so clearing never drops keyboard users off the input. The
   browser's own clear glyph is suppressed in favour of it.
+- The code backdrop is decorative, so it is `aria-hidden` and skipped entirely
+  under `prefers-reduced-motion` rather than left as a column of carets. Vote
+  and pin buttons stay outside the card's link, so no control is focused twice.
 - The launch clock's ticking tiles are `aria-hidden`, with a static sentence
   for assistive tech instead — otherwise a screen reader chases a number that
   changes every second.

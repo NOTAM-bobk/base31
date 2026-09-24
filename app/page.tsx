@@ -1169,18 +1169,35 @@ export default function HomePage() {
                   role="listitem"
                   style={{ "--i": index } as CSSProperties}
                 >
-                  <div className="site-card-top">
-                    <a href={site.url} className="site-link site-link-with-thumb" target="_blank" rel="noreferrer">
+                  {/* The whole information block is one link — icon, name,
+                      host, description and tags — while the pin and vote
+                      buttons sit outside it in the card's footer bar. */}
+                  <a href={site.url} className="site-link site-card-body" target="_blank" rel="noreferrer">
+                    <span className="site-card-head">
                       <SiteIcon site={site} />
-                      <span className="site-name-row">
-                        <span className="live-dot" aria-hidden="true" />
-                        <span className="site-name">{site.name}</span>
-                        {site.community && <span className="site-badge mono">community</span>}
-                        {isNew && <span className="site-badge is-new mono">new</span>}
-                        <span className="site-arrow mono" aria-hidden="true">↗</span>
-                        <span className="sr-only"> (opens in a new tab)</span>
+                      <span className="site-card-ident">
+                        <span className="site-card-title">
+                          <span className="site-name">{site.name}</span>
+                          {site.community && <span className="site-badge mono">community</span>}
+                          {isNew && <span className="site-badge is-new mono">new</span>}
+                        </span>
+                        <span className="site-url mono">{site.url.replace(/^https?:\/\//, "").replace(/\/$/, "")}</span>
                       </span>
-                    </a>
+                      <span className="site-open mono" aria-hidden="true">↗</span>
+                      <span className="sr-only"> (opens in a new tab)</span>
+                    </span>
+                    {site.description && <span className="site-description">{site.description}</span>}
+                    {site.tags && site.tags.length > 0 && (
+                      <span className="tags" aria-label="Tags">
+                        {site.tags.map((tag) => <span key={tag} className="tag mono">{tag}</span>)}
+                      </span>
+                    )}
+                  </a>
+                  <div className="site-card-foot">
+                    <span className="site-status mono">
+                      <span className="live-dot" aria-hidden="true" />
+                      live
+                    </span>
                     <div className="site-actions">
                       <button
                         type="button"
@@ -1216,15 +1233,6 @@ export default function HomePage() {
                       </button>
                     </div>
                   </div>
-                  <a href={site.url} className="site-link site-details" target="_blank" rel="noreferrer">
-                    <p className="site-url mono">{site.url.replace(/^https?:\/\//, "")}</p>
-                    {site.description && <p className="site-description">{site.description}</p>}
-                    {site.tags && site.tags.length > 0 && (
-                      <div className="tags" aria-label="Tags">
-                        {site.tags.map((tag) => <span key={tag} className="tag mono">{tag}</span>)}
-                      </div>
-                    )}
-                  </a>
                 </article>
               );
             })}

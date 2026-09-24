@@ -341,7 +341,6 @@ html[data-theme="light"] { --subtle: #6b6b6b; }
 .sites-panel[hidden] { display: none; }
 
 /* Site cards: icon, badges, and the small pieces globals.css dropped. --- */
-.site-link-with-thumb { display: flex; align-items: center; gap: 11px; min-width: 0; }
 /* Each site's app icon: a rounded tile whose gradient and glyph are derived
    from its subdomain, so every entry is visually distinct without a favicon
    request. See `SiteIcon` in app/page.tsx. */
@@ -365,6 +364,56 @@ html[data-theme="light"] { --subtle: #6b6b6b; }
   color: var(--subtle); font-size: 8.5px; letter-spacing: 0.07em; text-transform: uppercase;
 }
 .site-badge.is-new { border-color: color-mix(in srgb, var(--live) 45%, var(--line)); color: var(--live); }
+
+/* Card layout ---------------------------------------------------------
+   Each card is one link (icon, name, host, description, tags) with a
+   footer bar underneath holding the live marker, the pin and the votes,
+   so a row of cards reads like an app list rather than a pile of boxes. */
+.site-card {
+  padding: 0; overflow: hidden;
+  border: 1px solid var(--line); border-radius: var(--radius-card);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--surface) 92%, var(--background)), var(--surface));
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 5%);
+  transition: border-color 160ms ease, background 160ms ease, transform 160ms ease, box-shadow 160ms ease;
+}
+html[data-theme="light"] .site-card { box-shadow: inset 0 1px 0 #fff, 0 1px 2px rgb(0 0 0 / 4%); }
+html[data-theme="light"] .site-card:hover { box-shadow: var(--shadow), inset 0 1px 0 #fff; }
+.site-card:hover {
+  border-color: var(--line-strong); transform: translateY(-2px);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--surface-hover) 92%, var(--background)), var(--surface-hover));
+  box-shadow: var(--shadow), inset 0 1px 0 rgb(255 255 255 / 6%);
+}
+/* A pinned card keeps a green spine, so pinned entries read at a glance. */
+.site-card.is-pinned { border-color: color-mix(in srgb, var(--live) 38%, var(--line-strong)); }
+.site-card.is-pinned::before {
+  position: absolute; inset: 0 auto 0 0; z-index: 1; width: 3px; opacity: 0.9;
+  background: linear-gradient(180deg, transparent, var(--live) 22%, var(--live) 78%, transparent);
+  content: "";
+}
+
+.site-card-body { display: flex; flex-direction: column; gap: 10px; padding: 15px 15px 13px; }
+.site-card-head { display: flex; align-items: center; gap: 11px; }
+.site-card-ident { display: flex; min-width: 0; flex: 1; flex-direction: column; gap: 3px; }
+.site-card-title { display: flex; min-width: 0; align-items: center; gap: 8px; }
+.site-card-body .site-icon { width: 38px; height: 38px; border-radius: 12px; }
+.site-card-body .site-name { font-size: 14.5px; font-weight: 500; }
+.site-card-body .site-url { margin: 0; color: var(--subtle); font-size: 10.5px; }
+.site-open { flex: 0 0 auto; color: var(--subtle); font-size: 13px; transition: color 160ms ease, transform 160ms ease; }
+.site-card:hover .site-open { color: var(--live); transform: translate(2px, -2px); }
+.site-card-body .site-description { display: block; max-width: 100%; margin: 0; color: var(--muted); font-size: 12.5px; line-height: 1.55; }
+.site-card-body .tags { margin: 0; }
+.site-card-body .tag { background: color-mix(in srgb, var(--background) 45%, transparent); }
+
+.site-card-foot {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  padding: 9px 15px 10px; border-top: 1px solid var(--line);
+  background: color-mix(in srgb, var(--background) 45%, transparent);
+}
+.site-status {
+  display: inline-flex; align-items: center; gap: 6px;
+  color: var(--subtle); font-size: 9.5px; letter-spacing: 0.1em; text-transform: uppercase;
+}
+.site-actions { margin-left: auto; }
 .search-icon { color: var(--subtle); font-size: 13px; }
 .shortcut-hint {
   flex: 0 0 auto; padding: 2px 6px; border: 1px solid var(--line); border-radius: 5px;
@@ -439,15 +488,63 @@ html[data-theme="light"] .search-wrap { box-shadow: 0 8px 22px rgb(0 0 0 / 6%), 
    the loop) so the page has a single card silhouette. */
 .donation-board, .launch-block, .referral-block, .community-panel { border-radius: var(--radius-card); }
 
-/* The header nav carries a single link now, so it is dressed as a pill to
-   match the tag chips and the footer's tappable links instead of reading
-   as a stray word next to the wordmark. */
-.site-nav { gap: 8px; }
-.site-nav a {
-  padding: 6px 11px; border: 1px solid var(--line); border-radius: 999px;
-  transition: border-color 150ms ease, color 150ms ease, background 150ms ease;
+/* The header nav is plain text now, like the footer: no chip, no border,
+   just the link lifting from muted to full contrast on hover. */
+.site-nav a { color: var(--muted); transition: color 150ms ease; }
+.site-nav a:hover { color: var(--text-strong); }
+
+/* App shell -----------------------------------------------------------
+   The header is fixed to the top of the viewport over a blurred, mostly
+   opaque background, so the site reads like an app: the bar stays put
+   while content slides underneath it. `body` gets the bar's old height
+   back as padding, which keeps the previous in-flow spacing identical. */
+/* Scoped to the pages that actually render the bar: the blog, about, privacy
+   and error pages have no header, so they must not inherit its offset. */
+body:has(.site-header) { padding-top: 64px; }
+.site-header {
+  position: fixed; inset: 0 0 auto; z-index: 45;
+  border-bottom: 1px solid color-mix(in srgb, var(--line) 85%, transparent);
+  background: color-mix(in srgb, var(--background) 84%, transparent);
+  backdrop-filter: blur(14px) saturate(150%);
+  -webkit-backdrop-filter: blur(14px) saturate(150%);
 }
-.site-nav a:hover { border-color: var(--line-strong); background: var(--surface); color: var(--text-strong); }
+/* In-page anchors have to clear the fixed bar when they jump. */
+[id] { scroll-margin-top: 96px; }
+
+/* Code backdrop -------------------------------------------------------
+   A fixed wallpaper of code typing itself out behind the page. Server
+   rendered with no JavaScript and no timers: every line is a CSS width
+   animation with a stepped timing function, offset by a negative delay so
+   the lines never restart in sync. It sits at z-index -1 (above the page
+   background, below every piece of content) and is decorative only. */
+.code-backdrop {
+  position: fixed; inset: 0; z-index: -1; overflow: hidden;
+  padding: 92px 0 0 3vw; pointer-events: none; opacity: 0.5;
+  mask-image: linear-gradient(180deg, #000 62%, transparent);
+  -webkit-mask-image: linear-gradient(180deg, #000 62%, transparent);
+}
+/* A soft green bloom in the corner, so the layer has some depth to it. */
+.code-backdrop::before {
+  position: absolute; top: -26vh; left: -16vw; width: 64vw; height: 64vw;
+  background: radial-gradient(circle, color-mix(in srgb, var(--live) 13%, transparent), transparent 62%);
+  content: "";
+}
+.code-line {
+  display: block; width: 0; max-width: calc(100vw - 24px); overflow: hidden;
+  color: color-mix(in srgb, var(--live) 42%, var(--muted));
+  font-family: var(--font-mono); font-size: 12px; line-height: 2.05; white-space: nowrap;
+  /* The right border trails the typed text, which reads as a block cursor. */
+  border-right: 1px solid color-mix(in srgb, var(--live) 55%, transparent);
+  animation: code-type 11s steps(var(--steps, 32), end) infinite, code-fade 11s linear infinite;
+  animation-delay: calc(var(--i, 0) * -1.15s);
+}
+@keyframes code-type { 0% { width: 0; } 58%, 100% { width: var(--ch, 30ch); } }
+@keyframes code-fade {
+  0%, 3% { opacity: 0; }
+  9%, 66% { opacity: 0.9; }
+  78%, 100% { opacity: 0; }
+}
+html[data-theme="light"] .code-backdrop { opacity: 0.32; }
 
 .muted-link { color: var(--muted); }
 .empty {
@@ -708,10 +805,8 @@ p a:hover, li a:hover, dd a:hover, .privacy-copy a:hover, .blog-article a:hover,
   .site-list, .site-skeleton { grid-template-columns: 1fr 1fr; gap: 12px; }
   .site-list > .upload-card, .site-list > .empty { grid-column: 1 / -1; }
   .site-card { display: flex; flex-direction: column; }
-  .site-card .site-details { display: flex; flex: 1; flex-direction: column; }
-  .site-card .tags { margin-top: auto; }
-  /* Room for the card's action row next to a long site name. */
-  .site-card-top { gap: 10px; }
+  /* The linked block grows, so the footer of every card in a row lines up. */
+  .site-card-body { flex: 1; }
 }
 
 /* Narrow + touch ------------------------------------------------------ */
@@ -741,6 +836,13 @@ p a:hover, li a:hover, dd a:hover, .privacy-copy a:hover, .blog-article a:hover,
   .section-divider { margin-top: 44px; }
   .section-divider + * { margin-top: 40px; }
   .search-wrap { max-width: none; }
+  .site-card-body { padding: 13px 13px 11px; }
+  .site-card-foot { padding: 8px 13px 9px; }
+  .site-card-body .site-icon { width: 34px; height: 34px; border-radius: 11px; }
+  body:has(.site-header) { padding-top: 58px; }
+  [id] { scroll-margin-top: 84px; }
+  .code-backdrop { padding-top: 74px; opacity: 0.34; }
+  .code-line { font-size: 10.5px; line-height: 2; }
   .clock-row { gap: 9px; margin-top: 20px; }
   .clock-unit + .clock-unit::before { top: 12px; left: -7px; font-size: 18px; }
   .clock-value { min-width: 46px; height: 46px; padding: 0 6px; font-size: 22px; }
@@ -795,6 +897,9 @@ p a:hover, li a:hover, dd a:hover, .privacy-copy a:hover, .blog-article a:hover,
 
 @media (prefers-reduced-motion: reduce) {
   .donation-board, .donation-entry, .clock-digit, .referral-track, .modal, .modal-backdrop { transition: none; animation: none; }
+  /* The typed background is motion by definition; drop it entirely rather
+     than leaving a column of 1px carets behind. */
+  .code-backdrop { display: none; }
   .surprise-button, .surprise-button::before, .surprise-icon { transition: none; }
   .surprise-button:hover { transform: none; }
   .surprise-button:hover::after { animation: none; }

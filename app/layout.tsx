@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
 import "./globals.css";
 import "./overrides.css";
+import CodeBackdrop from "@/components/code-backdrop";
 import ConsentAwareAds from "@/components/consent-aware-ads";
 import ConsentAwareAnalytics from "@/components/consent-aware-analytics";
 import PrivacyConsent from "@/components/privacy-consent";
@@ -48,6 +49,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <noscript><style>{`.site-skeleton,.cursor-layer{display:none!important}`}</style></noscript>
       </head>
       <body>
+        <CodeBackdrop />
         <div className="top-accent" aria-hidden="true" />
         <StructuredData />
         <BlogTransitions />

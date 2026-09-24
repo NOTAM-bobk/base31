@@ -261,7 +261,7 @@ community upload's own favicon — both decorative, both cookie-free:
 
 | Component | Runs when |
 | --- | --- |
-| `components/consent-aware-analytics.tsx` | Microsoft Clarity, only on `accepted` |
+| `components/consent-aware-analytics.tsx` | Microsoft Clarity (`ylsxc7fokm`) and Google Analytics 4 (`G-Y5N2FYK786`), only on `accepted` |
 | `components/consent-aware-ads.tsx` | Adcash auto-tag (`iy7zk7mmw`), only on `accepted` |
 | `components/referral-carousel.tsx` | Never gated: the destination preview image loads straight from the destination (or a screenshot service) because the card is unusable without it. It sets no cookies, the sponsored links stay inert until clicked, and the privacy page says so. |
 
@@ -269,6 +269,13 @@ The Adcash script loader (`https://acscdn.com/script/aclib.js`) is inserted only
 after the visitor accepts, then runs the supplied auto-tag for zone
 `iy7zk7mmw`. Denying or withdrawing consent prevents the loader from being
 inserted (and removes its script element if consent changes after it loads).
+
+Clarity and Google Analytics work the same way and are declared in one
+component: each snippet appends its own loader tag with an id
+(`microsoft-clarity-loader`, `google-analytics-loader`) so withdrawing the
+choice removes what the page can remove. A library that already fetched stays
+loaded until the next page load, which is what the privacy page says — so
+never claim a withdrawal unloads a script that has already run.
 
 `lib/consent.ts` holds the `base31-consent` key, a `useConsent()` hook and the
 `base31-consent-change` event that keeps them in sync. `PrivacyConsent`

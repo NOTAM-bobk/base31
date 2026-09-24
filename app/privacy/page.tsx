@@ -44,9 +44,9 @@ export default function PrivacyPage() {
           advertising script runs; the directory works exactly the same either way.
         </p>
         <p>
-          Choosing “Confirm” allows Microsoft Clarity and our ad network to load. Choosing “Deny”
-          keeps both switched off — the only thing stored is the preference itself. You can change
-          your answer whenever you like with the{" "}
+          Choosing “Confirm” allows Microsoft Clarity, Google Analytics and our ad network to
+          load. Choosing “Deny” keeps all of them switched off — the only thing stored is the
+          preference itself. You can change your answer whenever you like with the{" "}
           <strong>Cookie settings</strong> link in the footer, which brings the notice back so you
           can choose again.
         </p>
@@ -75,12 +75,17 @@ export default function PrivacyPage() {
 
         <h2>Analytics</h2>
         <p>
-          If you confirm the cookie notice, we load Microsoft Clarity to understand how the
-          directory is used — which pages are viewed and where visitors click — so we can improve
-          it. Clarity may set cookies and record aggregated interaction data. If you deny, Clarity
-          is never loaded. See the{" "}
+          If you confirm the cookie notice, we load Microsoft Clarity and Google Analytics to
+          understand how the directory is used — which pages are viewed and where visitors click —
+          so we can improve it. Both may set cookies and record aggregated interaction data, and
+          Google Analytics reports traffic only in aggregate. If you deny, neither is loaded. See
+          the{" "}
           <a href="https://privacy.microsoft.com/privacystatement" target="_blank" rel="noreferrer">
             Microsoft privacy statement
+          </a>{" "}
+          and the{" "}
+          <a href="https://policies.google.com/privacy" target="_blank" rel="noreferrer">
+            Google privacy policy
           </a>{" "}
           for details.
         </p>
@@ -126,7 +131,8 @@ export default function PrivacyPage() {
         <h2>Your choices</h2>
         <p>
           Use <strong>Cookie settings</strong> in the footer to change or withdraw your answer at
-          any time; withdrawing it unloads the analytics and ad scripts again. Clearing site data in
+          any time; withdrawing it removes the analytics and ad loaders again and they stay off
+          until you confirm. Clearing site data in
           your browser also works. The directory and every link in it stay fully usable either way.
         </p>
 

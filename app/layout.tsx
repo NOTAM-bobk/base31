@@ -37,12 +37,13 @@ export const viewport: Viewport = { themeColor: "#000000", colorScheme: "light d
 // scroll-reveal animations only when the visitor allows motion. Because the
 // flag lives on <html> and is set by this script, `[data-reveal]` content is
 // never hidden when JavaScript is unavailable.
-const themeScript = `try{if(localStorage.getItem("base31-theme")==="light"){document.documentElement.setAttribute("data-theme","light")}}catch(e){}try{if(!matchMedia("(prefers-reduced-motion: reduce)").matches){document.documentElement.classList.add("anim")}}catch(e){}try{addEventListener("error",function(){document.documentElement.classList.remove("anim")},true)}catch(e){}`;
+const themeScript = `try{if(localStorage.getItem("base31-theme")==="light"){document.documentElement.setAttribute("data-theme","light")}}catch(e){}try{if(!matchMedia("(prefers-reduced-motion: reduce)").matches){document.documentElement.setAttribute("data-motion","enabled")}}catch(e){}`;
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
       <head>
+        <meta name="impact-site-verification" content="0c13bbc7-5a07-4070-84da-1b320feed539" />
         <script id="base31-theme" dangerouslySetInnerHTML={{ __html: themeScript }} />
         <noscript><style>{`.site-skeleton,.cursor-layer{display:none!important}`}</style></noscript>
       </head>

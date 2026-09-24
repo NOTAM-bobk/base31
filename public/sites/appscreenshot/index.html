@@ -2,19 +2,85 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Microlink Screenshot Capture</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- SEO ------------------------------------------------------------ -->
+    <title>App Screenshot — Free Website Screenshot Tool, No Sign-up | appscreenshot.base31.org</title>
+    <meta name="description" content="Capture a full-quality screenshot of any website or app URL in seconds. Free, no sign-up and no watermark — paste a link and download the image instantly.">
+    <link rel="canonical" href="https://appscreenshot.base31.org/">
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+    <meta name="color-scheme" content="light">
+    <meta name="theme-color" content="#fafafa">
+    <meta name="application-name" content="App Screenshot">
+    <meta name="apple-mobile-web-app-title" content="App Screenshot">
+    <meta name="author" content="base31.org">
+
+    <!-- Social preview -------------------------------------------------- -->
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="App Screenshot">
+    <meta property="og:locale" content="en_US">
+    <meta property="og:title" content="App Screenshot — Free Website Screenshot Tool">
+    <meta property="og:description" content="Paste any URL and get a clean, high-quality screenshot you can download, share or embed. Free, no account, no watermark.">
+    <meta property="og:url" content="https://appscreenshot.base31.org/">
+    <meta property="og:image" content="https://base31.org/opengraph-image">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="App Screenshot — capture any website in one click">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="App Screenshot — Free Website Screenshot Tool">
+    <meta name="twitter:description" content="Paste any URL and get a clean, high-quality screenshot you can download, share or embed. Free, no account, no watermark.">
+    <meta name="twitter:image" content="https://base31.org/opengraph-image">
+    <meta name="twitter:image:alt" content="App Screenshot — capture any website in one click">
+
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 76 65'%3E%3Crect width='76' height='65' rx='14' fill='%23000'/%3E%3Cpath d='M37.5 12 60 52H15z' fill='%23fff'/%3E%3C/svg%3E" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="https://base31.org/icons/apple-touch-icon.png">
+
+    <!-- Structured data: the site, the tool it hosts and its FAQ. ------- -->
+    <script type="application/ld+json">
+    {"@context":"https://schema.org","@graph":[{"@type":"WebSite","@id":"https://appscreenshot.base31.org/#website","url":"https://appscreenshot.base31.org/","name":"App Screenshot","alternateName":"App Screenshot by base31.org","description":"Capture a full-quality screenshot of any website or app URL in seconds. Free, no sign-up and no watermark.","inLanguage":"en","publisher":{"@id":"https://base31.org/#organization"}},{"@type":"WebApplication","@id":"https://appscreenshot.base31.org/#app","name":"App Screenshot","url":"https://appscreenshot.base31.org/","description":"Paste a URL and get a clean, high-quality screenshot you can download, share or embed. Free, no account and no watermark.","applicationCategory":"UtilitiesApplication","operatingSystem":"Any","browserRequirements":"Requires JavaScript","isAccessibleForFree":true,"inLanguage":"en","image":"https://base31.org/opengraph-image","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"featureList":["Screenshot any public website or app URL","No account and no watermark","Fallback renderer when the first service cannot reach a page","Copy the image URL or open the original","Runs entirely in your browser"],"isPartOf":{"@id":"https://base31.org/#website"}},{"@type":"FAQPage","@id":"https://appscreenshot.base31.org/#faq","mainEntity":[{"@type":"Question","name":"Is App Screenshot free to use?","acceptedAnswer":{"@type":"Answer","text":"Yes. Screenshots are free, need no account and carry no watermark. Rendering is done by third-party services (Microlink and thum.io) rather than by this page."}},{"@type":"Question","name":"Do I need to sign up?","acceptedAnswer":{"@type":"Answer","text":"No. Paste a URL and the screenshot is rendered immediately in your browser. There is nothing to install and no extension to add."}},{"@type":"Question","name":"What can I capture?","acceptedAnswer":{"@type":"Answer","text":"Any publicly reachable http or https address. Pages that sit behind a login, a paywall or a bot check cannot be captured because the rendering service never signs in."}},{"@type":"Question","name":"What size is the screenshot?","acceptedAnswer":{"@type":"Answer","text":"The first renderer returns the page at its own desktop width. If it cannot reach the page, the fallback renderer produces a 1200 by 800 crop, and the exact dimensions are shown under the image."}},{"@type":"Question","name":"Can I use the screenshots I capture?","acceptedAnswer":{"@type":"Answer","text":"You can use them in docs, portfolios, bug reports and presentations, but the page you captured still belongs to its owner: follow that site's terms and do not present the image as something it is not."}},{"@type":"Question","name":"Where are the screenshots stored?","acceptedAnswer":{"@type":"Answer","text":"This page stores nothing. The image is loaded straight from the rendering service into your browser, so there is no library to manage and no upload to wait for."}}]}]}
+    </script>
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://api.microlink.io">
+    <link rel="preconnect" href="https://image.thum.io">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Ads: Adcash auto-tag (zone iy7zk7mmw). The loader is async, so the
+         call polls briefly for `aclib` instead of assuming it is ready. -->
+    <script id="aclib" type="text/javascript" src="https://acscdn.com/script/aclib.js" async></script>
+    <script>
+        (function () {
+            var attempts = 0;
+            (function runAutoTag() {
+                if (window.aclib && typeof window.aclib.runAutoTag === 'function') {
+                    window.aclib.runAutoTag({ zoneId: 'iy7zk7mmw' });
+                } else if (attempts++ < 60) {
+                    window.setTimeout(runAutoTag, 250);
+                }
+            })();
+        })();
+    </script>
+
     <style>
+        html {
+            -webkit-text-size-adjust: 100%;
+            scroll-behavior: smooth;
+        }
+
         body {
             font-family: 'Inter', sans-serif;
             background-color: #fafafa; /* Vercel light mode background */
             color: #111;
         }
-        
+
+        ::selection {
+            background: #000;
+            color: #fff;
+        }
+
         .vercel-card {
             background: white;
             border: 1px solid #eaeaea;
@@ -34,7 +100,7 @@
             border-color: #000;
             box-shadow: 0 0 0 1px #000;
         }
-        
+
         .vercel-card:hover {
             box-shadow: 0 6px 20px rgba(0,0,0,0.08);
         }
@@ -52,7 +118,7 @@
             background-color: #fff;
             color: #000;
         }
-        
+
         .vercel-button:active {
             transform: scale(0.97);
         }
@@ -84,84 +150,134 @@
             opacity: 0;
             transition: opacity 0.4s ease-in-out;
         }
-        
+
         #result-image.loaded {
             opacity: 1;
         }
-        
+
         /* Modern Dot Background */
         .bg-dots {
             background-color: #fafafa;
             background-image: radial-gradient(#e5e7eb 1px, transparent 1px);
             background-size: 24px 24px;
         }
+
+        /* FAQ rows: native <details> so the answers are in the markup (and
+           readable by search engines) without any JavaScript. */
+        .faq-item summary {
+            list-style: none;
+            cursor: pointer;
+        }
+
+        .faq-item summary::-webkit-details-marker {
+            display: none;
+        }
+
+        .faq-chevron {
+            transition: transform 0.2s ease;
+        }
+
+        .faq-item[open] .faq-chevron {
+            transform: rotate(180deg);
+        }
+
+        /* Keyboard focus stays visible everywhere except links in prose. */
+        a:focus-visible,
+        button:focus-visible,
+        summary:focus-visible {
+            outline: 2px solid #000;
+            outline-offset: 2px;
+            border-radius: 4px;
+        }
+
+        .footer-link {
+            color: #6b7280;
+            transition: color 0.15s ease;
+        }
+
+        .footer-link:hover {
+            color: #000;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            html { scroll-behavior: auto; }
+            .spinner { animation-duration: 3s; }
+            .faq-chevron { transition: none; }
+            #result-image { transition: none; }
+        }
     </style>
 </head>
-<body class="bg-dots min-h-screen flex flex-col items-center py-16 px-4 sm:px-6 lg:px-8">
+<body class="bg-dots min-h-screen flex flex-col items-center px-4 sm:px-6 lg:px-8">
 
-    <main class="w-full max-w-3xl space-y-10">
-        
+    <main class="w-full max-w-3xl flex-1 space-y-10 py-16">
+
         <!-- Header Section -->
         <div class="text-center space-y-4">
             <div class="flex justify-center mb-6">
                <!-- Simple Triangle Logo akin to Vercel -->
-                <svg width="44" height="44" viewBox="0 0 76 65" fill="none" xmlns="http://www.w3.org/2000/svg" class="drop-shadow-sm">
+                <svg width="44" height="44" viewBox="0 0 76 65" fill="none" xmlns="http://www.w3.org/2000/svg" class="drop-shadow-sm" role="img" aria-label="App Screenshot">
                     <path d="M37.5274 0L75.0548 65H0L37.5274 0Z" fill="#000000"/>
                 </svg>
             </div>
-            <h1 class="text-4xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-gray-900 to-gray-500 pb-1">Capture Screenshot</h1>
-            <p class="text-gray-500 text-base max-w-md mx-auto">Enter any URL to generate a high-quality screenshot using the Microlink API.</p>
+            <h1 class="text-4xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-gray-900 to-gray-500 pb-1">Screenshot any website in one click</h1>
+            <p class="text-gray-500 text-base max-w-lg mx-auto">Paste a URL and this free tool renders a clean, high-quality screenshot you can download, share or embed. No sign-up, no watermark, no browser extension.</p>
         </div>
 
         <!-- Input Form Section -->
         <div class="vercel-card p-6 sm:p-8">
             <form id="capture-form" class="flex flex-col sm:flex-row gap-4">
                 <div class="flex-grow relative">
+                    <label for="url-input" class="sr-only">Web address to screenshot</label>
                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path></svg>
+                        <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path></svg>
                     </div>
-                    <input 
-                        type="url" 
-                        id="url-input" 
+                    <input
+                        type="url"
+                        id="url-input"
                         required
-                        placeholder="https://example.com" 
+                        placeholder="https://example.com"
                         class="vercel-input w-full pl-10 pr-4 py-2.5 text-sm"
                         autocomplete="off"
+                        inputmode="url"
+                        enterkeyhint="go"
+                        spellcheck="false"
+                        aria-describedby="capture-hint"
                     >
                 </div>
-                <button 
-                    type="submit" 
+                <button
+                    type="submit"
                     id="submit-btn"
                     class="vercel-button px-6 py-2.5 text-sm sm:w-auto w-full flex justify-center items-center h-[42px]"
                 >
                     <span id="btn-text">Capture</span>
-                    <div id="btn-spinner" class="spinner hidden ml-2 w-4 h-4 border-2 border-t-white border-white/20"></div>
+                    <div id="btn-spinner" class="spinner hidden ml-2 w-4 h-4 border-2 border-t-white border-white/20" aria-hidden="true"></div>
                 </button>
             </form>
+            <p id="capture-hint" class="mt-3 text-xs text-gray-500">Works with any public page. Pages behind a login cannot be captured.</p>
         </div>
 
         <!-- Result Section -->
-        <div id="result-container" class="hidden space-y-4">
+        <div id="result-container" class="hidden space-y-4" aria-live="polite">
             <h2 class="text-sm font-semibold text-gray-700 uppercase tracking-wider">Result</h2>
-            
+
             <!-- Error Message Box -->
-            <div id="error-message" class="hidden bg-red-50 border border-red-200 text-red-600 rounded-md p-4 text-sm">
+            <div id="error-message" class="hidden bg-red-50 border border-red-200 text-red-600 rounded-md p-4 text-sm" role="alert">
                 Failed to fetch screenshot. Please check the URL and try again.
             </div>
 
             <!-- Image Display -->
             <div id="image-wrapper" class="vercel-card overflow-hidden relative min-h-[200px] flex items-center justify-center bg-gray-50 hidden">
-                
+
                 <!-- Loading State inside wrapper -->
                 <div id="image-loading" class="absolute inset-0 flex flex-col items-center justify-center bg-white z-10">
                     <div class="spinner mb-3"></div>
                     <span class="text-xs text-gray-500 font-medium">Generating image...</span>
                 </div>
 
-                <img 
-                    id="result-image" 
-                    src="" 
-                    alt="Captured Screenshot" 
+                <img
+                    id="result-image"
+                    src=""
+                    alt="Captured Screenshot"
                     class="w-full h-auto object-cover"
                 >
             </div>
@@ -173,18 +289,130 @@
                 </div>
                 <div class="flex items-center gap-4 mt-2 sm:mt-0">
                     <button id="copy-btn" type="button" class="text-gray-500 hover:text-black transition-colors flex items-center gap-1.5 font-medium">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
                         Copy URL
                     </button>
                     <a id="download-link" href="#" target="_blank" rel="noopener noreferrer" class="text-black font-semibold hover:underline flex items-center gap-1.5">
                         Open Original
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
                     </a>
                 </div>
             </div>
         </div>
 
+        <!-- How it works -->
+        <section class="space-y-4" aria-labelledby="how-title">
+            <h2 id="how-title" class="text-sm font-semibold text-gray-700 uppercase tracking-wider">How it works</h2>
+            <ol class="grid gap-4 sm:grid-cols-3">
+                <li class="vercel-card p-5">
+                    <span class="font-mono text-xs text-gray-400">01</span>
+                    <h3 class="mt-2 text-sm font-semibold text-gray-900">Paste the URL</h3>
+                    <p class="mt-1 text-sm leading-6 text-gray-500">Drop in any public web address — a landing page, a docs site, or your own app in testing. The protocol is added for you.</p>
+                </li>
+                <li class="vercel-card p-5">
+                    <span class="font-mono text-xs text-gray-400">02</span>
+                    <h3 class="mt-2 text-sm font-semibold text-gray-900">It renders the page</h3>
+                    <p class="mt-1 text-sm leading-6 text-gray-500">A rendering service opens the page in a real browser and captures it. If that service cannot reach it, a second renderer is tried automatically.</p>
+                </li>
+                <li class="vercel-card p-5">
+                    <span class="font-mono text-xs text-gray-400">03</span>
+                    <h3 class="mt-2 text-sm font-semibold text-gray-900">Download or copy</h3>
+                    <p class="mt-1 text-sm leading-6 text-gray-500">Open the image at full size, copy its direct URL, or right-click to save. Nothing is stored on this page between visits.</p>
+                </li>
+            </ol>
+        </section>
+
+        <!-- FAQ -->
+        <section class="space-y-4" aria-labelledby="faq-title">
+            <h2 id="faq-title" class="text-sm font-semibold text-gray-700 uppercase tracking-wider">Frequently asked questions</h2>
+            <div class="vercel-card divide-y divide-gray-200 px-5 sm:px-6">
+                <details class="faq-item py-4">
+                    <summary class="flex items-center justify-between gap-4 text-sm font-medium text-gray-900">
+                        Is App Screenshot free to use?
+                        <svg class="faq-chevron w-4 h-4 shrink-0 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m6 9 6 6 6-6"></path></svg>
+                    </summary>
+                    <p class="mt-3 pr-6 text-sm leading-6 text-gray-500">Yes. Screenshots are free, need no account and carry no watermark. Rendering is done by third-party services (Microlink and thum.io) rather than by this page itself.</p>
+                </details>
+                <details class="faq-item py-4">
+                    <summary class="flex items-center justify-between gap-4 text-sm font-medium text-gray-900">
+                        Do I need to sign up?
+                        <svg class="faq-chevron w-4 h-4 shrink-0 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m6 9 6 6 6-6"></path></svg>
+                    </summary>
+                    <p class="mt-3 pr-6 text-sm leading-6 text-gray-500">No. Paste a URL and the screenshot is rendered right away. There is nothing to install and no browser extension to add.</p>
+                </details>
+                <details class="faq-item py-4">
+                    <summary class="flex items-center justify-between gap-4 text-sm font-medium text-gray-900">
+                        What can I capture?
+                        <svg class="faq-chevron w-4 h-4 shrink-0 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m6 9 6 6 6-6"></path></svg>
+                    </summary>
+                    <p class="mt-3 pr-6 text-sm leading-6 text-gray-500">Any publicly reachable http or https address. Pages behind a login, a paywall or a bot check cannot be captured, because the rendering service never signs in as you.</p>
+                </details>
+                <details class="faq-item py-4">
+                    <summary class="flex items-center justify-between gap-4 text-sm font-medium text-gray-900">
+                        What size is the screenshot?
+                        <svg class="faq-chevron w-4 h-4 shrink-0 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m6 9 6 6 6-6"></path></svg>
+                    </summary>
+                    <p class="mt-3 pr-6 text-sm leading-6 text-gray-500">The first renderer returns the page at its own desktop width. If it cannot reach the page, the fallback renderer produces a 1200 &times; 800 crop. The exact dimensions are printed under the image.</p>
+                </details>
+                <details class="faq-item py-4">
+                    <summary class="flex items-center justify-between gap-4 text-sm font-medium text-gray-900">
+                        Can I use the screenshots I capture?
+                        <svg class="faq-chevron w-4 h-4 shrink-0 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m6 9 6 6 6-6"></path></svg>
+                    </summary>
+                    <p class="mt-3 pr-6 text-sm leading-6 text-gray-500">You can use them in documentation, portfolios, bug reports and presentations, but the page you captured still belongs to its owner — follow that site's terms and never present the image as something it is not.</p>
+                </details>
+                <details class="faq-item py-4">
+                    <summary class="flex items-center justify-between gap-4 text-sm font-medium text-gray-900">
+                        Where are the screenshots stored?
+                        <svg class="faq-chevron w-4 h-4 shrink-0 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m6 9 6 6 6-6"></path></svg>
+                    </summary>
+                    <p class="mt-3 pr-6 text-sm leading-6 text-gray-500">This page stores nothing. The image is loaded straight from the rendering service into your browser, so there is no library to manage and no upload to wait for.</p>
+                </details>
+            </div>
+        </section>
+
     </main>
+
+    <!-- Footer -->
+    <footer class="mt-20 w-full border-t border-gray-200">
+        <div class="mx-auto flex w-full max-w-3xl flex-col gap-8 py-10 sm:flex-row sm:items-start sm:justify-between">
+            <div class="max-w-xs">
+                <div class="flex items-center gap-2.5">
+                    <svg width="18" height="18" viewBox="0 0 76 65" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                        <path d="M37.5274 0L75.0548 65H0L37.5274 0Z" fill="#000000"/>
+                    </svg>
+                    <span class="text-sm font-semibold tracking-tight text-gray-900">App Screenshot</span>
+                </div>
+                <p class="mt-3 text-xs leading-5 text-gray-500">A free screenshot tool for websites and apps, hosted on <a class="footer-link underline underline-offset-2" href="https://base31.org/">base31.org</a> — a small independent directory of useful sites and tools.</p>
+            </div>
+
+            <nav aria-label="Footer" class="grid gap-8 sm:grid-cols-2 sm:gap-12">
+                <div>
+                    <h2 class="text-xs font-semibold uppercase tracking-wider text-gray-700">base31</h2>
+                    <ul class="mt-3 space-y-2 text-sm">
+                        <li><a class="footer-link" href="https://base31.org/">Cool sites</a></li>
+                        <li><a class="footer-link" href="https://base31.org/blog">Blog</a></li>
+                        <li><a class="footer-link" href="https://base31.org/about">About</a></li>
+                        <li><a class="footer-link" href="https://base31.org/#updates">Bug report</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h2 class="text-xs font-semibold uppercase tracking-wider text-gray-700">Legal</h2>
+                    <ul class="mt-3 space-y-2 text-sm">
+                        <li><a class="footer-link" href="https://base31.org/terms">Terms of service</a></li>
+                        <li><a class="footer-link" href="https://base31.org/privacy">Privacy policy</a></li>
+                        <li><a class="footer-link" href="https://base31.org/privacy">Cookies &amp; ads</a></li>
+                        <li><a class="footer-link" href="mailto:hello@base31.org?subject=App%20Screenshot%20abuse%20report">Report abuse</a></li>
+                    </ul>
+                </div>
+            </nav>
+        </div>
+
+        <div class="mx-auto w-full max-w-3xl border-t border-gray-200 py-6">
+            <p class="text-xs leading-5 text-gray-500">&copy; 2026 App Screenshot &middot; appscreenshot.base31.org</p>
+            <p class="mt-3 text-xs leading-5 text-gray-500">Screenshots are rendered by third-party services (Microlink and thum.io), and this page shows ads served by Adcash. See the <a class="footer-link underline underline-offset-2" href="https://base31.org/privacy">privacy policy</a> for details. Only capture pages you have the right to capture, and respect each site's terms and robots rules.</p>
+        </div>
+    </footer>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
@@ -193,7 +421,7 @@
             const submitBtn = document.getElementById('submit-btn');
             const btnText = document.getElementById('btn-text');
             const btnSpinner = document.getElementById('btn-spinner');
-            
+
             const resultContainer = document.getElementById('result-container');
             const errorMessage = document.getElementById('error-message');
             const imageWrapper = document.getElementById('image-wrapper');
@@ -203,7 +431,7 @@
             const imageSize = document.getElementById('image-size');
             const downloadLink = document.getElementById('download-link');
             const copyBtn = document.getElementById('copy-btn');
-            
+
             // Format URL to ensure it has a valid protocol
             const formatUrl = (urlStr) => {
                 let formatted = urlStr.trim();
@@ -223,10 +451,10 @@
 
             form.addEventListener('submit', async (e) => {
                 e.preventDefault();
-                
+
                 let targetUrl = formatUrl(input.value);
                 if (!targetUrl) return;
-                
+
                 input.value = targetUrl; // update input visual immediately
 
                 // Basic validation check before sending
@@ -245,7 +473,7 @@
                 errorMessage.classList.add('hidden');
                 imageWrapper.classList.remove('hidden');
                 metaInfo.classList.add('hidden');
-                
+
                 // Show loader over image area, hide previous image
                 imageLoading.classList.remove('hidden');
                 resultImage.classList.remove('loaded');
@@ -257,14 +485,16 @@
 
                 const img = new Image();
                 let fallbackAttempted = false;
-                
+
                 img.onload = () => {
                     // Hide loading overlay
                     imageLoading.classList.add('hidden');
-                    
+
                     // Set actual image source and show it
                     resultImage.src = img.src;
-                    
+                    // Keep the alt text meaningful for the page that was captured.
+                    resultImage.alt = `Screenshot of ${targetUrl}`;
+
                     // Add slight delay for CSS transition to kick in
                     setTimeout(() => {
                         resultImage.classList.add('loaded');
@@ -273,7 +503,7 @@
                     // Update Meta Info using natural image dimensions
                     imageSize.textContent = `Dimensions: ${img.naturalWidth} × ${img.naturalHeight}`;
                     downloadLink.href = img.src;
-                    
+
                     // Setup Copy Button Logic
                     copyBtn.onclick = () => {
                         // Try modern clipboard API, fallback to execCommand
@@ -290,25 +520,25 @@
                                 return Promise.reject(err);
                             }
                         };
-                        
-                        const action = navigator.clipboard && navigator.clipboard.writeText 
-                            ? navigator.clipboard.writeText(img.src).catch(doCopy) 
+
+                        const action = navigator.clipboard && navigator.clipboard.writeText
+                            ? navigator.clipboard.writeText(img.src).catch(doCopy)
                             : doCopy();
 
                         action.then(() => {
                             const originalHTML = copyBtn.innerHTML;
-                            copyBtn.innerHTML = `<svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> <span class="text-green-600">Copied!</span>`;
+                            copyBtn.innerHTML = `<svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> <span class="text-green-600">Copied!</span>`;
                             setTimeout(() => copyBtn.innerHTML = originalHTML, 2000);
                         }).catch(err => console.error('Unable to copy', err));
                     };
 
                     metaInfo.classList.remove('hidden');
                     metaInfo.classList.add('flex');
-                    
+
                     // Reset Button State
                     setLoadingState(false);
                 };
-                
+
                 img.onerror = () => {
                     // If primary fails, try fallback, if fallback fails, show error
                     if (!fallbackAttempted) {
@@ -320,7 +550,7 @@
                         setLoadingState(false);
                     }
                 };
-                
+
                 // Start loading the image (starts with primary)
                 img.src = primaryUrl;
             });
@@ -338,7 +568,7 @@
                     submitBtn.disabled = true;
                     btnText.textContent = 'Capturing';
                     btnSpinner.classList.remove('hidden');
-                    
+
                     // Adjust spinner color for disabled state
                     btnSpinner.classList.remove('border-t-white', 'border-white/20');
                     btnSpinner.classList.add('border-t-black', 'border-black/20');
@@ -346,7 +576,7 @@
                     submitBtn.disabled = false;
                     btnText.textContent = 'Capture';
                     btnSpinner.classList.add('hidden');
-                    
+
                     // Reset spinner color
                     btnSpinner.classList.add('border-t-white', 'border-white/20');
                     btnSpinner.classList.remove('border-t-black', 'border-black/20');

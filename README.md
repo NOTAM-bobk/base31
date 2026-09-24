@@ -56,6 +56,36 @@ the sites themselves — all deployed together as one Vercel project.
 Set `"show": false` to keep a site live on its subdomain without listing it
 on the homepage.
 
+### A subdomain page's SEO checklist
+
+`public/sites/share/` and `public/sites/appscreenshot/` are the two worked
+examples of a full static page — copy their `<head>` when adding another. Each
+one ships:
+
+- a keyword-first `<title>`, a `<meta name="description">`, a `<link
+  rel="canonical">` on its own subdomain, plus `robots`, `color-scheme`,
+  `theme-color` and `application-name` tags.
+- `og:*` and `twitter:*` tags. The social image points at the apex
+  `https://base31.org/opengraph-image` (`app/opengraph-image.tsx`), because
+  these folders hold no PNGs of their own.
+- one `application/ld+json` `@graph` per page holding its `WebSite`, its
+  `WebApplication` and — where the page shows a FAQ — an `FAQPage` whose
+  `mainEntity` mirrors the visible `<details>` list. No node appears twice, and
+  `publisher` / `isPartOf` reference the apex `https://base31.org/#organization`
+  and `#website` ids from `components/structured-data.tsx`.
+- its own `robots.txt` and `sitemap.xml`. The apex `app/robots.ts` and
+  `app/sitemap.ts` only describe base31.org, and the middleware rewrites those
+  paths on a subdomain to `<site>/robots.txt` / `<site>/sitemap.xml`.
+
+Legal pages live on the apex, so a subdomain footer links out with absolute
+URLs (`https://base31.org/terms`, `https://base31.org/privacy`) — `/terms` on
+`example.base31.org` resolves under `public/sites/example/` and would 404.
+`appscreenshot/index.html` also carries the Adcash auto-tag (zone
+`iy7zk7mmw`, the same zone as `components/consent-aware-ads.tsx`) directly in
+its `<head>`; the loader is `async`, so the page polls for `aclib` before
+calling `runAutoTag`. Unlike the homepage it is ungated — that static page has
+no cookie banner of its own.
+
 ## Referral carousel
 
 The "Referrals worth a look" carousel sits just below the launch clock and is

@@ -1,1 +1,1147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Neo-Brutalist Word Guesser</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Visitor Counter Script -->
+    <script src="https://cdn.commoninja.com/sdk/latest/commonninja.js" defer></script>
+    
+    <style>
+        :root {
+            --bg-color: #f4f0ec;
+            --text-color: #1a1a1a;
+            --accent-green: #4ade80;
+            --accent-yellow: #fde047;
+            --border-color: #000000;
+            --shadow-color: #000000;
+            --main-font: 'JetBrains Mono', Courier, monospace;
+        }
 
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: var(--main-font);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .brutal-box {
+            background-color: white;
+            border: 3px solid var(--border-color);
+            box-shadow: 6px 6px 0px var(--shadow-color);
+            border-radius: 0;
+            transition: all 0.2s ease;
+        }
+
+        .brutal-input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid var(--border-color);
+            background-color: white;
+            font-family: var(--main-font);
+            font-size: 1rem;
+            outline: none;
+            box-shadow: inset 2px 2px 0px rgba(0,0,0,0.1);
+        }
+        
+        .brutal-input:focus {
+            background-color: #fdfdfd;
+            border-color: var(--text-color);
+        }
+
+        .brutal-button {
+            background-color: var(--accent-yellow);
+            color: var(--text-color);
+            border: 3px solid var(--border-color);
+            box-shadow: 4px 4px 0px var(--shadow-color);
+            padding: 14px 24px;
+            font-family: var(--main-font);
+            font-weight: 800;
+            font-size: 1.1rem;
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: all 0.1s ease;
+            width: 100%;
+        }
+
+        .brutal-button:active {
+            transform: translate(4px, 4px);
+            box-shadow: 0px 0px 0px var(--shadow-color);
+        }
+        
+        .brutal-button:hover {
+            background-color: #eab308;
+        }
+
+        .letter-box-container {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 1rem;
+        }
+
+        .letter-box {
+            width: 50px;
+            height: 60px;
+            font-size: 2rem;
+            text-align: center;
+            text-transform: uppercase;
+            border: 3px solid var(--border-color);
+            box-shadow: 3px 3px 0px var(--shadow-color);
+            background-color: white;
+            font-weight: bold;
+        }
+        
+        .letter-box.green {
+            background-color: var(--accent-green);
+        }
+
+        .letter-box:focus {
+            outline: 2px solid var(--accent-yellow);
+            outline-offset: 2px;
+        }
+
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 16px;
+            border-bottom: 2px solid var(--border-color);
+            background-color: white;
+        }
+
+        .copy-btn {
+            background-color: transparent;
+            border: 2px solid var(--border-color);
+            padding: 6px 12px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            box-shadow: 2px 2px 0px var(--shadow-color);
+            font-weight: bold;
+            transition: all 0.1s ease;
+        }
+
+        .copy-btn:active {
+            transform: translate(2px, 2px);
+            box-shadow: 0px 0px 0px var(--shadow-color);
+        }
+
+        .brutal-btn-small {
+            background-color: white;
+            border: 2px solid var(--border-color);
+            box-shadow: 2px 2px 0px var(--shadow-color);
+            padding: 6px 12px;
+            font-family: var(--main-font);
+            font-weight: bold;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.1s ease;
+        }
+        
+        .brutal-btn-small:hover { 
+            background-color: var(--accent-green); 
+        }
+        
+        .brutal-btn-small:active {
+            transform: translate(2px, 2px);
+            box-shadow: 0px 0px 0px var(--shadow-color);
+        }
+        
+        .secret-blur {
+            filter: blur(8px) grayscale(50%);
+            opacity: 0.8;
+            cursor: pointer;
+            transition: filter 0.3s ease, opacity 0.3s ease, transform 0.2s ease;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+        
+        .secret-blur:hover {
+            filter: blur(6px) grayscale(20%);
+            opacity: 0.95;
+        }
+        
+        .revealed {
+            filter: blur(0px) grayscale(0%);
+            opacity: 1;
+            transition: filter 0.3s ease, opacity 0.3s ease;
+            user-select: text;
+            -webkit-user-select: text;
+        }
+
+        .word-detail-drawer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
+            opacity: 0;
+            background-color: #faf7f5;
+            border-top: 0px solid var(--border-color);
+        }
+
+        .word-detail-drawer.open {
+            max-height: 280px;
+            opacity: 1;
+            border-top: 2px solid var(--border-color);
+        }
+
+        .word-clickable {
+            cursor: pointer;
+            transition: color 0.15s ease, transform 0.1s ease;
+        }
+        .word-clickable:hover {
+            color: #d97706;
+            text-decoration: underline;
+            text-decoration-thickness: 2px;
+        }
+
+        .detail-spinner {
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            border: 3px solid rgba(0,0,0,0.1);
+            border-radius: 50%;
+            border-top-color: var(--border-color);
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .dropdown-panel {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            margin-top: 8px;
+            background-color: white;
+            border: 3px solid var(--border-color);
+            box-shadow: 6px 6px 0px var(--shadow-color);
+            z-index: 100;
+            width: max-content;
+            max-width: 90vw;
+        }
+
+        .skeleton-container {
+            display: none;
+            flex-direction: column;
+        }
+        
+        .skeleton-item {
+            height: 56px;
+            border-bottom: 2px solid var(--border-color);
+            background: linear-gradient(90deg, #ffffff 25%, #e5e5e5 50%, #ffffff 75%);
+            background-size: 200% 100%;
+            animation: brutal-shimmer 1.5s infinite linear;
+        }
+        
+        .skeleton-item:last-child { 
+            border-bottom: none; 
+        }
+        
+        @keyframes brutal-shimmer {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        .typing-cursor::after {
+            content: '';
+            display: inline-block;
+            width: 12px;
+            height: 1em;
+            background-color: var(--text-color);
+            vertical-align: text-bottom;
+            margin-left: 6px;
+            animation: brutal-blink 1s step-end infinite;
+        }
+
+        @keyframes brutal-blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+
+        ::-webkit-scrollbar {
+            width: 12px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--bg-color);
+            border-left: 2px solid var(--border-color);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+
+    <main class="w-full max-w-2xl mx-auto relative">
+        
+        <!-- Utility Nav Bar -->
+        <div class="flex justify-between gap-3 mb-6 relative z-50">
+            <div class="relative">
+                <button id="hints-btn" class="brutal-btn-small flex items-center justify-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                    HINTS
+                </button>
+                <div id="hints-dropdown" class="dropdown-panel hidden p-4 w-72 text-left left-0 right-auto">
+                    <h3 class="font-bold border-b-2 border-black mb-2 pb-1 uppercase">Wordle Pro-Tips</h3>
+                    <ul class="text-sm list-disc pl-4 space-y-2 mb-4 font-semibold">
+                        <li>Start with vowel-heavy words like <span class="bg-yellow-200 px-1 border border-black">AUDIO</span> or <span class="bg-yellow-200 px-1 border border-black">ADIEU</span>.</li>
+                        <li>Target high frequency consonants: <strong>R, S, T, L, N</strong>.</li>
+                        <li>Don't forget words can have double letters (e.g., <strong>BLOOD</strong>).</li>
+                    </ul>
+                    <h3 class="font-bold border-b-2 border-black mb-2 pb-1 uppercase">Top Starters</h3>
+                    <div class="flex gap-2 flex-wrap text-sm">
+                        <span class="bg-gray-100 border-2 border-black px-2 py-1 font-bold shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">SALET</span>
+                        <span class="bg-gray-100 border-2 border-black px-2 py-1 font-bold shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">TRACE</span>
+                        <span class="bg-gray-100 border-2 border-black px-2 py-1 font-bold shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">CRANE</span>
+                        <span class="bg-gray-100 border-2 border-black px-2 py-1 font-bold shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">SLATE</span>
+                    </div>
+
+                    <div class="hidden md:block mt-4 pt-4 border-t-2 border-black">
+                        <h3 class="font-bold border-b-2 border-black mb-2 pb-1 uppercase">Keyboard Shortcuts</h3>
+                        <ul class="text-sm space-y-2 font-semibold">
+                            <li class="flex justify-between items-center"><span>Quick Search</span> <kbd class="bg-gray-100 border border-black px-1.5 py-0.5 rounded-sm shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] font-mono text-xs">Enter</kbd></li>
+                            <li class="flex justify-between items-center"><span>Move Green Boxes</span> <span class="flex gap-1"><kbd class="bg-gray-100 border border-black px-1.5 py-0.5 rounded-sm shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] font-mono text-xs">←</kbd><kbd class="bg-gray-100 border border-black px-1.5 py-0.5 rounded-sm shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] font-mono text-xs">→</kbd></span></li>
+                            <li class="flex justify-between items-center"><span>Delete & Back</span> <kbd class="bg-gray-100 border border-black px-1.5 py-0.5 rounded-sm shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] font-mono text-xs">Backspace</kbd></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="relative">
+                <button id="history-btn" class="brutal-btn-small flex items-center justify-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                    HISTORY
+                </button>
+                <div id="history-dropdown" class="dropdown-panel hidden p-4 w-72 text-left">
+                    <h3 class="font-bold border-b-2 border-black mb-2 pb-1 uppercase flex justify-between items-center">
+                        Recent Searches
+                        <button id="clear-history-btn" class="text-xs bg-red-400 hover:bg-red-500 text-black px-2 py-1 border border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-y-px active:translate-x-px active:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] transition-all cursor-pointer">CLEAR</button>
+                    </h3>
+                    <div id="history-list" class="max-h-60 overflow-y-auto pr-1">
+                        <!-- History items injected here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Main Header with Typing Effect -->
+        <header class="mb-8 text-center flex flex-col items-center">
+            <h1 id="main-heading" class="text-4xl md:text-5xl font-black uppercase tracking-tighter min-h-[40px] md:min-h-[48px] typing-cursor" style="text-shadow: 2px 2px 0px var(--accent-yellow), 4px 4px 0px var(--border-color);"></h1>
+            <p class="mt-2 font-bold text-lg border-b-4 border-black inline-block pb-1">Solver utility</p>
+        </header>
+
+        <!-- Today's Answer Card -->
+        <div class="brutal-box p-4 mb-8 bg-gray-100 flex flex-col items-center border-4">
+            <h3 class="font-bold uppercase text-sm border-b-2 border-black mb-3 text-center">Today's Wordle Answer</h3>
+            <div class="flex items-center gap-4">
+                <div id="todays-word-text" class="text-3xl font-black tracking-widest secret-blur select-none font-mono bg-white border-2 border-black px-6 py-2 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] text-center min-w-[160px]" title="Click to reveal">
+                    •••••
+                </div>
+                <button id="reveal-btn" class="p-2 border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] bg-white hover:bg-yellow-200 active:translate-y-1 active:translate-x-1 active:shadow-none transition-all flex items-center justify-center" title="Toggle Reveal">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                </button>
+            </div>
+            <div id="api-error-msg" class="hidden mt-3 text-xs font-bold text-red-600 bg-red-100 border-2 border-red-600 px-3 py-1 shadow-[2px_2px_0px_0px_#dc2626]">
+                Unable to load today's answer.
+            </div>
+            
+            <!-- New Reviews Section -->
+            <div class="mt-5 w-full border-t-2 border-black pt-4 flex flex-col items-center">
+                <h4 class="font-bold uppercase text-xs mb-3 text-center bg-black text-white px-2 py-0.5">Official NYT Reviews</h4>
+                <div id="review-links" class="flex flex-wrap justify-center gap-3">
+                    <!-- Injected via JS -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 1: Known Letters -->
+        <section class="brutal-box p-6 mb-8">
+            <h2 class="text-2xl font-bold mb-4 uppercase border-b-2 border-black pb-2">1. Known Letters (Yellow)</h2>
+            <p class="text-sm mb-2 font-bold">Letters that are in the word, but position is unknown.</p>
+            <input type="text" id="contains-input" class="brutal-input uppercase" placeholder="e.g., A R T" maxlength="15">
+        </section>
+
+        <!-- Section 2: Excluded Letters -->
+        <section class="brutal-box p-6 mb-8">
+            <h2 class="text-2xl font-bold mb-4 uppercase border-b-2 border-black pb-2">2. Excluded Letters (Grey)</h2>
+            <p class="text-sm mb-2 font-bold">Letters that are NOT in the word.</p>
+            <input type="text" id="excluded-input" class="brutal-input uppercase bg-gray-50" placeholder="e.g., Z X Q U" maxlength="26">
+        </section>
+
+        <!-- Section 3: Exact Positions -->
+        <section class="brutal-box p-6 mb-8">
+             <h2 class="text-2xl font-bold mb-4 uppercase border-b-2 border-black pb-2">3. Exact Positions (Green)</h2>
+             <p class="text-sm mb-4 font-bold">Enter letters in their exact known spots.</p>
+             
+             <div class="letter-box-container" id="exact-positions-container">
+                 <input type="text" class="letter-box green" maxlength="1" data-index="0">
+                 <input type="text" class="letter-box green" maxlength="1" data-index="1">
+                 <input type="text" class="letter-box green" maxlength="1" data-index="2">
+                 <input type="text" class="letter-box green" maxlength="1" data-index="3">
+                 <input type="text" class="letter-box green" maxlength="1" data-index="4">
+             </div>
+        </section>
+
+        <!-- Advanced Filters -->
+        <div class="mb-8 w-full flex flex-col items-center">
+            <button id="toggle-advanced-btn" class="text-sm font-bold underline cursor-pointer hover:text-yellow-600 mb-2 transition-colors">
+                + Advanced: Letter Frequencies
+            </button>
+            <div id="advanced-filters-container" class="hidden brutal-box p-6 w-full bg-gray-100 border-dashed border-4 border-gray-400">
+                <h3 class="text-xl font-bold mb-4 uppercase border-b-2 border-gray-400 pb-2 text-gray-700">Repeating Letters</h3>
+                
+                <div class="mb-4">
+                    <label class="block text-sm mb-2 font-bold text-gray-700">Letters appearing EXACTLY ONCE</label>
+                    <input type="text" id="exactly-once-input" class="brutal-input uppercase bg-white border-gray-400 focus:border-black" placeholder="e.g., A" maxlength="10">
+                </div>
+                
+                <div>
+                    <label class="block text-sm mb-2 font-bold text-gray-700">Letters appearing MORE THAN ONCE</label>
+                    <input type="text" id="more-than-once-input" class="brutal-input uppercase bg-white border-gray-400 focus:border-black" placeholder="e.g., E O" maxlength="10">
+                </div>
+            </div>
+        </div>
+
+        <!-- Search & Clear Actions -->
+        <div class="mb-8 flex flex-col sm:flex-row gap-4">
+            <button id="search-btn" class="brutal-button flex-1 flex items-center justify-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                Find Matching Words
+            </button>
+            <button id="clear-all-btn" class="brutal-btn-small bg-gray-200 hover:bg-red-300 text-black border-3 border-black px-6 py-3 font-bold uppercase shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:translate-x-1 active:translate-y-1 active:shadow-none transition-all flex items-center justify-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                Clear All
+            </button>
+        </div>
+
+        <!-- Results Section -->
+        <section id="results-section" class="brutal-box p-6 mb-8 hidden">
+            <div class="flex justify-between items-center mb-4 border-b-2 border-black pb-2 relative">
+                <h2 class="text-2xl font-bold uppercase flex items-center gap-2">
+                    Results <span id="results-count" class="text-sm bg-black text-white px-2 py-0.5 font-normal">0 found</span>
+                </h2>
+                
+                <div class="relative">
+                    <button id="results-filter-btn" class="brutal-btn-small flex items-center gap-1 text-xs">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
+                        FILTER / SORT
+                    </button>
+                    <div id="results-filter-dropdown" class="dropdown-panel hidden p-4 w-64 text-left">
+                        <h4 class="font-bold border-b-2 border-black mb-2 pb-1 uppercase text-xs">Sort By</h4>
+                        <div class="space-y-1 text-xs font-bold mb-4">
+                            <label class="flex items-center gap-2 cursor-pointer">
+                                <input type="radio" name="sortOrder" value="match" checked class="accent-black"> Match Score
+                            </label>
+                            <label class="flex items-center gap-2 cursor-pointer">
+                                <input type="radio" name="sortOrder" value="az" class="accent-black"> Alphabetical (A-Z)
+                            </label>
+                        </div>
+                        <h4 class="font-bold border-b-2 border-black mb-2 pb-1 uppercase text-xs">Secondary Filter</h4>
+                        <input type="text" id="filter-contains-input" class="brutal-input text-xs uppercase" placeholder="Must include letters...">
+                    </div>
+                </div>
+            </div>
+
+            <div id="skeleton-loader" class="skeleton-container brutal-box">
+                <div class="skeleton-item"></div>
+                <div class="skeleton-item"></div>
+                <div class="skeleton-item"></div>
+                <div class="skeleton-item"></div>
+            </div>
+
+            <div id="no-results-msg" class="hidden text-center py-8 font-bold text-gray-600">
+                No matching words found. Try removing some restrictions.
+            </div>
+
+            <div id="results-list" class="divide-y-2 divide-black border-2 border-black">
+                <!-- Results rendered here -->
+            </div>
+        </section>
+
+        <!-- Scroll Top Button -->
+        <div class="flex justify-end w-full mb-4">
+            <button id="scroll-top-btn" class="brutal-btn-small bg-white hover:bg-yellow-200 flex items-center justify-center gap-1 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:translate-x-1 active:translate-y-1 active:shadow-none transition-all">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"></line><polyline points="5 12 12 5 19 12"></polyline></svg>
+                TOP
+            </button>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="w-full max-w-2xl mx-auto mt-12 mb-6 pt-6 border-t-4 border-black flex flex-col gap-6 text-xs font-bold uppercase">
+        <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="flex flex-col sm:flex-row items-center gap-4">
+                <div>Built by Sawyer</div>
+                <span class="hidden sm:inline text-black font-black">|</span>
+                <div class="flex gap-3 text-[10px] sm:text-xs">
+                    <a href="https://www.nytimes.com/games/wordle/index.html" target="_blank" class="hover:underline text-black bg-yellow-200 px-2 py-1 border border-black shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] active:translate-y-px active:translate-x-px active:shadow-none transition-all">Play Wordle</a>
+                    <a href="https://www.wordhint.net/wordle/hint/today/" target="_blank" class="hover:underline text-black bg-green-300 px-2 py-1 border border-black shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] active:translate-y-px active:translate-x-px active:shadow-none transition-all">Wordle Hint</a>
+                </div>
+            </div>
+            <div class="flex gap-4 mt-2 sm:mt-0">
+                <a href="#" onclick="event.preventDefault();" class="hover:underline text-black">Privacy Policy</a>
+                <span class="text-black font-black">|</span>
+                <a href="#" onclick="event.preventDefault();" class="hover:underline text-black">Terms of Service</a>
+            </div>
+        </div>
+        
+        <!-- Visitor Counter -->
+        <div class="flex justify-center w-full">
+            <div class="commonninja_component pid-bba0be1e-efb2-452c-9a56-76ca4e0f8bc1"></div>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Typing Animation for Main Heading
+            const headingText = "WORD GUESSER";
+            const headingEl = document.getElementById('main-heading');
+            let typeIdx = 0;
+
+            function playTypingAnimation() {
+                if (!headingEl) return;
+                headingEl.textContent = "";
+                function typeChar() {
+                    if (typeIdx < headingText.length) {
+                        headingEl.textContent += headingText.charAt(typeIdx);
+                        typeIdx++;
+                        setTimeout(typeChar, 80);
+                    }
+                }
+                typeChar();
+            }
+            playTypingAnimation();
+
+            // Element references
+            const searchBtn = document.getElementById('search-btn');
+            const containsInput = document.getElementById('contains-input');
+            const excludedInput = document.getElementById('excluded-input');
+            const exactInputs = document.querySelectorAll('.letter-box.green');
+            const resultsSection = document.getElementById('results-section');
+            const resultsList = document.getElementById('results-list');
+            const skeletonLoader = document.getElementById('skeleton-loader');
+            const noResultsMsg = document.getElementById('no-results-msg');
+            const resultsCount = document.getElementById('results-count');
+
+            const hintsBtn = document.getElementById('hints-btn');
+            const hintsDropdown = document.getElementById('hints-dropdown');
+            const historyBtn = document.getElementById('history-btn');
+            const historyDropdown = document.getElementById('history-dropdown');
+            const historyList = document.getElementById('history-list');
+            const clearHistoryBtn = document.getElementById('clear-history-btn');
+            
+            const resultsFilterBtn = document.getElementById('results-filter-btn');
+            const resultsFilterDropdown = document.getElementById('results-filter-dropdown');
+            const sortRadios = document.querySelectorAll('input[name="sortOrder"]');
+            const filterContainsInput = document.getElementById('filter-contains-input');
+            const revealBtn = document.getElementById('reveal-btn');
+            const todaysWordText = document.getElementById('todays-word-text');
+            const clearAllBtn = document.getElementById('clear-all-btn');
+            const scrollTopBtn = document.getElementById('scroll-top-btn');
+            const apiErrorMsg = document.getElementById('api-error-msg');
+            const reviewLinksContainer = document.getElementById('review-links');
+            
+            const toggleAdvancedBtn = document.getElementById('toggle-advanced-btn');
+            const advancedFiltersContainer = document.getElementById('advanced-filters-container');
+            const exactlyOnceInput = document.getElementById('exactly-once-input');
+            const moreThanOnceInput = document.getElementById('more-than-once-input');
+
+            let searchHistory = JSON.parse(localStorage.getItem('wordleGuesserHistory')) || [];
+            let currentWordsData = [];
+            const dictionaryCache = new Map();
+            let solvedWordSolution = "";
+
+            // Fallback word repository to guarantee instantaneous offline search results
+            const FALLBACK_5_LETTER_WORDS = [
+                "ABUSE", "ADULT", "AGENT", "ANGER", "APPLE", "AWARD", "BASIS", "BEACH", "BIRTH", "BLOCK",
+                "BLOOD", "BOARD", "BRAIN", "BREAD", "BREAK", "BROWN", "BUYER", "CAUSE", "CHAIN", "CHAIR",
+                "CHEST", "CHIEF", "CHILD", "CHINA", "CLAIM", "CLASS", "CLOCK", "COACH", "COAST", "COURT",
+                "COVER", "CREAM", "CRIME", "CROWD", "CROWN", "DANCE", "DEATH", "DEPTH", "DOUBT", "DRAFT",
+                "DRAMA", "DREAM", "DRESS", "DRINK", "DRIVE", "EARTH", "ENEMY", "ENTRY", "FAITH", "FAULT",
+                "FIELD", "FIGHT", "FINAL", "FLOOR", "FOCUS", "FORCE", "FRAME", "FRONT", "FRUIT", "GLASS",
+                "GRANT", "GRASS", "GREEN", "GROUP", "GUIDE", "HEART", "HEAVY", "HORSE", "HOTEL", "HOUSE",
+                "IMAGE", "INDEX", "INPUT", "ISSUE", "JUDGE", "KNIFE", "LAYER", "LEVEL", "LIGHT", "LIMIT",
+                "LUNCH", "MAJOR", "MARCH", "MATCH", "METAL", "MODEL", "MONEY", "MONTH", "MOTOR", "MOUTH",
+                "MUSIC", "NIGHT", "NOISE", "NORTH", "NOVEL", "NURSE", "OFFER", "ORDER", "OTHER", "PAPER",
+                "PARTY", "PEACE", "PHASE", "PHONE", "PIECE", "PILOT", "PITCH", "PLACE", "PLANE", "PLANT",
+                "PLATE", "POINT", "POWER", "PRICE", "PRIDE", "PRIZE", "PROOF", "QUEEN", "RADIO", "RANGE",
+                "RATIO", "REPLY", "RIGHT", "RIVER", "ROUND", "ROUTE", "SCALE", "SCENE", "SCOPE", "SCORE",
+                "SENSE", "SHAPE", "SHARE", "SHEET", "SHIFT", "SHIRT", "SHOCK", "SIGHT", "SIMON", "SKILL",
+                "SLEEP", "SMILE", "SMOKE", "SOUND", "SOUTH", "SPACE", "SPEED", "STAFF", "STAGE", "START",
+                "STATE", "STEAM", "STEEL", "STOCK", "STONE", "STORE", "STUDY", "STUFF", "STYLE", "SUGAR",
+                "TABLE", "TASTE", "TERRY", "THEME", "THING", "TITLE", "TOTAL", "TOUCH", "TOWER", "TRACK",
+                "TRADE", "TRAIN", "TREND", "TRIAL", "TRUST", "TRUTH", "UNCLE", "UNION", "VALUE", "VIDEO",
+                "VISIT", "VOICE", "WASTE", "WATCH", "WATER", "WHILE", "WHITE", "WHOLE", "WOMAN", "WORLD",
+                "YOUTH", "SALET", "TRACE", "CRANE", "SLATE", "AUDIO", "ADIEU", "STORM", "FLAME", "GLOBE"
+            ];
+
+            // 1. Fetch Today's NYT Wordle Solution
+            async function fetchTodaysWord() {
+                const now = new Date();
+                const year = now.getFullYear();
+                const month = String(now.getMonth() + 1).padStart(2, '0');
+                const day = String(now.getDate()).padStart(2, '0');
+                const formattedDate = `${year}-${month}-${day}`;
+                
+                const url = `https://www.nytimes.com/svc/wordle/v2/${formattedDate}.json`;
+
+                try {
+                    const response = await fetch(url);
+                    if (response.ok) {
+                        const data = await response.json();
+                        if (data.solution && typeof data.solution === 'string') {
+                            solvedWordSolution = data.solution.toUpperCase();
+                        }
+                    } else {
+                        throw new Error('API Response not ok');
+                    }
+                } catch (e) {
+                    if (apiErrorMsg) {
+                        apiErrorMsg.textContent = `Unable to fetch answer for ${formattedDate}.`;
+                        apiErrorMsg.classList.remove('hidden');
+                    }
+                    const dayOfYear = Math.floor((now - new Date(now.getFullYear(), 0, 0)) / (1000 * 60 * 60 * 24));
+                    solvedWordSolution = FALLBACK_5_LETTER_WORDS[dayOfYear % FALLBACK_5_LETTER_WORDS.length];
+                }
+
+                if (todaysWordText) {
+                    todaysWordText.dataset.solution = solvedWordSolution;
+                    todaysWordText.textContent = "•••••";
+                }
+            }
+            fetchTodaysWord();
+
+            // Reveal/Blur toggle
+            function toggleReveal() {
+                if (!todaysWordText) return;
+                const isBlurred = todaysWordText.classList.contains('secret-blur');
+                if (isBlurred) {
+                    todaysWordText.classList.remove('secret-blur', 'select-none');
+                    todaysWordText.classList.add('revealed');
+                    todaysWordText.textContent = solvedWordSolution || "SHINE";
+                } else {
+                    todaysWordText.classList.add('secret-blur', 'select-none');
+                    todaysWordText.classList.remove('revealed');
+                    todaysWordText.textContent = "•••••";
+                }
+            }
+
+            if (revealBtn) revealBtn.addEventListener('click', toggleReveal);
+            if (todaysWordText) todaysWordText.addEventListener('click', toggleReveal);
+
+            // Generate NYT Review Links Dynamically
+            function generateReviewLinks() {
+                if (!reviewLinksContainer) return;
+                let reviewHTML = '';
+                
+                for (let i = 0; i < 3; i++) {
+                    const date = new Date();
+                    date.setDate(date.getDate() - i);
+                    
+                    const year = date.getFullYear();
+                    const month = String(date.getMonth() + 1).padStart(2, '0');
+                    const day = String(date.getDate()).padStart(2, '0');
+                    
+                    // Baseline reference: Sept 12, 2026 = Wordle #1912
+                    const baselineDate = new Date(2026, 8, 12); // Note: JS months are 0-indexed (8 = Sept)
+                    
+                    // Strip time from both dates to ensure accurate day diff comparison
+                    const currentTargetDate = new Date(year, date.getMonth(), date.getDate());
+                    
+                    const diffTime = currentTargetDate - baselineDate;
+                    const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
+                    const wordleNum = 1912 + diffDays;
+                    
+                    const url = `https://www.nytimes.com/${year}/${month}/${day}/crosswords/wordle-review-${wordleNum}.html`;
+                    let label = i === 0 ? 'Today' : (i === 1 ? 'Yesterday' : `${month}/${day}`);
+                    
+                    reviewHTML += `<a href="${url}" target="_blank" class="brutal-btn-small hover:bg-yellow-200 text-xs no-underline text-black font-mono shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">${label}: #${wordleNum}</a>`;
+                }
+                reviewLinksContainer.innerHTML = reviewHTML;
+            }
+            generateReviewLinks();
+
+            // 2. Dropdown UI Management
+            function toggleDropdown(dropdown) {
+                if (!dropdown) return;
+                const isHidden = dropdown.classList.contains('hidden');
+                document.querySelectorAll('.dropdown-panel').forEach(d => d.classList.add('hidden'));
+                if (isHidden) dropdown.classList.remove('hidden');
+            }
+
+            if (hintsBtn && hintsDropdown) {
+                hintsBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    toggleDropdown(hintsDropdown);
+                });
+            }
+
+            if (historyBtn && historyDropdown) {
+                historyBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    renderHistory();
+                    toggleDropdown(historyDropdown);
+                });
+            }
+
+            if (resultsFilterBtn && resultsFilterDropdown) {
+                resultsFilterBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    toggleDropdown(resultsFilterDropdown);
+                });
+            }
+
+            if (toggleAdvancedBtn && advancedFiltersContainer) {
+                toggleAdvancedBtn.addEventListener('click', () => {
+                    advancedFiltersContainer.classList.toggle('hidden');
+                    if (advancedFiltersContainer.classList.contains('hidden')) {
+                        toggleAdvancedBtn.textContent = '+ Advanced: Letter Frequencies';
+                    } else {
+                        toggleAdvancedBtn.textContent = '- Hide Advanced Filters';
+                    }
+                });
+            }
+
+            document.addEventListener('click', (e) => {
+                if (!e.target.closest('.dropdown-panel') && !e.target.closest('.brutal-btn-small')) {
+                    document.querySelectorAll('.dropdown-panel').forEach(d => d.classList.add('hidden'));
+                }
+            });
+
+            // 3. Search History Management
+            function renderHistory() {
+                if (!historyList) return;
+                historyList.innerHTML = '';
+                if (searchHistory.length === 0) {
+                    historyList.innerHTML = '<div class="text-xs text-gray-500 italic py-2">No recent searches</div>';
+                    return;
+                }
+
+                searchHistory.slice(0, 10).forEach(item => {
+                    const div = document.createElement('div');
+                    div.className = 'py-1.5 border-b border-gray-200 text-xs flex justify-between items-center hover:bg-yellow-100 cursor-pointer px-1';
+                    div.innerHTML = `<span class="font-bold">${item.query}</span><span class="text-gray-500 font-mono text-[10px]">${item.count} found</span>`;
+                    div.addEventListener('click', () => {
+                        if (containsInput) containsInput.value = item.yellow || '';
+                        if (excludedInput) excludedInput.value = item.grey || '';
+                        exactInputs.forEach((inp, idx) => {
+                            inp.value = item.green ? item.green[idx] || '' : '';
+                        });
+                        
+                        if (exactlyOnceInput) exactlyOnceInput.value = item.once || '';
+                        if (moreThanOnceInput) moreThanOnceInput.value = item.multi || '';
+                        
+                        // Expand advanced filters if populated
+                        if ((item.once || item.multi) && advancedFiltersContainer && advancedFiltersContainer.classList.contains('hidden')) {
+                            toggleAdvancedBtn.click();
+                        }
+                        
+                        searchWords();
+                        document.querySelectorAll('.dropdown-panel').forEach(d => d.classList.add('hidden'));
+                    });
+                    historyList.appendChild(div);
+                });
+            }
+
+            if (clearHistoryBtn) {
+                clearHistoryBtn.addEventListener('click', () => {
+                    searchHistory = [];
+                    localStorage.removeItem('wordleGuesserHistory');
+                    renderHistory();
+                });
+            }
+
+            // 4. Exact Positions Box Navigation
+            exactInputs.forEach((input, index) => {
+                input.addEventListener('input', (e) => {
+                    input.value = input.value.toUpperCase().replace(/[^A-Z]/g, '');
+                    if (input.value && index < exactInputs.length - 1) {
+                        exactInputs[index + 1].focus();
+                    }
+                    triggerAutoRefresh();
+                });
+
+                input.addEventListener('keydown', (e) => {
+                    if (e.key === 'Backspace' && !input.value && index > 0) {
+                        exactInputs[index - 1].focus();
+                    } else if (e.key === 'ArrowLeft' && index > 0) {
+                        exactInputs[index - 1].focus();
+                    } else if (e.key === 'ArrowRight' && index < exactInputs.length - 1) {
+                        exactInputs[index + 1].focus();
+                    } else if (e.key === 'Enter') {
+                        searchWords();
+                    }
+                });
+            });
+
+            [containsInput, excludedInput, exactlyOnceInput, moreThanOnceInput].forEach(input => {
+                if (!input) return;
+                input.addEventListener('input', () => {
+                    input.value = input.value.toUpperCase().replace(/[^A-Z]/g, '');
+                    triggerAutoRefresh();
+                });
+                input.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') searchWords();
+                });
+            });
+
+            // 5. Debounced Auto Refresh
+            let autoRefreshTimer = null;
+            function triggerAutoRefresh() {
+                clearTimeout(autoRefreshTimer);
+                autoRefreshTimer = setTimeout(() => {
+                    searchWords(false);
+                }, 300);
+            }
+
+            // 6. Primary Solver Engine
+            async function searchWords(saveToHistory = true) {
+                if (!resultsSection) return;
+
+                resultsSection.classList.remove('hidden');
+                if (skeletonLoader) skeletonLoader.style.display = 'flex';
+                if (resultsList) resultsList.innerHTML = '';
+                if (noResultsMsg) noResultsMsg.classList.add('hidden');
+
+                // Construct search pattern (lowercase for Datamuse API wildcard 'sp')
+                let pattern = '';
+                exactInputs.forEach(input => {
+                    const char = input.value.trim().toLowerCase();
+                    pattern += (char && /[a-z]/.test(char)) ? char : '?';
+                });
+
+                const yellowText = containsInput ? containsInput.value.trim().toUpperCase() : '';
+                const greyText = excludedInput ? excludedInput.value.trim().toUpperCase() : '';
+
+                const yellowLetters = yellowText.replace(/[^A-Z]/g, '').split('');
+                const greyLetters = greyText.replace(/[^A-Z]/g, '').split('');
+                const onceLetters = exactlyOnceInput ? exactlyOnceInput.value.replace(/[^A-Z]/g, '').split('') : [];
+                const multiLetters = moreThanOnceInput ? moreThanOnceInput.value.replace(/[^A-Z]/g, '').split('') : [];
+
+                let candidateWords = [];
+
+                try {
+                    const apiUrl = `https://api.datamuse.com/words?sp=${pattern}&max=1000`;
+                    const res = await fetch(apiUrl);
+                    if (res.ok) {
+                        const data = await res.json();
+                        candidateWords = data.map(item => item.word.toUpperCase());
+                    }
+                } catch (e) {
+                    console.warn("Datamuse network query skipped, resorting to internal library.");
+                }
+
+                // Combine with fallback repository to guarantee extensive word availability
+                candidateWords = Array.from(new Set([...candidateWords, ...FALLBACK_5_LETTER_WORDS]));
+
+                // Apply strict Wordle rule filtering
+                const exactPatternArr = Array.from(exactInputs).map(i => i.value.trim().toUpperCase());
+
+                const filtered = candidateWords.filter(word => {
+                    if (word.length !== 5 || !/^[A-Z]+$/.test(word)) return false;
+
+                    // Green exact spot check
+                    for (let i = 0; i < 5; i++) {
+                        if (exactPatternArr[i] && word[i] !== exactPatternArr[i]) {
+                            return false;
+                        }
+                    }
+
+                    // Yellow required letters check
+                    for (let letter of yellowLetters) {
+                        if (!word.includes(letter)) return false;
+                    }
+
+                    // Grey excluded letters check
+                    const preservedLetters = new Set([...yellowLetters, ...exactPatternArr.filter(Boolean)]);
+                    for (let letter of greyLetters) {
+                        if (!preservedLetters.has(letter) && word.includes(letter)) {
+                            return false;
+                        }
+                    }
+                    
+                    // Exactly Once check
+                    for (let letter of onceLetters) {
+                        let count = 0;
+                        for(let i=0; i<5; i++) { if(word[i] === letter) count++; }
+                        if (count !== 1) return false;
+                    }
+
+                    // More Than Once check
+                    for (let letter of multiLetters) {
+                        let count = 0;
+                        for(let i=0; i<5; i++) { if(word[i] === letter) count++; }
+                        if (count <= 1) return false;
+                    }
+
+                    return true;
+                });
+
+                // Calculate Match Scores
+                currentWordsData = filtered.map((word, idx) => {
+                    let score = 100 - (idx * 0.1);
+                    return { word, score };
+                });
+
+                if (saveToHistory && (yellowText || greyText || exactPatternArr.some(Boolean) || onceLetters.length > 0 || multiLetters.length > 0)) {
+                    let advFilters = [];
+                    if (onceLetters.length) advFilters.push(`=1(${onceLetters.join('')})`);
+                    if (multiLetters.length) advFilters.push(`>1(${multiLetters.join('')})`);
+                    
+                    const queryLabel = [
+                        exactPatternArr.map(c => c || '_').join(''),
+                        yellowText ? `+${yellowText}` : '',
+                        greyText ? `-${greyText}` : '',
+                        ...advFilters
+                    ].filter(Boolean).join(' ');
+
+                    const historyEntry = {
+                        query: queryLabel,
+                        count: currentWordsData.length,
+                        yellow: yellowText,
+                        grey: greyText,
+                        green: exactPatternArr,
+                        once: onceLetters.join(''),
+                        multi: multiLetters.join('')
+                    };
+
+                    searchHistory = [historyEntry, ...searchHistory.filter(h => h.query !== queryLabel)].slice(0, 15);
+                    localStorage.setItem('wordleGuesserHistory', JSON.stringify(searchHistory));
+                }
+
+                displayResults(currentWordsData);
+            }
+
+            if (searchBtn) {
+                searchBtn.addEventListener('click', () => searchWords(true));
+            }
+
+            // 7. Dictionary Definition API Fetching
+            async function fetchWordDetails(word) {
+                const lower = word.toLowerCase();
+                if (dictionaryCache.has(lower)) {
+                    return dictionaryCache.get(lower);
+                }
+
+                try {
+                    const res = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${lower}`);
+                    if (!res.ok) throw new Error('Not found');
+                    const data = await res.json();
+                    
+                    const entry = data[0];
+                    const phonetic = entry.phonetic || (entry.phonetics && entry.phonetics.find(p => p.text)?.text) || '';
+                    const meanings = entry.meanings || [];
+                    const firstMeaning = meanings[0] || {};
+                    const partOfSpeech = firstMeaning.partOfSpeech || 'word';
+                    const definition = firstMeaning.definitions?.[0]?.definition || 'No definition available.';
+                    const example = firstMeaning.definitions?.[0]?.example || '';
+
+                    const resultData = { phonetic, partOfSpeech, definition, example };
+                    dictionaryCache.set(lower, resultData);
+                    return resultData;
+                } catch (err) {
+                    const fallback = {
+                        phonetic: '',
+                        partOfSpeech: 'entry',
+                        definition: 'Standard dictionary entry detail not available for this word.',
+                        example: ''
+                    };
+                    dictionaryCache.set(lower, fallback);
+                    return fallback;
+                }
+            }
+
+            window.toggleWordDrawer = async function(word, index) {
+                const drawer = document.getElementById(`drawer-${index}`);
+                const toggleBtn = document.getElementById(`toggle-btn-${index}`);
+                if (!drawer) return;
+
+                const isOpen = drawer.classList.contains('open');
+
+                document.querySelectorAll('.word-detail-drawer.open').forEach(d => {
+                    if (d !== drawer) d.classList.remove('open');
+                });
+                document.querySelectorAll('.copy-btn[id^="toggle-btn-"]').forEach(b => {
+                    b.classList.remove('bg-yellow-200');
+                    b.textContent = 'INFO ▾';
+                });
+
+                if (isOpen) {
+                    drawer.classList.remove('open');
+                    if (toggleBtn) toggleBtn.textContent = 'INFO ▾';
+                } else {
+                    drawer.classList.add('open');
+                    if (toggleBtn) {
+                        toggleBtn.textContent = 'INFO ▴';
+                        toggleBtn.classList.add('bg-yellow-200');
+                    }
+
+                    const contentContainer = document.getElementById(`drawer-content-${index}`);
+                    if (contentContainer && !contentContainer.dataset.loaded) {
+                        contentContainer.innerHTML = `
+                            <div class="flex items-center gap-2 text-xs font-bold text-gray-600 py-2">
+                                <span class="detail-spinner"></span> Loading definition...
+                            </div>
+                        `;
+
+                        const details = await fetchWordDetails(word);
+                        contentContainer.dataset.loaded = 'true';
+                        
+                        contentContainer.innerHTML = `
+                            <div class="text-xs space-y-2 text-left">
+                                <div class="flex items-center gap-2 flex-wrap border-b border-gray-300 pb-1.5">
+                                    <span class="bg-black text-white px-2 py-0.5 text-[10px] font-black uppercase tracking-wide">${details.partOfSpeech}</span>
+                                    ${details.phonetic ? `<span class="font-mono text-gray-600 font-bold">${details.phonetic}</span>` : ''}
+                                </div>
+                                <div>
+                                    <span class="font-black uppercase text-[10px] text-gray-500 block">Definition</span>
+                                    <p class="font-bold text-gray-800 leading-snug">${details.definition}</p>
+                                </div>
+                                ${details.example ? `
+                                    <div class="bg-white p-2 border border-black text-gray-700 italic text-[11px]">
+                                        "${details.example}"
+                                    </div>
+                                ` : ''}
+                            </div>
+                        `;
+                    }
+                }
+            };
+
+            // 8. Clipboard Copy Function
+            window.copyToClipboard = function(text, btnElement) {
+                const textarea = document.createElement('textarea');
+                textarea.value = text;
+                document.body.appendChild(textarea);
+                textarea.select();
+                try {
+                    document.execCommand('copy');
+                    const origText = btnElement.textContent;
+                    btnElement.textContent = 'COPIED!';
+                    btnElement.classList.add('bg-green-300');
+                    setTimeout(() => {
+                        btnElement.textContent = origText;
+                        btnElement.classList.remove('bg-green-300');
+                    }, 1200);
+                } catch (err) {
+                    console.error('Copy failed', err);
+                }
+                document.body.removeChild(textarea);
+            };
+
+            // 9. Display & Render Results
+            function displayResults(wordsData) {
+                if (skeletonLoader) skeletonLoader.style.display = 'none';
+                if (!resultsList) return;
+                resultsList.innerHTML = '';
+                
+                const secondaryFilter = filterContainsInput ? filterContainsInput.value.toUpperCase().replace(/[^A-Z]/g, '').split('') : [];
+                let wordsToDisplay = [...wordsData];
+                
+                if (secondaryFilter.length > 0) {
+                    wordsToDisplay = wordsToDisplay.filter(wordObj => {
+                        let wordToCheck = wordObj.word;
+                        for (let letter of secondaryFilter) {
+                            const index = wordToCheck.indexOf(letter);
+                            if (index === -1) return false;
+                            wordToCheck = wordToCheck.slice(0, index) + wordToCheck.slice(index + 1);
+                        }
+                        return true;
+                    });
+                }
+                
+                const checkedSort = document.querySelector('input[name="sortOrder"]:checked');
+                const sortMethod = checkedSort ? checkedSort.value : 'match';
+                if (sortMethod === 'az') {
+                    wordsToDisplay.sort((a, b) => a.word.localeCompare(b.word));
+                } else {
+                    wordsToDisplay.sort((a, b) => (b.score || 0) - (a.score || 0));
+                }
+
+                if (wordsToDisplay.length === 0) {
+                    if (resultsCount) resultsCount.textContent = '0 found';
+                    if (noResultsMsg) noResultsMsg.classList.remove('hidden');
+                    return;
+                }
+
+                if (noResultsMsg) noResultsMsg.classList.add('hidden');
+                if (resultsCount) resultsCount.textContent = `${wordsToDisplay.length} found`;
+
+                const totalWords = wordsToDisplay.length;
+
+                wordsToDisplay.forEach((wordObj, index) => {
+                    const item = document.createElement('div');
+                    item.className = 'result-item-wrapper border-b-2 border-black bg-white';
+                    
+                    let percentChance = Math.max(1, Math.round(99 - (index * (98 / Math.max(1, totalWords - 1)))));
+                    if (totalWords === 1) percentChance = 99;
+
+                    const wordText = wordObj.word;
+
+                    item.innerHTML = `
+                        <div class="result-item flex items-center justify-between p-3 gap-2 sm:gap-4">
+                            <span class="font-black text-xl tracking-widest font-mono word-clickable" onclick="toggleWordDrawer('${wordText}', ${index})" title="Click for details">${wordText}</span>
+                            <span class="text-xs font-bold text-gray-700 bg-yellow-200 px-2 py-1 border border-black shadow-[1px_1px_0px_0px_rgba(0,0,0,1)]">${percentChance}% match</span>
+                            <div class="flex-grow"></div>
+                            <div class="flex items-center gap-2">
+                                <button id="toggle-btn-${index}" class="copy-btn text-xs bg-gray-50 hover:bg-yellow-100" onclick="toggleWordDrawer('${wordText}', ${index})">INFO ▾</button>
+                                <button class="copy-btn text-xs" onclick="copyToClipboard('${wordText}', this)">COPY</button>
+                            </div>
+                        </div>
+                        <div id="drawer-${index}" class="word-detail-drawer px-4 py-3">
+                            <div id="drawer-content-${index}"></div>
+                        </div>
+                    `;
+                    resultsList.appendChild(item);
+                });
+            }
+
+            // Listeners for sort & filter controls
+            sortRadios.forEach(radio => {
+                radio.addEventListener('change', () => displayResults(currentWordsData));
+            });
+
+            if (filterContainsInput) {
+                filterContainsInput.addEventListener('input', () => {
+                    filterContainsInput.value = filterContainsInput.value.toUpperCase().replace(/[^A-Z]/g, '');
+                    displayResults(currentWordsData);
+                });
+            }
+
+            // Clear All Inputs button
+            if (clearAllBtn) {
+                clearAllBtn.addEventListener('click', () => {
+                    if (containsInput) containsInput.value = '';
+                    if (excludedInput) excludedInput.value = '';
+                    exactInputs.forEach(i => i.value = '');
+                    if (exactlyOnceInput) exactlyOnceInput.value = '';
+                    if (moreThanOnceInput) moreThanOnceInput.value = '';
+                    if (filterContainsInput) filterContainsInput.value = '';
+                    if (resultsSection) resultsSection.classList.add('hidden');
+                    if (resultsList) resultsList.innerHTML = '';
+                    currentWordsData = [];
+                });
+            }
+
+            // Scroll Top button
+            if (scrollTopBtn) {
+                scrollTopBtn.addEventListener('click', () => {
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                });
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1113,7 +1113,7 @@ export default function HomePage() {
 
       <main>
         <section className="intro" aria-labelledby="page-title">
-          <p className="eyebrow mono">the independent web directory</p>
+          <p className="eyebrow mono">the real web directory</p>
           {/* The explicit spaces keep the heading readable as one sentence when
               it is flattened to text (search snippets, screen readers), even
               though each line is a block box visually. */}

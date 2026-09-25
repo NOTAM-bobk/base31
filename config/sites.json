@@ -110,13 +110,13 @@
     "tags": ["education", "vocabulary", "learning"],
     "description": "Learn a new word each day with definitions and example sentences.",
     "show": true
-  }
-]
+  },
   {
     "name": "Subdomain Finder",
     "subdomain": "subdomain",
     "url": "https://subdomain.base31.org",
-    "tags": ["subdomain", "utlity", "tool"],
-    "description": "Find any domains of any url",
+    "tags": ["subdomain", "utility", "tool"],
+    "description": "Find any domains of any URL.",
     "show": true
-  },
+  }
+]

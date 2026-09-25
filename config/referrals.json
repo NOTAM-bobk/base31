@@ -19,12 +19,12 @@
     "description": "sign up and get free credits.",
     "tag": "referral",
     "show": true
-  }
-]
+  },
   {
     "name": "Manus AI",
-    "url": "google.com",
+    "url": "https://manus.im",
     "description": " sign up and get free AI creditez.",
     "tag": "support",
     "show": true
-  },
+  }
+]

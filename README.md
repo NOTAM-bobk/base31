@@ -123,7 +123,17 @@ support.
 
 Add entries to the array and the carousel picks them up — no code changes.
 Run `npm run validate:content` to check `sites.json`, `blogs.json`,
-`referrals.json` and `donations.json` in one go.
+`referrals.json` and `donations.json` in one go, and do it before pushing.
+
+All four files under `config/` are imported straight into the build, so a file
+that is not valid JSON stops the deploy before a single page renders, with an
+unhelpful `Unexpected non-whitespace character` / `Expected ',' or ']'` from the
+bundler. Two ways to do that by accident:
+
+- An unescaped `"` inside a description or blog body string (`judging its
+  "engagement" value` needs `\"`). This already took down one deploy.
+- A new entry pasted **after** the array's closing `]` instead of before it,
+  which leaves both the orphan object and a stray trailing comma.
 
 ## Sitemap, FAQ and on-page extras
 

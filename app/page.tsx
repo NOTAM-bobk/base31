@@ -1167,22 +1167,22 @@ export default function HomePage() {
 
         <section id="sites" className="directory-section" aria-labelledby="sites-heading">
           <div className="section-heading" data-reveal>
-            <div className="section-heading-main">
-              <h2 id="sites-heading">Featured sites</h2>
+            {/* The heading is the disclosure control: the label and the arrow
+                live in one button, so clicking either one toggles the panel. */}
+            <h2 id="sites-heading" className="section-heading-main">
               <button
                 type="button"
-                className={`section-toggle${sitesCollapsed ? " is-collapsed" : ""}`}
+                className={`sites-toggle${sitesCollapsed ? " is-collapsed" : ""}`}
                 onClick={() => { buzz(6); setSitesCollapsed((collapsed) => !collapsed); }}
                 aria-expanded={!sitesCollapsed}
                 aria-controls="sites-panel"
-                aria-label={sitesCollapsed ? "Show the featured sites" : "Hide the featured sites"}
-                title={sitesCollapsed ? "Show the sites" : "Minimize the sites"}
               >
-                <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2.1" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <span className="sites-toggle-label">Featured sites</span>
+                <svg className="sites-toggle-arrow" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2.1" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                   <path d="m6 9 6 6 6-6" />
                 </svg>
               </button>
-            </div>
+            </h2>
             {(query.trim() || activeTag) && (
               <span className="section-count mono" aria-live="polite">
                 {list.length} match{list.length === 1 ? "" : "es"}
@@ -1367,6 +1367,20 @@ export default function HomePage() {
 
         {/* Sponsored referral links, below the clock. */}
         <ReferralCarousel />
+
+        {/* The sponsored support button: an ad slot that pays for the rest of
+            the page. It is a plain link, so it needs no consent gate. */}
+        <a
+          className="support-ad"
+          data-reveal
+          href="https://www.profitableratecpmnetwork.com/vsnt502b?key=014ca151909e76ba10dc8d6cfae88709"
+          target="_blank"
+          rel="noreferrer sponsored"
+        >
+          <span className="support-ad-tag mono">ad</span>
+          <span className="support-ad-text">Want to support base31? Click this button to help</span>
+          <span className="support-ad-arrow mono" aria-hidden="true">↗</span>
+        </a>
 
         {/* SEO FAQ, then the subscribe block: the FAQ moved up so the page
             ends on the call to action, directly above the footer. */}

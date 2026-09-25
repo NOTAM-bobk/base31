@@ -115,6 +115,24 @@ html[data-motion="enabled"] [data-reveal][data-revealed] { opacity: 1; transform
 .donation-board .donation-cta:active { transform: scale(0.99); }
 @keyframes note-pin { from { opacity: 0; transform: translateY(-6px) rotate(-1deg); } to { opacity: 1; transform: none; } }
 
+/* The sponsored support button at the foot of the page. globals.css gives it
+   the dashed frame; everything that makes it read as a button lives here. */
+.support-ad {
+  align-items: center; gap: 11px; margin-top: 72px; padding: 13px 15px;
+  border: 1px solid var(--line-strong); border-radius: var(--radius-card);
+  background: var(--surface); font-size: 12.5px; line-height: 1.4;
+  transition: border-color 150ms ease, transform 150ms ease, box-shadow 150ms ease;
+}
+.support-ad:hover { border-color: color-mix(in srgb, var(--live) 45%, var(--line-strong)); transform: translateY(-2px); box-shadow: var(--shadow); }
+.support-ad:active { transform: scale(0.995); }
+.support-ad-tag {
+  flex: 0 0 auto; padding: 2px 6px; border: 1px solid var(--line-strong); border-radius: 5px;
+  color: var(--subtle); font-size: 8.5px; letter-spacing: 0.08em; text-transform: uppercase;
+}
+.support-ad-text { flex: 1; min-width: 0; color: var(--text); }
+.support-ad-arrow { flex: 0 0 auto; color: var(--live); font-size: 13px; transition: transform 150ms ease; }
+.support-ad:hover .support-ad-arrow { transform: translate(2px, -2px); }
+
 /* Launch count-up clock — the flip tiles, restored. -------------------- */
 .launch-block { margin-top: 72px; padding: 30px 24px; border: 1px solid var(--line); border-radius: 18px; background: var(--surface); text-align: center; }
 .launch-head { display: inline-flex; align-items: center; gap: 8px; color: var(--subtle); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; }
@@ -363,17 +381,28 @@ html[data-theme="light"] { --subtle: #6b6b6b; }
 .empty-reset { padding: 0; border: 0; background: none; color: var(--live); font: inherit; font-size: 13px; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
 .empty-reset:hover { color: var(--text-strong); }
 
-/* The "Featured sites" heading carries a small minimize toggle. */
+/* The "Featured sites" heading *is* the disclosure control: the text is
+   underlined and the chevron sits beside it with no box of its own, so the
+   heading reads like a link. Both live inside one button, which is what lets
+   either the text or the arrow open and close the panel. */
 .section-heading-main { display: flex; align-items: center; gap: 9px; }
-.section-toggle {
-  display: inline-grid; width: 24px; height: 24px; flex: 0 0 auto; place-items: center; padding: 0;
-  border: 1px solid var(--line); border-radius: 7px; background: var(--surface);
-  color: var(--muted); cursor: pointer;
-  transition: color 150ms ease, border-color 150ms ease, background 150ms ease;
+.sites-toggle {
+  display: inline-flex; align-items: center; gap: 7px; padding: 0;
+  border: 0; background: none; color: var(--text-strong);
+  font: inherit; letter-spacing: inherit; cursor: pointer;
 }
-.section-toggle svg { transition: transform 220ms cubic-bezier(0.2, 0.7, 0.2, 1); }
-.section-toggle:hover { border-color: var(--line-strong); background: var(--surface-hover); color: var(--text-strong); }
-.section-toggle.is-collapsed svg { transform: rotate(-90deg); }
+.sites-toggle-label {
+  text-decoration: underline; text-decoration-thickness: 1px;
+  text-decoration-color: var(--line-strong); text-underline-offset: 4px;
+  transition: text-decoration-color 150ms ease, color 150ms ease;
+}
+.sites-toggle:hover .sites-toggle-label { text-decoration-color: currentColor; }
+.sites-toggle-arrow {
+  flex: 0 0 auto; color: var(--muted);
+  transition: transform 220ms cubic-bezier(0.2, 0.7, 0.2, 1), color 150ms ease;
+}
+.sites-toggle:hover .sites-toggle-arrow { color: var(--text-strong); }
+.sites-toggle.is-collapsed .sites-toggle-arrow { transform: rotate(-90deg); }
 .sites-panel[hidden] { display: none; }
 
 /* Site cards: icon, badges, and the small pieces globals.css dropped. --- */

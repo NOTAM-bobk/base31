@@ -177,10 +177,13 @@ bundler. Two ways to do that by accident:
   The generated tile is `SITE_GLYPHS` + a hashed HSL gradient, kept as the
   fallback; add a shape by appending to that array.
 - Community uploads fresh within 14 days get a `new` badge.
-- The "Featured sites" heading has a small chevron button that minimizes the
-  directory (filters, sort and every card) without clearing the visitor's
-  search or tag. The panel is `<div id="sites-panel">` behind
-  `aria-expanded`/`aria-controls`, hidden with the `hidden` attribute.
+- The "Featured sites" heading *is* the minimize control: the label is
+  underlined and the chevron sits beside it with no box of its own, and both
+  live inside the same `.sites-toggle` button, so clicking either the text or
+  the arrow opens and closes the directory (filters, sort and every card)
+  without clearing the visitor's search or tag. The panel is
+  `<div id="sites-panel">` behind `aria-expanded`/`aria-controls`, hidden with
+  the `hidden` attribute, and the arrow rotates to `-90deg` when collapsed.
 - "Surprise me" in the hero opens a random entry — from the current filter
   results when a search is active, otherwise from the whole directory. It is
   styled as a green pill with a bolt badge (`.surprise-button` in
@@ -193,6 +196,13 @@ bundler. Two ways to do that by accident:
 - On a 1000px-and-wider screen the shell is 1080px and the directory is a
   two-column grid; the donation board and prose stay capped at a readable
   measure so the extra width goes to the cards.
+- The **support button** at the foot of `main` (`.support-ad`) is the sponsored
+  strip that pays for the page: an `ad` tag, "Want to support base31? Click this
+  button to help", and an arrow, linking out with `rel="noreferrer sponsored"`.
+  It sits directly under the referral carousel where it lived before, is a
+  plain link, and therefore needs no consent gate. Its base rule is in
+  `globals.css` (dashed frame); the solid material, hover lift and the tag/text/
+  arrow pieces are in `app/overrides.css`.
 - The hero search is one solid control (`.search-wrap` in `app/overrides.css`):
   a raised field, the glyph in its own tile, a green ring on focus, and a
   clear button that takes the place of the `/` hint once there is a query.

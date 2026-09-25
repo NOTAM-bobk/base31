@@ -201,6 +201,20 @@ Run `npm run validate:content` to check `sites.json`, `blogs.json`,
   changes. The `:has()` scope matters: the blog, about, privacy and error pages
   render no header, and must not inherit its offset. Every `[id]` carries a
   matching `scroll-margin-top`, so in-page anchors still land below the bar.
+- The header's right-hand slot holds `components/github-stats.tsx` — the GitHub
+  mark, the repository's commit count and a small "commits" label, linking to
+  the source. It replaced the Share button; the share sheet is still reachable
+  with the `S` shortcut, which was never the button's own handler.
+  - The count comes from the public GitHub API with no key: one commit per
+    page, and the last page number in the `Link` response header is the total.
+    It is cached in `localStorage` for an hour because the unauthenticated API
+    allows only 60 requests per hour per IP. A refused request leaves the dash
+    in place — the link still works, it just shows no number.
+- The subscribe block (`components/directory-notifications.tsx`, `#updates`)
+  is the last thing in `main`, directly above the footer and *below* the FAQ,
+  so the page ends on the call to action. Its email field and the button beside
+  it share the softer 14px rounding of the site's own input box
+  (`.search-wrap`); everything else about the block is unchanged.
 - `components/code-backdrop.tsx` is the typing-code wallpaper behind the page.
   It is server rendered and CSS-only: no JavaScript, no timer, one stepped
   width animation per line, staggered with negative delays so the lines never

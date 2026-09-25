@@ -7,6 +7,7 @@ import DonationBoard from "@/components/donation-board";
 import Faq from "@/components/faq";
 import ReferralCarousel from "@/components/referral-carousel";
 import DirectoryNotifications from "@/components/directory-notifications";
+import GithubStats from "@/components/github-stats";
 import { resetConsent, useConsent } from "@/lib/consent";
 
 type Site = { name: string; subdomain: string; url: string; tags?: string[]; description?: string; show?: boolean; community?: boolean; createdAt?: number; icon?: string };
@@ -1093,11 +1094,10 @@ export default function HomePage() {
             <a href="/blog">Blog</a>
           </nav>
           <div className="header-actions">
-            <button type="button" className="icon-button share-button mono" onClick={() => { buzz(8); setShareOpen(true); }} aria-label="Share base31.org" aria-haspopup="dialog">
-              <span>Share</span>
-              <kbd className="shortcut-hint">S</kbd>
-              <span aria-hidden="true">↗</span>
-            </button>
+            {/* The header used to carry a Share button; it shows the
+                repository's commit count now and links to the source. The
+                share sheet is still reachable with the S shortcut. */}
+            <GithubStats />
             <button
               type="button"
               className="icon-button theme-toggle"
@@ -1368,10 +1368,13 @@ export default function HomePage() {
         {/* Sponsored referral links, below the clock. */}
         <ReferralCarousel />
 
-        <DirectoryNotifications />
-
-        {/* SEO FAQ — the last block in main, directly above the footer. */}
+        {/* SEO FAQ, then the subscribe block: the FAQ moved up so the page
+            ends on the call to action, directly above the footer. */}
         <Faq />
+
+        {/* The subscribe block sits below the FAQ as the final thing before
+            the footer, so the page ends on the call to action. */}
+        <DirectoryNotifications />
       </main>
 
       <footer className="site-footer">

@@ -144,7 +144,10 @@ bundler. Two ways to do that by accident:
   out, and community uploads are not listed (they are only known at runtime).
 - `components/faq.tsx` renders the FAQ above the footer together with its
   matching `FAQPage` structured data. Edit the `FAQS` array there and both the
-  copy and the schema stay in sync.
+  copy and the schema stay in sync. Every question is a native
+  `<details>`/`<summary>` disclosure, so the list starts closed, toggles with
+  no JavaScript, and keeps each answer in the served HTML — collapsing the
+  list never hides the copy from a crawler, and the schema repeats it anyway.
 - Structured data is split so no graph is emitted twice:
   `components/structured-data.tsx` is rendered once from the root layout and
   holds the page-agnostic `Organization` + `WebSite` nodes (the site's
@@ -240,11 +243,23 @@ bundler. Two ways to do that by accident:
   width animation per line, staggered with negative delays so the lines never
   restart in sync. It is `aria-hidden`, ignores pointer events, and every line
   is measured in `ch` so it types exactly as wide as its own text.
-- A directory card is one link (`.site-card-body` — the preview band, icon,
-  name, host, description and tags) plus a `.site-card-foot` bar holding the
-  pin and the two votes. Keeping the buttons outside the link is what lets the
-  whole information block be clickable without nesting interactive elements.
-  Pinned cards get a green spine; `SiteIcon` is 38px (34px on phones).
+- A directory card is one link (`.site-card-body` — the preview band, the
+  centred title, the favicon + host row, the description and the tags) plus a
+  `.site-card-foot` bar holding the pin and the two votes. Keeping the buttons
+  outside the link is what lets the whole information block be clickable
+  without nesting interactive elements. Pinned cards get a green spine;
+  `SiteIcon` is 38px (34px on phones).
+- The site name is the card's title: centred on its own line, above
+  `.site-card-strip` (a hairline that fades out at both ends), with the
+  favicon, the host and the `↗` marker centred underneath it. That is why
+  `.site-card-info` centres its children and the old `.site-card-ident`
+  column is gone — the name is no longer part of the meta row. `SiteIcon`
+  moved down into that row with it, and `.site-name` keeps `min-width: 0` so
+  an overlong name still ellipsizes instead of pushing the card wider.
+- The two thumbs are stacked in `.vote-stack` with the up vote above the down
+  vote, so the pair reads as one control; the pin stays beside the stack,
+  vertically centred by `.site-actions`. The footer bar is therefore about
+  twice as tall as the 27px buttons alone would make it.
 - Every card opens with a screenshot of its destination — the WordPress mShots
   call the referral carousel uses, with thum.io (which the App Screenshot page
   already depends on) as a second try, so every kept site gets a preview with
@@ -288,6 +303,10 @@ bundler. Two ways to do that by accident:
   changes every second.
 - Vote counts are `aria-hidden` too; the button's own label already carries the
   number, so they are not read twice.
+- The FAQ's questions are `<summary>` elements rather than headings with click
+  handlers, so Enter/Space opens them and the closed/open state is announced
+  for free; the native marker is replaced by `.faq-chevron`, which is
+  `aria-hidden` because the disclosure state already says the same thing.
 - External links (directory cards, referral cards) carry a visually hidden
   "opens in a new tab" hint.
 - Pin and vote buttons grow from 27px to 38–40px under `(pointer: coarse)`
@@ -298,9 +317,9 @@ bundler. Two ways to do that by accident:
   original values sat just under 4.5:1 for the 9–10px labels.
 - The custom cursor keeps the native caret over inputs and textareas.
 - The Vibration API, confetti, flip clock, scroll reveals, the exit-intent
-  nudge, `scroll-behavior: smooth` and carousel auto-rotation are all skipped
-  under `prefers-reduced-motion`, and the reveal gate (`html[data-motion="enabled"]`) is never
-  applied without JavaScript.
+  nudge, the FAQ chevron flip, `scroll-behavior: smooth` and carousel
+  auto-rotation are all skipped under `prefers-reduced-motion`, and the reveal
+  gate (`html[data-motion="enabled"]`) is never applied without JavaScript.
 - The blog ships an RSS feed at `/blog/feed.xml` and a JSON Feed 1.1 twin at
   `/blog/feed.json`, both generated from `lib/blogs.ts` and advertised with
   `<link rel="alternate">`. Posts also show a reading time and a "read next"
@@ -428,8 +447,8 @@ its new choice, which keeps switching or clearing a vote from double-counting.
 | `NEXT_PUBLIC_COUNTER_URL` | Vercel / Keys tab | Optional override for the deployed worker URL the homepage calls |
 | `COUNTER_SECRET` | Worker secret (`wrangler secret put`) | Optional; when set, requests must send `x-counter-secret` |
 | `RESEND_API_KEY` | Next.js hosting environment + Worker secret | Resend API credential used for bug reports, confirmations, and publication emails |
-| `RESEND_FROM_EMAIL` | Next.js hosting environment + Worker secret | Verified sender address used by Resend for reports and directory emails |
-| `BUG_REPORT_TO` | Next.js hosting environment | Inbox that receives the bug-report form submissions |
+| `RESEND_FROM_EMAIL` | Next.js hosting environment + Worker secret | Sender address used by Resend; `base31 <onboarding@resend.dev>` until a domain is verified |
+| `BUG_REPORT_TO` | Next.js hosting environment | Inbox that receives the bug-report form submissions; without a verified domain Resend only delivers to the account owner |
 | `VAPID_PUBLIC_KEY` | Worker secret | Public VAPID key served to browsers for opt-in push notifications |
 | `VAPID_PRIVATE_KEY` | Worker secret | Private VAPID key used to sign push notifications; never expose it to the browser |
 | `VAPID_SUBJECT` | Worker secret | VAPID contact URI, for example a `mailto:` address |
@@ -462,7 +481,16 @@ publication notices. The `/api/bug-report` Next.js route sends the optional
 reply address, report text, and current page URL to `BUG_REPORT_TO`. Set
 `RESEND_API_KEY`, `RESEND_FROM_EMAIL`, and `BUG_REPORT_TO` in the hosting
 Settings → Environment before bug reports can be delivered. The sender must be
-verified with Resend. The Worker also needs `RESEND_API_KEY` and
+verified with Resend, and until an owned domain is verified the sender has to
+be the shared test address `onboarding@resend.dev` — Resend rejects a
+`gmail.com` (or any unowned domain) `from`, and the test sender only delivers
+to the account owner's own address, so sending to anyone else fails with a
+`403 validation_error`. The same limit applies to the Worker's double-opt-in
+confirmation and publication emails: they cannot reach outside subscribers
+until `RESEND_FROM_EMAIL` is an address on a verified domain (for example
+`base31 <reports@base31.org>`), at which point `BUG_REPORT_TO` can be any
+inbox. `RESEND_FROM_EMAIL` accepts the `Display Name <address>` form. The
+Worker also needs `RESEND_API_KEY` and
 `RESEND_FROM_EMAIL` set as Worker secrets for subscriptions and publication
 notices. Configure push by generating a VAPID key pair and setting
 `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, and `VAPID_SUBJECT` as Worker secrets;
@@ -472,6 +500,40 @@ visitor-controlled opt-in and do not depend on the cookie banner.
 Do not commit credentials. Set Worker secrets with `wrangler secret put
 <KEY>` from `worker/`; add the Next.js variables in the hosting environment
 settings so they are available to the deployed app.
+
+### Verify the sending domain in Resend
+
+`base31.org` is not registered with Resend yet, so `RESEND_FROM_EMAIL` has to
+stay on the shared `onboarding@resend.dev` test sender and mail only reaches
+the account owner. Verify the domain once to send from `reports@base31.org`
+(or any other local part) to any inbox:
+
+1. Open [resend.com/domains](https://resend.com/domains), choose **Add
+   Domain**, enter `base31.org`, and pick a region (the default is
+   `us-east-1`). The stored `RESEND_API_KEY` is send-only — Resend answers
+   `401 restricted_api_key` on `GET /domains` — so it cannot add or list
+   domains. Use the dashboard, or swap in a full-access key for this step.
+2. Resend lists the records for the domain. They are normally:
+   - `MX` on `send` → `feedback-smtp.<region>.amazonses.com`, priority `10`
+   - `TXT` on `send` → `v=spf1 include:amazonses.com ~all`
+   - `TXT` (sometimes `CNAME`) on `resend._domainkey` → the DKIM value the
+     dashboard shows
+   - optionally `TXT` on `_dmarc` → `v=DMARC1; p=none;`
+
+   Copy what Resend actually shows: the region changes the MX host.
+3. The domain's nameservers are Vercel's (`ns1`/`ns2.vercel-dns.com`), so add
+   the records under Vercel → Domains → `base31.org` → DNS Records. The
+   Cloudflare zone for `base31.org` exists but is still **pending** (DNS was
+   never delegated to it), so records created there do not resolve.
+4. Once the records propagate, run `npm run check:mail` to confirm SPF, DKIM,
+   and MX resolve, then press **Verify DNS Records** in Resend.
+5. After verification, set `RESEND_FROM_EMAIL` to `base31 <reports@base31.org>`
+   and point `BUG_REPORT_TO` at any inbox, both in the hosting environment and
+   as Worker secrets.
+
+`npm run check:mail` takes an optional domain argument and prints the
+nameservers plus a pass/fail line per record, exiting non-zero while something
+required is still missing.
 
 > The vote routes only exist once the worker has been redeployed. Until then
 the thumbs fall back to local-only voting — the counts show `–` and the click

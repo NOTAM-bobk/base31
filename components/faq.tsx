@@ -42,21 +42,41 @@ const faqSchema = {
   })),
 };
 
-/** The FAQ block that sits directly above the footer: visible answers for
- *  readers, plus matching FAQPage structured data for search engines. */
+/** The FAQ block that sits directly above the footer. Each question is a
+ *  native <details>/<summary> disclosure: it opens and closes with no
+ *  JavaScript, it is keyboard and screen-reader operable on its own, and the
+ *  answer text stays in the served HTML — so the copy is still crawlable
+ *  (and repeated in the FAQPage structured data below) even though every
+ *  item starts collapsed. */
 export default function Faq() {
   return (
     <section className="faq-section" data-reveal aria-labelledby="faq-heading">
       <p className="eyebrow mono">questions</p>
       <h2 id="faq-heading">Frequently asked questions</h2>
-      <dl className="faq-list">
+      <div className="faq-list">
         {FAQS.map((item) => (
-          <div className="faq-item" key={item.question}>
-            <dt>{item.question}</dt>
-            <dd>{item.answer}</dd>
-          </div>
+          <details className="faq-item" key={item.question}>
+            <summary className="faq-question">
+              <span>{item.question}</span>
+              <svg
+                className="faq-chevron"
+                viewBox="0 0 24 24"
+                width="15"
+                height="15"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.1"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
+                <path d="m6 9 6 6 6-6" />
+              </svg>
+            </summary>
+            <p className="faq-answer">{item.answer}</p>
+          </details>
         ))}
-      </dl>
+      </div>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
     </section>
   );

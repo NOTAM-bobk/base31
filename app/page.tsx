@@ -1261,16 +1261,18 @@ export default function HomePage() {
                   <a href={site.url} className="site-link site-card-body" target="_blank" rel="noreferrer">
                     <SitePreview site={site} />
                     <span className="site-card-info">
+                      {/* The site name is the card's title: centred on its own
+                          line, above a gradient strip that fades into the
+                          meta row (favicon + host) and the description. */}
+                      <span className="site-card-title">
+                        <span className="site-name">{site.name}</span>
+                        {site.community && <span className="site-badge mono">community</span>}
+                        {isNew && <span className="site-badge is-new mono">new</span>}
+                      </span>
+                      <span className="site-card-strip" aria-hidden="true" />
                       <span className="site-card-head">
                         <SiteIcon site={site} />
-                        <span className="site-card-ident">
-                          <span className="site-card-title">
-                            <span className="site-name">{site.name}</span>
-                            {site.community && <span className="site-badge mono">community</span>}
-                            {isNew && <span className="site-badge is-new mono">new</span>}
-                          </span>
-                          <span className="site-url mono">{site.url.replace(/^https?:\/\//, "").replace(/\/$/, "")}</span>
-                        </span>
+                        <span className="site-url mono">{site.url.replace(/^https?:\/\//, "").replace(/\/$/, "")}</span>
                         <span className="site-open mono" aria-hidden="true">↗</span>
                         <span className="sr-only"> (opens in a new tab)</span>
                       </span>
@@ -1293,29 +1295,33 @@ export default function HomePage() {
                       >
                         <HeartIcon filled={pinned} />
                       </button>
-                      <button
-                        type="button"
-                        className={`vote-button up${vote === 1 ? " is-active" : ""}`}
-                        onClick={() => castVote(site.subdomain, 1)}
-                        aria-pressed={vote === 1}
-                        aria-label={`Thumbs up ${site.name}${totals ? `, ${totals.up} up` : ""}`}
-                      >
-                        <ThumbIcon />
-                        {/* keyed so the count replays its pop animation on change;
-                            the number is in the button's label, so this is
-                            decorative to avoid reading the same value twice. */}
-                        <span key={totals ? totals.up : "none"} className="vote-count mono" aria-hidden="true">{totals ? totals.up : "–"}</span>
-                      </button>
-                      <button
-                        type="button"
-                        className={`vote-button down${vote === -1 ? " is-active" : ""}`}
-                        onClick={() => castVote(site.subdomain, -1)}
-                        aria-pressed={vote === -1}
-                        aria-label={`Thumbs down ${site.name}${totals ? `, ${totals.down} down` : ""}`}
-                      >
-                        <ThumbIcon down />
-                        <span key={totals ? totals.down : "none"} className="vote-count mono" aria-hidden="true">{totals ? totals.down : "–"}</span>
-                      </button>
+                      {/* Thumbs up sits directly above thumbs down, so the
+                          pair reads as one control. */}
+                      <span className="vote-stack">
+                        <button
+                          type="button"
+                          className={`vote-button up${vote === 1 ? " is-active" : ""}`}
+                          onClick={() => castVote(site.subdomain, 1)}
+                          aria-pressed={vote === 1}
+                          aria-label={`Thumbs up ${site.name}${totals ? `, ${totals.up} up` : ""}`}
+                        >
+                          <ThumbIcon />
+                          {/* keyed so the count replays its pop animation on change;
+                              the number is in the button's label, so this is
+                              decorative to avoid reading the same value twice. */}
+                          <span key={totals ? totals.up : "none"} className="vote-count mono" aria-hidden="true">{totals ? totals.up : "–"}</span>
+                        </button>
+                        <button
+                          type="button"
+                          className={`vote-button down${vote === -1 ? " is-active" : ""}`}
+                          onClick={() => castVote(site.subdomain, -1)}
+                          aria-pressed={vote === -1}
+                          aria-label={`Thumbs down ${site.name}${totals ? `, ${totals.down} down` : ""}`}
+                        >
+                          <ThumbIcon down />
+                          <span key={totals ? totals.down : "none"} className="vote-count mono" aria-hidden="true">{totals ? totals.down : "–"}</span>
+                        </button>
+                      </span>
                     </div>
                   </div>
                 </article>

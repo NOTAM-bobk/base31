@@ -1256,8 +1256,9 @@ export default function HomePage() {
                   style={{ "--i": index } as CSSProperties}
                 >
                   {/* The whole information block is one link — preview, icon,
-                      name, host, description and tags — while the pin and vote
-                      buttons sit outside it in the card's footer bar. */}
+                      name, host, description and tags — while the pin (top
+                      right, over the preview) and the votes (footer bar) sit
+                      outside it, so no control is ever nested in the link. */}
                   <a href={site.url} className="site-link site-card-body" target="_blank" rel="noreferrer">
                     <SitePreview site={site} />
                     <span className="site-card-info">
@@ -1284,17 +1285,20 @@ export default function HomePage() {
                       )}
                     </span>
                   </a>
+                  {/* The pin floats at the card's top-right corner, over the
+                      preview, but stays outside the link so the two controls
+                      never overlap in the tab order. */}
+                  <button
+                    type="button"
+                    className={`favorite-button${pinned ? " is-active" : ""}`}
+                    onClick={() => toggleFavorite(site.subdomain)}
+                    aria-pressed={pinned}
+                    aria-label={pinned ? `Unpin ${site.name}` : `Pin ${site.name} to the top`}
+                  >
+                    <HeartIcon filled={pinned} />
+                  </button>
                   <div className="site-card-foot">
                     <div className="site-actions">
-                      <button
-                        type="button"
-                        className={`favorite-button${pinned ? " is-active" : ""}`}
-                        onClick={() => toggleFavorite(site.subdomain)}
-                        aria-pressed={pinned}
-                        aria-label={pinned ? `Unpin ${site.name}` : `Pin ${site.name} to the top`}
-                      >
-                        <HeartIcon filled={pinned} />
-                      </button>
                       {/* Thumbs up sits directly above thumbs down, so the
                           pair reads as one control. */}
                       <span className="vote-stack">

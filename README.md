@@ -244,11 +244,14 @@ bundler. Two ways to do that by accident:
   restart in sync. It is `aria-hidden`, ignores pointer events, and every line
   is measured in `ch` so it types exactly as wide as its own text.
 - A directory card is one link (`.site-card-body` — the preview band, the
-  centred title, the favicon + host row, the description and the tags) plus a
-  `.site-card-foot` bar holding the pin and the two votes. Keeping the buttons
-  outside the link is what lets the whole information block be clickable
-  without nesting interactive elements. Pinned cards get a green spine;
-  `SiteIcon` is 38px (34px on phones).
+  centred title, the favicon + host row, the description and the tags). The pin
+  and the two votes both stay outside that link: the pin floats at the card's
+  top-right corner over the preview (`.favorite-button`, absolutely positioned,
+  a translucent dark pill so the white heart reads on any screenshot in either
+  theme) and the votes live in the `.site-card-foot` bar underneath. Keeping
+  the buttons outside the link is what lets the whole information block be
+  clickable without nesting interactive elements. Pinned cards get a green
+  spine; `SiteIcon` is 38px (34px on phones).
 - The site name is the card's title: centred on its own line, above
   `.site-card-strip` (a green gradient band that fades out at both ends and
   carries a soft glow) and the centred meta row holding the favicon, the host
@@ -259,8 +262,11 @@ bundler. Two ways to do that by accident:
   instead of pushing the card wider.
 - The two thumbs are stacked in `.vote-stack` with the up vote above the down
   vote, so the pair reads as one control; the pin stays beside the stack,
-  vertically centred by `.site-actions`. The footer bar is therefore about
-  twice as tall as the 27px buttons alone would make it.
+  vertically centred by `.site-actions`. The footer bar now holds only the two
+  votes, so it keeps a shallow `3px 15px 7px` padding that lifts the thumbs a
+  little higher in the card; phones tighten it further through a
+  `.site-card .site-card-foot` override (one extra class, so it wins whatever
+  the source order).
 - Every card opens with a screenshot of its destination — the WordPress mShots
   call the referral carousel uses, with thum.io (which the App Screenshot page
   already depends on) as a second try, so every kept site gets a preview with
@@ -337,6 +343,7 @@ in the referral carousel and each community upload's own favicon — both decora
 | --- | --- |
 | `components/consent-aware-analytics.tsx` | Microsoft Clarity (`ylsxc7fokm`) and Google Analytics 4 (`G-Y5N2FYK786`), only on `accepted` |
 | `components/consent-aware-ads.tsx` | Adcash auto-tag (`iy7zk7mmw`), only on `accepted` |
+| `public/sites/appscreenshot/index.html`, `public/sites/share/index.html` | Never gated: these static subdomain pages render outside Next.js and carry no cookie banner, so the same Adcash auto-tag sits directly in their `<head>` (the async loader is polled for `aclib` before the tag runs). |
 | `components/referral-carousel.tsx` | Never gated: the destination preview image loads straight from the destination (or a screenshot service) because the card is unusable without it. It sets no cookies, the sponsored links stay inert until clicked, and the privacy page says so. |
 
 The Adcash script loader (`https://acscdn.com/script/aclib.js`) is inserted only

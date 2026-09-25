@@ -1,1 +1,777 @@
+<!DOCTYPE html>
+<html lang="en" class="antialiased h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fast Iframe Tester</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        vercel: {
+                            black: '#000000',
+                            white: '#ffffff',
+                            accents1: '#fafafa',
+                            accents2: '#eaeaea',
+                            accents3: '#999999',
+                            accents4: '#888888',
+                            accents5: '#666666',
+                            accents6: '#444444',
+                            accents7: '#333333',
+                            accents8: '#111111',
+                            blue: '#0070f3',
+                            blueHover: '#0060d0',
+                            cyan: '#50e3c2',
+                            red: '#e00',
+                            errorLight: '#ff1a1a',
+                            errorDark: '#c00',
+                        }
+                    },
+                    boxShadow: {
+                        'vercel-small': '0 2px 4px rgba(0,0,0,0.04)',
+                        'vercel-medium': '0 4px 8px rgba(0,0,0,0.06)',
+                        'vercel-large': '0 8px 30px rgba(0,0,0,0.12)',
+                    },
+                    animation: {
+                        'pulse-fast': 'pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        :root {
+            --bg-color: #ffffff;
+            --text-color: #000000;
+            --border-color: #eaeaea;
+            --header-bg: rgba(255, 255, 255, 0.8);
+            --input-bg: #ffffff;
+            --input-border: #eaeaea;
+            --input-focus: #000000;
+        }
 
+        .dark {
+            --bg-color: #000000;
+            --text-color: #ffffff;
+            --border-color: #333333;
+            --header-bg: rgba(0, 0, 0, 0.8);
+            --input-bg: #111111;
+            --input-border: #333333;
+            --input-focus: #ffffff;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            transition: background-color 0.2s ease, color 0.2s ease;
+        }
+
+        .glass-header {
+            background-color: var(--header-bg);
+            backdrop-filter: saturate(180%) blur(5px);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .vercel-input {
+            background-color: var(--input-bg);
+            border: 1px solid var(--input-border);
+            color: var(--text-color);
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .vercel-input:focus {
+            outline: none;
+            border-color: var(--input-focus);
+        }
+
+        .vercel-button {
+            transition: all 0.2s ease;
+        }
+
+        .vercel-button-primary {
+            background-color: var(--text-color);
+            color: var(--bg-color);
+            border: 1px solid var(--text-color);
+        }
+
+        .vercel-button-primary:hover {
+            background-color: transparent;
+            color: var(--text-color);
+        }
+
+        .vercel-button-secondary {
+            background-color: transparent;
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+        }
+        
+        .vercel-button-secondary:hover {
+            border-color: var(--text-color);
+        }
+
+        /* Loader animation */
+        .loader {
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--border-color);
+            border-top-color: var(--text-color);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Iframe container styling */
+        .iframe-wrapper {
+            position: relative;
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            overflow: hidden;
+            background-color: var(--input-bg);
+            transition: box-shadow 0.3s ease;
+        }
+        
+        .iframe-wrapper:hover {
+             box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+        }
+
+        /* Error state styling */
+        .error-state {
+            border-color: theme('colors.vercel.errorDark');
+        }
+
+        /* Custom Range Slider */
+        input[type=range] {
+            -webkit-appearance: none;
+            background: transparent;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 16px;
+            width: 16px;
+            border-radius: 50%;
+            background: var(--text-color);
+            cursor: pointer;
+            margin-top: -6px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            border: 1px solid var(--border-color);
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 4px;
+            cursor: pointer;
+            background: var(--border-color);
+            border-radius: 2px;
+        }
+        input[type=range]:focus {
+            outline: none;
+        }
+        
+        /* Custom scrollbars for scale wrapper */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background-color: var(--border-color);
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body class="h-full flex flex-col font-sans overflow-hidden">
+    <!-- Header -->
+    <header class="glass-header sticky top-0 z-50 px-6 py-4 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+            <svg class="w-6 h-6 text-vercel-black dark:text-vercel-white" viewBox="0 0 76 65" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M37.5274 0L75.0548 65H0L37.5274 0Z" fill="currentColor"/>
+            </svg>
+            <h1 class="text-xl font-semibold tracking-tight">Iframe Tester</h1>
+        </div>
+        
+        <div class="flex items-center gap-4">
+            <!-- Theme Toggle -->
+            <button id="themeToggle" class="vercel-button-secondary p-2 rounded-md flex items-center justify-center w-9 h-9" aria-label="Toggle Theme">
+                <!-- Sun Icon -->
+                <svg id="sunIcon" class="w-4 h-4 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                </svg>
+                <!-- Moon Icon -->
+                <svg id="moonIcon" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+                </svg>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 flex flex-col p-6 gap-4 overflow-hidden max-w-7xl mx-auto w-full">
+        
+        <!-- Controls Panel (Upgraded) -->
+        <div class="flex flex-col gap-4 w-full bg-[var(--input-bg)] p-4 rounded-lg border border-[var(--border-color)] shadow-vercel-small transition-all">
+            
+            <div class="flex flex-col md:flex-row gap-4 items-end w-full">
+                <div class="flex-1 w-full relative">
+                    <label for="urlInput" class="block text-sm font-medium text-[var(--text-color)] mb-1.5 opacity-80 flex justify-between items-center">
+                        <span>Test URL</span>
+                        <span class="text-xs opacity-60 font-normal hidden sm:inline">Sites with restrictive X-Frame-Options cannot be previewed</span>
+                    </label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <svg class="h-4 w-4 text-vercel-accents5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path>
+                            </svg>
+                        </div>
+                        <input type="url" id="urlInput" list="urlHistory"
+                            class="vercel-input block w-full pl-10 pr-12 py-2 sm:text-sm rounded-md" 
+                            placeholder="https://example.com"
+                            value="https://example.com">
+                        
+                        <!-- Quick Clear Button -->
+                        <button id="clearBtn" class="absolute inset-y-0 right-0 pr-3 flex items-center text-vercel-accents5 hover:text-[var(--text-color)] transition-colors">
+                            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                        </button>
+                    </div>
+                    <p id="errorMsg" class="absolute -bottom-5 left-1 text-[11px] text-vercel-errorDark hidden">Please enter a valid URL.</p>
+                </div>
+
+                <div class="w-full md:w-48 shrink-0">
+                     <label class="block text-sm font-medium text-[var(--text-color)] mb-1.5 opacity-80">Viewport</label>
+                     <select id="viewportSelect" class="vercel-input block w-full py-2 pl-3 pr-8 sm:text-sm rounded-md appearance-none cursor-pointer">
+                         <option value="responsive">Responsive (Fill)</option>
+                         <option value="mobile">Mobile (375x812)</option>
+                         <option value="tablet">Tablet (768x1024)</option>
+                         <option value="desktop">Desktop (1440x900)</option>
+                     </select>
+                </div>
+
+                <button id="loadBtn" class="vercel-button vercel-button-primary px-6 py-2 rounded-md font-medium text-sm w-full md:w-32 flex justify-center items-center h-[38px] shrink-0">
+                    <span id="loadBtnText">Load Frame</span>
+                    <div id="loadBtnSpinner" class="loader hidden ml-2 border-[var(--bg-color)] border-top-[var(--text-color)]"></div>
+                </button>
+                
+                <button id="stopBtn" class="hidden vercel-button bg-vercel-errorDark text-white hover:bg-vercel-errorLight border-transparent px-6 py-2 rounded-md font-medium text-sm w-full md:w-32 flex justify-center items-center h-[38px] shrink-0 transition-colors">
+                    <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    <span>Stop</span>
+                </button>
+            </div>
+
+            <!-- Advanced Toolbar -->
+            <div class="flex flex-col sm:flex-row items-center justify-between pt-3 border-t border-[var(--border-color)] text-sm gap-4">
+                <div class="flex items-center gap-4 w-full sm:w-auto">
+                    <div class="flex items-center gap-2" title="Scale Iframe">
+                        <svg class="w-4 h-4 text-vercel-accents5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"></path></svg>
+                        <input type="range" id="zoomSlider" min="25" max="150" value="100" class="w-20 sm:w-28">
+                        <span id="zoomValue" class="text-xs font-mono tabular-nums w-12 opacity-80 text-right">100%</span>
+                    </div>
+                    <div class="h-4 w-px bg-[var(--border-color)]"></div>
+                    <button id="rotateBtn" class="vercel-button-secondary px-2.5 py-1 rounded-md text-xs flex items-center gap-1.5 disabled:opacity-40 disabled:cursor-not-allowed transition-all" disabled title="Toggle Orientation (Portrait/Landscape)">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                        <span class="hidden sm:inline">Rotate</span>
+                    </button>
+                </div>
+                <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
+                     <button id="copyShareBtn" class="text-vercel-accents5 hover:text-[var(--text-color)] transition-colors px-2.5 py-1 text-xs flex items-center gap-1.5 rounded-md border border-transparent hover:border-[var(--border-color)]">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path></svg>
+                        <span>Share Link</span>
+                     </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Iframe Workspace -->
+        <div class="flex-1 w-full bg-[var(--bg-color)] rounded-lg flex flex-col relative min-h-0 border border-[var(--border-color)] overflow-hidden shadow-vercel-medium">
+            
+            <!-- Toolbar above iframe -->
+            <div class="h-10 border-b border-[var(--border-color)] bg-[var(--input-bg)] flex items-center justify-between px-4 text-xs text-vercel-accents5 shrink-0">
+                <div class="flex items-center gap-2">
+                    <span class="flex h-3 w-3 rounded-full bg-vercel-errorLight shadow-sm"></span>
+                    <span class="flex h-3 w-3 rounded-full bg-yellow-400 shadow-sm"></span>
+                    <span class="flex h-3 w-3 rounded-full bg-green-400 shadow-sm"></span>
+                </div>
+                <div id="statusText" class="truncate max-w-[150px] sm:max-w-md font-mono tracking-tight">Ready</div>
+                <div class="flex items-center gap-3">
+                    <button id="refreshFrameBtn" class="hover:text-[var(--text-color)] transition-colors" title="Reload Frame">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                    </button>
+                    <button id="openNewTabBtn" class="hover:text-[var(--text-color)] transition-colors" title="Open in New Tab">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Iframe Container -->
+            <div class="flex-1 relative bg-gray-50 dark:bg-[#0a0a0a] flex items-start justify-center overflow-auto p-4 md:p-8 custom-scrollbar">
+                
+                <!-- Loading Overlay -->
+                <div id="loadingOverlay" class="absolute inset-0 bg-white/60 dark:bg-black/60 backdrop-blur-[2px] z-20 flex flex-col items-center justify-center hidden transition-all duration-300">
+                    <div class="loader w-8 h-8 mb-4"></div>
+                    <p class="text-sm font-medium animate-pulse text-[var(--text-color)]">Loading origin...</p>
+                </div>
+
+                <!-- Empty State -->
+                <div id="emptyState" class="absolute inset-0 flex flex-col items-center justify-center text-vercel-accents4 z-0 bg-[var(--bg-color)]">
+                    <svg class="w-16 h-16 mb-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"></path>
+                    </svg>
+                    <p class="text-sm font-medium text-[var(--text-color)] opacity-80">Enter a URL to begin testing</p>
+                    <p class="text-xs opacity-60 mt-2">Try pasting a documentation link or a local development server.</p>
+                </div>
+                
+                <!-- The actual iframe wrapped for scaling -->
+                <div id="scaleWrapper" class="relative flex-shrink-0 transition-transform duration-200 z-10 will-change-transform flex items-center justify-center w-full h-full" style="transform-origin: center top;">
+                    <div id="frameContainer" class="iframe-wrapper w-full h-full bg-white transition-all duration-300 ease-in-out opacity-0 ring-1 ring-[var(--border-color)]">
+                        <iframe id="testFrame" src="" class="w-full h-full border-0 bg-white" sandbox="allow-same-origin allow-scripts allow-popups allow-forms" title="Preview Frame"></iframe>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="w-full border-t border-[var(--border-color)] bg-[var(--bg-color)] py-4 px-6 flex flex-wrap justify-center gap-6 text-sm text-vercel-accents5 shrink-0 z-40 relative">
+        <button class="hover:text-[var(--text-color)] transition-colors legal-link" data-policy="terms">Terms of Service</button>
+        <button class="hover:text-[var(--text-color)] transition-colors legal-link" data-policy="privacy">Privacy Policy</button>
+        <button class="hover:text-[var(--text-color)] transition-colors legal-link" data-policy="cookies">Cookie Policy</button>
+    </footer>
+
+    <!-- Legal Modal -->
+    <div id="legalModal" class="fixed inset-0 bg-black/40 dark:bg-white/10 backdrop-blur-sm z-[100] hidden items-center justify-center p-4 opacity-0 transition-opacity duration-200">
+        <div class="bg-[var(--bg-color)] border border-[var(--border-color)] shadow-vercel-large rounded-lg w-full max-w-lg flex flex-col overflow-hidden transform scale-95 transition-transform duration-200" id="legalModalContent">
+            <div class="flex items-center justify-between p-4 border-b border-[var(--border-color)] bg-[var(--input-bg)]">
+                <h2 id="modalTitle" class="text-lg font-semibold tracking-tight">Legal</h2>
+                <button id="closeModalBtn" class="text-vercel-accents5 hover:text-[var(--text-color)] transition-colors">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            <div class="p-6 overflow-y-auto max-h-[60vh] text-sm text-[var(--text-color)] opacity-90 custom-scrollbar" id="modalBody">
+                <!-- Content injected here -->
+            </div>
+            <div class="p-4 border-t border-[var(--border-color)] bg-[var(--input-bg)] flex justify-end">
+                <button id="acceptModalBtn" class="vercel-button vercel-button-primary px-4 py-2 rounded-md font-medium text-sm">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- HTML native datalist for history autocomplete -->
+    <datalist id="urlHistory"></datalist>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // DOM Elements
+            const urlInput = document.getElementById('urlInput');
+            const loadBtn = document.getElementById('loadBtn');
+            const clearBtn = document.getElementById('clearBtn');
+            const testFrame = document.getElementById('testFrame');
+            const frameContainer = document.getElementById('frameContainer');
+            const scaleWrapper = document.getElementById('scaleWrapper');
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            const emptyState = document.getElementById('emptyState');
+            const statusText = document.getElementById('statusText');
+            const viewportSelect = document.getElementById('viewportSelect');
+            const themeToggle = document.getElementById('themeToggle');
+            const sunIcon = document.getElementById('sunIcon');
+            const moonIcon = document.getElementById('moonIcon');
+            const refreshFrameBtn = document.getElementById('refreshFrameBtn');
+            const openNewTabBtn = document.getElementById('openNewTabBtn');
+            const errorMsg = document.getElementById('errorMsg');
+            const loadBtnText = document.getElementById('loadBtnText');
+            const loadBtnSpinner = document.getElementById('loadBtnSpinner');
+            const stopBtn = document.getElementById('stopBtn');
+            
+            // Advanced feature elements
+            const zoomSlider = document.getElementById('zoomSlider');
+            const zoomValue = document.getElementById('zoomValue');
+            const rotateBtn = document.getElementById('rotateBtn');
+            const copyShareBtn = document.getElementById('copyShareBtn');
+            const urlHistoryDatalist = document.getElementById('urlHistory');
+
+            // --- State Variables ---
+            let isLandscape = false;
+            let currentViewport = 'responsive';
+            const defaultPlaceholderUrl = 'https://example.com';
+            let historyList = JSON.parse(localStorage.getItem('iframeTesterHistory') || '[]');
+
+            // --- History Management ---
+            function renderHistory() {
+                urlHistoryDatalist.innerHTML = '';
+                historyList.forEach(url => {
+                    const option = document.createElement('option');
+                    option.value = url;
+                    urlHistoryDatalist.appendChild(option);
+                });
+            }
+
+            function addToHistory(url) {
+                if (!url || url === defaultPlaceholderUrl) return;
+                // Move to front if exists
+                historyList = historyList.filter(u => u !== url);
+                historyList.unshift(url);
+                if (historyList.length > 15) historyList.pop();
+                localStorage.setItem('iframeTesterHistory', JSON.stringify(historyList));
+                renderHistory();
+            }
+            renderHistory();
+
+            // --- Theme Management ---
+            function initTheme() {
+                if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                    document.documentElement.classList.add('dark');
+                    sunIcon.classList.remove('hidden');
+                    moonIcon.classList.add('hidden');
+                } else {
+                    document.documentElement.classList.remove('dark');
+                    sunIcon.classList.add('hidden');
+                    moonIcon.classList.remove('hidden');
+                }
+            }
+
+            themeToggle.addEventListener('click', () => {
+                const isDark = document.documentElement.classList.toggle('dark');
+                if (isDark) {
+                    localStorage.theme = 'dark';
+                    sunIcon.classList.remove('hidden');
+                    moonIcon.classList.add('hidden');
+                } else {
+                    localStorage.theme = 'light';
+                    sunIcon.classList.add('hidden');
+                    moonIcon.classList.remove('hidden');
+                }
+            });
+            initTheme();
+
+            // --- Utility Functions ---
+            function isValidUrl(string) {
+                try {
+                    new URL(string);
+                    return true;
+                } catch (_) {
+                    try {
+                       new URL('https://' + string);
+                       return true;
+                    } catch(__) {
+                        return false;  
+                    }
+                }
+            }
+
+            function formatUrl(url) {
+                if (!/^https?:\/\//i.test(url)) {
+                    return 'https://' + url;
+                }
+                return url;
+            }
+
+            function showError(show) {
+                if (show) {
+                    urlInput.classList.add('error-state');
+                    if (errorMsg) errorMsg.classList.remove('hidden');
+                } else {
+                    urlInput.classList.remove('error-state');
+                    if (errorMsg) errorMsg.classList.add('hidden');
+                }
+            }
+
+            // --- Iframe & Viewport Control Logic ---
+            function setViewport(type) {
+                currentViewport = type;
+                frameContainer.style.width = '';
+                frameContainer.style.height = '';
+                scaleWrapper.classList.remove('w-full', 'h-full');
+                frameContainer.classList.remove('w-full', 'h-full');
+                
+                // Toggle rotation based on viewport type
+                if (type === 'responsive') {
+                    rotateBtn.disabled = true;
+                    rotateBtn.classList.remove('text-[var(--text-color)]');
+                } else {
+                    rotateBtn.disabled = false;
+                    rotateBtn.classList.add('text-[var(--text-color)]');
+                }
+
+                let baseWidth, baseHeight;
+
+                switch(type) {
+                    case 'mobile':
+                        baseWidth = 375; baseHeight = 812; break;
+                    case 'tablet':
+                        baseWidth = 768; baseHeight = 1024; break;
+                    case 'desktop':
+                        baseWidth = 1440; baseHeight = 900; break;
+                    case 'responsive':
+                    default:
+                        frameContainer.classList.add('w-full', 'h-full');
+                        scaleWrapper.classList.add('w-full', 'h-full');
+                        return;
+                }
+
+                // Apply orientation values
+                if (isLandscape) {
+                    frameContainer.style.width = `${baseHeight}px`;
+                    frameContainer.style.height = `${baseWidth}px`;
+                } else {
+                    frameContainer.style.width = `${baseWidth}px`;
+                    frameContainer.style.height = `${baseHeight}px`;
+                }
+                
+                // Keep wrapper tight for accurate centering during transforms
+                scaleWrapper.style.width = frameContainer.style.width;
+                scaleWrapper.style.height = frameContainer.style.height;
+            }
+
+            function loadIframe(url) {
+                if (!url) return;
+                const formattedUrl = formatUrl(url);
+
+                if (!isValidUrl(formattedUrl)) {
+                    showError(true);
+                    return;
+                }
+                
+                showError(false);
+                urlInput.value = formattedUrl;
+                addToHistory(formattedUrl);
+                
+                // Set query parameter quietly for link sharing
+                const currentUrl = new URL(window.location);
+                currentUrl.searchParams.set('url', formattedUrl);
+                window.history.replaceState({}, '', currentUrl);
+
+                // Start loading UI state
+                loadingOverlay.classList.remove('hidden');
+                emptyState.classList.add('hidden');
+                statusText.textContent = `Connecting to ${new URL(formattedUrl).hostname}...`;
+                frameContainer.classList.add('opacity-50');
+                
+                loadBtn.classList.add('hidden');
+                stopBtn.classList.remove('hidden');
+
+                testFrame.src = formattedUrl;
+            }
+
+            function stopLoading() {
+                testFrame.src = 'about:blank'; // Clears iframe to stop loading
+                
+                loadingOverlay.classList.add('hidden');
+                frameContainer.classList.remove('opacity-0', 'opacity-50');
+                
+                statusText.textContent = `Load Stopped`;
+                statusText.classList.add('text-vercel-accents5');
+                statusText.classList.remove('text-vercel-errorDark');
+                
+                stopBtn.classList.add('hidden');
+                loadBtn.classList.remove('hidden');
+            }
+
+            // Iframe finish rendering success hook
+            testFrame.onload = function() {
+                if (testFrame.src === '' || testFrame.src === 'about:blank' || testFrame.src === window.location.href) return;
+
+                loadingOverlay.classList.add('hidden');
+                frameContainer.classList.remove('opacity-0', 'opacity-50');
+                
+                try {
+                    const urlObj = new URL(testFrame.src);
+                    statusText.textContent = `Rendering: ${urlObj.hostname}`;
+                } catch(e) {
+                    statusText.textContent = `Rendered (Cross-Origin)`;
+                }
+
+                stopBtn.classList.add('hidden');
+                loadBtn.classList.remove('hidden');
+            };
+
+            // Iframe finish rendering fail hook
+            testFrame.onerror = function() {
+                 if (testFrame.src === 'about:blank') return;
+                 
+                 statusText.textContent = `Error loading frame`;
+                 statusText.classList.add('text-vercel-errorDark');
+                 loadingOverlay.classList.add('hidden');
+                 
+                 stopBtn.classList.add('hidden');
+                 loadBtn.classList.remove('hidden');
+            }
+
+            // --- Event Listeners ---
+            loadBtn.addEventListener('click', () => {
+                loadIframe(urlInput.value.trim());
+            });
+
+            stopBtn.addEventListener('click', stopLoading);
+
+            urlInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    loadIframe(urlInput.value.trim());
+                    urlInput.blur(); 
+                }
+            });
+
+            urlInput.addEventListener('input', () => {
+                if(urlInput.classList.contains('error-state')) {
+                    showError(false);
+                }
+            });
+
+            // Specific Interaction Request: Clear default on focus
+            urlInput.addEventListener('focus', function() {
+                if (this.value === defaultPlaceholderUrl) {
+                    this.value = '';
+                }
+            });
+            urlInput.addEventListener('blur', function() {
+                if (this.value.trim() === '') {
+                    this.value = defaultPlaceholderUrl;
+                }
+            });
+
+            clearBtn.addEventListener('click', () => {
+                urlInput.value = '';
+                urlInput.focus();
+                showError(false);
+            });
+
+            // Advanced controls events
+            viewportSelect.addEventListener('change', (e) => {
+                setViewport(e.target.value);
+            });
+
+            rotateBtn.addEventListener('click', () => {
+                isLandscape = !isLandscape;
+                rotateBtn.classList.toggle('bg-[var(--text-color)]');
+                rotateBtn.classList.toggle('text-[var(--bg-color)]');
+                setViewport(currentViewport);
+            });
+
+            zoomSlider.addEventListener('input', (e) => {
+                const scaleValue = e.target.value;
+                zoomValue.textContent = `${scaleValue}%`;
+                scaleWrapper.style.transform = `scale(${scaleValue / 100})`;
+            });
+
+            // Toolbar functionality events
+            refreshFrameBtn.addEventListener('click', () => {
+                if (testFrame.src && testFrame.src !== window.location.href) {
+                     loadIframe(urlInput.value.trim());
+                }
+            });
+
+            openNewTabBtn.addEventListener('click', () => {
+                const currentUrl = testFrame.src;
+                if (currentUrl && currentUrl !== window.location.href) {
+                    window.open(currentUrl, '_blank');
+                }
+            });
+            
+            copyShareBtn.addEventListener('click', () => {
+                const url = window.location.href;
+                navigator.clipboard.writeText(url).then(() => {
+                    const originalText = copyShareBtn.innerHTML;
+                    copyShareBtn.innerHTML = `<svg class="w-3.5 h-3.5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg><span class="text-green-500">Copied!</span>`;
+                    setTimeout(() => {
+                        copyShareBtn.innerHTML = originalText;
+                    }, 2000);
+                });
+            });
+
+            // --- Legal Modal Logic ---
+            const legalModal = document.getElementById('legalModal');
+            const legalModalContent = document.getElementById('legalModalContent');
+            const closeModalBtn = document.getElementById('closeModalBtn');
+            const acceptModalBtn = document.getElementById('acceptModalBtn');
+            const modalTitle = document.getElementById('modalTitle');
+            const modalBody = document.getElementById('modalBody');
+            const legalLinks = document.querySelectorAll('.legal-link');
+
+            const legalTexts = {
+                terms: {
+                    title: 'Terms of Service',
+                    content: `<p class="mb-4">Welcome to our Iframe Tester application. By accessing or using our service, you agree to be bound by these Terms of Service.</p>
+                              <h3 class="font-semibold mb-2">1. Use of Service</h3>
+                              <p class="mb-4">You may use this tool to preview and test URLs inside an iframe structure. We are not responsible for the content loaded within the frame.</p>
+                              <h3 class="font-semibold mb-2">2. Limitations</h3>
+                              <p>Due to security constraints (like X-Frame-Options and Content Security Policy), some websites cannot be loaded within an iframe. This is an expected behavior of modern web browsers.</p>`
+                },
+                privacy: {
+                    title: 'Privacy Policy',
+                    content: `<p class="mb-4">Your privacy is important to us. This application operates entirely within your browser.</p>
+                              <h3 class="font-semibold mb-2">Data Collection</h3>
+                              <p class="mb-4">We do not send your tested URLs, browsing habits, or personal information to any external servers. All history data is saved locally on your device via LocalStorage.</p>
+                              <h3 class="font-semibold mb-2">Third-Party Content</h3>
+                              <p>When you load a URL in the iframe, you are directly interacting with that third-party service, and their respective privacy policies apply.</p>`
+                },
+                cookies: {
+                    title: 'Cookie Policy',
+                    content: `<p class="mb-4">This application uses minimal local storage to improve your experience.</p>
+                              <ul class="list-disc pl-5 space-y-2">
+                                <li><strong>Theme Preference:</strong> We store your light/dark mode preference.</li>
+                                <li><strong>URL History:</strong> We store your recently tested URLs (up to 15) to provide autocomplete functionality.</li>
+                              </ul>
+                              <p class="mt-4">We do not use tracking cookies or third-party analytics cookies.</p>`
+                }
+            };
+
+            function openModal(policy) {
+                const data = legalTexts[policy];
+                if (!data) return;
+                
+                modalTitle.textContent = data.title;
+                modalBody.innerHTML = data.content;
+                
+                legalModal.classList.remove('hidden');
+                legalModal.classList.add('flex');
+                
+                // Slight delay for animation to trigger
+                setTimeout(() => {
+                    legalModal.classList.remove('opacity-0');
+                    legalModalContent.classList.remove('scale-95');
+                }, 10);
+            }
+
+            function closeModal() {
+                legalModal.classList.add('opacity-0');
+                legalModalContent.classList.add('scale-95');
+                
+                setTimeout(() => {
+                    legalModal.classList.add('hidden');
+                    legalModal.classList.remove('flex');
+                }, 200);
+            }
+
+            legalLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    openModal(e.target.dataset.policy);
+                });
+            });
+
+            closeModalBtn.addEventListener('click', closeModal);
+            acceptModalBtn.addEventListener('click', closeModal);
+            legalModal.addEventListener('click', (e) => {
+                if (e.target === legalModal) closeModal();
+            });
+
+            // --- Initialization ---
+            setViewport('responsive');
+            
+            // Check for URL parameter to auto-load shared links
+            const params = new URLSearchParams(window.location.search);
+            const sharedUrl = params.get('url');
+            if (sharedUrl) {
+                urlInput.value = sharedUrl;
+                loadIframe(sharedUrl);
+            }
+        });
+    </script>
+</body>
+</html>

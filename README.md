@@ -250,12 +250,13 @@ bundler. Two ways to do that by accident:
   without nesting interactive elements. Pinned cards get a green spine;
   `SiteIcon` is 38px (34px on phones).
 - The site name is the card's title: centred on its own line, above
-  `.site-card-strip` (a hairline that fades out at both ends), with the
-  favicon, the host and the `↗` marker centred underneath it. That is why
-  `.site-card-info` centres its children and the old `.site-card-ident`
-  column is gone — the name is no longer part of the meta row. `SiteIcon`
-  moved down into that row with it, and `.site-name` keeps `min-width: 0` so
-  an overlong name still ellipsizes instead of pushing the card wider.
+  `.site-card-strip` (a green gradient band that fades out at both ends and
+  carries a soft glow) and the centred meta row holding the favicon, the host
+  and the `↗` marker underneath it. That is why `.site-card-info` centres its
+  children and the old `.site-card-ident` column is gone — the name is no
+  longer part of the meta row. `SiteIcon` moved down into that row with it,
+  and `.site-name` keeps `min-width: 0` so an overlong name still ellipsizes
+  instead of pushing the card wider.
 - The two thumbs are stacked in `.vote-stack` with the up vote above the down
   vote, so the pair reads as one control; the pin stays beside the stack,
   vertically centred by `.site-actions`. The footer bar is therefore about

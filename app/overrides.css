@@ -304,26 +304,59 @@ html[data-theme="light"] { --subtle: #6b6b6b; }
 }
 .skip-link:focus { transform: none; }
 
-/* Directory filters ---------------------------------------------------- */
+/* Directory filters ----------------------------------------------------
+   Every chip and sort option here is something you press, so they are
+   drawn as filled controls with a real edge and a shadow — the same solid
+   material as the cards — and they depress when clicked. Nothing in the
+   filter row is outline-only any more.
+   The count inside a chip is part of the button's own label, so the chip's
+   accessible name still reads as "games 4". */
 .filter-bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 16px; }
-.tag-filters, .sort-controls { display: flex; flex-wrap: wrap; gap: 6px; }
+.tag-filters { display: flex; flex-wrap: wrap; gap: 7px; }
 .tag-chip {
-  display: inline-flex; align-items: center; gap: 6px; padding: 5px 10px;
-  border: 1px solid var(--line); border-radius: 999px; background: transparent;
-  color: var(--muted); font-size: 11.5px; cursor: pointer;
-  transition: border-color 150ms ease, color 150ms ease, background 150ms ease;
+  display: inline-flex; align-items: center; gap: 7px; padding: 7px 13px;
+  border: 1px solid color-mix(in srgb, var(--line-strong) 68%, var(--line));
+  border-radius: 999px;
+  background: var(--surface);
+  box-shadow: 0 1px 2px rgb(0 0 0 / 26%), inset 0 1px 0 rgb(255 255 255 / 5%);
+  color: var(--text); font-size: 11.5px; font-weight: 500; cursor: pointer;
+  transition: border-color 150ms ease, color 150ms ease, background 150ms ease, transform 150ms ease, box-shadow 150ms ease;
 }
-.tag-chip:hover { border-color: var(--line-strong); color: var(--text-strong); }
-.tag-chip.is-active { border-color: color-mix(in srgb, var(--live) 55%, var(--line)); background: color-mix(in srgb, var(--live) 12%, transparent); color: var(--live); }
+.tag-chip:hover {
+  border-color: var(--line-strong); background: var(--surface-hover); color: var(--text-strong);
+  transform: translateY(-1px); box-shadow: 0 3px 8px -3px rgb(0 0 0 / 45%), inset 0 1px 0 rgb(255 255 255 / 6%);
+}
+.tag-chip:active { transform: translateY(0); box-shadow: inset 0 2px 4px rgb(0 0 0 / 30%); }
+.tag-chip.is-active {
+  border-color: color-mix(in srgb, var(--live) 58%, var(--line));
+  background: color-mix(in srgb, var(--live) 17%, var(--surface));
+  color: color-mix(in srgb, var(--live) 84%, var(--text-strong));
+  box-shadow: 0 1px 2px rgb(0 0 0 / 26%), inset 0 1px 0 color-mix(in srgb, var(--live) 20%, transparent);
+}
 .tag-chip-count { color: var(--subtle); font-size: 9.5px; }
-.tag-chip.is-active .tag-chip-count { color: var(--live); }
-.sort-controls { padding: 3px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); }
-.sort-button {
-  padding: 5px 10px; border: 0; border-radius: 7px; background: transparent;
-  color: var(--muted); font-size: 11px; cursor: pointer; transition: background 150ms ease, color 150ms ease;
+.tag-chip.is-active .tag-chip-count { color: inherit; opacity: 0.75; }
+/* The sort options share one recessed rail, so they read as a segmented
+   control: the active option is the raised key in it. */
+.sort-controls {
+  display: flex; flex-wrap: wrap; gap: 4px; padding: 3px;
+  border: 1px solid color-mix(in srgb, var(--line-strong) 62%, var(--line));
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--surface) 62%, var(--background));
+  box-shadow: inset 0 1px 3px rgb(0 0 0 / 30%);
 }
-.sort-button:hover { color: var(--text-strong); }
-.sort-button.is-active { background: var(--surface-hover); color: var(--text-strong); }
+.sort-button {
+  padding: 7px 13px; border: 1px solid transparent; border-radius: 9px; background: transparent;
+  color: var(--muted); font-size: 11px; font-weight: 500; cursor: pointer;
+  transition: background 150ms ease, color 150ms ease, border-color 150ms ease, box-shadow 150ms ease;
+}
+.sort-button:hover { background: var(--surface-hover); color: var(--text-strong); }
+.sort-button:active { box-shadow: inset 0 2px 4px rgb(0 0 0 / 30%); }
+.sort-button.is-active {
+  border-color: color-mix(in srgb, var(--live) 52%, var(--line));
+  background: color-mix(in srgb, var(--live) 17%, var(--surface));
+  color: color-mix(in srgb, var(--live) 84%, var(--text-strong));
+  box-shadow: 0 1px 2px rgb(0 0 0 / 30%), inset 0 1px 0 color-mix(in srgb, var(--live) 20%, transparent);
+}
 .empty-reset { padding: 0; border: 0; background: none; color: var(--live); font: inherit; font-size: 13px; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
 .empty-reset:hover { color: var(--text-strong); }
 
@@ -366,21 +399,27 @@ html[data-theme="light"] { --subtle: #6b6b6b; }
 .site-badge.is-new { border-color: color-mix(in srgb, var(--live) 45%, var(--line)); color: var(--live); }
 
 /* Card layout ---------------------------------------------------------
-   Each card is one link (icon, name, host, description, tags) with a
-   footer bar underneath holding the live marker, the pin and the votes,
-   so a row of cards reads like an app list rather than a pile of boxes. */
+   Each card is one link (preview, icon, name, host, description, tags)
+   with a footer bar underneath holding the pin and the votes, so a row of
+   cards reads like an app list rather than a pile of boxes.
+   The card itself is a solid surface, not a tint: one opaque fill, a
+   visible edge and a real shadow, so a card reads as a physical object
+   sitting on the page instead of an outline drawn on it. The fill stays
+   put on hover — only the edge, the lift and the shadow react — because
+   the preview's gradient fades into `--surface` and a moving fill would
+   leave a seam where the two meet. */
 .site-card {
-  padding: 0; overflow: hidden;
-  border: 1px solid var(--line); border-radius: var(--radius-card);
-  background: linear-gradient(180deg, color-mix(in srgb, var(--surface) 92%, var(--background)), var(--surface));
-  box-shadow: inset 0 1px 0 rgb(255 255 255 / 5%);
-  transition: border-color 160ms ease, background 160ms ease, transform 160ms ease, box-shadow 160ms ease;
+  position: relative; padding: 0; overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--line-strong) 62%, var(--line));
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  box-shadow: 0 1px 2px rgb(0 0 0 / 30%), inset 0 1px 0 rgb(255 255 255 / 5%);
+  transition: border-color 160ms ease, transform 160ms ease, box-shadow 160ms ease;
 }
-html[data-theme="light"] .site-card { box-shadow: inset 0 1px 0 #fff, 0 1px 2px rgb(0 0 0 / 4%); }
+html[data-theme="light"] .site-card { box-shadow: 0 1px 1px rgb(0 0 0 / 5%), 0 2px 6px rgb(0 0 0 / 4%), inset 0 1px 0 #fff; }
 html[data-theme="light"] .site-card:hover { box-shadow: var(--shadow), inset 0 1px 0 #fff; }
 .site-card:hover {
   border-color: var(--line-strong); transform: translateY(-2px);
-  background: linear-gradient(180deg, color-mix(in srgb, var(--surface-hover) 92%, var(--background)), var(--surface-hover));
   box-shadow: var(--shadow), inset 0 1px 0 rgb(255 255 255 / 6%);
 }
 /* A pinned card keeps a green spine, so pinned entries read at a glance. */
@@ -391,7 +430,33 @@ html[data-theme="light"] .site-card:hover { box-shadow: var(--shadow), inset 0 1
   content: "";
 }
 
-.site-card-body { display: flex; flex-direction: column; gap: 10px; padding: 15px 15px 13px; }
+/* The preview band:
+   a live screenshot of the destination, faded into the card by a gradient
+   so the image never ends on a hard edge beside the text. The tile keeps
+   the site's own hashed gradient underneath (set inline by `SitePreview`),
+   so a slow or blocked screenshot still shows a deliberate tile in the
+   card's colour rather than a grey box. It is decorative — the name, host
+   and description sit right below it — and it is part of the card's single
+   link, so it is clickable like the rest of the body. */
+.site-preview {
+  position: relative; display: block; aspect-ratio: 16 / 9; max-height: 200px;
+  overflow: hidden; background-position: center; background-size: cover;
+}
+.site-preview img {
+  width: 100%; height: 100%; object-fit: cover; object-position: top center;
+  transition: transform 460ms cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+.site-card:hover .site-preview img { transform: scale(1.04); }
+.site-preview-fade {
+  position: absolute; inset: 0; pointer-events: none;
+  background:
+    linear-gradient(180deg, rgb(0 0 0 / 12%), rgb(0 0 0 / 0%) 38%),
+    linear-gradient(180deg, rgb(0 0 0 / 0%) 46%, color-mix(in srgb, var(--surface) 82%, transparent) 84%, var(--surface));
+}
+
+.site-card-body { display: flex; flex-direction: column; padding: 0; }
+/* The padded half of the card, below the preview band. */
+.site-card-info { display: flex; flex-direction: column; gap: 10px; padding: 15px 15px 13px; }
 .site-card-head { display: flex; align-items: center; gap: 11px; }
 .site-card-ident { display: flex; min-width: 0; flex: 1; flex-direction: column; gap: 3px; }
 .site-card-title { display: flex; min-width: 0; align-items: center; gap: 8px; }
@@ -401,17 +466,22 @@ html[data-theme="light"] .site-card:hover { box-shadow: var(--shadow), inset 0 1
 .site-open { flex: 0 0 auto; color: var(--subtle); font-size: 13px; transition: color 160ms ease, transform 160ms ease; }
 .site-card:hover .site-open { color: var(--live); transform: translate(2px, -2px); }
 .site-card-body .site-description { display: block; max-width: 100%; margin: 0; color: var(--muted); font-size: 12.5px; line-height: 1.55; }
-.site-card-body .tags { margin: 0; }
-.site-card-body .tag { background: color-mix(in srgb, var(--background) 45%, transparent); }
+.site-card-body .tags { margin: 0; gap: 6px; }
+/* Card tags are filled chips rather than tinted outlines, so they read as
+   the same solid material as the card they sit on. */
+.site-card-body .tag {
+  padding: 4px 8px; border: 1px solid color-mix(in srgb, var(--line-strong) 55%, var(--line));
+  border-radius: 7px;
+  background: color-mix(in srgb, var(--surface-hover) 86%, var(--background));
+  color: var(--muted);
+}
 
+/* The footer bar now holds only the pin and the votes, so it hangs them off
+   the right edge. */
 .site-card-foot {
-  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  display: flex; align-items: center; justify-content: flex-end; gap: 10px;
   padding: 9px 15px 10px; border-top: 1px solid var(--line);
   background: color-mix(in srgb, var(--background) 45%, transparent);
-}
-.site-status {
-  display: inline-flex; align-items: center; gap: 6px;
-  color: var(--subtle); font-size: 9.5px; letter-spacing: 0.1em; text-transform: uppercase;
 }
 .site-actions { margin-left: auto; }
 .search-icon { color: var(--subtle); font-size: 13px; }
@@ -698,6 +768,39 @@ html { scroll-behavior: smooth; }
 .footer-link-button { padding: 2px 0; border: 0; background: none; color: var(--muted); font: inherit; font-size: 12px; cursor: pointer; transition: color 150ms ease; }
 .footer-link-button:hover { color: var(--text-strong); }
 
+/* The footer's source-code button: the one footer item that leaves the
+   site, so it carries the GitHub mark and reads as a small solid button
+   beside the plain links rather than as one more link. */
+.footer-source {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 4px 11px; border: 1px solid color-mix(in srgb, var(--line-strong) 68%, var(--line));
+  border-radius: 999px; background: var(--surface);
+  box-shadow: 0 1px 2px rgb(0 0 0 / 24%), inset 0 1px 0 rgb(255 255 255 / 5%);
+  color: var(--muted); font-size: 11.5px;
+  transition: border-color 150ms ease, color 150ms ease, background 150ms ease, transform 150ms ease;
+}
+.footer-source svg { flex: 0 0 auto; }
+.footer-source:hover {
+  border-color: var(--line-strong); background: var(--surface-hover); color: var(--text-strong);
+  transform: translateY(-1px);
+}
+.footer-source:active { transform: translateY(0); }
+
+/* Theme swap -----------------------------------------------------------
+   Dark and light repaint nearly every surface on the page, and the CSS
+   variables swap instantly, so the change used to snap. `theme-fade` is
+   added to <html> for the length of the switch only (see `switchTheme` in
+   app/page.tsx), which eases the colour change and then gets out of the
+   way again so hover, focus and scroll keep their own timings. Only
+   colours are transitioned — never layout — and the button that flips the
+   theme never adds the class at all under `prefers-reduced-motion`. */
+@media (prefers-reduced-motion: no-preference) {
+  html.theme-fade,
+  html.theme-fade * {
+    transition: background-color 340ms ease, border-color 340ms ease, color 340ms ease, box-shadow 340ms ease, fill 340ms ease !important;
+  }
+}
+
 /* Blog extras: feed links, reading time and the "read next" cards. ------ */
 .blog-subscribe { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 18px 0 0; color: var(--subtle); font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; }
 .blog-subscribe a { color: var(--live); }
@@ -836,7 +939,7 @@ p a:hover, li a:hover, dd a:hover, .privacy-copy a:hover, .blog-article a:hover,
   .section-divider { margin-top: 44px; }
   .section-divider + * { margin-top: 40px; }
   .search-wrap { max-width: none; }
-  .site-card-body { padding: 13px 13px 11px; }
+  .site-card-info { padding: 12px 13px 11px; }
   .site-card-foot { padding: 8px 13px 9px; }
   .site-card-body .site-icon { width: 34px; height: 34px; border-radius: 11px; }
   body:has(.site-header) { padding-top: 58px; }

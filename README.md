@@ -206,11 +206,31 @@ Run `npm run validate:content` to check `sites.json`, `blogs.json`,
   width animation per line, staggered with negative delays so the lines never
   restart in sync. It is `aria-hidden`, ignores pointer events, and every line
   is measured in `ch` so it types exactly as wide as its own text.
-- A directory card is one link (`.site-card-body` — icon, name, host,
-  description, tags) plus a `.site-card-foot` bar holding the live marker, the
+- A directory card is one link (`.site-card-body` — the preview band, icon,
+  name, host, description and tags) plus a `.site-card-foot` bar holding the
   pin and the two votes. Keeping the buttons outside the link is what lets the
   whole information block be clickable without nesting interactive elements.
   Pinned cards get a green spine; `SiteIcon` is 38px (34px on phones).
+- Every card opens with a screenshot of its destination — the WordPress mShots
+  call the referral carousel uses, with thum.io (which the App Screenshot page
+  already depends on) as a second try, so every kept site gets a preview with
+  no image to maintain and no API key (see `SitePreview` in `app/page.tsx`). A gradient fades the shot into `--surface`, which is why the
+  card's fill is a solid `--surface` and never changes on hover: a moving fill
+  would leave a seam where the fade meets the body. The band keeps the site's
+  hashed gradient underneath, so a slow or blocked screenshot still shows a
+  deliberate tile instead of a grey box.
+- Both the chips and the sort options are filled controls (solid fill, visible
+  edge, shadow, and a pressed state) rather than outlines, and the card tags
+  are filled chips in the same material. The active sort option is the raised
+  key in a recessed rail.
+- The footer's **Source code** button is the GitHub link, kept beside the plain
+  footer links (`.footer-source`).
+- Dark/light switching eases every surface at once. `switchTheme` in
+  `app/page.tsx` adds `theme-fade` to `<html>`, flushes the layout, then flips
+  the theme, and removes the class after 480ms, so the transition only covers
+  the swap; the rule is inside `@media (prefers-reduced-motion:
+  no-preference)` as well as guarded in JS. The class is removed on unmount
+  too, because `<html>` outlives client-side navigation.
 
 ## Accessibility notes
 
@@ -256,8 +276,8 @@ Run `npm run validate:content` to check `sites.json`, `blogs.json`,
 
 No analytics, ad script or ad cookie loads until the visitor answers the
 banner, and the answer is the single switch for all of it. The only things that
-load either way are the destination preview images described above and each
-community upload's own favicon — both decorative, both cookie-free:
+load either way are the destination preview images on every directory card and
+in the referral carousel and each community upload's own favicon — both decorative, both cookie-free:
 
 | Component | Runs when |
 | --- | --- |

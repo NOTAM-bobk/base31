@@ -97,8 +97,8 @@ export default function PrivacyPage() {
           ad network is added to the page at all.
         </p>
         <p>
-          The sponsored cards in the referral carousel are ordinary links: they request nothing from
-          a third party unless you click one. Each card does show a small preview image of where the
+          The sponsored cards in the referral carousel and the cards in the directory are ordinary links: they request nothing from
+          a third party unless you click one. Each one shows a small preview image of where the
           link goes — a screenshot or the destination’s favicon, loaded directly from that site (or a
           screenshot service) so you can see what you are clicking. Those image requests are
           decorative and set no cookies; if you would rather not make them, blocking third-party

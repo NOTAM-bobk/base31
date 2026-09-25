@@ -296,6 +296,63 @@ function SiteIcon({ site }: { site: Site }) {
   );
 }
 
+// A live screenshot of the destination, used as the band at the top of every
+// card: WordPress mShots first (the same keyless service the referral carousel
+// uses) and thum.io — which the App Screenshot page already depends on — as a
+// second chance if the first refuses the request. The same trade as the
+// referral carousel: this is a destination preview, not tracking, so it is not
+// gated behind the cookie banner, since a card is hard to judge without its
+// picture. It sets no cookies and the privacy page says so.
+const previewSources = (site: Site): string[] => {
+  try {
+    const url = new URL(site.url).toString();
+    return [
+      `https://s0.wp.com/mshots/v1/${encodeURIComponent(url)}?w=640&h=360`,
+      `https://image.thum.io/get/width/640/crop/360/${url}`,
+    ];
+  } catch {
+    return [];
+  }
+};
+
+// The preview band: the destination's screenshot, faded into the card body by
+// a gradient so it never ends on a hard edge beside the text. The tile keeps
+// the site's own hashed gradient underneath, so a slow or blocked screenshot
+// still shows a deliberate tile in the card's colour rather than a grey box —
+// and the band itself is decorative, since the name, host and description sit
+// right beside it.
+function SitePreview({ site }: { site: Site }) {
+  const hash = hashKey(site.subdomain || site.name);
+  const hue = hash % 360;
+  const sources = previewSources(site);
+  // Walks the source list on each failure; once it runs out, the band keeps
+  // the site's own gradient rather than breaking.
+  const [index, setIndex] = useState(0);
+  const src = sources[index];
+
+  if (sources.length === 0) return null;
+
+  return (
+    <span
+      className="site-preview"
+      aria-hidden="true"
+      style={{ backgroundImage: `linear-gradient(140deg, hsl(${hue} 62% 40%), hsl(${(hue + 38) % 360} 58% 24%))` }}
+    >
+      {src && (
+        <img
+          src={src}
+          alt=""
+          loading="lazy"
+          decoding="async"
+          referrerPolicy="no-referrer"
+          onError={() => setIndex((current) => current + 1)}
+        />
+      )}
+      <span className="site-preview-fade" />
+    </span>
+  );
+}
+
 // Words the headline cycles through on load. The first one is server-rendered,
 // so the sentence still reads (and indexes) without JavaScript.
 const ROTATING_WORDS = ["curious", "cool", "amazing", "interested", "creative", "restless", "adventurous"];
@@ -440,6 +497,8 @@ export default function HomePage() {
   const [form, setForm] = useState({ title: "", description: "", tags: "", slug: "", email: "" });
   const searchRef = useRef<HTMLInputElement>(null);
   const toastTimer = useRef<number | null>(null);
+  // Holds the timer that removes the one-off theme-transition class.
+  const themeFadeTimer = useRef<number | null>(null);
   // When this tab was opened, so the exit nudge can wait until the visitor has
   // actually had a chance to read something.
   const openedAt = useRef(Date.now());
@@ -494,6 +553,33 @@ export default function HomePage() {
     else root.removeAttribute("data-theme");
     document.querySelector('meta[name="theme-color"]')?.setAttribute("content", theme === "light" ? "#fafafa" : "#000000");
   }, [theme]);
+
+  // Dark and light repaint every surface on the page, and CSS variables swap
+  // instantly, so the change used to snap. `theme-fade` on <html> adds one
+  // short colour transition for the length of the switch (see
+  // app/overrides.css); it is added, the layout flushed, and only then is the
+  // theme flipped, so the transition actually sees both values. The class is
+  // removed again afterwards so hover and scroll keep their own timings, and
+  // nothing is added at all when the visitor prefers reduced motion.
+  const switchTheme = () => {
+    const root = document.documentElement;
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (!reduced) {
+      root.classList.add("theme-fade");
+      void root.offsetWidth;
+      if (themeFadeTimer.current) window.clearTimeout(themeFadeTimer.current);
+      themeFadeTimer.current = window.setTimeout(() => root.classList.remove("theme-fade"), 480);
+    }
+    buzz(8);
+    setTheme(theme === "dark" ? "light" : "dark");
+  };
+
+  // The fade class lives on <html>, which survives client-side navigation, so
+  // it must not outlive this page.
+  useEffect(() => () => {
+    if (themeFadeTimer.current) window.clearTimeout(themeFadeTimer.current);
+    document.documentElement.classList.remove("theme-fade");
+  }, []);
 
   // The cookie banner sits at the very bottom, so the floating action button
   // needs to lift out of its way while it is visible.
@@ -1015,7 +1101,7 @@ export default function HomePage() {
             <button
               type="button"
               className="icon-button theme-toggle"
-              onClick={() => { buzz(8); setTheme((current) => (current === "dark" ? "light" : "dark")); }}
+              onClick={switchTheme}
               aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}
               title={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}
             >
@@ -1169,35 +1255,34 @@ export default function HomePage() {
                   role="listitem"
                   style={{ "--i": index } as CSSProperties}
                 >
-                  {/* The whole information block is one link — icon, name,
-                      host, description and tags — while the pin and vote
+                  {/* The whole information block is one link — preview, icon,
+                      name, host, description and tags — while the pin and vote
                       buttons sit outside it in the card's footer bar. */}
                   <a href={site.url} className="site-link site-card-body" target="_blank" rel="noreferrer">
-                    <span className="site-card-head">
-                      <SiteIcon site={site} />
-                      <span className="site-card-ident">
-                        <span className="site-card-title">
-                          <span className="site-name">{site.name}</span>
-                          {site.community && <span className="site-badge mono">community</span>}
-                          {isNew && <span className="site-badge is-new mono">new</span>}
+                    <SitePreview site={site} />
+                    <span className="site-card-info">
+                      <span className="site-card-head">
+                        <SiteIcon site={site} />
+                        <span className="site-card-ident">
+                          <span className="site-card-title">
+                            <span className="site-name">{site.name}</span>
+                            {site.community && <span className="site-badge mono">community</span>}
+                            {isNew && <span className="site-badge is-new mono">new</span>}
+                          </span>
+                          <span className="site-url mono">{site.url.replace(/^https?:\/\//, "").replace(/\/$/, "")}</span>
                         </span>
-                        <span className="site-url mono">{site.url.replace(/^https?:\/\//, "").replace(/\/$/, "")}</span>
+                        <span className="site-open mono" aria-hidden="true">↗</span>
+                        <span className="sr-only"> (opens in a new tab)</span>
                       </span>
-                      <span className="site-open mono" aria-hidden="true">↗</span>
-                      <span className="sr-only"> (opens in a new tab)</span>
+                      {site.description && <span className="site-description">{site.description}</span>}
+                      {site.tags && site.tags.length > 0 && (
+                        <span className="tags" aria-label="Tags">
+                          {site.tags.map((tag) => <span key={tag} className="tag mono">{tag}</span>)}
+                        </span>
+                      )}
                     </span>
-                    {site.description && <span className="site-description">{site.description}</span>}
-                    {site.tags && site.tags.length > 0 && (
-                      <span className="tags" aria-label="Tags">
-                        {site.tags.map((tag) => <span key={tag} className="tag mono">{tag}</span>)}
-                      </span>
-                    )}
                   </a>
                   <div className="site-card-foot">
-                    <span className="site-status mono">
-                      <span className="live-dot" aria-hidden="true" />
-                      live
-                    </span>
                     <div className="site-actions">
                       <button
                         type="button"
@@ -1298,6 +1383,14 @@ export default function HomePage() {
             <a href="/about">About</a>
             <a href="/terms">Terms of service</a>
             <a href="/privacy">Privacy</a>
+            {/* The one footer item that leaves the site, so it carries the
+                GitHub mark and reads as a small button rather than a link. */}
+            <a className="footer-source" href="https://github.com/NOTAM-bobk/base31" target="_blank" rel="noreferrer">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-hidden="true">
+                <path d="M12 1.8a10.2 10.2 0 0 0-3.2 19.9c.5.1.7-.2.7-.5v-1.9c-2.8.6-3.4-1.3-3.4-1.3-.5-1.2-1.1-1.5-1.1-1.5-.9-.6.1-.6.1-.6 1 .1 1.6 1 1.6 1 .9 1.6 2.4 1.1 3 .9.1-.7.4-1.1.7-1.4-2.3-.3-4.6-1.1-4.6-5 0-1.1.4-2 1-2.7-.1-.3-.4-1.3.1-2.7 0 0 .8-.3 2.8 1a9.5 9.5 0 0 1 5 0c2-1.3 2.8-1 2.8-1 .5 1.4.2 2.4.1 2.7.6.7 1 1.6 1 2.7 0 3.9-2.3 4.7-4.6 5 .4.3.7.9.7 1.9v2.8c0 .3.2.6.7.5A10.2 10.2 0 0 0 12 1.8Z" />
+              </svg>
+              Source code
+            </a>
             <a href="#updates">Bug report</a>
             <button
               type="button"

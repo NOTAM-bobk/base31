@@ -48,12 +48,12 @@
     "show": true
   },
   {
-    "name": "Example Site",
-    "subdomain": "example",
-    "url": "https://example.base31.org",
-    "tags": ["demo", "starter"],
-    "description": "A starter example showing how to add a static site to base31.org.",
-    "show": false
+    "name": "iframe tester",
+    "subdomain": "iframetester",
+    "url": "https://iframetester.base31.org",
+    "tags": ["iframe", "dev"],
+    "description": "Test any url with this tool, iframe testing.",
+    "show": true
   },
   {
     "name": "Focus Canvas",

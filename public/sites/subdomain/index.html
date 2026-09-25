@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enchanted Recon | Subdomain Enumerator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        /* Neo-brutalist custom styles */
+        :root {
+            --bg-color: #fdfbf7;
+            --text-color: #1a1a1a;
+            --primary: #ff4b4b;
+            --secondary: #2563eb;
+            --accent: #10b981;
+            --border-width: 3px;
+        }
+
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            /* Grid background for technical feel */
+            background-image: 
+                linear-gradient(rgba(0, 0, 0, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 0, 0, 0.05) 1px, transparent 1px);
+            background-size: 20px 20px;
+            overflow-x: hidden;
+        }
+
+        /* Brutalist component classes */
+        .brutal-box {
+            background-color: white;
+            border: var(--border-width) solid var(--text-color);
+            box-shadow: 6px 6px 0px var(--text-color);
+            transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        .brutal-input {
+            border: var(--border-width) solid var(--text-color);
+            background-color: white;
+            font-family: 'JetBrains Mono', monospace;
+            transition: all 0.2s ease;
+        }
+        
+        .brutal-input:focus {
+            outline: none;
+            box-shadow: 4px 4px 0px var(--secondary);
+            transform: translate(-2px, -2px);
+        }
+
+        .brutal-btn {
+            background-color: var(--primary);
+            color: white;
+            border: var(--border-width) solid var(--text-color);
+            box-shadow: 4px 4px 0px var(--text-color);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.15s ease;
+            cursor: pointer;
+        }
+
+        .brutal-btn:hover {
+            transform: translate(-2px, -2px);
+            box-shadow: 6px 6px 0px var(--text-color);
+        }
+
+        .brutal-btn:active {
+            transform: translate(2px, 2px);
+            box-shadow: 0px 0px 0px var(--text-color);
+        }
+
+        .brutal-badge {
+            border: 2px solid var(--text-color);
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: bold;
+        }
+
+        /* Animations */
+        @keyframes scanline {
+            0% { transform: translateY(-100%); }
+            100% { transform: translateY(100%); }
+        }
+
+        .scanning-active {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .scanning-active::after {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(to bottom, transparent, rgba(37, 99, 235, 0.2), transparent);
+            animation: scanline 2s linear infinite;
+            pointer-events: none;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+        
+        .cursor-blink {
+            animation: blink 1s step-end infinite;
+        }
+
+        /* Terminal output styling */
+        .terminal-text {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.875rem;
+        }
+
+        .fade-in-up {
+            animation: fadeInUp 0.4s ease-out forwards;
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* Loading spinner */
+        .spinner {
+            width: 24px;
+            height: 24px;
+            border: 3px solid var(--text-color);
+            border-bottom-color: transparent;
+            border-radius: 50%;
+            display: inline-block;
+            box-sizing: border-box;
+            animation: rotation 1s linear infinite;
+        }
+
+        @keyframes rotation {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 12px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--bg-color);
+            border-left: 2px solid var(--text-color);
+        }
+        ::-webkit-scrollbar-thumb {
+            background-color: var(--text-color);
+        }
+    </style>
+</head>
+<body class="min-h-screen p-4 md:p-8 lg:p-12 flex flex-col items-center">
+
+    <header class="w-full max-w-5xl mb-8 md:mb-12 flex flex-col md:flex-row justify-between items-start md:items-end border-b-4 border-gray-900 pb-4 overflow-hidden">
+        <div class="w-full md:w-auto">
+            <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold tracking-tighter uppercase whitespace-nowrap">
+                Subdomain Finder
+            </h1>
+            <p class="mt-2 text-sm md:text-lg font-medium opacity-80 flex items-center gap-2">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12h4l3-9 5 18 3-9h5"/></svg>
+                Real-Time Asset Discovery
+            </p>
+        </div>
+        <div class="mt-4 md:mt-0 self-start md:self-end text-right terminal-text text-xs md:text-sm border-2 border-gray-900 p-2 bg-white w-full md:w-auto">
+            <div class="text-gray-500">SYSTEM.STATUS</div>
+            <div class="font-bold text-green-600 flex items-center justify-start md:justify-end gap-2">
+                <div class="w-2 h-2 bg-green-500 rounded-full cursor-blink"></div>
+                LIVE_DATA_READY
+            </div>
+        </div>
+    </header>
+
+    <main class="w-full max-w-5xl flex flex-col gap-8">
+        <!-- Input Section -->
+        <section class="brutal-box p-6 md:p-8 bg-yellow-50">
+            <h2 class="text-2xl font-bold mb-4 uppercase flex items-center gap-3">
+                <span class="bg-gray-900 text-white w-8 h-8 flex items-center justify-center rounded-sm">01</span>
+                Target Definition
+            </h2>
+            
+            <form id="scanForm" class="flex flex-col gap-4">
+                <div class="flex flex-col md:flex-row gap-4">
+                    <div class="flex-grow relative">
+                        <div class="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none text-gray-500 font-bold terminal-text">
+                            https://
+                        </div>
+                        <input type="text" id="targetUrl" required
+                            class="brutal-input w-full p-4 pl-24 text-lg md:text-xl"
+                            placeholder="example.com"
+                            autocomplete="off" spellcheck="false">
+                    </div>
+                    <button type="submit" id="scanBtn" class="brutal-btn px-8 py-4 text-xl flex items-center justify-center min-w-[200px]">
+                        <span id="btnText">Initiate Scan</span>
+                        <span id="btnLoader" class="spinner ml-3 hidden"></span>
+                    </button>
+                </div>
+
+                <!-- Advanced Options Toggle -->
+                <div class="mt-2">
+                    <button type="button" id="toggleAdvanced" class="text-sm font-bold flex items-center gap-2 hover:text-blue-600 transition-colors uppercase">
+                        <svg id="advancedIcon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="transition-transform"><path d="M9 18l6-6-6-6"/></svg>
+                        Advanced Configuration
+                    </button>
+                    
+                    <!-- Advanced Options Panel -->
+                    <div id="advancedOptions" class="hidden mt-4 p-4 border-2 border-gray-900 bg-white grid grid-cols-1 md:grid-cols-2 gap-4 terminal-text">
+                        <label class="flex items-center gap-3 cursor-pointer group">
+                            <div class="relative w-6 h-6 border-2 border-gray-900 bg-white flex items-center justify-center group-hover:bg-gray-100">
+                                <input type="checkbox" checked class="opacity-0 absolute w-full h-full cursor-pointer peer">
+                                <svg class="hidden peer-checked:block w-4 h-4 text-red-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6L9 17l-5-5"/></svg>
+                            </div>
+                            <span>Deep Crawl (Hidden URLs)</span>
+                        </label>
+                        <label class="flex items-center gap-3 cursor-pointer group">
+                            <div class="relative w-6 h-6 border-2 border-gray-900 bg-white flex items-center justify-center group-hover:bg-gray-100">
+                                <input type="checkbox" checked class="opacity-0 absolute w-full h-full cursor-pointer peer">
+                                <svg class="hidden peer-checked:block w-4 h-4 text-red-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6L9 17l-5-5"/></svg>
+                            </div>
+                            <span>Wildcard Detection</span>
+                        </label>
+                        <label class="flex items-center gap-3 cursor-pointer group">
+                            <div class="relative w-6 h-6 border-2 border-gray-900 bg-white flex items-center justify-center group-hover:bg-gray-100">
+                                <input type="checkbox" checked class="opacity-0 absolute w-full h-full cursor-pointer peer">
+                                <svg class="hidden peer-checked:block w-4 h-4 text-red-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6L9 17l-5-5"/></svg>
+                            </div>
+                            <span>Brute-force Common Prefixes</span>
+                        </label>
+                        <div class="flex items-center gap-3">
+                            <span class="opacity-70">Threads:</span>
+                            <input type="number" value="50" min="1" max="200" class="border-2 border-gray-900 p-1 w-20 text-center font-bold">
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </section>
+
+        <!-- Results Dashboard (Hidden Initially) -->
+        <section id="resultsDashboard" class="hidden flex-col gap-6">
+            
+            <!-- Metrics Row -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="brutal-box p-4 bg-blue-50 flex flex-col justify-center items-center text-center">
+                    <span class="text-xs md:text-sm font-bold uppercase opacity-70">Total Found (CT Logs)</span>
+                    <span id="metricTotal" class="text-3xl md:text-4xl font-bold terminal-text">0</span>
+                </div>
+                <div class="brutal-box p-4 bg-green-50 flex flex-col justify-center items-center text-center">
+                    <span class="text-xs md:text-sm font-bold uppercase opacity-70">Active & Resolved</span>
+                    <span id="metricAlive" class="text-3xl md:text-4xl font-bold terminal-text text-green-600">0</span>
+                </div>
+                <div class="brutal-box p-4 bg-gray-50 flex flex-col justify-center items-center text-center">
+                    <span class="text-xs md:text-sm font-bold uppercase opacity-70">Unresolved/Dead</span>
+                    <span id="metricHidden" class="text-3xl md:text-4xl font-bold terminal-text text-gray-600">0</span>
+                </div>
+                <div class="brutal-box p-4 bg-purple-50 flex flex-col justify-center items-center text-center">
+                    <span class="text-xs md:text-sm font-bold uppercase opacity-70">Wildcards</span>
+                    <span id="metricWildcard" class="text-3xl md:text-4xl font-bold terminal-text text-purple-600">0</span>
+                </div>
+            </div>
+
+            <!-- Terminal Output -->
+            <div class="brutal-box bg-gray-900 text-green-400 p-1 h-96 flex flex-col">
+                <div class="bg-gray-800 px-4 py-2 border-b-2 border-gray-700 flex justify-between items-center text-white text-xs font-bold uppercase tracking-wider">
+                    <div class="flex items-center gap-2">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 17l6-6-6-6M12 19h8"/></svg>
+                        Live Enumeration Log
+                    </div>
+                    <div class="flex gap-2">
+                        <button id="copyBtn" class="hover:text-blue-400 transition-colors cursor-pointer disabled:opacity-50" title="Copy to Clipboard">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                        </button>
+                    </div>
+                </div>
+                
+                <div id="terminalBody" class="p-4 overflow-y-auto flex-grow terminal-text text-sm leading-relaxed relative">
+                    <!-- Progress bar at top of terminal during scan -->
+                    <div id="scanProgressContainer" class="absolute top-0 left-0 w-full h-1 bg-gray-800 hidden">
+                        <div id="scanProgress" class="h-full bg-blue-500 w-0 transition-all duration-300"></div>
+                    </div>
+                    
+                    <div id="logContainer" class="flex flex-col gap-1">
+                        <div class="text-gray-500">> Awaiting target definition...</div>
+                    </div>
+                    <!-- Auto-scroll anchor -->
+                    <div id="terminalBottom"></div>
+                </div>
+            </div>
+
+            <!-- Structured Data Table -->
+            <div class="brutal-box bg-white overflow-hidden">
+                <div class="bg-gray-100 p-4 border-b-3 border-gray-900 flex justify-between items-center">
+                    <h3 class="font-bold uppercase">Discovered Assets</h3>
+                    <div class="flex gap-2">
+                        <span class="brutal-badge bg-green-100 text-green-800 px-2 py-1 text-xs">LIVE</span>
+                        <span class="brutal-badge bg-yellow-100 text-yellow-800 px-2 py-1 text-xs">HIDDEN</span>
+                        <span class="brutal-badge bg-purple-100 text-purple-800 px-2 py-1 text-xs">WILDCARD</span>
+                    </div>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-white border-b-2 border-gray-900 terminal-text text-sm">
+                                <th class="p-4 py-3 font-bold">Subdomain</th>
+                                <th class="p-4 py-3 font-bold">Status</th>
+                                <th class="p-4 py-3 font-bold">IP Address</th>
+                                <th class="p-4 py-3 font-bold">Type/Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody id="resultsTableBody" class="terminal-text text-sm">
+                            <!-- Table rows injected via JS -->
+                            <tr>
+                                <td colspan="4" class="p-8 text-center text-gray-500 italic">No data yet. Initiate a scan.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="mt-16 w-full max-w-5xl border-t-4 border-gray-900 pt-8 pb-12 flex flex-col gap-8">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-6 text-sm font-medium">
+            <div class="flex flex-col gap-2">
+                <h4 class="font-bold uppercase text-gray-500 mb-2 border-b-2 border-gray-200 pb-1">Tools</h4>
+                <a href="#" class="hover:text-blue-600 hover:underline">Subdomain Scanner</a>
+                <a href="#" class="hover:text-blue-600 hover:underline">DNS Lookup</a>
+                <a href="#" class="hover:text-blue-600 hover:underline">Port Scanner</a>
+                <a href="#" class="hover:text-blue-600 hover:underline">IP Geolocation</a>
+            </div>
+            <div class="flex flex-col gap-2">
+                <h4 class="font-bold uppercase text-gray-500 mb-2 border-b-2 border-gray-200 pb-1">Resources</h4>
+                <a href="#" class="hover:text-blue-600 hover:underline">OSINT Framework</a>
+                <a href="#" class="hover:text-blue-600 hover:underline">API Documentation</a>
+                <a href="#" class="hover:text-blue-600 hover:underline">Security Blog</a>
+                <a href="#" class="hover:text-blue-600 hover:underline">How it Works</a>
+            </div>
+            <div class="flex flex-col gap-2">
+                <h4 class="font-bold uppercase text-gray-500 mb-2 border-b-2 border-gray-200 pb-1">Company</h4>
+                <a href="#" class="hover:text-blue-600 hover:underline">About Us</a>
+                <a href="#" class="hover:text-blue-600 hover:underline">Pricing Plans</a>
+                <a href="#" class="hover:text-blue-600 hover:underline">Contact Support</a>
+                <a href="#" class="hover:text-blue-600 hover:underline">Partnerships</a>
+            </div>
+            <div class="flex flex-col gap-2">
+                <h4 class="font-bold uppercase text-gray-500 mb-2 border-b-2 border-gray-200 pb-1">Legal</h4>
+                <a href="#" class="hover:text-blue-600 hover:underline">Privacy Policy</a>
+                <a href="#" class="hover:text-blue-600 hover:underline">Terms of Service</a>
+                <a href="#" class="hover:text-blue-600 hover:underline">Cookie Policy</a>
+                <a href="#" class="hover:text-blue-600 hover:underline">Data Processing</a>
+            </div>
+        </div>
+        <div class="flex flex-col md:flex-row justify-between items-center text-xs font-bold uppercase opacity-60 border-t-2 border-gray-100 pt-6 text-center md:text-left gap-4">
+            <p>© 2026 SUBDOMAIN FINDER PLATFORM</p>
+            <p>REAL-TIME LIVE DATA ENVIRONMENT</p>
+        </div>
+    </footer>
+
+    <script>
+        // DOM Elements
+        const form = document.getElementById('scanForm');
+        const targetInput = document.getElementById('targetUrl');
+        const scanBtn = document.getElementById('scanBtn');
+        const btnText = document.getElementById('btnText');
+        const btnLoader = document.getElementById('btnLoader');
+        
+        const toggleAdvanced = document.getElementById('toggleAdvanced');
+        const advancedOptions = document.getElementById('advancedOptions');
+        const advancedIcon = document.getElementById('advancedIcon');
+        
+        const resultsDashboard = document.getElementById('resultsDashboard');
+        const logContainer = document.getElementById('logContainer');
+        const terminalBottom = document.getElementById('terminalBottom');
+        const terminalBody = document.getElementById('terminalBody');
+        const resultsTableBody = document.getElementById('resultsTableBody');
+        
+        const progressContainer = document.getElementById('scanProgressContainer');
+        const progressBar = document.getElementById('scanProgress');
+        const copyBtn = document.getElementById('copyBtn');
+        
+        // Metrics
+        const els = {
+            total: document.getElementById('metricTotal'),
+            alive: document.getElementById('metricAlive'),
+            hidden: document.getElementById('metricHidden'), // Re-purposed for 'unresolved'
+            wildcard: document.getElementById('metricWildcard')
+        };
+
+        let isScanning = false;
+        let allDiscoveredLogs = [];
+
+        // UI Interactions
+        toggleAdvanced.addEventListener('click', () => {
+            advancedOptions.classList.toggle('hidden');
+            if (advancedOptions.classList.contains('hidden')) {
+                advancedIcon.style.transform = 'rotate(0deg)';
+            } else {
+                advancedIcon.style.transform = 'rotate(90deg)';
+            }
+        });
+
+        // Helper to extract clean domain
+        function getBaseDomain(url) {
+            let domain = url.replace(/^(https?:\/\/)?(www\.)?/, '');
+            domain = domain.split('/')[0];
+            return domain || '';
+        }
+
+        const appendLog = (msg, colorClass = 'text-gray-300') => {
+            const div = document.createElement('div');
+            div.className = `${colorClass} fade-in-up`;
+            
+            // Add timestamp
+            const now = new Date();
+            const timeStr = `${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}:${now.getSeconds().toString().padStart(2,'0')}`;
+            
+            div.innerHTML = `<span class="opacity-50">[${timeStr}]</span> ${msg}`;
+            logContainer.appendChild(div);
+            allDiscoveredLogs.push(`[${timeStr}] ${msg.replace(/<[^>]*>?/gm, '')}`); 
+            
+            // Auto scroll to bottom
+            terminalBottom.scrollIntoView({ behavior: 'smooth' });
+        };
+
+        // Real Data Fetching via Certificate Transparency Logs
+        async function fetchRealCTLogs(domain) {
+            appendLog(`> Querying real Certificate Transparency logs for ${domain}...`, 'text-blue-300');
+            try {
+                // Using a reliable CORS proxy to hit crt.sh
+                const crtUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(`https://crt.sh/?q=%.${domain}&output=json`)}`;
+                const response = await fetch(crtUrl);
+                
+                if (!response.ok) throw new Error('CT Log provider returned an error.');
+                
+                const data = await response.json();
+                if (!Array.isArray(data)) throw new Error('Invalid CT Log format.');
+
+                let subs = new Set();
+                data.forEach(cert => {
+                    if (cert.name_value) {
+                        const nameValues = cert.name_value.split('\n');
+                        nameValues.forEach(name => {
+                            let cleanName = name.toLowerCase().trim();
+                            // Ensure it's actually a subdomain of our target
+                            if (cleanName.endsWith(domain)) {
+                                subs.add(cleanName);
+                            }
+                        });
+                    }
+                });
+
+                return Array.from(subs);
+            } catch (error) {
+                appendLog(`> [ERROR] CT Log fetch failed: ${error.message}`, 'text-red-500 font-bold');
+                return [];
+            }
+        }
+
+        // Real DNS Resolution using Google DoH
+        async function resolveDns(subdomain) {
+            // Can't natively resolve a wildcard directly via standard A record DoH easily, we resolve the base
+            const queryName = subdomain.replace('*.', '');
+            try {
+                const res = await fetch(`https://dns.google/resolve?name=${queryName}&type=A`);
+                const data = await res.json();
+                
+                if (data.Answer && data.Answer.length > 0) {
+                    // Find the first A record (type 1)
+                    const aRecord = data.Answer.find(r => r.type === 1);
+                    if(aRecord) {
+                        return { ip: aRecord.data, status: 'Resolved' };
+                    }
+                }
+                return { ip: 'N/A', status: 'Unresolved' };
+            } catch(e) {
+                return { ip: 'Error', status: 'Failed' };
+            }
+        }
+
+        // Main Scan Logic
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (isScanning) return;
+
+            const rawTarget = targetInput.value.trim();
+            if(!rawTarget) return;
+
+            const domain = getBaseDomain(rawTarget);
+            if (!domain.includes('.')) {
+                alert("Please enter a valid domain (e.g., example.com)");
+                return;
+            }
+            
+            // Reset UI for new scan
+            isScanning = true;
+            targetInput.disabled = true;
+            btnText.textContent = 'SCANNING...';
+            btnLoader.classList.remove('hidden');
+            scanBtn.classList.replace('bg-red-500', 'bg-gray-800');
+            scanBtn.style.backgroundColor = 'var(--text-color)';
+            
+            resultsDashboard.classList.remove('hidden');
+            terminalBody.classList.add('scanning-active');
+            progressContainer.classList.remove('hidden');
+            progressBar.style.width = '5%';
+            
+            // Reset Data
+            allDiscoveredLogs = [];
+            logContainer.innerHTML = '';
+            resultsTableBody.innerHTML = '';
+            Object.values(els).forEach(el => el.textContent = '0');
+            
+            let counters = { total: 0, alive: 0, hidden: 0, wildcard: 0 };
+
+            appendLog(`> INITIALIZING REAL-TIME SCANNER...`, 'text-blue-400 font-bold');
+            appendLog(`> Target Locked: <b>${domain}</b>`);
+            
+            // 1. Fetch from CT Logs
+            const discoveredSubs = await fetchRealCTLogs(domain);
+            
+            counters.total = discoveredSubs.length;
+            animateValue(els.total, counters.total);
+            progressBar.style.width = '30%';
+
+            if (discoveredSubs.length === 0) {
+                appendLog(`> No subdomains found in public CT logs for this domain.`, 'text-yellow-400');
+            } else {
+                appendLog(`> Found ${discoveredSubs.length} unique subdomains. Commencing DNS resolution...`, 'text-green-400 font-bold');
+                
+                // Limit processing to prevent browser crash/rate limiting on massive domains
+                const maxToProcess = Math.min(discoveredSubs.length, 200); 
+                if(discoveredSubs.length > 200) {
+                    appendLog(`> Note: Displaying and resolving top 200 records to prevent rate limiting.`, 'text-yellow-400');
+                }
+
+                // 2. Process and Resolve DNS in batches
+                for (let i = 0; i < maxToProcess; i++) {
+                    const sub = discoveredSubs[i];
+                    const isWildcard = sub.startsWith('*.');
+                    
+                    if (isWildcard) counters.wildcard++;
+                    
+                    // Resolve IP
+                    const dnsInfo = await resolveDns(sub);
+                    
+                    let logColor = 'text-gray-400';
+                    if (dnsInfo.status === 'Resolved') {
+                        counters.alive++;
+                        logColor = 'text-green-400';
+                    } else {
+                        counters.hidden++;
+                        logColor = 'text-gray-500';
+                    }
+
+                    // Update UI live
+                    appendLog(`Resolved: ${sub} -> [${dnsInfo.ip}]`, logColor);
+                    
+                    animateValue(els.alive, counters.alive);
+                    animateValue(els.hidden, counters.hidden);
+                    animateValue(els.wildcard, counters.wildcard);
+                    
+                    addTableRow({
+                        sub: sub,
+                        status: dnsInfo.status,
+                        ip: dnsInfo.ip,
+                        isWildcard: isWildcard
+                    });
+
+                    // Update progress bar
+                    const progress = 30 + ((i + 1) / maxToProcess) * 70;
+                    progressBar.style.width = `${progress}%`;
+                    
+                    // Small artificial delay purely to prevent UI freezing and show animation
+                    await sleep(50); 
+                }
+            }
+
+            appendLog(`> Scan complete.`, 'text-green-400 font-bold');
+            progressBar.style.width = '100%';
+
+            // Cleanup UI
+            setTimeout(() => {
+                isScanning = false;
+                targetInput.disabled = false;
+                btnText.textContent = 'INITIATE SCAN';
+                btnLoader.classList.add('hidden');
+                scanBtn.style.backgroundColor = 'var(--primary)';
+                terminalBody.classList.remove('scanning-active');
+                setTimeout(() => progressContainer.classList.add('hidden'), 1000);
+            }, 500);
+        });
+
+        // Helper to add rows to the structured table
+        function addTableRow(asset) {
+            if (resultsTableBody.children.length === 1 && resultsTableBody.children[0].innerText.includes('No data yet')) {
+                resultsTableBody.innerHTML = '';
+            }
+
+            const tr = document.createElement('tr');
+            tr.className = "border-b border-gray-200 hover:bg-gray-50 transition-colors fade-in-up";
+            
+            let badgeHtml = '';
+            if(asset.isWildcard) badgeHtml = `<span class="ml-2 inline-block px-1 bg-purple-200 text-purple-800 text-[10px] font-bold">WILD</span>`;
+
+            let statusColor = 'text-gray-500';
+            if(asset.status === 'Resolved') statusColor = 'text-green-600 font-bold';
+
+            // Clean url for link
+            let href = `http://${asset.sub.replace('*.', '')}`;
+
+            tr.innerHTML = `
+                <td class="p-4 py-3 font-medium break-all text-blue-600">
+                    <a href="${href}" target="_blank" class="hover:underline">${asset.sub}</a>
+                    ${badgeHtml}
+                </td>
+                <td class="p-4 py-3 ${statusColor}">${asset.status}</td>
+                <td class="p-4 py-3 font-mono text-xs">${asset.ip}</td>
+                <td class="p-4 py-3 text-gray-600 text-xs uppercase">${asset.isWildcard ? 'Wildcard Domain' : 'Standard Asset'}</td>
+            `;
+            
+            resultsTableBody.insertBefore(tr, resultsTableBody.firstChild);
+        }
+
+        // Utility functions
+        const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+        function animateValue(obj, end, duration = 300) {
+            const start = parseInt(obj.textContent) || 0;
+            if (start === end) return;
+            obj.innerHTML = end; 
+        }
+
+        // Copy functionality
+        copyBtn.addEventListener('click', () => {
+            if(allDiscoveredLogs.length === 0) return;
+            const textToCopy = allDiscoveredLogs.join('\n');
+            
+            const textArea = document.createElement("textarea");
+            textArea.value = textToCopy;
+            document.body.appendChild(textArea);
+            textArea.select();
+            try {
+                document.execCommand('copy');
+                const originalHtml = copyBtn.innerHTML;
+                copyBtn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>';
+                copyBtn.classList.add('text-green-400');
+                setTimeout(() => {
+                    copyBtn.innerHTML = originalHtml;
+                    copyBtn.classList.remove('text-green-400');
+                }, 2000);
+            } catch (err) {
+                console.error('Failed to copy', err);
+            }
+            document.body.removeChild(textArea);
+        });
+
+    </script>
+</body>
+</html>

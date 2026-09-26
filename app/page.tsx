@@ -1297,9 +1297,26 @@ export default function HomePage() {
         <div className="footer-meta mono">
           <address className="footer-contact">
             <span className="footer-contact-label">Contact</span>
-            <a href="mailto:sawyer11456@gmail.com">sawyer11456@gmail.com</a>
-            <a href="tel:+16124443853">612 444 3853</a>
-            <span>Minneapolis, Minnesota</span>
+            <a className="footer-contact-item" href="mailto:sawyer11456@gmail.com">
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <rect x="3" y="5" width="18" height="14" rx="2" />
+                <path d="m3.6 7 8.4 6 8.4-6" />
+              </svg>
+              sawyer11456@gmail.com
+            </a>
+            <a className="footer-contact-item" href="tel:+16124443853">
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <path d="M5.2 3.5h3l1.5 4-2 1.4a12.4 12.4 0 0 0 5.4 5.4l1.4-2 4 1.5v3a2 2 0 0 1-2.2 2A15.6 15.6 0 0 1 3.5 5.7 2 2 0 0 1 5.2 3.5Z" />
+              </svg>
+              612 444 3853
+            </a>
+            <span className="footer-contact-item">
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <path d="M12 21s7-6.4 7-11.1a7 7 0 1 0-14 0C5 14.6 12 21 12 21Z" />
+                <circle cx="12" cy="9.9" r="2.6" />
+              </svg>
+              Minneapolis, Minnesota
+            </span>
           </address>
           <span className="footer-version">v{pkg.version}</span>
         </div>

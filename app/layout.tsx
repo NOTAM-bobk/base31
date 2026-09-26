@@ -9,6 +9,7 @@ import ConsentAwareAnalytics from "@/components/consent-aware-analytics";
 import PrivacyConsent from "@/components/privacy-consent";
 import StructuredData from "@/components/structured-data";
 import BlogTransitions from "@/components/blog-transitions";
+import PageBehaviors from "@/components/page-behaviors";
 
 const siteUrl = "https://base31.org";
 
@@ -56,6 +57,8 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <div className="top-accent" aria-hidden="true" />
         <StructuredData />
         <BlogTransitions />
+        {/* Screen Wake Lock plus the leave warning; see the component for why. */}
+        <PageBehaviors />
         {children}
         {/* Trustpilot TrustBox bootstrap. It scans for `.trustpilot-widget`
             placeholders (the review collector lives in app/page.tsx) and swaps

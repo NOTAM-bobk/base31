@@ -10,7 +10,7 @@ add this.
   gtag('js', new Date());
 
   gtag('config', 'G-Y5N2FYK786');
-</script>
+</script>  
 
   
 A homepage/directory for `base31.org` that lists every subdomain site, plus

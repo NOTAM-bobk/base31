@@ -1,0 +1,508 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+
+<!-- SEO --------------------------------------------------------------- -->
+<title>GitHub Explorer — Browse Any Repo's Files and Code, with AI | githubexplorer.base31.org</title>
+<meta name="description" content="Explore any GitHub repository's files and folders, read the code, browse a user's repos, and generate a README, docs or next steps with AI. Free, no sign-up." />
+<link rel="canonical" href="https://githubexplorer.base31.org/" />
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />
+<meta name="color-scheme" content="light dark" />
+<meta name="theme-color" content="#fafafa" media="(prefers-color-scheme: light)" />
+<meta name="theme-color" content="#0a0a0a" media="(prefers-color-scheme: dark)" />
+<meta name="application-name" content="GitHub Explorer" />
+<meta name="apple-mobile-web-app-title" content="GitHub Explorer" />
+<meta name="author" content="base31.org" />
+
+<!-- Social preview ---------------------------------------------------- -->
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="GitHub Explorer" />
+<meta property="og:locale" content="en_US" />
+<meta property="og:title" content="GitHub Explorer — Browse Repos, Read Code, Generate Docs" />
+<meta property="og:description" content="Open any GitHub repository, browse its file tree, read the code, explore a user's repos, and let AI write a README, docs or what to build next. Free, no account." />
+<meta property="og:url" content="https://githubexplorer.base31.org/" />
+<meta property="og:image" content="https://base31.org/opengraph-image" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:image:alt" content="GitHub Explorer — browse repositories and generate docs" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="GitHub Explorer — Browse Repos, Read Code, Generate Docs" />
+<meta name="twitter:description" content="Open any GitHub repository, browse its files, read the code, and let AI write a README, docs or next steps. Free, no account." />
+<meta name="twitter:image" content="https://base31.org/opengraph-image" />
+<meta name="twitter:image:alt" content="GitHub Explorer — browse repositories and generate docs" />
+
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230a0a0a'/%3E%3Cpath d='M11 8.5 5.5 16 11 23.5M21 8.5 26.5 16 21 23.5' fill='none' stroke='%23a78bfa' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E" type="image/svg+xml" />
+<link rel="apple-touch-icon" href="https://base31.org/icons/apple-touch-icon.png" />
+
+<!-- Structured data: the site, the tool it hosts and its FAQ. --------- -->
+<script type="application/ld+json">
+{"@context":"https://schema.org","@graph":[{"@type":"WebSite","@id":"https://githubexplorer.base31.org/#website","url":"https://githubexplorer.base31.org/","name":"GitHub Explorer","alternateName":"GitHub Explorer by base31.org","description":"Browse any GitHub repository's files and code, explore a user's repositories, and generate READMEs, docs and ideas with AI.","inLanguage":"en","publisher":{"@id":"https://base31.org/#organization"}},{"@type":"WebApplication","@id":"https://githubexplorer.base31.org/#app","name":"GitHub Explorer","url":"https://githubexplorer.base31.org/","description":"Open a GitHub repository, browse its file tree, read the code with syntax highlighting, explore a user's repos, and generate a README, documentation or next steps with AI.","applicationCategory":"DeveloperApplication","operatingSystem":"Any","browserRequirements":"Requires JavaScript","isAccessibleForFree":true,"inLanguage":"en","image":"https://base31.org/opengraph-image","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"featureList":["Browse any public repository's files and folders","Read source files with syntax highlighting","Explore every repository for a GitHub user","Generate a README, docs or a roadmap with AI","Explain a file or answer questions about a repo","Optional personal token for a higher rate limit"],"isPartOf":{"@id":"https://base31.org/#website"}},{"@type":"FAQPage","@id":"https://githubexplorer.base31.org/#faq","mainEntity":[{"@type":"Question","name":"How does GitHub Explorer work?","acceptedAnswer":{"@type":"Answer","text":"It reads public repositories through GitHub's free REST API: repository metadata, the full file tree, and raw file contents. Everything is loaded straight into your browser, and no account is needed for public repositories."}},{"@type":"Question","name":"Why do I sometimes hit a rate limit?","acceptedAnswer":{"@type":"Answer","text":"GitHub's unauthenticated API allows 60 requests per hour per IP address, which a few repository opens can use up. Add an optional personal access token in settings to raise the limit to 5,000 requests per hour; the token is stored only in your browser."}},{"@type":"Question","name":"Which repositories can I open?","acceptedAnswer":{"@type":"Answer","text":"Any repository that is public. Private repositories are only visible with a personal access token that has access to them, and the token never leaves your browser except when calling GitHub's own API."}},{"@type":"Question","name":"How does the AI feature work?","acceptedAnswer":{"@type":"Answer","text":"Choose a task such as generating a README, writing documentation, suggesting what to build next, or explaining a file. The page sends a small summary of the repository, its file tree and a few key files to the site's server, which passes it to an AI model and returns the result."}},{"@type":"Question","name":"Is the AI output ready to use?","acceptedAnswer":{"@type":"Answer","text":"Treat it as a strong first draft. The model sees the file tree and a handful of key files, not your whole codebase, so review anything it claims about behaviour, versions or commands before committing it."}},{"@type":"Question","name":"Do you store the repositories I open?","acceptedAnswer":{"@type":"Answer","text":"No. Browsing happens directly between your browser and GitHub. The recent-repositories list and any personal token are stored in your own browser storage, never on our servers."}}]}]}
+</script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="preconnect" href="https://api.github.com" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+<!-- Syntax highlighting: swap the light/dark theme in JS. -->
+<link id="hljsLight" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css" />
+<link id="hljsDark" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css" disabled />
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+
+<!-- Ads: Adcash auto-tag (zone iy7zk7mmw). This static subdomain page has no
+     cookie banner of its own, so the tag loads ungated here. The loader is
+     async, so the call polls briefly for `aclib` instead of assuming it is ready. -->
+<script id="aclib" type="text/javascript" src="https://acscdn.com/script/aclib.js" async></script>
+<script>
+  (function () {
+    var attempts = 0;
+    (function runAutoTag() {
+      if (window.aclib && typeof window.aclib.runAutoTag === 'function') {
+        window.aclib.runAutoTag({ zoneId: 'iy7zk7mmw' });
+      } else if (attempts++ < 60) {
+        window.setTimeout(runAutoTag, 250);
+      }
+    })();
+  })();
+</script>
+
+<script>
+  // Apply the saved theme before first paint to avoid a flash.
+  (function () {
+    var t = null;
+    try { t = localStorage.getItem('ghe:theme'); } catch (e) {}
+    if (!t) t = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    document.documentElement.setAttribute('data-theme', t);
+  })();
+</script>
+
+<style>
+:root {
+  --bg: #fafafa; --bg-elev: #ffffff; --card: #ffffff;
+  --line: #e6e6e6; --line-strong: #d4d4d4;
+  --fg: #0a0a0a; --fg-soft: #171717; --muted: #6b7280; --muted-2: #9ca3af;
+  --hover: #f4f4f5;
+  --accent: #7c3aed; --accent-strong: #6d28d9; --accent-soft: #f5f3ff;
+  --ok: #10b981; --ok-soft: #ecfdf5;
+  --warn: #f59e0b; --warn-soft: #fffbeb;
+  --info: #0ea5e9; --info-soft: #f0f9ff;
+  --danger: #ef4444; --danger-soft: #fef2f2;
+  --ring: rgba(124, 58, 237, 0.32);
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 8px 24px rgba(0, 0, 0, 0.05);
+  --radius: 12px; --radius-sm: 8px;
+  --grid: rgba(0, 0, 0, 0.035);
+  --code-bg: #ffffff;
+}
+html[data-theme="dark"] {
+  --bg: #050505; --bg-elev: #0a0a0a; --card: #0d0d0e;
+  --line: #232326; --line-strong: #333336;
+  --fg: #f5f5f5; --fg-soft: #ededed; --muted: #9aa0a6; --muted-2: #6b7280;
+  --hover: #151517;
+  --accent: #a78bfa; --accent-strong: #c4b5fd; --accent-soft: rgba(167, 139, 250, 0.12);
+  --ok: #3ecf8e; --ok-soft: rgba(62, 207, 142, 0.1);
+  --warn: #fbbf24; --warn-soft: rgba(251, 191, 36, 0.1);
+  --info: #38bdf8; --info-soft: rgba(56, 189, 248, 0.1);
+  --danger: #f87171; --danger-soft: rgba(248, 113, 113, 0.1);
+  --ring: rgba(167, 139, 250, 0.4);
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow: 0 1px 3px rgba(0, 0, 0, 0.5), 0 12px 32px rgba(0, 0, 0, 0.45);
+  --grid: rgba(255, 255, 255, 0.03);
+  --code-bg: #0b0b0e;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+[id] { scroll-margin-top: 5rem; }
+body {
+  margin: 0; min-height: 100vh;
+  background-color: var(--bg);
+  background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 44px 44px;
+  color: var(--fg);
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+::selection { background: var(--fg); color: var(--bg); }
+a { color: inherit; text-decoration: none; }
+button { font-family: inherit; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+.skip { position: absolute; left: -9999px; top: 0; z-index: 100; background: var(--fg); color: var(--bg); padding: 10px 16px; border-radius: 0 0 8px 0; font-size: 13px; font-weight: 500; }
+.skip:focus { left: 0; }
+.mono { font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace; }
+
+.wrap { width: 100%; max-width: 1080px; margin: 0 auto; padding: 0 20px; }
+.wrap.narrow { max-width: 760px; }
+.topbar { position: sticky; top: 0; z-index: 30; backdrop-filter: saturate(180%) blur(12px); -webkit-backdrop-filter: saturate(180%) blur(12px); background: color-mix(in srgb, var(--bg) 82%, transparent); border-bottom: 1px solid var(--line); }
+.topbar-inner { display: flex; align-items: center; justify-content: space-between; height: 56px; }
+.brand { display: flex; align-items: center; gap: 9px; font-size: 14px; font-weight: 600; letter-spacing: -0.01em; }
+.brand-mark { display: flex; align-items: center; justify-content: center; width: 26px; height: 26px; border-radius: 7px; background: var(--fg); color: var(--bg); }
+.topbar-actions { display: flex; align-items: center; gap: 4px; }
+.icon-btn { display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 8px; border: 1px solid transparent; background: transparent; color: var(--muted); cursor: pointer; transition: background 0.15s, color 0.15s; }
+.icon-btn:hover { background: var(--hover); color: var(--fg); }
+.icon-btn svg { width: 18px; height: 18px; }
+
+main { display: block; padding: 52px 0 0; }
+.hero { text-align: center; padding: 8px 0 28px; }
+.pill { display: inline-flex; align-items: center; gap: 7px; height: 26px; padding: 0 11px; border: 1px solid var(--line); border-radius: 999px; background: var(--card); color: var(--muted); font-size: 12px; font-weight: 500; box-shadow: var(--shadow-sm); }
+.pill .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+.hero h1 { margin: 20px 0 12px; font-size: clamp(30px, 5.5vw, 46px); line-height: 1.06; font-weight: 700; letter-spacing: -0.03em; }
+.hero h1 .grad { background: linear-gradient(100deg, var(--accent-strong), var(--accent) 55%, var(--info)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.hero p { margin: 0 auto; max-width: 560px; color: var(--muted); font-size: 16px; line-height: 1.6; }
+
+.checker { margin-top: 28px; padding: 14px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--card); box-shadow: var(--shadow); }
+.field { display: flex; gap: 10px; }
+.input-wrap { position: relative; flex: 1; display: flex; align-items: center; }
+.input-wrap .lead { position: absolute; left: 14px; color: var(--muted-2); display: flex; pointer-events: none; }
+.input-wrap .lead svg { width: 17px; height: 17px; }
+input[type="text"], input[type="password"] {
+  width: 100%; height: 48px; padding: 0 44px 0 42px;
+  border: 1px solid var(--line-strong); border-radius: var(--radius-sm);
+  background: var(--bg); color: var(--fg);
+  font-size: 15px; font-family: "JetBrains Mono", ui-monospace, monospace;
+  outline: none; transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
+}
+input::placeholder { color: var(--muted-2); font-family: "Inter", sans-serif; }
+input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--ring); background: var(--card); }
+.kbd-hint { position: absolute; right: 12px; display: inline-flex; align-items: center; height: 22px; padding: 0 7px; border: 1px solid var(--line); border-radius: 6px; background: var(--card); color: var(--muted-2); font-size: 11px; font-weight: 600; font-family: "JetBrains Mono", monospace; }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 48px; padding: 0 22px; border-radius: var(--radius-sm); border: 1px solid transparent; cursor: pointer; white-space: nowrap; font-size: 14px; font-weight: 600; transition: transform 0.08s, opacity 0.15s; }
+.btn-primary { background: var(--fg); color: var(--bg); box-shadow: var(--shadow-sm); }
+.btn-primary:hover { opacity: 0.88; }
+.btn-primary:active { transform: translateY(1px); }
+.btn-primary:disabled { opacity: 0.55; cursor: progress; }
+.spinner { width: 16px; height: 16px; border-radius: 50%; border: 2px solid color-mix(in srgb, var(--bg) 35%, transparent); border-top-color: var(--bg); animation: spin 0.7s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.examples { display: flex; flex-wrap: wrap; align-items: center; gap: 7px; margin-top: 12px; padding: 0 2px; }
+.examples span.lbl { color: var(--muted-2); font-size: 12px; }
+.chip { height: 26px; padding: 0 11px; border: 1px solid var(--line); border-radius: 999px; background: var(--bg); color: var(--muted); cursor: pointer; font-size: 12px; font-family: "JetBrains Mono", monospace; transition: border-color 0.15s, color 0.15s; }
+.chip:hover { border-color: var(--fg); color: var(--fg); }
+.hint-note { margin: 10px 2px 0; color: var(--muted-2); font-size: 12px; }
+
+.hidden { display: none !important; }
+.card { border: 1px solid var(--line); border-radius: var(--radius); background: var(--card); box-shadow: var(--shadow); overflow: hidden; }
+.card + .card { margin-top: 18px; }
+
+.repo-head { display: flex; align-items: flex-start; gap: 15px; padding: 20px; flex-wrap: wrap; }
+.repo-head .avatar { width: 46px; height: 46px; border-radius: 10px; border: 1px solid var(--line); background: var(--hover); flex: none; }
+.repo-head .rh-meta { min-width: 0; flex: 1; }
+.repo-head .rh-title { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.repo-head .rh-title h2 { margin: 0; font-size: 20px; font-weight: 700; letter-spacing: -0.02em; font-family: "JetBrains Mono", monospace; }
+.repo-head .rh-title a { color: var(--muted); display: inline-flex; }
+.repo-head .rh-title a svg { width: 16px; height: 16px; }
+.repo-head .rh-desc { margin: 6px 0 0; color: var(--muted); font-size: 14px; line-height: 1.55; max-width: 720px; }
+.repo-head .rh-links { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+.stats { display: flex; flex-wrap: wrap; gap: 16px; margin-top: 12px; color: var(--muted); font-size: 12.5px; }
+.stats span { display: inline-flex; align-items: center; gap: 5px; }
+.stats svg { width: 14px; height: 14px; }
+.lang-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--accent); }
+.topic { padding: 2px 8px; border: 1px solid var(--line); border-radius: 999px; font-size: 11px; color: var(--muted); }
+
+.explorer { display: grid; grid-template-columns: 300px 1fr; gap: 18px; margin-top: 18px; align-items: start; }
+.pane { border: 1px solid var(--line); border-radius: var(--radius); background: var(--card); box-shadow: var(--shadow-sm); overflow: hidden; }
+.pane-head { display: flex; align-items: center; gap: 8px; padding: 11px 14px; border-bottom: 1px solid var(--line); background: var(--bg-elev); }
+.pane-head h3 { margin: 0; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); }
+.tree-filter { padding: 10px 12px; border-bottom: 1px solid var(--line); }
+.tree-filter input { height: 34px; padding: 0 12px; font-size: 13px; }
+.tree { max-height: 620px; overflow: auto; padding: 6px; }
+.tree details { margin-left: 2px; }
+.tree summary { display: flex; align-items: center; gap: 7px; padding: 5px 8px; border-radius: 6px; cursor: pointer; font-size: 13px; list-style: none; color: var(--fg-soft); }
+.tree summary::-webkit-details-marker { display: none; }
+.tree summary:hover { background: var(--hover); }
+.tree summary .tw { color: var(--muted-2); transition: transform 0.15s; font-size: 10px; }
+.tree details[open] > summary .tw { transform: rotate(90deg); }
+.tree .fnode { display: flex; align-items: center; gap: 7px; width: 100%; padding: 5px 8px 5px 10px; margin-left: 16px; border: 0; border-radius: 6px; background: none; color: var(--muted); cursor: pointer; font-size: 13px; text-align: left; font-family: "JetBrains Mono", monospace; }
+.tree .fnode:hover { background: var(--hover); color: var(--fg); }
+.tree .fnode.on { background: var(--accent-soft); color: var(--accent-strong); }
+.tree .fnode .fn { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tico { flex: none; width: 14px; height: 14px; color: var(--muted-2); }
+.tree .fnode.on .tico { color: var(--accent-strong); }
+.flat-list .fnode { margin-left: 0; }
+
+.view-head { display: flex; align-items: center; gap: 10px; padding: 11px 14px; border-bottom: 1px solid var(--line); background: var(--bg-elev); flex-wrap: wrap; }
+.view-head .path { font-family: "JetBrains Mono", monospace; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; min-width: 120px; }
+.view-head .meta { color: var(--muted-2); font-size: 11px; }
+.icon-link { display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; border: 1px solid var(--line); border-radius: 7px; background: var(--card); color: var(--muted); cursor: pointer; }
+.icon-link:hover { border-color: var(--fg); color: var(--fg); }
+.icon-link svg { width: 15px; height: 15px; }
+.code-wrap { max-height: 620px; overflow: auto; background: var(--code-bg); }
+.code-wrap pre { margin: 0; }
+.code-wrap code { display: block; padding: 16px; font-family: "JetBrains Mono", monospace; font-size: 12.5px; line-height: 1.6; background: transparent !important; }
+.placeholder { padding: 44px 20px; text-align: center; color: var(--muted-2); font-size: 13.5px; }
+
+.grid-repos { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px; margin-top: 18px; }
+.repo-card { display: flex; flex-direction: column; gap: 8px; padding: 16px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--card); box-shadow: var(--shadow-sm); cursor: pointer; text-align: left; transition: border-color 0.15s, transform 0.1s; }
+.repo-card:hover { border-color: var(--accent); transform: translateY(-1px); }
+.repo-card .rc-name { font-family: "JetBrains Mono", monospace; font-size: 14px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.repo-card .rc-desc { color: var(--muted); font-size: 12.5px; line-height: 1.5; min-height: 34px; }
+.repo-card .rc-foot { display: flex; align-items: center; gap: 14px; color: var(--muted-2); font-size: 11.5px; margin-top: auto; }
+.repo-card .rc-foot span { display: inline-flex; align-items: center; gap: 4px; }
+.repo-card .rc-foot svg { width: 13px; height: 13px; }
+.badge-ai { display: inline-flex; align-items: center; gap: 4px; padding: 2px 7px; border-radius: 999px; background: var(--accent-soft); color: var(--accent-strong); font-size: 10.5px; font-weight: 600; }
+
+.ai-pane { margin-top: 18px; }
+.ai-actions { display: flex; flex-wrap: wrap; gap: 8px; padding: 14px; }
+.ai-btn { display: inline-flex; align-items: center; gap: 7px; height: 38px; padding: 0 14px; border: 1px solid var(--line-strong); border-radius: var(--radius-sm); background: var(--card); color: var(--fg-soft); cursor: pointer; font-size: 13px; font-weight: 500; transition: border-color 0.15s, background 0.15s; }
+.ai-btn:hover { border-color: var(--accent); color: var(--accent-strong); }
+.ai-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.ai-btn svg { width: 15px; height: 15px; }
+.ai-ask { display: flex; gap: 8px; padding: 0 14px 14px; }
+.ai-ask input { height: 40px; }
+.ai-ask .btn { height: 40px; padding: 0 16px; }
+.ai-out { border-top: 1px solid var(--line); padding: 16px; }
+.ai-out .ai-out-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 12px; }
+.ai-out .ai-out-head h3 { margin: 0; font-size: 13px; font-weight: 600; }
+.ai-tabs { display: flex; gap: 4px; }
+.ai-tab { height: 28px; padding: 0 10px; border: 1px solid var(--line); border-radius: 7px; background: var(--card); color: var(--muted); cursor: pointer; font-size: 12px; }
+.ai-tab.on { background: var(--accent); border-color: var(--accent); color: #fff; }
+.md { font-size: 14px; line-height: 1.7; color: var(--fg-soft); }
+.md h1 { font-size: 22px; margin: 18px 0 10px; letter-spacing: -0.02em; }
+.md h2 { font-size: 18px; margin: 16px 0 8px; }
+.md h3 { font-size: 15px; margin: 14px 0 6px; }
+.md p { margin: 0 0 10px; }
+.md ul { margin: 0 0 10px; padding-left: 20px; }
+.md li { margin: 3px 0; }
+.md a { color: var(--info); text-decoration: underline; text-underline-offset: 2px; }
+.md code { font-family: "JetBrains Mono", monospace; font-size: 12.5px; background: var(--hover); padding: 1px 5px; border-radius: 5px; }
+.md pre { background: var(--code-bg); border: 1px solid var(--line); border-radius: 8px; padding: 12px; overflow: auto; margin: 0 0 12px; }
+.md pre code { background: none; padding: 0; }
+.md blockquote { margin: 0 0 10px; padding: 2px 14px; border-left: 3px solid var(--line-strong); color: var(--muted); }
+.md hr { border: 0; border-top: 1px solid var(--line); margin: 14px 0; }
+.raw-md { white-space: pre-wrap; word-break: break-word; font-family: "JetBrains Mono", monospace; font-size: 12.5px; line-height: 1.65; background: var(--code-bg); border: 1px solid var(--line); border-radius: 8px; padding: 14px; max-height: 460px; overflow: auto; margin: 0; }
+
+.mini-spinner { width: 15px; height: 15px; border-radius: 50%; border: 2px solid var(--line-strong); border-top-color: var(--accent); animation: spin 0.7s linear infinite; }
+.notice { display: flex; gap: 10px; padding: 13px 16px; border-radius: var(--radius-sm); border: 1px solid; font-size: 13px; line-height: 1.55; }
+.notice svg { flex: none; width: 16px; height: 16px; margin-top: 1px; }
+.notice.err { color: var(--danger); border-color: color-mix(in srgb, var(--danger) 35%, transparent); background: var(--danger-soft); }
+.notice.warn { color: var(--warn); border-color: color-mix(in srgb, var(--warn) 35%, transparent); background: var(--warn-soft); }
+.notice.info { color: var(--muted); border-color: var(--line); background: var(--bg-elev); }
+
+.recent { margin-top: 22px; }
+.section-eyebrow { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+.section-eyebrow h2 { margin: 0; font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+.link-btn { background: none; border: 0; color: var(--muted-2); cursor: pointer; font-size: 12px; font-weight: 500; }
+.link-btn:hover { color: var(--danger); }
+.recent-list { display: flex; flex-wrap: wrap; gap: 8px; }
+.recent-item { display: inline-flex; align-items: center; gap: 8px; height: 32px; padding: 0 12px; border: 1px solid var(--line); border-radius: 999px; background: var(--card); color: var(--muted); cursor: pointer; font-family: "JetBrains Mono", monospace; font-size: 12.5px; }
+.recent-item:hover { border-color: var(--fg); color: var(--fg); }
+
+.section { margin-top: 52px; }
+.section > h2 { margin: 0 0 8px; font-size: 22px; font-weight: 600; letter-spacing: -0.02em; }
+.section > p.lead { margin: 0 0 22px; color: var(--muted); font-size: 15px; line-height: 1.6; max-width: 620px; }
+.steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+.step { padding: 18px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--card); box-shadow: var(--shadow-sm); }
+.step .num { font-family: "JetBrains Mono", monospace; font-size: 12px; font-weight: 500; color: var(--accent-strong); }
+.step h3 { margin: 9px 0 5px; font-size: 14px; font-weight: 600; }
+.step p { margin: 0; color: var(--muted); font-size: 13px; line-height: 1.55; }
+
+.faq-list { border: 1px solid var(--line); border-radius: var(--radius); background: var(--card); overflow: hidden; box-shadow: var(--shadow-sm); }
+.faq-item { border-bottom: 1px solid var(--line); }
+.faq-item:last-child { border-bottom: 0; }
+.faq-item summary { display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 16px 18px; cursor: pointer; font-size: 14px; font-weight: 500; list-style: none; }
+.faq-item summary::-webkit-details-marker { display: none; }
+.faq-item .chev { flex: none; color: var(--muted-2); transition: transform 0.2s ease; }
+.faq-item[open] .chev { transform: rotate(180deg); }
+.faq-item .ans { padding: 0 18px 17px; color: var(--muted); font-size: 13.5px; line-height: 1.65; }
+.faq-note { margin-top: 14px; font-size: 12px; color: var(--muted-2); line-height: 1.6; }
+
+dialog { border: 1px solid var(--line); border-radius: var(--radius); background: var(--card); color: var(--fg); padding: 0; max-width: 460px; width: calc(100% - 32px); box-shadow: var(--shadow); }
+dialog::backdrop { background: rgba(0, 0, 0, 0.5); }
+.dlg-body { padding: 20px; }
+.dlg-body h2 { margin: 0 0 4px; font-size: 17px; }
+.dlg-body p { margin: 0 0 16px; color: var(--muted); font-size: 13px; line-height: 1.55; }
+.dlg-body label { display: block; font-size: 12px; font-weight: 600; color: var(--muted); margin-bottom: 6px; }
+.dlg-body input { padding-left: 14px; }
+.dlg-foot { display: flex; gap: 8px; justify-content: flex-end; margin-top: 16px; }
+
+footer { margin-top: 66px; border-top: 1px solid var(--line); }
+.footer-inner { display: flex; flex-wrap: wrap; gap: 28px; justify-content: space-between; padding: 34px 0; }
+.footer-brand { max-width: 320px; }
+.footer-brand p { margin: 12px 0 0; color: var(--muted); font-size: 12.5px; line-height: 1.6; }
+.footer-cols { display: flex; gap: 48px; }
+.footer-col h3 { margin: 0 0 12px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.07em; color: var(--muted-2); }
+.footer-col ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 9px; }
+.footer-col a { color: var(--muted); font-size: 13px; transition: color 0.15s; }
+.footer-col a:hover { color: var(--fg); }
+.footer-base { border-top: 1px solid var(--line); padding: 18px 0; color: var(--muted-2); font-size: 12px; line-height: 1.6; }
+
+@media (max-width: 820px) {
+  .explorer { grid-template-columns: 1fr; }
+  .tree { max-height: 300px; }
+  .steps { grid-template-columns: 1fr; }
+}
+@media (max-width: 640px) {
+  main { padding-top: 36px; }
+  .field { flex-direction: column; }
+  .btn-primary { width: 100%; }
+  .footer-cols { gap: 34px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; }
+}
+</style>
+</head>
+<body>
+<a href="#main" class="skip">Skip to the explorer</a>
+
+<header class="topbar">
+  <div class="wrap topbar-inner">
+    <a href="/" class="brand" aria-label="GitHub Explorer home">
+      <span class="brand-mark" aria-hidden="true">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M8 7 3 12l5 5M16 7l5 5-5 5"/></svg>
+      </span>
+      <span>GitHub Explorer</span>
+    </a>
+    <div class="topbar-actions">
+      <button id="settingsBtn" class="icon-btn" type="button" aria-label="Settings">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.6 1.6 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.6 1.6 0 0 0-1.8-.3 1.6 1.6 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1A1.6 1.6 0 0 0 9 19.4a1.6 1.6 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.6 1.6 0 0 0 .3-1.8 1.6 1.6 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1A1.6 1.6 0 0 0 4.6 9a1.6 1.6 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.6 1.6 0 0 0 1.8.3H9a1.6 1.6 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.6 1.6 0 0 0 1 1.5 1.6 1.6 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.6 1.6 0 0 0-.3 1.8V9a1.6 1.6 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.6 1.6 0 0 0-1.5 1z"/></svg>
+      </button>
+      <button id="themeBtn" class="icon-btn" type="button" aria-label="Toggle dark mode"></button>
+    </div>
+  </div>
+</header>
+
+<main id="main">
+  <div class="wrap narrow">
+    <section class="hero">
+      <span class="pill"><span class="dot" aria-hidden="true"></span>GitHub's free API + AI</span>
+      <h1>Explore any repo, <span class="grad">read the code, ship the docs.</span></h1>
+      <p>Paste a GitHub repository or a username. Browse every file and folder, read the source with syntax highlighting, and let AI draft the README, documentation or next steps.</p>
+    </section>
+
+    <section class="checker" aria-label="Repository search">
+      <form id="checkForm" class="field" novalidate>
+        <div class="input-wrap">
+          <span class="lead" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.9a3.4 3.4 0 0 0-.9-2.6c3-.3 6.2-1.5 6.2-6.7A5.2 5.2 0 0 0 19.9 5 4.9 4.9 0 0 0 19.8 1S18.5.6 16 2.3a13.4 13.4 0 0 0-7 0C6.5.6 5.2 1 5.2 1A4.9 4.9 0 0 0 5.1 5 5.2 5.2 0 0 0 3.7 8.8c0 5.2 3.2 6.4 6.2 6.7a3.4 3.4 0 0 0-.9 2.6V22"/></svg>
+          </span>
+          <label for="queryInput" class="sr-only">GitHub repository or username</label>
+          <input id="queryInput" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="go" placeholder="owner/repo or a username" />
+          <kbd class="kbd-hint" id="kbdHint">/</kbd>
+        </div>
+        <button id="submitBtn" class="btn btn-primary" type="submit"><span id="btnLabel">Explore</span></button>
+      </form>
+      <p class="hint-note">Try <span class="mono">facebook/react</span> for a repository, or <span class="mono">torvalds</span> for a user's repos.</p>
+    </section>
+
+    <div id="messageSlot"></div>
+    <div id="resultSlot" aria-live="polite"></div>
+
+    <section id="recentSection" class="recent" hidden>
+      <div class="section-eyebrow">
+        <h2>Recent</h2>
+        <button id="clearRecent" class="link-btn" type="button">Clear</button>
+      </div>
+      <div id="recentList" class="recent-list"></div>
+    </section>
+
+    <section class="section">
+      <h2>What you can do</h2>
+      <p class="lead">Everything reads through GitHub's public API straight into your browser.</p>
+      <div class="steps">
+        <div class="step">
+          <span class="num">01</span>
+          <h3>Browse &amp; read</h3>
+          <p>Open a repository, walk its full file tree, filter by name, and read any source file with syntax highlighting, line wrapping and a one-click copy or download.</p>
+        </div>
+        <div class="step">
+          <span class="num">02</span>
+          <h3>Explore a user</h3>
+          <p>Enter a username to list every public repository they own, sorted by most recently updated, each with language, stars and description.</p>
+        </div>
+        <div class="step">
+          <span class="num">03</span>
+          <h3>Let AI draft</h3>
+          <p>Generate a README, write developer documentation, get a prioritised roadmap of what to build next, or ask questions about the codebase.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="faq">
+      <h2>Frequently asked questions</h2>
+      <div class="faq-list">
+        <details class="faq-item">
+          <summary>How does GitHub Explorer work?<span class="chev" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></span></summary>
+          <div class="ans">It reads public repositories through GitHub's free REST API: repository metadata, the full file tree, and raw file contents. Everything is loaded straight into your browser, and no account is needed for public repositories.</div>
+        </details>
+        <details class="faq-item">
+          <summary>Why do I sometimes hit a rate limit?<span class="chev" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></span></summary>
+          <div class="ans">GitHub's unauthenticated API allows 60 requests per hour per IP address, which a few repository opens can use up. Add an optional personal access token in settings to raise the limit to 5,000 requests per hour; the token is stored only in your browser.</div>
+        </details>
+        <details class="faq-item">
+          <summary>Which repositories can I open?<span class="chev" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></span></summary>
+          <div class="ans">Any repository that is public. Private repositories are only visible with a personal access token that has access to them, and the token never leaves your browser except when calling GitHub's own API.</div>
+        </details>
+        <details class="faq-item">
+          <summary>How does the AI feature work?<span class="chev" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></span></summary>
+          <div class="ans">Choose a task such as generating a README, writing documentation, suggesting what to build next, or explaining a file. The page sends a small summary of the repository, its file tree and a few key files to the site's server, which passes it to an AI model and returns the result.</div>
+        </details>
+        <details class="faq-item">
+          <summary>Is the AI output ready to use?<span class="chev" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></span></summary>
+          <div class="ans">Treat it as a strong first draft. The model sees the file tree and a handful of key files, not your whole codebase, so review anything it claims about behaviour, versions or commands before committing it.</div>
+        </details>
+        <details class="faq-item">
+          <summary>Do you store the repositories I open?<span class="chev" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></span></summary>
+          <div class="ans">No. Browsing happens directly between your browser and GitHub. The recent-repositories list and any personal token are stored in your own browser storage, never on our servers.</div>
+        </details>
+      </div>
+      <p class="faq-note">This is an independent viewer for GitHub's public data and is not affiliated with GitHub. It never writes to your repositories.</p>
+    </section>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap footer-inner">
+    <div class="footer-brand">
+      <a href="/" class="brand">
+        <span class="brand-mark" aria-hidden="true">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M8 7 3 12l5 5M16 7l5 5-5 5"/></svg>
+        </span>
+        <span>GitHub Explorer</span>
+      </a>
+      <p>A free GitHub repository browser with code viewing and AI docs, hosted on <a href="https://base31.org/" style="color:var(--fg); text-decoration:underline; text-underline-offset:2px;">base31.org</a>. Not affiliated with GitHub.</p>
+    </div>
+    <div class="footer-cols">
+      <div class="footer-col">
+        <h3>base31</h3>
+        <ul>
+          <li><a href="https://base31.org/">Cool sites</a></li>
+          <li><a href="https://base31.org/blog">Blog</a></li>
+          <li><a href="https://base31.org/about">About</a></li>
+          <li><a href="https://base31.org/#updates">Bug report</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h3>Legal</h3>
+        <ul>
+          <li><a href="https://base31.org/terms">Terms of service</a></li>
+          <li><a href="https://base31.org/privacy">Privacy policy</a></li>
+          <li><a href="https://base31.org/privacy">Cookies &amp; ads</a></li>
+          <li><a href="mailto:hello@base31.org?subject=GitHub%20Explorer%20abuse%20report">Report abuse</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="wrap footer-base">
+    &copy; 2026 GitHub Explorer &middot; githubexplorer.base31.org. Repository data comes from GitHub's public API and this page shows ads served by Adcash — see the <a href="https://base31.org/privacy" style="color:var(--muted); text-decoration:underline; text-underline-offset:2px;">privacy policy</a>.
+  </div>
+</footer>
+
+<dialog id="settingsDlg" aria-labelledby="settingsTitle">
+  <div class="dlg-body">
+    <h2 id="settingsTitle">Settings</h2>
+    <p>A personal access token raises GitHub's limit from 60 to 5,000 requests per hour and lets you open private repositories. It is kept in this browser only and is sent only to GitHub.</p>
+    <label for="tokenInput">GitHub personal access token (optional)</label>
+    <input id="tokenInput" type="password" autocomplete="off" spellcheck="false" placeholder="ghp_… or github_pat_…" />
+    <div class="dlg-foot">
+      <button id="tokenClear" class="link-btn" type="button">Remove token</button>
+      <button id="tokenSave" class="btn btn-primary" type="button" style="height:38px;padding:0 16px;">Save</button>
+    </div>
+  </div>
+</dialog>
+
+<script defer src="app.js"></script>
+</body>
+</html>

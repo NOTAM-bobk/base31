@@ -80,6 +80,14 @@
     "show": true
   },
   {
+    "name": "GitHub Explorer",
+    "subdomain": "githubexplorer",
+    "url": "https://githubexplorer.base31.org",
+    "tags": ["github", "developer", "ai", "code"],
+    "description": "Browse any GitHub repository's files and code, explore a user's repositories, and draft READMEs and docs with AI.",
+    "show": true
+  },
+  {
     "name": "Joke Generator",
     "subdomain": "jokegenrator",
     "url": "https://jokegenrator.base31.org",

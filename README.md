@@ -1,7 +1,16 @@
 # base31.org
+google anylistics verfication   
+add this.   
 
-add this. 
-<meta name="trustpilot-one-time-domain-verification-id" content="c33dc438-a677-4add-a519-04714888e931"/> 
+  <!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-Y5N2FYK786"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-Y5N2FYK786');
+</script>
 
   
 A homepage/directory for `base31.org` that lists every subdomain site, plus

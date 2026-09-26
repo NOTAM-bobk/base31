@@ -1355,6 +1355,26 @@ export default function HomePage() {
           </div>
         </section>
 
+        {/* Trustpilot review collector. The TrustBox bootstrap script lives in
+            app/layout.tsx; it renders the hosted widget into this placeholder,
+            and the link inside it is the no-JS fallback. */}
+        <section className="trustpilot-section" data-reveal aria-labelledby="trustpilot-heading">
+          <p className="eyebrow mono">reviews</p>
+          <h2 id="trustpilot-heading">Enjoying base31?</h2>
+          <p className="trustpilot-lede">Tell other curious people what you found. Reviews are collected by Trustpilot.</p>
+          <div
+            className="trustpilot-widget"
+            data-locale="en-US"
+            data-template-id="56278e9abfbbba0bdcd568bc"
+            data-businessunit-id="6ab71f7b09356411d7a0b67f"
+            data-style-height="52px"
+            data-style-width="100%"
+            data-token="922794cb-0a34-48a9-9ed1-9b845648dce8"
+          >
+            <a href="https://www.trustpilot.com/review/base31.org" target="_blank" rel="noopener noreferrer">Trustpilot</a>
+          </div>
+        </section>
+
         <section id="about" className="about-section" data-reveal aria-labelledby="about-heading">
           <p className="eyebrow mono">about the directory</p>
           <h2 id="about-heading">A small home for the interesting internet.</h2>

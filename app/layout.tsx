@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
+import Script from "next/script";
 import "./globals.css";
 import "./overrides.css";
 import CodeBackdrop from "@/components/code-backdrop";
@@ -56,6 +57,14 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <StructuredData />
         <BlogTransitions />
         {children}
+        {/* Trustpilot TrustBox bootstrap. It scans for `.trustpilot-widget`
+            placeholders (the review collector lives in app/page.tsx) and swaps
+            them for the hosted widget once the page is interactive. */}
+        <Script
+          id="trustpilot-bootstrap"
+          src="https://widget.trustpilot.com/bootstrap/v5/tp.widget.bootstrap.min.js"
+          strategy="afterInteractive"
+        />
         <PrivacyConsent />
         <ConsentAwareAnalytics />
         <ConsentAwareAds />

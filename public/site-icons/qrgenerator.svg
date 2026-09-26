@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img" aria-label="QR Code Generator">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#34d399" />
+      <stop offset="1" stop-color="#0891b2" />
+    </linearGradient>
+  </defs>
+  <rect width="32" height="32" rx="8" fill="url(#bg)" />
+  <g fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="7" y="7" width="7" height="7" rx="1.6" />
+    <rect x="18" y="7" width="7" height="7" rx="1.6" />
+    <rect x="7" y="18" width="7" height="7" rx="1.6" />
+    <path d="M18 18h3.2v3.2H18zM24 18h1.2M18 24h1.2M22 22h3.2v3.2H22z" />
+  </g>
+</svg>

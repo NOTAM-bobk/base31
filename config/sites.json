@@ -88,6 +88,22 @@
     "show": true
   },
   {
+    "name": "QR Code Generator",
+    "subdomain": "qrgenerator",
+    "url": "https://qrgenerator.base31.org",
+    "tags": ["qr", "utility", "tool", "generator"],
+    "description": "Create free custom QR codes for links, Wi-Fi, contacts and messages, with PNG and SVG download.",
+    "show": true
+  },
+  {
+    "name": "Password Generator",
+    "subdomain": "passwordgen",
+    "url": "https://passwordgen.base31.org",
+    "tags": ["security", "password", "utility", "tool"],
+    "description": "Generate strong random passwords and passphrases, and save them in a vault encrypted with your own master passphrase.",
+    "show": true
+  },
+  {
     "name": "Joke Generator",
     "subdomain": "jokegenrator",
     "url": "https://jokegenrator.base31.org",

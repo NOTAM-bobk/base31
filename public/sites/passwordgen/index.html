@@ -1,0 +1,395 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+
+<!-- SEO --------------------------------------------------------------- -->
+<title>Strong Password Generator — Free Random Passwords &amp; Vault | passwordgen.base31.org</title>
+<meta name="description" content="Generate strong random passwords and memorable passphrases in your browser, check their strength, and save them in a vault encrypted with your own master passphrase. Free, no sign-up, nothing uploaded." />
+<link rel="canonical" href="https://passwordgen.base31.org/" />
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />
+<meta name="color-scheme" content="light dark" />
+<meta name="theme-color" content="#fafafa" media="(prefers-color-scheme: light)" />
+<meta name="theme-color" content="#0a0a0a" media="(prefers-color-scheme: dark)" />
+<meta name="application-name" content="Password Generator" />
+<meta name="apple-mobile-web-app-title" content="Password Generator" />
+<meta name="author" content="base31.org" />
+
+<!-- Social preview ---------------------------------------------------- -->
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="Password Generator" />
+<meta property="og:locale" content="en_US" />
+<meta property="og:title" content="Strong Password Generator — Free Random Passwords &amp; Vault" />
+<meta property="og:description" content="Create strong random passwords and passphrases, see their real entropy, and store them in a vault encrypted with your own master passphrase. Everything happens on your device." />
+<meta property="og:url" content="https://passwordgen.base31.org/" />
+<meta property="og:image" content="https://base31.org/opengraph-image" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:image:alt" content="Strong Password Generator — generate and save passwords in your browser" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Strong Password Generator — Free Random Passwords &amp; Vault" />
+<meta name="twitter:description" content="Create strong random passwords and passphrases, see their real entropy, and store them in a vault encrypted with your own master passphrase. Everything happens on your device." />
+<meta name="twitter:image" content="https://base31.org/opengraph-image" />
+<meta name="twitter:image:alt" content="Strong Password Generator — generate and save passwords in your browser" />
+
+<link id="favicon" rel="icon" href="/favicon.svg" type="image/svg+xml" />
+<link rel="apple-touch-icon" href="https://base31.org/icons/apple-touch-icon.png" />
+
+<!-- Structured data: the site, the tool it hosts and its FAQ. --------- -->
+<script type="application/ld+json">
+{"@context":"https://schema.org","@graph":[{"@type":"WebSite","@id":"https://passwordgen.base31.org/#website","url":"https://passwordgen.base31.org/","name":"Password Generator","alternateName":"Strong Password Generator by base31.org","description":"Generate strong random passwords and passphrases in the browser and keep them in a locally encrypted vault.","inLanguage":"en","publisher":{"@id":"https://base31.org/#organization"}},{"@type":"WebApplication","@id":"https://passwordgen.base31.org/#app","name":"Password Generator","url":"https://passwordgen.base31.org/","description":"Create cryptographically strong random passwords and memorable passphrases, measure their entropy, and save them to a vault encrypted with a master passphrase using PBKDF2 and AES-GCM. Runs entirely in the browser.","applicationCategory":"SecurityApplication","operatingSystem":"Any","browserRequirements":"Requires JavaScript and Web Crypto","isAccessibleForFree":true,"inLanguage":"en","image":"https://base31.org/opengraph-image","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"featureList":["Cryptographically secure random passwords","Adjustable length and character classes","Word-based passphrases for typing on phones","Entropy-based strength meter","Exclude ambiguous characters","Vault encrypted with a master passphrase","Import and export encrypted backups","Everything generated and stored locally in your browser"],"isPartOf":{"@id":"https://base31.org/#website"}},{"@type":"FAQPage","@id":"https://passwordgen.base31.org/#faq","mainEntity":[{"@type":"Question","name":"Is this password generator safe to use?","acceptedAnswer":{"@type":"Answer","text":"Yes. Passwords are generated with the browser's Web Crypto API, which draws from the operating system's cryptographic random source, and nothing you type or generate is ever sent to a server. The page has no backend that stores your data."}},{"@type":"Question","name":"How long should my password be?","acceptedAnswer":{"@type":"Answer","text":"For anything important, aim for at least 16 random characters, or a passphrase of five or six words. Length matters far more than swapping letters for symbols — every extra character multiplies the number of guesses an attacker needs."}},{"@type":"Question","name":"Is a passphrase stronger than a random password?","acceptedAnswer":{"@type":"Answer","text":"Both can be strong when they are long enough. A six-word passphrase from a large word list carries roughly the same entropy as a twelve-character random password, and it is much easier to type on a phone. Use the entropy figure shown under the result to compare them."}},{"@type":"Question","name":"How does the vault keep my passwords private?","acceptedAnswer":{"@type":"Answer","text":"Your master passphrase is never stored. A 256-bit key is derived from it with PBKDF2 and 210,000 iterations, and the entries are sealed with AES-GCM. The encrypted blob lives in your own browser storage, so nobody — including this site — can read it without the passphrase."}},{"@type":"Question","name":"What happens if I forget my master passphrase?","acceptedAnswer":{"@type":"Answer","text":"There is no reset and no recovery email, because the passphrase is the only thing that can decrypt the vault. That is what makes it private. Keep an exported encrypted backup and the passphrase somewhere safe."}},{"@type":"Question","name":"Does the vault replace a real password manager?","acceptedAnswer":{"@type":"Answer","text":"No. It is a convenient, self-contained scratchpad for a few credentials on one device. Browser storage can be cleared by the browser, and it does not sync or fill logins, so keep your permanent copy in a dedicated password manager."}}]}]}
+</script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+<link rel="stylesheet" href="./style.css" />
+
+<!-- Ads: Adcash auto-tag (zone iy7zk7mmw). This static subdomain page has no
+     cookie banner of its own, so the tag loads ungated here. The loader is
+     async, so the call polls briefly for `aclib` instead of assuming it is ready. -->
+<script id="aclib" type="text/javascript" src="https://acscdn.com/script/aclib.js" async></script>
+<script>
+  (function () {
+    var attempts = 0;
+    (function runAutoTag() {
+      if (window.aclib && typeof window.aclib.runAutoTag === 'function') {
+        window.aclib.runAutoTag({ zoneId: 'iy7zk7mmw' });
+      } else if (attempts++ < 60) {
+        window.setTimeout(runAutoTag, 250);
+      }
+    })();
+  })();
+</script>
+
+<script>
+  // Apply the saved theme before first paint to avoid a flash.
+  (function () {
+    var t = null;
+    try { t = localStorage.getItem('pw:theme'); } catch (e) {}
+    if (!t) t = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    document.documentElement.setAttribute('data-theme', t);
+  })();
+</script>
+
+<script src="./app.js" defer></script>
+</head>
+
+<body>
+<a href="#main" class="skip">Skip to the generator</a>
+
+<header class="topbar">
+  <div class="wrap topbar-inner">
+    <a href="/" class="brand" aria-label="Password Generator home">
+      <span class="brand-mark" aria-hidden="true">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="4.5"/><path d="m11.2 11.2 8 8"/><path d="m16.5 16.5 2-2M19 19l2-2"/></svg>
+      </span>
+      <span>Password Generator</span>
+    </a>
+    <div class="topbar-actions">
+      <button id="themeBtn" class="icon-btn" type="button" aria-label="Toggle dark mode"></button>
+    </div>
+  </div>
+</header>
+
+<main id="main">
+  <div class="wrap">
+    <!-- Hero -->
+    <section class="hero">
+      <span class="pill"><span class="dot" aria-hidden="true"></span>Generated on your device with Web Crypto</span>
+      <h1>Passwords that are actually <span class="grad">hard to guess</span></h1>
+      <p>Create cryptographically strong passwords and memorable passphrases, watch the real entropy while you tweak them, then keep them in a vault only your master passphrase can open.</p>
+    </section>
+
+    <!-- Workspace -->
+    <section class="workspace" aria-label="Password generator">
+
+      <!-- Options -->
+      <div class="card">
+        <div class="card-head">
+          <div>
+            <h2>Build a password</h2>
+            <p>Every change regenerates instantly — tune until the meter feels right.</p>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="switch-row">
+            <div><div class="sw-label">Passphrase mode</div><div class="sw-sub">Join random dictionary words instead of characters.</div></div>
+            <label class="switch"><input id="fPassphrase" type="checkbox" /><span class="track"></span><span class="knob"></span><span class="sr-only">Passphrase mode</span></label>
+          </div>
+
+          <!-- Character mode -->
+          <div id="charOpts">
+            <div class="field">
+              <label for="fLength">Length — <span class="mono" id="lenVal">20</span> characters</label>
+              <input id="fLength" class="control" type="range" min="8" max="64" step="1" value="20" />
+            </div>
+            <div class="classes">
+              <div class="switch-row"><div><div class="sw-label">Lowercase</div><div class="sw-sub">a–z</div></div><label class="switch"><input id="fLower" type="checkbox" checked /><span class="track"></span><span class="knob"></span><span class="sr-only">Lowercase letters</span></label></div>
+              <div class="switch-row"><div><div class="sw-label">Uppercase</div><div class="sw-sub">A–Z</div></div><label class="switch"><input id="fUpper" type="checkbox" checked /><span class="track"></span><span class="knob"></span><span class="sr-only">Uppercase letters</span></label></div>
+              <div class="switch-row"><div><div class="sw-label">Digits</div><div class="sw-sub">0–9</div></div><label class="switch"><input id="fDigits" type="checkbox" checked /><span class="track"></span><span class="knob"></span><span class="sr-only">Digits</span></label></div>
+              <div class="switch-row"><div><div class="sw-label">Symbols</div><div class="sw-sub">!@#$%…</div></div><label class="switch"><input id="fSymbols" type="checkbox" checked /><span class="track"></span><span class="knob"></span><span class="sr-only">Symbols</span></label></div>
+            </div>
+            <div class="switch-row">
+              <div><div class="sw-label">Exclude ambiguous characters</div><div class="sw-sub">Drops letters and digits that look alike: I l 1 O 0 o.</div></div>
+              <label class="switch"><input id="fNoAmbiguous" type="checkbox" checked /><span class="track"></span><span class="knob"></span><span class="sr-only">Exclude ambiguous characters</span></label>
+            </div>
+          </div>
+
+          <!-- Passphrase mode -->
+          <div id="passOpts" hidden>
+            <div class="field">
+              <label for="fWords">Words — <span class="mono" id="wordsVal">5</span></label>
+              <input id="fWords" class="control" type="range" min="3" max="8" step="1" value="5" />
+            </div>
+            <div class="grid-2">
+              <div class="field"><label for="fSeparator">Separator</label><select id="fSeparator" class="control"><option value="-" selected>Hyphen — amber-fox</option><option value=" ">Space — amber fox</option><option value=".">Dot — amber.fox</option><option value="_">Underscore — amber_fox</option><option value="">None — amberfox</option></select></div>
+              <div class="field"><label for="fAddNumber">Append a number</label><select id="fAddNumber" class="control"><option value="0" selected>No</option><option value="1">Yes — a random 0–99</option></select></div>
+            </div>
+            <div class="switch-row">
+              <div><div class="sw-label">Capitalise each word</div><div class="sw-sub">Amber-Fox-Cedar</div></div>
+              <label class="switch"><input id="fCapitalize" type="checkbox" checked /><span class="track"></span><span class="knob"></span><span class="sr-only">Capitalise each word</span></label>
+            </div>
+            <p class="hint">Passphrases are easier to type on a phone and just as strong when they are long enough.</p>
+          </div>
+
+          <button id="genBtn" class="btn btn-primary btn-block" type="button" style="margin-top:8px">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11a8 8 0 1 0-2.3 5.7"/><path d="M21 4v5h-5"/></svg>
+            Generate password
+          </button>
+        </div>
+      </div>
+
+      <!-- Result -->
+      <div class="card result">
+        <div class="card-head">
+          <div><h2>Your password</h2><p>Generated locally — never uploaded.</p></div>
+        </div>
+        <div class="pw-box">
+          <div id="pwOut" class="pw-out muted">Choose your options and generate.</div>
+        </div>
+        <div class="meter">
+          <div class="meter-head">
+            <span class="meter-label" id="meterLabel">—</span>
+            <span class="meter-entropy" id="meterEntropy">—</span>
+          </div>
+          <div class="meter-track"><div class="meter-fill" id="meterFill"></div></div>
+          <div class="meter-legend"><span>Weak</span><span>Fair</span><span>Strong</span><span>Excellent</span></div>
+        </div>
+        <div class="pw-actions">
+          <button id="copyPw" class="btn btn-primary grow" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>Copy</button>
+          <button id="regenBtn" class="btn btn-ghost" type="button">Regenerate</button>
+          <button id="savePw" class="btn btn-ghost grow" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h11l3 3v13H5z"/><path d="M8 4v5h7"/><path d="M8 20v-6h8v6"/></svg>Save to vault</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Vault -->
+    <section class="vault" id="vault">
+      <div class="card">
+        <div class="card-head">
+          <div><h2>Your vault</h2><p>Sealed with AES-GCM under a key derived from your master passphrase.</p></div>
+          <span id="vaultLockBadge" class="lock-badge" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>Unlocked</span>
+        </div>
+
+        <div id="vaultError" class="vault-error" hidden style="margin:16px 18px 0"></div>
+
+        <!-- Locked -->
+        <div id="vaultLocked" class="vault-locked">
+          <p id="vaultIntro">A vault starts as an empty, encrypted box. Choose a master passphrase — it is never stored, so only you can open it.</p>
+          <div class="vault-forms">
+            <div class="vault-form" id="createForm">
+              <h4>Create a vault</h4>
+              <div class="field">
+                <label for="vaultPass">Master passphrase</label>
+                <input id="vaultPass" class="control mono" type="password" autocomplete="new-password" spellcheck="false" placeholder="At least 8 characters" />
+                <p class="hint">Use a passphrase you will not forget. There is no reset and no recovery email.</p>
+              </div>
+              <div class="field">
+                <label for="vaultPass2">Confirm passphrase</label>
+                <input id="vaultPass2" class="control mono" type="password" autocomplete="new-password" spellcheck="false" placeholder="Repeat it" />
+              </div>
+              <button id="vaultCreate" class="btn btn-primary btn-block" type="button">Create encrypted vault</button>
+            </div>
+            <div class="vault-form" id="unlockForm" hidden>
+              <h4>Unlock your vault</h4>
+              <div class="field">
+                <label for="vaultUnlockPass">Master passphrase</label>
+                <input id="vaultUnlockPass" class="control mono" type="password" autocomplete="current-password" spellcheck="false" placeholder="Your passphrase" />
+              </div>
+              <button id="vaultUnlock" class="btn btn-ghost btn-block" type="button">Unlock</button>
+              <button id="vaultForget" class="btn btn-danger btn-block" type="button" style="margin-top:8px">Delete vault from this browser</button>
+            </div>
+          </div>
+          <div class="vault-note">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 4 6v6c0 4.4 3.4 7.9 8 9 4.6-1.1 8-4.6 8-9V6z"/><path d="m9 12 2 2 4-4"/></svg>
+            <span>Your entries stay in this browser's local storage as ciphertext. Nothing is uploaded, and this site cannot read them. Browser storage can be cleared at any time, so keep an exported backup of anything important.</span>
+          </div>
+        </div>
+
+        <!-- Unlocked -->
+        <div id="vaultUnlocked" hidden>
+          <div class="vault-toolbar">
+            <div class="vault-search">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.2-3.2"/></svg>
+              <input id="vaultSearch" class="control" type="search" placeholder="Search label, username or site" autocomplete="off" spellcheck="false" />
+            </div>
+            <span class="vault-count" id="vaultCount">0 entries</span>
+            <button id="addEntry" class="btn btn-primary btn-sm" type="button">Add entry</button>
+            <button id="lockBtn" class="btn btn-ghost btn-sm" type="button">Lock</button>
+          </div>
+          <div id="vaultList" class="vault-list"></div>
+          <div class="vault-footer">
+            <button id="exportBtn" class="btn btn-ghost btn-sm" type="button">Export backup</button>
+            <button id="importBtn" class="btn btn-ghost btn-sm" type="button">Import</button>
+            <input id="importFile" type="file" accept="application/json,.json" hidden />
+            <label for="autoLock" style="font-size:12px;color:var(--muted);font-weight:600">Auto-lock</label>
+            <select id="autoLock" class="control" style="width:auto;height:34px;padding:0 30px 0 10px;font-size:12.5px">
+              <option value="1">After 1 minute</option>
+              <option value="5" selected>After 5 minutes</option>
+              <option value="15">After 15 minutes</option>
+              <option value="0">Never</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- How it works -->
+    <section class="section">
+      <h2>How it works</h2>
+      <p class="lead">Three ideas do all the work: real randomness, length over clever substitutions, and encryption that only you hold the key to.</p>
+      <div class="steps">
+        <div class="step">
+          <span class="num">01</span>
+          <h3>Randomness you can trust</h3>
+          <p>Characters come from <span class="mono">crypto.getRandomValues</span>, the browser's cryptographic source, rather than a predictable <span class="mono">Math.random</span> sequence. No pattern, no seed, no bias.</p>
+        </div>
+        <div class="step">
+          <span class="num">02</span>
+          <h3>Measured, not guessed</h3>
+          <p>The meter reports true entropy in bits — the number of guesses an attacker would need. Longer passwords and bigger character sets raise it fast; lookalike swaps barely move it.</p>
+        </div>
+        <div class="step">
+          <span class="num">03</span>
+          <h3>Saving that stays private</h3>
+          <p>The vault derives a 256-bit key from your passphrase with PBKDF2 and seals entries with AES-GCM. The ciphertext lives in your browser; the passphrase is never stored.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Tips -->
+    <section class="section">
+      <h2>Getting the most out of a password</h2>
+      <p class="lead">Most breaches do not break cryptography — they exploit reuse, short passwords and phishable habits. A few rules cover the great majority of risk.</p>
+      <div class="tips">
+        <div class="tip"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8V5a1 1 0 0 1 1-1h3M20 8V5a1 1 0 0 0-1-1h-3M4 16v3a1 1 0 0 0 1 1h3M20 16v3a1 1 0 0 1-1 1h-3"/></svg></span><div><h3>Length beats complexity</h3><p>Each extra character multiplies the search space. Sixteen random characters is a solid default; twenty is better for anything that guards money or email.</p></div></div>
+        <div class="tip"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span><div><h3>One password, one account</h3><p>Reuse is what turns a single leaked database into a cascade of account takeovers. A unique password everywhere means a breach stays contained.</p></div></div>
+        <div class="tip"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M3 12h18"/><circle cx="12" cy="12" r="9"/></svg></span><div><h3>Turn on two-factor auth</h3><p>A strong password plus an authenticator app or hardware key is dramatically harder to break than either alone. Use it on email first.</p></div></div>
+        <div class="tip"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 2 20h20L12 3z"/><path d="M12 10v4M12 17.5h.01"/></svg></span><div><h3>Beware of “password checkers”</h3><p>Any page that asks you to type an existing password is a phishing risk. Generate new passwords here, and never paste a live one into a site you do not control.</p></div></div>
+      </div>
+    </section>
+
+    <!-- FAQ -->
+    <section class="section" id="faq">
+      <h2>Frequently asked questions</h2>
+      <div class="faq-list">
+        <details class="faq-item">
+          <summary>Is this password generator safe to use?<span class="chev" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></span></summary>
+          <div class="ans">Yes. Passwords are generated with the browser's Web Crypto API, which draws from the operating system's cryptographic random source, and nothing you type or generate is ever sent to a server. The page has no backend that stores your data.</div>
+        </details>
+        <details class="faq-item">
+          <summary>How long should my password be?<span class="chev" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></span></summary>
+          <div class="ans">For anything important, aim for at least 16 random characters, or a passphrase of five or six words. Length matters far more than swapping letters for symbols — every extra character multiplies the number of guesses an attacker needs.</div>
+        </details>
+        <details class="faq-item">
+          <summary>Is a passphrase stronger than a random password?<span class="chev" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></span></summary>
+          <div class="ans">Both can be strong when they are long enough. A six-word passphrase from a large word list carries roughly the same entropy as a twelve-character random password, and it is much easier to type on a phone. Use the entropy figure shown under the result to compare them.</div>
+        </details>
+        <details class="faq-item">
+          <summary>How does the vault keep my passwords private?<span class="chev" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></span></summary>
+          <div class="ans">Your master passphrase is never stored. A 256-bit key is derived from it with PBKDF2 and 210,000 iterations, and the entries are sealed with AES-GCM. The encrypted blob lives in your own browser storage, so nobody — including this site — can read it without the passphrase.</div>
+        </details>
+        <details class="faq-item">
+          <summary>What happens if I forget my master passphrase?<span class="chev" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></span></summary>
+          <div class="ans">There is no reset and no recovery email, because the passphrase is the only thing that can decrypt the vault. That is what makes it private. Keep an exported encrypted backup and the passphrase somewhere safe.</div>
+        </details>
+        <details class="faq-item">
+          <summary>Does the vault replace a real password manager?<span class="chev" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></span></summary>
+          <div class="ans">No. It is a convenient, self-contained scratchpad for a few credentials on one device. Browser storage can be cleared by the browser, and it does not sync or fill logins, so keep your permanent copy in a dedicated password manager.</div>
+        </details>
+      </div>
+      <p class="faq-note">Tip: generate the password here, save it to the vault, then paste it into the site you are creating it for. If your browser or a security tool flags the paste, type the first few characters and paste the rest.</p>
+    </section>
+
+  </div>
+</main>
+
+<!-- Entry editor -->
+<div id="entryModal" class="modal" hidden>
+  <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="entryTitle">
+    <div class="card-head">
+      <div><h2 id="entryTitle">Add entry</h2><p>Sealed into your local vault on save.</p></div>
+      <button id="entryClose" class="icon-btn" type="button" aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+    </div>
+    <div class="card-body">
+      <div class="field"><label for="eLabel">Label</label><input id="eLabel" class="control" autocomplete="off" placeholder="GitHub" /></div>
+      <div class="field"><label for="eUser">Username or email</label><input id="eUser" class="control mono" autocomplete="off" spellcheck="false" placeholder="you@example.com" /></div>
+      <div class="field">
+        <label for="ePass">Password</label>
+        <div style="display:flex;gap:8px">
+          <input id="ePass" class="control mono" autocomplete="off" spellcheck="false" placeholder="Paste or generate" />
+          <button id="entryGen" class="btn btn-ghost" type="button" title="Generate a strong password" aria-label="Generate a strong password"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11a8 8 0 1 0-2.3 5.7"/><path d="M21 4v5h-5"/></svg></button>
+        </div>
+      </div>
+      <div class="field"><label for="eUrl">Website</label><input id="eUrl" class="control mono" autocomplete="off" spellcheck="false" placeholder="https://github.com" /></div>
+      <div class="field"><label for="eNotes">Notes</label><textarea id="eNotes" class="control" rows="2" spellcheck="false" placeholder="Recovery codes, security questions…"></textarea></div>
+    </div>
+    <div class="modal-foot">
+      <button id="entrySave" class="btn btn-primary grow" type="button">Save to vault</button>
+      <button id="entryDelete" class="btn btn-danger" type="button" hidden>Delete</button>
+      <button id="entryCancel" class="btn btn-ghost" type="button">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="wrap footer-inner">
+    <div class="footer-brand">
+      <a href="/" class="brand">
+        <span class="brand-mark" aria-hidden="true">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="4.5"/><path d="m11.2 11.2 8 8"/><path d="m16.5 16.5 2-2M19 19l2-2"/></svg>
+        </span>
+        <span>Password Generator</span>
+      </a>
+      <p>Strong random passwords and passphrases, generated in your browser and kept in a vault only you can open — hosted on <a href="https://base31.org/" style="color:var(--fg); text-decoration:underline; text-underline-offset:2px;">base31.org</a>.</p>
+    </div>
+    <div class="footer-cols">
+      <div class="footer-col">
+        <h3>base31</h3>
+        <ul>
+          <li><a href="https://base31.org/">Cool sites</a></li>
+          <li><a href="https://base31.org/blog">Blog</a></li>
+          <li><a href="https://base31.org/about">About</a></li>
+          <li><a href="https://base31.org/#updates">Bug report</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h3>Legal</h3>
+        <ul>
+          <li><a href="https://base31.org/terms">Terms of service</a></li>
+          <li><a href="https://base31.org/privacy">Privacy policy</a></li>
+          <li><a href="https://base31.org/privacy">Cookies &amp; ads</a></li>
+          <li><a href="mailto:hello@base31.org?subject=Password%20Generator%20abuse%20report">Report abuse</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="wrap footer-base">
+    &copy; 2026 Password Generator &middot; passwordgen.base31.org. Passwords are generated and stored locally in your browser and never uploaded; this page shows ads served by Adcash — see the <a href="https://base31.org/privacy" style="color:var(--muted); text-decoration:underline; text-underline-offset:2px;">privacy policy</a>.
+  </div>
+</footer>
+</body>
+</html>

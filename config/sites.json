@@ -72,6 +72,14 @@
     "show": true
   },
   {
+    "name": "Is It Taken",
+    "subdomain": "isittaken",
+    "url": "https://isittaken.base31.org",
+    "tags": ["domains", "utility", "tool"],
+    "description": "Check whether a domain name is available and see registration insights and instant alternatives.",
+    "show": true
+  },
+  {
     "name": "Joke Generator",
     "subdomain": "jokegenrator",
     "url": "https://jokegenrator.base31.org",

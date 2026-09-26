@@ -159,14 +159,18 @@ export default function DirectoryNotifications() {
       {pushStatus && <p className="community-status" role="status">{pushStatus}</p>}
 
       <details className="bug-report-details">
-        <summary>Found a bug? Send a report</summary>
+        <summary>Found a bug or have an idea? Send a report</summary>
+        <p className="community-privacy-note">
+          Bug reports and feature ideas both go to{" "}
+          <a href="mailto:hello@base31.org">hello@base31.org</a>, together with the page you were on.
+        </p>
         <form className="submit-form bug-report-form" onSubmit={sendBugReport}>
           <label className="submit-field">
             <span>Your email <small>(optional, if you’d like a reply)</small></span>
             <input name="report-email" type="email" autoComplete="email" maxLength={254} placeholder="you@example.com" />
           </label>
           <label className="submit-field">
-            <span>What went wrong?</span>
+            <span>What went wrong, or what would you like to see?</span>
             <textarea name="report-message" required minLength={10} maxLength={4000} rows={4} placeholder="What did you expect, and what happened instead?" />
           </label>
           <label className="report-honeypot" aria-hidden="true">
@@ -174,7 +178,7 @@ export default function DirectoryNotifications() {
             <input name="website" tabIndex={-1} autoComplete="off" />
           </label>
           <div className="bug-report-submit">
-            <button className="community-action is-primary" type="submit" disabled={reportBusy}>{reportBusy ? "Sending…" : "Send bug report"}</button>
+            <button className="community-action is-primary" type="submit" disabled={reportBusy}>{reportBusy ? "Sending…" : "Send report"}</button>
             {reportStatus && <p className="community-status" role="status">{reportStatus}</p>}
           </div>
         </form>

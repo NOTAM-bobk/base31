@@ -16,7 +16,7 @@ export default function StructuredData() {
           "An independent directory of cool sites, fun websites, creative web projects, and useful online tools.",
         logo: `${siteUrl}/icons/base31-icon-512.png`,
         sameAs: ["https://github.com/NOTAM-bobk/base31"],
-        email: "sawyer11456@gmail.com",
+        email: "hello@base31.org",
         telephone: "+1-612-444-3853",
         address: {
           "@type": "PostalAddress",
@@ -27,7 +27,7 @@ export default function StructuredData() {
         contactPoint: {
           "@type": "ContactPoint",
           contactType: "customer support",
-          email: "sawyer11456@gmail.com",
+          email: "hello@base31.org",
           telephone: "+1-612-444-3853",
           areaServed: "US",
           availableLanguage: "en",

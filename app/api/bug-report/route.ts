@@ -93,8 +93,11 @@ export async function POST(request: Request) {
 
   const apiKey = process.env.RESEND_API_KEY;
   const from = process.env.RESEND_FROM_EMAIL;
-  const to = process.env.BUG_REPORT_TO;
-  if (!apiKey || !from || !to) {
+  // Bug reports and feature ideas both land in the same inbox; the shared
+  // address is the default so the form keeps working when the variable is
+  // unset. `BUG_REPORT_TO` can still point somewhere else.
+  const to = process.env.BUG_REPORT_TO || "hello@base31.org";
+  if (!apiKey || !from) {
     return json({ error: "Bug reports are temporarily unavailable. Please try again later." }, 503);
   }
 
@@ -102,13 +105,13 @@ export async function POST(request: Request) {
   const safeEmail = email ? escapeHtml(email) : "Not provided";
   const safePage = escapeHtml(page);
   const text = [
-    "New base31.org bug report",
+    "New base31.org bug or feature report",
     `From: ${email || "Not provided"}`,
     `Page: ${page}`,
     "",
     message,
   ].join("\n");
-  const html = `<h2>New base31.org bug report</h2><p><strong>Reply-to:</strong> ${safeEmail}</p><p><strong>Page:</strong> ${safePage}</p><hr><p>${safeMessage.replace(/\n/g, "<br>")}</p>`;
+  const html = `<h2>New base31.org bug or feature report</h2><p><strong>Reply-to:</strong> ${safeEmail}</p><p><strong>Page:</strong> ${safePage}</p><hr><p>${safeMessage.replace(/\n/g, "<br>")}</p>`;
 
   try {
     const response = await fetch("https://api.resend.com/emails", {
@@ -120,7 +123,7 @@ export async function POST(request: Request) {
       body: JSON.stringify({
         from,
         to,
-        subject: "New base31.org bug report",
+        subject: "New base31.org bug or feature report",
         text,
         html,
         ...(email ? { reply_to: email } : {}),

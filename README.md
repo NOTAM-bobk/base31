@@ -1,6 +1,7 @@
 # base31.org
-google anylistics verfication   
-add this.   
+Google Analytics verification. The tag below is implemented in
+`components/consent-aware-analytics.tsx`, which appends the loader and runs the
+config once the cookie banner is accepted.
 
   <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-Y5N2FYK786"></script>
@@ -469,7 +470,7 @@ its new choice, which keeps switching or clearing a vote from double-counting.
 | `COUNTER_SECRET` | Worker secret (`wrangler secret put`) | Optional; when set, requests must send `x-counter-secret` |
 | `RESEND_API_KEY` | Next.js hosting environment + Worker secret | Resend API credential used for bug reports, confirmations, and publication emails |
 | `RESEND_FROM_EMAIL` | Next.js hosting environment + Worker secret | Sender address used by Resend; `base31 <onboarding@resend.dev>` until a domain is verified |
-| `BUG_REPORT_TO` | Next.js hosting environment | Inbox that receives the bug-report form submissions; without a verified domain Resend only delivers to the account owner |
+| `BUG_REPORT_TO` | Next.js hosting environment | Inbox that receives the bug and feature reports from the site form; defaults to `hello@base31.org`. Without a verified domain Resend only delivers to the account owner |
 | `VAPID_PUBLIC_KEY` | Worker secret | Public VAPID key served to browsers for opt-in push notifications |
 | `VAPID_PRIVATE_KEY` | Worker secret | Private VAPID key used to sign push notifications; never expose it to the browser |
 | `VAPID_SUBJECT` | Worker secret | VAPID contact URI, for example a `mailto:` address |
@@ -499,7 +500,8 @@ redeploy) if you host the worker on a custom domain.
 
 The directory already uses Resend for double-opt-in email updates and new-site
 publication notices. The `/api/bug-report` Next.js route sends the optional
-reply address, report text, and current page URL to `BUG_REPORT_TO`. Set
+reply address, report text, and current page URL to `BUG_REPORT_TO`, which
+defaults to `hello@base31.org`. Set
 `RESEND_API_KEY`, `RESEND_FROM_EMAIL`, and `BUG_REPORT_TO` in the hosting
 Settings → Environment before bug reports can be delivered. The sender must be
 verified with Resend, and until an owned domain is verified the sender has to
@@ -510,7 +512,7 @@ to the account owner's own address, so sending to anyone else fails with a
 confirmation and publication emails: they cannot reach outside subscribers
 until `RESEND_FROM_EMAIL` is an address on a verified domain (for example
 `base31 <reports@base31.org>`), at which point `BUG_REPORT_TO` can be any
-inbox. `RESEND_FROM_EMAIL` accepts the `Display Name <address>` form. The
+inbox (it ships pointed at `hello@base31.org`). `RESEND_FROM_EMAIL` accepts the `Display Name <address>` form. The
 Worker also needs `RESEND_API_KEY` and
 `RESEND_FROM_EMAIL` set as Worker secrets for subscriptions and publication
 notices. Configure push by generating a VAPID key pair and setting
@@ -549,8 +551,9 @@ the account owner. Verify the domain once to send from `reports@base31.org`
 4. Once the records propagate, run `npm run check:mail` to confirm SPF, DKIM,
    and MX resolve, then press **Verify DNS Records** in Resend.
 5. After verification, set `RESEND_FROM_EMAIL` to `base31 <reports@base31.org>`
-   and point `BUG_REPORT_TO` at any inbox, both in the hosting environment and
-   as Worker secrets.
+   and point `BUG_REPORT_TO` at the inbox that should receive reports
+   (`hello@base31.org` by default), both in the hosting environment and as
+   Worker secrets.
 
 `npm run check:mail` takes an optional domain argument and prints the
 nameservers plus a pass/fail line per record, exiting non-zero while something

@@ -1283,12 +1283,12 @@ export default function HomePage() {
         <div className="footer-meta mono">
           <address className="footer-contact">
             <span className="footer-contact-label">Contact</span>
-            <a className="footer-contact-item" href="mailto:sawyer11456@gmail.com">
+            <a className="footer-contact-item" href="mailto:hello@base31.org">
               <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                 <rect x="3" y="5" width="18" height="14" rx="2" />
                 <path d="m3.6 7 8.4 6 8.4-6" />
               </svg>
-              sawyer11456@gmail.com
+              hello@base31.org
             </a>
             <a className="footer-contact-item" href="tel:+16124443853">
               <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">

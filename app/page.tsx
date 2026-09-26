@@ -4,13 +4,11 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { CSSProperties, FormEvent, RefObject } from "react";
 import sites from "@/config/sites.json";
 import pkg from "@/package.json";
-import DonationBoard from "@/components/donation-board";
-import TrustpilotReviews from "@/components/trustpilot-reviews";
 import AboutSection from "@/components/about-section";
+import SupportSection from "@/components/support-section";
 import { SITE_GLYPHS } from "@/components/site-glyphs";
 import Cursor from "@/components/cursor";
 import Faq from "@/components/faq";
-import ReferralCarousel from "@/components/referral-carousel";
 import DirectoryNotifications from "@/components/directory-notifications";
 import GithubStats from "@/components/github-stats";
 import { resetConsent, useConsent } from "@/lib/consent";
@@ -1081,6 +1079,14 @@ export default function HomePage() {
             )}
           </div>
 
+          {/* With the panel hidden the list simply vanishes, so the closed
+              state says so in words instead of leaving a silent gap. */}
+          {sitesCollapsed && (
+            <p className="section-closed-note" role="status">
+              Featured sites are closed right now. Open the “Featured sites” heading above to browse every site again.
+            </p>
+          )}
+
           <div id="sites-panel" className="sites-panel" hidden={sitesCollapsed}>
           <div className="filter-bar" data-reveal>
             <div className="tag-filters" role="group" aria-label="Filter by tag">
@@ -1246,40 +1252,20 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* Trustpilot review collector; the TrustBox bootstrap lives in
-            app/layout.tsx. */}
-        <TrustpilotReviews />
-
         <AboutSection />
 
-        {/* Supporters, dressed up like a pinboard. It sits directly above the
-            launch clock; on narrow screens only its CTA detaches into a fixed
-            button so the support link stays reachable. */}
-        <DonationBoard />
+        {/* The support hub: the Trustpilot reviews, the donation board, the
+            sponsored referrals and the paid support button, gathered under one
+            collapsible "Support" heading. It is open by default and the
+            heading toggles it, the same way the featured-sites heading does. */}
+        <SupportSection />
 
         <hr className="section-divider" aria-hidden="true" />
 
-        {/* Live count-up from the launch of base31. */}
+        {/* Live count-up from the launch of base31, under the support hub. */}
         <LaunchClock />
 
         <hr className="section-divider" aria-hidden="true" />
-
-        {/* Sponsored referral links, below the clock. */}
-        <ReferralCarousel />
-
-        {/* The sponsored support button: an ad slot that pays for the rest of
-            the page. It is a plain link, so it needs no consent gate. */}
-        <a
-          className="support-ad"
-          data-reveal
-          href="https://www.profitableratecpmnetwork.com/vsnt502b?key=014ca151909e76ba10dc8d6cfae88709"
-          target="_blank"
-          rel="noreferrer sponsored"
-        >
-          <span className="support-ad-tag mono">ad</span>
-          <span className="support-ad-text">Want to support base31? Click this button to help</span>
-          <span className="support-ad-arrow mono" aria-hidden="true">↗</span>
-        </a>
 
         {/* SEO FAQ, then the subscribe block: the FAQ moved up so the page
             ends on the call to action, directly above the footer. */}

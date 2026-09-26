@@ -538,6 +538,35 @@ html[data-theme="light"] { --subtle: #6b6b6b; }
 .sites-toggle.is-collapsed .sites-toggle-arrow { transform: rotate(-90deg); }
 .sites-panel[hidden] { display: none; }
 
+/* The closed-state note. A shut disclosure panel leaves no trace of itself, so
+   this line says so in words instead of leaving a silent gap. It is shared by
+   the "Featured sites" heading and the "Support" heading below. */
+.section-closed-note {
+  margin: 0; padding: 15px 17px;
+  border: 1px dashed var(--line-strong); border-radius: 12px;
+  color: var(--muted); font-size: 12.5px; line-height: 1.55;
+}
+
+/* Support hub ---------------------------------------------------------
+   One collapsible group holding the review collector, the donation board, the
+   sponsored referrals and the paid support button. Each of those blocks
+   normally carries a large top margin so it can stand alone on the page, so
+   inside the panel the first one drops its margin and the rest step down
+   tighter — otherwise the group reads as a column of gaps. */
+.support-section {
+  margin-top: 108px; padding-top: 34px;
+  border-top: 1px solid var(--line);
+}
+.support-panel > :first-child { margin-top: 0; }
+.support-panel .donation-board { margin-top: 44px; }
+.support-panel .referral-block { margin-top: 44px; }
+.support-panel .support-ad { margin-top: 26px; }
+@media (max-width: 600px) {
+  .support-section { margin-top: 84px; padding-top: 28px; }
+  .support-panel .donation-board,
+  .support-panel .referral-block { margin-top: 32px; }
+}
+
 /* Site cards: icon, badges, and the small pieces globals.css dropped. --- */
 /* Each site's app icon: a rounded tile whose gradient and glyph are derived
    from its subdomain, so every entry is visually distinct without a favicon
@@ -846,9 +875,14 @@ body:has(.site-header) { padding-top: 64px; }
    JavaScript and no timers: every line is a CSS width animation with a stepped
    timing function, offset by a negative delay so the lines never restart in
    sync. It sits at z-index -1 (above the page background, below every piece of
-   content) and is decorative only. */
+   content) and is decorative only.
+   `position: fixed` only means "the viewport" while no ancestor turns into a
+   scroll container, so globals.css guards horizontal overflow with
+   `overflow-x: clip` rather than `hidden` — a `hidden` value on <html> makes it
+   the scrolling box and drags fixed layers along with the scroll on some
+   engines. `bottom: auto` keeps the layer anchored to the top edge here. */
 .code-backdrop {
-  position: fixed; top: 0; left: 0; right: 0; z-index: -1; overflow: hidden;
+  position: fixed; top: 0; left: 0; right: 0; bottom: auto; z-index: -1; overflow: hidden;
   padding: 92px 0 0 3vw; pointer-events: none; opacity: 0.5;
   mask-image: linear-gradient(180deg, #000 62%, transparent);
   -webkit-mask-image: linear-gradient(180deg, #000 62%, transparent);

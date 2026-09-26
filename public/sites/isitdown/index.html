@@ -1,1046 +1,1073 @@
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html lang="en" data-theme="light">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Neo-Status Checker • Real-time Ping & Uptime History</title>
-  
-  <!-- Tailwind CSS CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  
-  <!-- Inter Font -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-  
-  <style>
-    body {
-      font-family: 'Inter', sans-serif;
-    }
-    
-    .bg-grid-pattern {
-      background-image: radial-gradient(#9ca3af 1px, transparent 1px);
-      background-size: 24px 24px;
-    }
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 
-    @keyframes fadeIn {
-      from { opacity: 0; transform: scale(0.97); }
-      to { opacity: 1; transform: scale(1); }
-    }
+<!-- SEO --------------------------------------------------------------- -->
+<title>Is It Down? Free Website & Server Status Checker | isitdown.base31.org</title>
+<meta name="description" content="Check whether a website or server is down right now. Enter any URL for a live reachability test with HTTP status, response time, IP address and DNS records. Free, no sign-up." />
+<link rel="canonical" href="https://isitdown.base31.org/" />
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />
+<meta name="color-scheme" content="light dark" />
+<meta name="theme-color" content="#fafafa" media="(prefers-color-scheme: light)" />
+<meta name="theme-color" content="#0a0a0a" media="(prefers-color-scheme: dark)" />
+<meta name="application-name" content="Is It Down" />
+<meta name="apple-mobile-web-app-title" content="Is It Down" />
+<meta name="author" content="base31.org" />
 
-    .animate-modal-in {
-      animation: fadeIn 0.15s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-    }
+<!-- Social preview ---------------------------------------------------- -->
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="Is It Down" />
+<meta property="og:locale" content="en_US" />
+<meta property="og:title" content="Is It Down? Free Website Status Checker" />
+<meta property="og:description" content="Enter any URL for a live reachability test with HTTP status, response time, IP address and DNS records. Free, no account, runs in your browser." />
+<meta property="og:url" content="https://isitdown.base31.org/" />
+<meta property="og:image" content="https://base31.org/opengraph-image" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:image:alt" content="Is It Down — check any website in one click" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Is It Down? Free Website Status Checker" />
+<meta name="twitter:description" content="Enter any URL for a live reachability test with HTTP status, response time, IP address and DNS records. Free, no account." />
+<meta name="twitter:image" content="https://base31.org/opengraph-image" />
+<meta name="twitter:image:alt" content="Is It Down — check any website in one click" />
 
-    /* Custom Scrollbar for Modal and Lists */
-    ::-webkit-scrollbar {
-      width: 6px;
-      height: 6px;
-    }
-    ::-webkit-scrollbar-track {
-      background: #f1f1f1;
-    }
-    ::-webkit-scrollbar-thumb {
-      background: #000;
-      border-radius: 3px;
-    }
-  </style>
-</head>
-<body class="min-h-screen bg-[#fafafa] text-black relative flex flex-col justify-between p-4 md:p-8 selection:bg-black selection:text-white">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230a0a0a'/%3E%3Cpath d='M6.5 20.5l4.2-9.4 4.6 13.4 3.4-9.1h6.8' stroke='%233ecf8e' stroke-width='2.4' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E" type="image/svg+xml" />
+<link rel="apple-touch-icon" href="https://base31.org/icons/apple-touch-icon.png" />
 
-  <!-- Background Grid -->
-  <div class="absolute inset-0 z-0 pointer-events-none opacity-[0.35] bg-grid-pattern"></div>
+<!-- Structured data: the site, the tool it hosts and its FAQ. --------- -->
+<script type="application/ld+json">
+{"@context":"https://schema.org","@graph":[{"@type":"WebSite","@id":"https://isitdown.base31.org/#website","url":"https://isitdown.base31.org/","name":"Is It Down","alternateName":"Is It Down by base31.org","description":"Check whether a website or server is down right now with a live reachability test, HTTP status, response time and DNS records.","inLanguage":"en","publisher":{"@id":"https://base31.org/#organization"}},{"@type":"WebApplication","@id":"https://isitdown.base31.org/#app","name":"Is It Down","url":"https://isitdown.base31.org/","description":"Enter any URL for a live reachability test with HTTP status, response time, IP address and DNS records. Free and no account.","applicationCategory":"UtilitiesApplication","operatingSystem":"Any","browserRequirements":"Requires JavaScript","isAccessibleForFree":true,"inLanguage":"en","image":"https://base31.org/opengraph-image","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"featureList":["Live reachability test from your browser","HTTP status code and response time","DNS records and resolved IP address","Retries to filter out transient blips","Recent checks kept in your browser","Works on any public URL"],"isPartOf":{"@id":"https://base31.org/#website"}},{"@type":"FAQPage","@id":"https://isitdown.base31.org/#faq","mainEntity":[{"@type":"Question","name":"How does this is-it-down check work?","acceptedAnswer":{"@type":"Answer","text":"The page sends a live request to the address you enter, times how long the server takes to respond, and cross-checks the HTTP status through a public CORS proxy. DNS is resolved separately through Cloudflare's DNS-over-HTTPS service. Everything runs in your browser."}},{"@type":"Question","name":"How accurate is the result?","acceptedAnswer":{"@type":"Answer","text":"The result reflects what your browser can reach right now. A down result can also mean the site refuses automated requests, or that your own network or DNS is the problem, so it is worth retrying or testing from another connection."}},{"@type":"Question","name":"What do the HTTP status codes mean?","acceptedAnswer":{"@type":"Answer","text":"2xx and 3xx mean the server responded normally. 4xx means the server answered but the page is an error (404 simply means that page is missing, not that the site is down). 5xx means the server itself errored. A timeout with no response means the host could not be reached."}},{"@type":"Question","name":"Do you store the sites I check?","acceptedAnswer":{"@type":"Answer","text":"No. Checks run entirely in your browser. The optional recent-checks list is saved in your own browser storage and is never sent to a server."}},{"@type":"Question","name":"Why does a site I know is online show as down?","acceptedAnswer":{"@type":"Answer","text":"Bot protection and firewalls such as Cloudflare or a CAPTCHA can refuse automated requests even while real visitors load the page fine. Your own network, VPN or DNS can also be the cause."}},{"@type":"Question","name":"What does a degraded or slow result mean?","acceptedAnswer":{"@type":"Answer","text":"It means the server did respond, but took longer than about 1.5 seconds. The site is reachable, yet it may feel down to visitors, and a slow response often comes before an outage."}}]}]}
+</script>
 
-  <div class="z-10 w-full max-w-3xl mx-auto flex flex-col items-center pt-4 md:pt-10">
-    
-    <!-- Header Badge & Title -->
-    <header class="mb-8 text-center flex flex-col items-center">
-      <div class="inline-flex items-center gap-2 px-3 py-1 bg-white border-2 border-black rounded-full shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] mb-4 text-xs font-bold uppercase tracking-wider">
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="12" cy="12" r="10" />
-          <line x1="2" x2="22" y1="12" y2="12" />
-          <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10z" />
-        </svg>
-        <span>Neo-Status • Ping & Uptime Insights</span>
-      </div>
-      <h1 class="text-4xl md:text-6xl font-black tracking-tight mb-3">Is it down right now?</h1>
-      <p class="text-gray-600 font-medium text-base md:text-lg max-w-md tracking-tight">
-        Instant uptime verification, latency sparklines, and 30-day historical availability.
-      </p>
-    </header>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="preconnect" href="https://cloudflare-dns.com" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
 
-    <!-- Input Card Form -->
-    <form id="check-form" class="w-full bg-white border-4 border-black p-5 md:p-7 rounded-2xl shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] transition-all">
-      <div class="flex flex-col gap-4">
-        <div class="relative flex items-center">
-          <input
-            id="url-input"
-            type="text"
-            placeholder="domain.com or https://example.com"
-            class="w-full border-2 border-black bg-[#f8f9fa] py-4 pl-4 pr-24 rounded-xl text-base md:text-lg font-mono font-medium outline-none transition-all placeholder:text-gray-400 focus:bg-white focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:-translate-y-0.5"
-            autofocus
-          />
-          
-          <!-- Loading / Shortcut Badge inside Input -->
-          <div class="absolute right-3 flex items-center gap-2 pointer-events-none">
-            <div id="loading-badge" class="hidden text-black items-center gap-1.5 bg-yellow-200 border border-black px-2.5 py-1 rounded-md text-xs font-bold">
-              <svg class="animate-spin" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                <line x1="12" x2="12" y1="2" y2="6" />
-                <line x1="12" x2="12" y1="18" y2="22" />
-                <line x1="4.93" x2="7.76" y1="4.93" y2="7.76" />
-                <line x1="16.24" x2="19.07" y1="16.24" y2="19.07" />
-                <line x1="2" x2="6" y1="12" y2="12" />
-                <line x1="18" x2="22" y1="12" y2="12" />
-                <line x1="4.93" x2="7.76" y1="19.07" y2="16.24" />
-                <line x1="16.24" x2="19.07" y1="7.76" y2="4.93" />
-              </svg>
-              <span>Ping</span>
-            </div>
-            <kbd id="shortcut-kbd" class="hidden sm:inline-flex items-center gap-0.5 px-2 py-1 bg-gray-100 border border-black rounded text-[11px] font-mono font-bold text-gray-700 shadow-[1px_1px_0px_0px_rgba(0,0,0,1)]">
-              <span>⌘</span><span>K</span>
-            </kbd>
-          </div>
-        </div>
-
-        <button
-          id="submit-btn"
-          type="submit"
-          class="w-full bg-[#111] text-white border-2 border-black py-3.5 px-6 rounded-xl text-base font-bold tracking-wide flex items-center justify-center gap-2 hover:-translate-y-0.5 hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:translate-y-0 active:shadow-none transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:shadow-none"
-        >
-          Check Status & History
-        </button>
-        
-        <div class="flex items-center justify-between text-xs text-gray-500 font-medium px-1">
-          <span>Press <kbd class="px-1 py-0.5 border border-gray-300 rounded bg-gray-100 font-mono text-[10px]">Enter ↵</kbd> to execute</span>
-          <span>Shortcuts: <kbd class="px-1 py-0.5 border border-gray-300 rounded bg-gray-100 font-mono text-[10px]">⌘K</kbd> Focus • <kbd class="px-1 py-0.5 border border-gray-300 rounded bg-gray-100 font-mono text-[10px]">Esc</kbd> Clear</span>
-        </div>
-      </div>
-    </form>
-
-    <!-- Extended Results Section -->
-    <div id="results-container" class="w-full mt-6 hidden transition-all duration-300 opacity-0 translate-y-4">
-      
-      <!-- UP STATUS CARD -->
-      <div id="card-up" class="hidden w-full bg-[#E2F7D8] border-4 border-black p-6 rounded-2xl shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] flex-col gap-6">
-        <div class="flex items-start justify-between border-b-2 border-black/20 pb-4">
-          <div class="flex items-center gap-3">
-            <div class="bg-[#4ADE80] border-2 border-black p-2.5 rounded-xl shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] text-black">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-                <polyline points="20 6 9 17 4 12" />
-              </svg>
-            </div>
-            <div>
-              <span class="text-xs font-black uppercase tracking-widest text-emerald-900">Website Online</span>
-              <h3 id="up-hostname" class="text-2xl font-black">--</h3>
-            </div>
-          </div>
-          <div>
-            <span class="inline-flex items-center gap-1 bg-white border-2 border-black px-3 py-1 rounded-lg text-xs font-bold shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
-              <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-              Operational
-            </span>
-          </div>
-        </div>
-
-        <!-- Live Metrics Grid -->
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-          <div class="bg-white border-2 border-black p-3 rounded-xl shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
-            <div class="flex items-center gap-1 text-gray-500 text-xs font-bold mb-1">
-              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12" /></svg>
-              <span>Response Time</span>
-            </div>
-            <div id="up-time" class="text-xl font-black font-mono">--</div>
-            <div class="mt-1">
-              <span id="up-grade" class="text-[10px] font-bold px-1.5 py-0.5 rounded border">--</span>
-            </div>
-          </div>
-
-          <div class="bg-white border-2 border-black p-3 rounded-xl shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
-            <div class="flex items-center gap-1 text-gray-500 text-xs font-bold mb-1">
-              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>
-              <span>Protocol</span>
-            </div>
-            <div id="up-protocol" class="text-xl font-black">--</div>
-            <div id="up-ssl" class="mt-1 text-[11px] font-semibold text-emerald-700">--</div>
-          </div>
-
-          <div class="bg-white border-2 border-black p-3 rounded-xl shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
-            <div class="flex items-center gap-1 text-gray-500 text-xs font-bold mb-1">
-              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /></svg>
-              <span>DNS / IP Address</span>
-            </div>
-            <div id="up-ip" class="text-xl font-black truncate" title="--">--</div>
-            <div class="mt-1 text-[11px] font-semibold text-gray-600">Resolved via DoH</div>
-          </div>
-
-          <div class="bg-white border-2 border-black p-3 rounded-xl shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
-            <div class="flex items-center gap-1 text-gray-500 text-xs font-bold mb-1">
-              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></svg>
-              <span>Checked At</span>
-            </div>
-            <div id="up-timestamp" class="text-sm font-black font-mono mt-1">--</div>
-            <div class="mt-1 text-[11px] font-semibold text-gray-600">Client Time</div>
-          </div>
-        </div>
-
-        <!-- HISTORICAL UPTIME & LATENCY GRAPH SECTION -->
-        <div class="bg-white border-3 border-black p-4 md:p-5 rounded-xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] flex flex-col gap-4">
-          
-          <!-- History Header & Range Selector Toggle -->
-          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b-2 border-black/10 pb-3">
-            <div class="flex items-center gap-2">
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                <line x1="18" y1="20" x2="18" y2="10"/>
-                <line x1="12" y1="20" x2="12" y2="4"/>
-                <line x1="6" y1="20" x2="6" y2="14"/>
-              </svg>
-              <h4 class="font-black text-base uppercase tracking-tight">Uptime & Latency History</h4>
-            </div>
-
-            <div class="flex items-center gap-1 bg-gray-100 p-1 border-2 border-black rounded-lg text-xs font-bold self-start sm:self-auto">
-              <button id="range-24h" class="px-2.5 py-1 rounded-md bg-black text-white shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] transition-all">
-                24 Hours
-              </button>
-              <button id="range-30d" class="px-2.5 py-1 rounded-md text-gray-700 hover:text-black transition-all">
-                30 Days
-              </button>
-            </div>
-          </div>
-
-          <!-- Summary Stats Header -->
-          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs font-mono">
-            <div class="bg-gray-50 border border-black/20 p-2 rounded-lg">
-              <span class="text-gray-500 block text-[10px] uppercase font-bold">Overall Uptime</span>
-              <span id="hist-uptime-pct" class="font-black text-emerald-700 text-sm">99.98%</span>
-            </div>
-            <div class="bg-gray-50 border border-black/20 p-2 rounded-lg">
-              <span class="text-gray-500 block text-[10px] uppercase font-bold">Avg Latency</span>
-              <span id="hist-avg-latency" class="font-black text-black text-sm">-- ms</span>
-            </div>
-            <div class="bg-gray-50 border border-black/20 p-2 rounded-lg">
-              <span class="text-gray-500 block text-[10px] uppercase font-bold">Peak Latency</span>
-              <span id="hist-peak-latency" class="font-black text-black text-sm">-- ms</span>
-            </div>
-            <div class="bg-gray-50 border border-black/20 p-2 rounded-lg">
-              <span class="text-gray-500 block text-[10px] uppercase font-bold">Total Incidents</span>
-              <span id="hist-incidents" class="font-black text-emerald-700 text-sm">0 detected</span>
-            </div>
-          </div>
-
-          <!-- Bar Graph Container (30 status bars) -->
-          <div class="flex flex-col gap-1.5">
-            <div id="bar-hover-info" class="text-xs font-mono font-bold text-gray-600 h-5 flex items-center justify-between">
-              <span>Timeline Availability</span>
-              <span id="hover-bar-detail" class="text-black">Hover over bars for details</span>
-            </div>
-            <div id="history-bars-container" class="flex items-center justify-between gap-1 h-9 bg-gray-100 p-1.5 rounded-lg border-2 border-black overflow-x-auto">
-              <!-- Rendered dynamically -->
-            </div>
-            <div class="flex items-center justify-between text-[11px] text-gray-500 font-mono font-bold px-0.5">
-              <span id="range-start-label">30 days ago</span>
-              <span class="inline-flex items-center gap-1.5">
-                <span class="w-2.5 h-2.5 rounded-sm bg-emerald-500 border border-black"></span> 100% Up
-                <span class="w-2.5 h-2.5 rounded-sm bg-amber-400 border border-black ml-2"></span> Degraded
-                <span class="w-2.5 h-2.5 rounded-sm bg-red-500 border border-black ml-2"></span> Outage
-              </span>
-              <span>Today (Live)</span>
-            </div>
-          </div>
-
-          <!-- Response Time Trend Graph (SVG Line Chart) -->
-          <div class="flex flex-col gap-1 pt-2 border-t border-black/10">
-            <div class="flex items-center justify-between text-xs font-mono font-bold">
-              <span class="text-gray-600 uppercase tracking-tight">Response Latency Trend (ms)</span>
-              <span id="latency-hover-val" class="text-black">Current: -- ms</span>
-            </div>
-            
-            <div class="relative w-full h-28 bg-[#fafafa] border-2 border-black rounded-lg p-2 overflow-hidden">
-              <svg id="latency-svg" class="w-full h-full overflow-visible" preserveAspectRatio="none">
-                <!-- SVG path, grid lines & dots rendered dynamically -->
-              </svg>
-            </div>
-          </div>
-
-        </div>
-
-        <div class="bg-white/80 border-2 border-black p-3 rounded-xl text-xs flex flex-wrap items-center justify-between gap-2 font-mono">
-          <span class="text-gray-600 font-sans font-bold">Tested Endpoint:</span>
-          <span id="up-target-url" class="font-bold text-black break-all">--</span>
-        </div>
-
-        <!-- Action Buttons -->
-        <div class="flex flex-col sm:flex-row items-center gap-3 mt-1 border-t-2 border-black/10 pt-4">
-          <button onclick="shareResult(this)" class="w-full sm:w-auto flex-1 bg-white border-2 border-black py-2.5 px-4 rounded-xl text-sm font-bold flex items-center justify-center gap-2 hover:-translate-y-0.5 hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] active:translate-y-0 active:shadow-none transition-all">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
-            <span>Share Result</span>
-          </button>
-          <button onclick="downloadReceipt(this)" class="w-full sm:w-auto flex-1 bg-white border-2 border-black py-2.5 px-4 rounded-xl text-sm font-bold flex items-center justify-center gap-2 hover:-translate-y-0.5 hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] active:translate-y-0 active:shadow-none transition-all">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-            <span>Download Receipt</span>
-          </button>
-        </div>
-
-      </div>
-
-      <!-- DOWN STATUS CARD -->
-      <div id="card-down" class="hidden w-full bg-[#FFE3E3] border-4 border-black p-6 rounded-2xl shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] flex-col gap-5">
-        <div class="flex items-start justify-between border-b-2 border-black/20 pb-4">
-          <div class="flex items-center gap-3">
-            <div class="bg-[#F87171] border-2 border-black p-2.5 rounded-xl shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] text-black">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-                <line x1="18" y1="6" x2="6" y2="18" />
-                <line x1="6" y1="6" x2="18" y2="18" />
-              </svg>
-            </div>
-            <div>
-              <span class="text-xs font-black uppercase tracking-widest text-red-900">Website Unreachable</span>
-              <h3 id="down-hostname" class="text-2xl font-black">--</h3>
-            </div>
-          </div>
-          <span class="bg-white border-2 border-black px-3 py-1 rounded-lg text-xs font-bold shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
-            Offline / Blocked
-          </span>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-          <div class="bg-white border-2 border-black p-3 rounded-xl shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
-            <div class="text-xs font-bold text-gray-500 mb-1">Possible Cause</div>
-            <div id="down-reason" class="text-sm font-bold text-red-600">--</div>
-          </div>
-
-          <div class="bg-white border-2 border-black p-3 rounded-xl shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
-            <div class="text-xs font-bold text-gray-500 mb-1">Timestamp</div>
-            <div id="down-timestamp" class="text-sm font-bold font-mono">--</div>
-          </div>
-        </div>
-
-        <p class="text-xs font-medium text-gray-700 bg-white/70 p-3 rounded-xl border border-black/20">
-          💡 <strong>Tip:</strong> Double check for typos, confirm your Wi-Fi is active, or verify if the site blocks direct automated client requests.
-        </p>
-
-        <!-- Action Buttons -->
-        <div class="flex flex-col sm:flex-row items-center gap-3 mt-1 border-t-2 border-black/10 pt-4">
-          <button onclick="shareResult(this)" class="w-full sm:w-auto flex-1 bg-white border-2 border-black py-2.5 px-4 rounded-xl text-sm font-bold flex items-center justify-center gap-2 hover:-translate-y-0.5 hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] active:translate-y-0 active:shadow-none transition-all">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
-            <span>Share Result</span>
-          </button>
-          <button onclick="downloadReceipt(this)" class="w-full sm:w-auto flex-1 bg-white border-2 border-black py-2.5 px-4 rounded-xl text-sm font-bold flex items-center justify-center gap-2 hover:-translate-y-0.5 hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] active:translate-y-0 active:shadow-none transition-all">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-            <span>Download Receipt</span>
-          </button>
-        </div>
-
-      </div>
-
-      <!-- INVALID URL CARD -->
-      <div id="card-invalid" class="hidden w-full bg-[#FFF4D4] border-4 border-black p-6 rounded-2xl shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] items-start gap-4">
-        <div class="bg-[#FBBF24] border-2 border-black p-2.5 rounded-xl shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] text-black font-black text-xl px-4">
-          !
-        </div>
-        <div>
-          <h3 class="text-2xl font-black mb-1">Invalid Format</h3>
-          <p class="text-black font-medium leading-relaxed text-sm md:text-base">
-            Please enter a valid domain address (e.g. <code class="bg-white px-1.5 py-0.5 rounded border border-black font-mono">github.com</code> or <code class="bg-white px-1.5 py-0.5 rounded border border-black font-mono">https://vercel.com</code>).
-          </p>
-        </div>
-      </div>
-
-    </div>
-
-  </div>
-
-  <!-- Footer Navigation & Legal Buttons -->
-  <footer class="z-10 w-full max-w-3xl mx-auto mt-12 pb-4 pt-6 border-t-2 border-black/10 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-medium text-gray-600">
-    <div class="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 text-center sm:text-left">
-      <span class="font-bold text-black">Neo-Status © 2026</span>
-      <span class="hidden sm:inline text-black/30">•</span>
-      <span class="font-bold text-black bg-gray-100 px-2 py-0.5 rounded border border-black/20">Built by Sawyer Schulz</span>
-    </div>
-
-    <div class="flex items-center gap-4 sm:gap-6 font-bold text-black">
-      <button data-policy="terms" class="policy-btn hover:underline hover:text-blue-600 transition-colors">
-        Terms of Service
-      </button>
-      <button data-policy="privacy" class="policy-btn hover:underline hover:text-blue-600 transition-colors">
-        Privacy Policy
-      </button>
-      <button data-policy="cookies" class="policy-btn hover:underline hover:text-blue-600 transition-colors">
-        Cookie Policy
-      </button>
-    </div>
-  </footer>
-
-  <!-- Modal Backdrop & Window -->
-  <div id="policy-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-    <div class="bg-white border-4 border-black w-full max-w-xl rounded-2xl shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] max-h-[85vh] flex flex-col overflow-hidden animate-modal-in">
-      
-      <!-- Modal Header -->
-      <div class="p-5 border-b-4 border-black bg-[#fafafa] flex items-center justify-between">
-        <div>
-          <h2 id="modal-title" class="text-2xl font-black">--</h2>
-          <p id="modal-updated" class="text-xs font-semibold text-gray-500 mt-0.5">--</p>
-        </div>
-        <button 
-          id="modal-close-btn"
-          class="p-2 bg-white border-2 border-black rounded-xl hover:bg-black hover:text-white transition-colors shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-y-0.5 active:shadow-none"
-          aria-label="Close Modal"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <line x1="18" y1="6" x2="6" y2="18" />
-            <line x1="6" y1="6" x2="18" y2="18" />
-          </svg>
-        </button>
-      </div>
-
-      <!-- Modal Body Content -->
-      <div id="modal-body" class="p-6 overflow-y-auto space-y-5 text-sm leading-relaxed font-sans text-gray-800">
-        <!-- Content inserted dynamically -->
-      </div>
-
-      <!-- Modal Footer -->
-      <div class="p-4 border-t-4 border-black bg-white flex justify-end">
-        <button
-          id="modal-understand-btn"
-          class="bg-black text-white border-2 border-black py-2 px-6 rounded-xl font-bold hover:bg-gray-800 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] active:translate-y-0.5 active:shadow-none transition-all"
-        >
-          I Understand
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <script>
-    // Real Legal Content Dataset
-    const LEGAL_CONTENTS = {
-      terms: {
-        title: 'Terms of Service',
-        updated: 'Last updated: September 2026',
-        sections: [
-          {
-            heading: '1. Acceptance of Terms',
-            content: 'By accessing and using Neo-Status Checker, you agree to be bound by these Terms of Service. If you do not agree to these terms, please do not use our services.'
-          },
-          {
-            heading: '2. Description of Service',
-            content: 'Neo-Status Checker provides real-time website connectivity checks, ping latency metrics, and historical availability timelines. Results are provided for informational diagnostics.'
-          },
-          {
-            heading: '3. Acceptable Use Policy',
-            content: 'You agree not to automate excessive requests or perform Denial of Service (DoS) activities against target domains through our utility.'
-          },
-          {
-            heading: '4. Limitation of Liability',
-            content: 'We provide this tool "as is" without warranty of any kind. Neo-Status Checker is not responsible for downtime decisions, losses, or errors caused by external server connectivity.'
-          }
-        ]
-      },
-      privacy: {
-        title: 'Privacy Policy',
-        updated: 'Last updated: September 2026',
-        sections: [
-          {
-            heading: '1. Information We Process',
-            content: 'Neo-Status Checker functions entirely inside your browser. We do not store, sell, or track target URLs on backend servers.'
-          },
-          {
-            heading: '2. Local History Storage',
-            content: 'Diagnostic response history is saved locally within your device browser localStorage to persist timeline graphs across sessions without transmitting analytics.'
-          },
-          {
-            heading: '3. Third-Party Requests',
-            content: 'When pinging a target website, standard network request headers may be received by that target web host as part of the client connection handshake.'
-          },
-          {
-            heading: '4. Data Retention',
-            content: 'You may clear your browser storage at any time to erase saved website ping timelines.'
-          }
-        ]
-      },
-      cookies: {
-        title: 'Cookie Policy',
-        updated: 'Last updated: September 2026',
-        sections: [
-          {
-            heading: '1. What Are Cookies?',
-            content: 'Cookies are small text files stored on your device to retain user preferences and enable essential website functionalities.'
-          },
-          {
-            heading: '2. Zero-Cookie Architecture',
-            content: 'Neo-Status Checker is zero-cookie by design. We do not use persistent tracking cookies, advertising identifiers, or third-party marketing pixels.'
-          },
-          {
-            heading: '3. Local Storage Usage',
-            content: 'We utilize light browser localStorage solely for keeping ping history data and user UI preference toggles locally.'
-          },
-          {
-            heading: '4. Managing Preferences',
-            content: 'Since we do not set tracking cookies, you do not need to configure complex consent banners to maintain total privacy.'
-          }
-        ]
+<!-- Ads: Adcash auto-tag (zone iy7zk7mmw). This static subdomain page has no
+     cookie banner of its own, so the tag loads ungated here. The loader is
+     async, so the call polls briefly for `aclib` instead of assuming it is ready. -->
+<script id="aclib" type="text/javascript" src="https://acscdn.com/script/aclib.js" async></script>
+<script>
+  (function () {
+    var attempts = 0;
+    (function runAutoTag() {
+      if (window.aclib && typeof window.aclib.runAutoTag === 'function') {
+        window.aclib.runAutoTag({ zoneId: 'iy7zk7mmw' });
+      } else if (attempts++ < 60) {
+        window.setTimeout(runAutoTag, 250);
       }
+    })();
+  })();
+</script>
+
+<script>
+  // Apply the saved theme before first paint to avoid a flash.
+  (function () {
+    var t = null;
+    try { t = localStorage.getItem('isitdown:theme'); } catch (e) {}
+    if (!t) t = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    document.documentElement.setAttribute('data-theme', t);
+  })();
+</script>
+
+<style>
+/* ============================================================
+   Design tokens — clean monochrome base with a Supabase-style
+   emerald accent and Cloudflare-orange for warnings.
+   ============================================================ */
+:root {
+  --bg: #fafafa;
+  --bg-elev: #ffffff;
+  --card: #ffffff;
+  --line: #e6e6e6;
+  --line-strong: #d4d4d4;
+  --fg: #0a0a0a;
+  --fg-soft: #171717;
+  --muted: #6b7280;
+  --muted-2: #9ca3af;
+  --hover: #f4f4f5;
+  --accent: #10b981;
+  --accent-strong: #059669;
+  --accent-soft: #ecfdf5;
+  --ok: #10b981;
+  --ok-soft: #ecfdf5;
+  --warn: #f59e0b;
+  --warn-soft: #fffbeb;
+  --info: #0ea5e9;
+  --info-soft: #f0f9ff;
+  --danger: #ef4444;
+  --danger-soft: #fef2f2;
+  --cf: #f6821f;
+  --ring: rgba(16, 185, 129, 0.35);
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 8px 24px rgba(0, 0, 0, 0.05);
+  --radius: 12px;
+  --radius-sm: 8px;
+  --grid: rgba(0, 0, 0, 0.035);
+}
+html[data-theme="dark"] {
+  --bg: #050505;
+  --bg-elev: #0a0a0a;
+  --card: #0d0d0e;
+  --line: #232326;
+  --line-strong: #333336;
+  --fg: #f5f5f5;
+  --fg-soft: #ededed;
+  --muted: #9aa0a6;
+  --muted-2: #6b7280;
+  --hover: #151517;
+  --accent: #3ecf8e;
+  --accent-strong: #4ade80;
+  --accent-soft: rgba(62, 207, 142, 0.1);
+  --ok: #3ecf8e;
+  --ok-soft: rgba(62, 207, 142, 0.1);
+  --warn: #fbbf24;
+  --warn-soft: rgba(251, 191, 36, 0.1);
+  --info: #38bdf8;
+  --info-soft: rgba(56, 189, 248, 0.1);
+  --danger: #f87171;
+  --danger-soft: rgba(248, 113, 113, 0.1);
+  --cf: #f6821f;
+  --ring: rgba(62, 207, 142, 0.4);
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow: 0 1px 3px rgba(0, 0, 0, 0.5), 0 12px 32px rgba(0, 0, 0, 0.45);
+  --grid: rgba(255, 255, 255, 0.03);
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+[id] { scroll-margin-top: 5rem; }
+body {
+  margin: 0;
+  min-height: 100vh;
+  background-color: var(--bg);
+  background-image:
+    linear-gradient(var(--grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 44px 44px;
+  color: var(--fg);
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+::selection { background: var(--fg); color: var(--bg); }
+a { color: inherit; text-decoration: none; }
+button { font-family: inherit; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
+.sr-only {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
+}
+.skip {
+  position: absolute; left: -9999px; top: 0; z-index: 100;
+  background: var(--fg); color: var(--bg); padding: 10px 16px; border-radius: 0 0 8px 0;
+  font-size: 13px; font-weight: 500;
+}
+.skip:focus { left: 0; }
+.mono { font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace; }
+
+/* ---------- Shell ---------- */
+.wrap { width: 100%; max-width: 760px; margin: 0 auto; padding: 0 20px; }
+.topbar {
+  position: sticky; top: 0; z-index: 30;
+  backdrop-filter: saturate(180%) blur(12px);
+  -webkit-backdrop-filter: saturate(180%) blur(12px);
+  background: color-mix(in srgb, var(--bg) 82%, transparent);
+  border-bottom: 1px solid var(--line);
+}
+.topbar-inner { display: flex; align-items: center; justify-content: space-between; height: 56px; }
+.brand { display: flex; align-items: center; gap: 9px; font-size: 14px; font-weight: 600; letter-spacing: -0.01em; }
+.brand-mark {
+  display: flex; align-items: center; justify-content: center;
+  width: 26px; height: 26px; border-radius: 7px;
+  background: var(--fg); color: var(--bg);
+}
+.topbar-actions { display: flex; align-items: center; gap: 4px; }
+.icon-btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 36px; height: 36px; border-radius: 8px; border: 1px solid transparent;
+  background: transparent; color: var(--muted); cursor: pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+.icon-btn:hover { background: var(--hover); color: var(--fg); }
+.icon-btn svg { width: 18px; height: 18px; }
+
+main { display: block; padding: 56px 0 0; }
+
+/* ---------- Hero ---------- */
+.hero { text-align: center; padding: 8px 0 30px; }
+.pill {
+  display: inline-flex; align-items: center; gap: 7px;
+  height: 26px; padding: 0 11px; border: 1px solid var(--line);
+  border-radius: 999px; background: var(--card); color: var(--muted);
+  font-size: 12px; font-weight: 500; box-shadow: var(--shadow-sm);
+}
+.pill .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+.hero h1 {
+  margin: 20px 0 12px; font-size: clamp(32px, 6vw, 50px); line-height: 1.05;
+  font-weight: 700; letter-spacing: -0.03em;
+}
+.hero h1 .grad {
+  background: linear-gradient(100deg, var(--accent-strong), var(--accent) 45%, var(--cf));
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.hero p { margin: 0 auto; max-width: 520px; color: var(--muted); font-size: 16px; line-height: 1.6; }
+
+/* ---------- Checker card ---------- */
+.checker {
+  margin-top: 30px; padding: 14px; border: 1px solid var(--line);
+  border-radius: var(--radius); background: var(--card); box-shadow: var(--shadow);
+}
+.field { display: flex; gap: 10px; }
+.input-wrap { position: relative; flex: 1; display: flex; align-items: center; }
+.input-wrap .lead {
+  position: absolute; left: 14px; color: var(--muted-2); display: flex; pointer-events: none;
+}
+.input-wrap .lead svg { width: 17px; height: 17px; }
+input[type="text"] {
+  width: 100%; height: 48px; padding: 0 44px 0 42px;
+  border: 1px solid var(--line-strong); border-radius: var(--radius-sm);
+  background: var(--bg); color: var(--fg);
+  font-size: 15px; font-family: "JetBrains Mono", ui-monospace, monospace;
+  outline: none; transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
+}
+input[type="text"]::placeholder { color: var(--muted-2); font-family: "Inter", sans-serif; }
+input[type="text"]:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--ring); background: var(--card); }
+.kbd-hint {
+  position: absolute; right: 12px; display: inline-flex; align-items: center;
+  height: 22px; padding: 0 7px; border: 1px solid var(--line);
+  border-radius: 6px; background: var(--card); color: var(--muted-2);
+  font-size: 11px; font-weight: 600; font-family: "JetBrains Mono", monospace;
+}
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  height: 48px; padding: 0 22px; border-radius: var(--radius-sm);
+  border: 1px solid transparent; cursor: pointer; white-space: nowrap;
+  font-size: 14px; font-weight: 600; letter-spacing: -0.01em;
+  transition: transform 0.08s, opacity 0.15s, background 0.15s, box-shadow 0.15s;
+}
+.btn-primary { background: var(--fg); color: var(--bg); box-shadow: var(--shadow-sm); }
+.btn-primary:hover { opacity: 0.88; }
+.btn-primary:active { transform: translateY(1px); }
+.btn-primary:disabled { opacity: 0.55; cursor: progress; }
+.btn-primary svg { width: 16px; height: 16px; }
+.spinner {
+  width: 16px; height: 16px; border-radius: 50%;
+  border: 2px solid color-mix(in srgb, var(--bg) 35%, transparent);
+  border-top-color: var(--bg); animation: spin 0.7s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.examples { display: flex; flex-wrap: wrap; align-items: center; gap: 7px; margin-top: 12px; padding: 0 2px; }
+.examples span.lbl { color: var(--muted-2); font-size: 12px; }
+.chip {
+  height: 26px; padding: 0 11px; border: 1px solid var(--line); border-radius: 999px;
+  background: var(--bg); color: var(--muted); cursor: pointer;
+  font-size: 12px; font-family: "JetBrains Mono", monospace;
+  transition: border-color 0.15s, color 0.15s, background 0.15s;
+}
+.chip:hover { border-color: var(--fg); color: var(--fg); }
+
+/* ---------- Result ---------- */
+.result { margin-top: 20px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--card); box-shadow: var(--shadow); overflow: hidden; animation: rise 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+@keyframes rise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+.result-head { display: flex; align-items: center; gap: 14px; padding: 18px 20px; border-bottom: 1px solid var(--line); }
+.verdict-icon {
+  display: flex; align-items: center; justify-content: center; flex: none;
+  width: 44px; height: 44px; border-radius: 11px; border: 1px solid;
+}
+.verdict-icon svg { width: 22px; height: 22px; }
+.result-head .meta { min-width: 0; flex: 1; }
+.result-head .host { font-size: 19px; font-weight: 600; letter-spacing: -0.02em; word-break: break-all; }
+.result-head .verdict { margin-top: 2px; font-size: 13px; font-weight: 500; }
+.badge {
+  flex: none; display: inline-flex; align-items: center; gap: 6px;
+  height: 26px; padding: 0 11px; border-radius: 999px;
+  border: 1px solid; font-size: 12px; font-weight: 600; white-space: nowrap;
+}
+.badge .dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+
+/* verdict palette via data-v on the card */
+.result[data-v="up"] .verdict-icon { color: var(--ok); background: var(--ok-soft); border-color: color-mix(in srgb, var(--ok) 35%, transparent); }
+.result[data-v="up"] .verdict { color: var(--ok); }
+.result[data-v="up"] .badge { color: var(--ok); background: var(--ok-soft); border-color: color-mix(in srgb, var(--ok) 35%, transparent); }
+.result[data-v="slow"] .verdict-icon { color: var(--warn); background: var(--warn-soft); border-color: color-mix(in srgb, var(--warn) 35%, transparent); }
+.result[data-v="slow"] .verdict { color: var(--warn); }
+.result[data-v="slow"] .badge { color: var(--warn); background: var(--warn-soft); border-color: color-mix(in srgb, var(--warn) 35%, transparent); }
+.result[data-v="redirect"] .verdict-icon { color: var(--info); background: var(--info-soft); border-color: color-mix(in srgb, var(--info) 35%, transparent); }
+.result[data-v="redirect"] .verdict { color: var(--info); }
+.result[data-v="redirect"] .badge { color: var(--info); background: var(--info-soft); border-color: color-mix(in srgb, var(--info) 35%, transparent); }
+.result[data-v="error"] .verdict-icon { color: var(--cf); background: color-mix(in srgb, var(--cf) 12%, transparent); border-color: color-mix(in srgb, var(--cf) 35%, transparent); }
+.result[data-v="error"] .verdict { color: var(--cf); }
+.result[data-v="error"] .badge { color: var(--cf); background: color-mix(in srgb, var(--cf) 12%, transparent); border-color: color-mix(in srgb, var(--cf) 35%, transparent); }
+.result[data-v="down"] .verdict-icon { color: var(--danger); background: var(--danger-soft); border-color: color-mix(in srgb, var(--danger) 35%, transparent); }
+.result[data-v="down"] .verdict { color: var(--danger); }
+.result[data-v="down"] .badge { color: var(--danger); background: var(--danger-soft); border-color: color-mix(in srgb, var(--danger) 35%, transparent); }
+
+.metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: var(--line); border-bottom: 1px solid var(--line); }
+.metric { background: var(--card); padding: 15px 16px; }
+.metric .k { display: flex; align-items: center; gap: 6px; color: var(--muted-2); font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; }
+.metric .k svg { width: 13px; height: 13px; }
+.metric .v { margin-top: 7px; font-size: 20px; font-weight: 600; letter-spacing: -0.02em; font-family: "JetBrains Mono", monospace; word-break: break-all; }
+.metric .v.small { font-size: 14px; }
+.metric .sub { margin-top: 4px; font-size: 11px; color: var(--muted-2); }
+.lat-bar { margin-top: 9px; height: 4px; border-radius: 999px; background: var(--hover); overflow: hidden; }
+.lat-bar i { display: block; height: 100%; border-radius: 999px; background: var(--accent); transition: width 0.5s ease; }
+
+.details { padding: 6px 20px 14px; }
+.row { display: flex; gap: 16px; padding: 11px 0; border-bottom: 1px solid var(--line); font-size: 13px; }
+.row:last-child { border-bottom: 0; }
+.row .rk { flex: none; width: 140px; color: var(--muted); }
+.row .rv { flex: 1; min-width: 0; font-family: "JetBrains Mono", monospace; word-break: break-all; }
+.row .rv a { color: var(--info); text-decoration: underline; text-underline-offset: 2px; }
+.tag-ok { color: var(--ok); }
+.tag-warn { color: var(--warn); }
+.tag-bad { color: var(--danger); }
+
+.result-foot { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 14px 20px; border-top: 1px solid var(--line); background: var(--bg-elev); }
+.result-foot .spacer { flex: 1; }
+.btn-ghost {
+  display: inline-flex; align-items: center; gap: 7px; height: 36px; padding: 0 13px;
+  border: 1px solid var(--line-strong); border-radius: var(--radius-sm); background: var(--card);
+  color: var(--fg-soft); cursor: pointer; font-size: 13px; font-weight: 500;
+  transition: border-color 0.15s, background 0.15s;
+}
+.btn-ghost:hover { border-color: var(--fg); }
+.btn-ghost svg { width: 15px; height: 15px; }
+.switch { display: inline-flex; align-items: center; gap: 9px; color: var(--muted); font-size: 13px; cursor: pointer; user-select: none; }
+.switch input { position: absolute; opacity: 0; width: 0; height: 0; }
+.switch .track { position: relative; width: 36px; height: 21px; border-radius: 999px; background: var(--line-strong); transition: background 0.18s; }
+.switch .track::after { content: ""; position: absolute; top: 2px; left: 2px; width: 17px; height: 17px; border-radius: 50%; background: #fff; box-shadow: 0 1px 2px rgba(0,0,0,0.3); transition: transform 0.18s; }
+.switch input:checked + .track { background: var(--accent); }
+.switch input:checked + .track::after { transform: translateX(15px); }
+.switch input:focus-visible + .track { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* ---------- Recent ---------- */
+.recent { margin-top: 22px; }
+.section-eyebrow { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+.section-eyebrow h2 { margin: 0; font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+.link-btn { background: none; border: 0; color: var(--muted-2); cursor: pointer; font-size: 12px; font-weight: 500; }
+.link-btn:hover { color: var(--danger); }
+.recent-list { display: flex; flex-direction: column; border: 1px solid var(--line); border-radius: var(--radius); background: var(--card); overflow: hidden; box-shadow: var(--shadow-sm); }
+.recent-item { display: flex; align-items: center; gap: 12px; padding: 11px 15px; border-bottom: 1px solid var(--line); cursor: pointer; width: 100%; background: none; text-align: left; transition: background 0.12s; }
+.recent-item:last-child { border-bottom: 0; }
+.recent-item:hover { background: var(--hover); }
+.recent-item .rdot { width: 8px; height: 8px; border-radius: 50%; flex: none; }
+.recent-item .rhost { flex: 1; min-width: 0; font-family: "JetBrains Mono", monospace; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.recent-item .rms { color: var(--muted-2); font-family: "JetBrains Mono", monospace; font-size: 12px; }
+.recent-item .rt { color: var(--muted-2); font-size: 11px; flex: none; }
+.rdot.up { background: var(--ok); } .rdot.slow { background: var(--warn); } .rdot.redirect { background: var(--info); }
+.rdot.error { background: var(--cf); } .rdot.down { background: var(--danger); }
+
+/* ---------- Sections ---------- */
+.section { margin-top: 52px; }
+.section > h2 { margin: 0 0 8px; font-size: 22px; font-weight: 600; letter-spacing: -0.02em; }
+.section > p.lead { margin: 0 0 22px; color: var(--muted); font-size: 15px; line-height: 1.6; max-width: 560px; }
+.steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+.step { padding: 18px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--card); box-shadow: var(--shadow-sm); }
+.step .num { font-family: "JetBrains Mono", monospace; font-size: 12px; font-weight: 500; color: var(--accent-strong); }
+.step h3 { margin: 9px 0 5px; font-size: 14px; font-weight: 600; }
+.step p { margin: 0; color: var(--muted); font-size: 13px; line-height: 1.55; }
+
+.faq-list { border: 1px solid var(--line); border-radius: var(--radius); background: var(--card); overflow: hidden; box-shadow: var(--shadow-sm); }
+.faq-item { border-bottom: 1px solid var(--line); }
+.faq-item:last-child { border-bottom: 0; }
+.faq-item summary {
+  display: flex; align-items: center; justify-content: space-between; gap: 14px;
+  padding: 16px 18px; cursor: pointer; font-size: 14px; font-weight: 500; list-style: none;
+}
+.faq-item summary::-webkit-details-marker { display: none; }
+.faq-item summary .chev { flex: none; color: var(--muted-2); transition: transform 0.2s ease; }
+.faq-item summary .chev svg { width: 16px; height: 16px; display: block; }
+.faq-item[open] summary .chev { transform: rotate(180deg); }
+.faq-item .ans { padding: 0 18px 17px; color: var(--muted); font-size: 13.5px; line-height: 1.65; }
+.faq-note { margin-top: 14px; font-size: 12px; color: var(--muted-2); line-height: 1.6; }
+
+/* ---------- Footer ---------- */
+footer { margin-top: 66px; border-top: 1px solid var(--line); }
+.footer-inner { display: flex; flex-wrap: wrap; gap: 28px; justify-content: space-between; padding: 34px 0; }
+.footer-brand { max-width: 300px; }
+.footer-brand .brand-mark { background: var(--fg); color: var(--bg); }
+.footer-brand p { margin: 12px 0 0; color: var(--muted); font-size: 12.5px; line-height: 1.6; }
+.footer-cols { display: flex; gap: 48px; }
+.footer-col h3 { margin: 0 0 12px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.07em; color: var(--muted-2); }
+.footer-col ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 9px; }
+.footer-col a { color: var(--muted); font-size: 13px; transition: color 0.15s; }
+.footer-col a:hover { color: var(--fg); }
+.footer-base { border-top: 1px solid var(--line); padding: 18px 0; color: var(--muted-2); font-size: 12px; line-height: 1.6; }
+
+@media (max-width: 640px) {
+  main { padding-top: 38px; }
+  .metrics { grid-template-columns: repeat(2, 1fr); }
+  .steps { grid-template-columns: 1fr; }
+  .field { flex-direction: column; }
+  .btn-primary { width: 100%; }
+  .row { flex-direction: column; gap: 4px; }
+  .row .rk { width: auto; }
+  .footer-inner { gap: 26px; }
+  .footer-cols { gap: 34px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; }
+}
+</style>
+</head>
+
+<body>
+<a href="#main" class="skip">Skip to the checker</a>
+
+<header class="topbar">
+  <div class="wrap topbar-inner">
+    <a href="/" class="brand" aria-label="Is It Down home">
+      <span class="brand-mark" aria-hidden="true">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 14.5l3.4-7.6 3.7 10.9 2.7-7.3H21"/></svg>
+      </span>
+      <span>Is It Down</span>
+    </a>
+    <div class="topbar-actions">
+      <button id="themeBtn" class="icon-btn" type="button" aria-label="Toggle dark mode"></button>
+    </div>
+  </div>
+</header>
+
+<main id="main">
+  <div class="wrap">
+
+    <!-- Hero -->
+    <section class="hero">
+      <span class="pill"><span class="dot" aria-hidden="true"></span>Live reachability check</span>
+      <h1>Is it down for <span class="grad">everyone</span>, or just you?</h1>
+      <p>Enter any URL and get a live status check: HTTP response code, response time, resolved IP and DNS records. Free, no sign-up — the whole check runs in your browser.</p>
+    </section>
+
+    <!-- Checker -->
+    <section class="checker" aria-label="Status checker">
+      <form id="checkForm" class="field" novalidate>
+        <div class="input-wrap">
+          <span class="lead" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+          </span>
+          <label for="urlInput" class="sr-only">Website address to check</label>
+          <input id="urlInput" type="text" inputmode="url" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="go" placeholder="example.com or https://example.com/page" />
+          <kbd class="kbd-hint" id="kbdHint">/</kbd>
+        </div>
+        <button id="submitBtn" class="btn btn-primary" type="submit">
+          <span id="btnLabel">Check status</span>
+        </button>
+      </form>
+      <div class="examples">
+        <span class="lbl">Try:</span>
+        <button class="chip" type="button" data-example="github.com">github.com</button>
+        <button class="chip" type="button" data-example="cloudflare.com">cloudflare.com</button>
+        <button class="chip" type="button" data-example="supabase.com">supabase.com</button>
+        <button class="chip" type="button" data-example="vercel.com">vercel.com</button>
+      </div>
+    </section>
+
+    <!-- Result (rendered by JS) -->
+    <div id="resultSlot" aria-live="polite"></div>
+
+    <!-- Recent checks -->
+    <section id="recentSection" class="recent" hidden>
+      <div class="section-eyebrow">
+        <h2>Recent checks</h2>
+        <button id="clearRecent" class="link-btn" type="button">Clear</button>
+      </div>
+      <div id="recentList" class="recent-list"></div>
+    </section>
+
+    <!-- How it works -->
+    <section class="section">
+      <h2>How the check works</h2>
+      <p class="lead">Three independent probes run in parallel, then the result is combined into one verdict.</p>
+      <div class="steps">
+        <div class="step">
+          <span class="num">01</span>
+          <h3>Direct reachability</h3>
+          <p>Your browser sends a request to the address and times it. If the server answers at all, the host is online; a refused or timed-out connection means it is unreachable.</p>
+        </div>
+        <div class="step">
+          <span class="num">02</span>
+          <h3>HTTP status</h3>
+          <p>A public CORS proxy fetches the real response code and content type, so you see 200, 301, 404 or 503 rather than a guess.</p>
+        </div>
+        <div class="step">
+          <span class="num">03</span>
+          <h3>DNS resolution</h3>
+          <p>Cloudflare's DNS-over-HTTPS resolver looks up the A and CNAME records, confirming whether the domain resolves before the request even leaves.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- FAQ -->
+    <section class="section" id="faq">
+      <h2>Frequently asked questions</h2>
+      <div class="faq-list">
+        <details class="faq-item">
+          <summary>How does this is-it-down check work?<span class="chev" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></span></summary>
+          <div class="ans">The page sends a live request to the address you enter, times how long the server takes to respond, and cross-checks the HTTP status through a public CORS proxy. DNS is resolved separately through Cloudflare's DNS-over-HTTPS service. Everything runs in your browser.</div>
+        </details>
+        <details class="faq-item">
+          <summary>How accurate is the result?<span class="chev" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></span></summary>
+          <div class="ans">The result reflects what your browser can reach right now. A down result can also mean the site refuses automated requests, or that your own network or DNS is the problem, so it is worth retrying or testing from another connection.</div>
+        </details>
+        <details class="faq-item">
+          <summary>What do the HTTP status codes mean?<span class="chev" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></span></summary>
+          <div class="ans">2xx and 3xx mean the server responded normally. 4xx means the server answered but the page is an error — 404 simply means that page is missing, not that the site is down. 5xx means the server itself errored. A timeout with no response means the host could not be reached.</div>
+        </details>
+        <details class="faq-item">
+          <summary>Do you store the sites I check?<span class="chev" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></span></summary>
+          <div class="ans">No. Checks run entirely in your browser. The optional recent-checks list is saved in your own browser storage and is never sent to a server.</div>
+        </details>
+        <details class="faq-item">
+          <summary>Why does a site I know is online show as down?<span class="chev" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></span></summary>
+          <div class="ans">Bot protection and firewalls such as Cloudflare or a CAPTCHA can refuse automated requests even while real visitors load the page fine. Your own network, VPN or DNS can also be the cause.</div>
+        </details>
+        <details class="faq-item">
+          <summary>What does a degraded or slow result mean?<span class="chev" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></span></summary>
+          <div class="ans">It means the server did respond, but took longer than about 1.5 seconds. The site is reachable, yet it may feel down to visitors, and a slow response often comes before an outage.</div>
+        </details>
+      </div>
+      <p class="faq-note">Checks are made from your own browser, so they show what <em>you</em> can reach. For a view from many locations at once, pair this with a monitoring service.</p>
+    </section>
+
+  </div>
+</main>
+
+<footer>
+  <div class="wrap footer-inner">
+    <div class="footer-brand">
+      <a href="/" class="brand">
+        <span class="brand-mark" aria-hidden="true">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 14.5l3.4-7.6 3.7 10.9 2.7-7.3H21"/></svg>
+        </span>
+        <span>Is It Down</span>
+      </a>
+      <p>A free website and server status checker with live HTTP, latency and DNS diagnostics, hosted on <a href="https://base31.org/" style="color:var(--fg); text-decoration:underline; text-underline-offset:2px;">base31.org</a>.</p>
+    </div>
+    <div class="footer-cols">
+      <div class="footer-col">
+        <h3>base31</h3>
+        <ul>
+          <li><a href="https://base31.org/">Cool sites</a></li>
+          <li><a href="https://base31.org/blog">Blog</a></li>
+          <li><a href="https://base31.org/about">About</a></li>
+          <li><a href="https://base31.org/#updates">Bug report</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h3>Legal</h3>
+        <ul>
+          <li><a href="https://base31.org/terms">Terms of service</a></li>
+          <li><a href="https://base31.org/privacy">Privacy policy</a></li>
+          <li><a href="https://base31.org/privacy">Cookies &amp; ads</a></li>
+          <li><a href="mailto:hello@base31.org?subject=Is%20It%20Down%20abuse%20report">Report abuse</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="wrap footer-base">
+    &copy; 2026 Is It Down &middot; isitdown.base31.org. Checks run from your browser and show ads served by Adcash; see the <a href="https://base31.org/privacy" style="color:var(--muted); text-decoration:underline; text-underline-offset:2px;">privacy policy</a>. Only check sites you are allowed to, and do not use this tool to hammer a target.
+  </div>
+</footer>
+
+<script>
+(function () {
+  "use strict";
+
+  /* ------------------------------------------------------------------
+     Config
+     ------------------------------------------------------------------ */
+  var DOH = "https://cloudflare-dns.com/dns-query";
+  var PROXY = "https://api.allorigins.win/get?url=";
+  var MAIN_TIMEOUT = 8000;     // first direct attempt
+  var CONFIRM_TIMEOUT = 4000;  // confirmation attempt after a failure
+  var SLOW_MS = 1500;          // above this the site is "slow"
+  var AUTO_REFRESH_MS = 30000;
+  var RECENT_KEY = "isitdown:recent";
+  var THEME_KEY = "isitdown:theme";
+
+  /* ------------------------------------------------------------------
+     Element refs
+     ------------------------------------------------------------------ */
+  var form = document.getElementById("checkForm");
+  var input = document.getElementById("urlInput");
+  var submitBtn = document.getElementById("submitBtn");
+  var btnLabel = document.getElementById("btnLabel");
+  var kbdHint = document.getElementById("kbdHint");
+  var resultSlot = document.getElementById("resultSlot");
+  var recentSection = document.getElementById("recentSection");
+  var recentList = document.getElementById("recentList");
+  var clearRecentBtn = document.getElementById("clearRecent");
+  var themeBtn = document.getElementById("themeBtn");
+
+  var state = { url: null, host: null, busy: false, timer: null, last: null };
+
+  /* ------------------------------------------------------------------
+     Icons
+     ------------------------------------------------------------------ */
+  var ICON = {
+    up: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>',
+    slow: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>',
+    redirect: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 5h5v5"/><path d="M19 5l-8 8"/><path d="M19 14v4a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h4"/></svg>',
+    error: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4"/><path d="M12 17h.01"/><path d="M10.3 3.9 2 18a2 2 0 0 0 1.7 3h16.6a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg>',
+    down: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/></svg>',
+    bolt: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>',
+    clock: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>',
+    globe: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>',
+    hash: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9h16"/><path d="M4 15h16"/><path d="M10 3 8 21"/><path d="M16 3l-2 18"/></svg>',
+    copy: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>',
+    refresh: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg>'
+  };
+
+  /* ------------------------------------------------------------------
+     Theme
+     ------------------------------------------------------------------ */
+  function renderThemeIcon() {
+    var dark = document.documentElement.getAttribute("data-theme") === "dark";
+    themeBtn.innerHTML = dark
+      ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>'
+      : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9z"/></svg>';
+    themeBtn.setAttribute("aria-label", dark ? "Switch to light mode" : "Switch to dark mode");
+  }
+  themeBtn.addEventListener("click", function () {
+    var next = document.documentElement.getAttribute("data-theme") === "dark" ? "light" : "dark";
+    document.documentElement.setAttribute("data-theme", next);
+    try { localStorage.setItem(THEME_KEY, next); } catch (e) {}
+    renderThemeIcon();
+  });
+  renderThemeIcon();
+
+  /* ------------------------------------------------------------------
+     Helpers
+     ------------------------------------------------------------------ */
+  function normalize(raw) {
+    var v = (raw || "").trim();
+    if (!v) return "";
+    if (!/^https?:\/\//i.test(v)) v = "https://" + v;
+    return v;
+  }
+  function parse(raw) {
+    var url = normalize(raw);
+    if (!url) return null;
+    try {
+      var u = new URL(url);
+      if (!u.hostname || u.hostname.indexOf(".") === -1) return null;
+      if (u.protocol !== "http:" && u.protocol !== "https:") return null;
+      return u;
+    } catch (e) { return null; }
+  }
+  function sameUrl(a, b) {
+    try { var ua = new URL(a), ub = new URL(b); return ua.href === ub.href; } catch (e) { return a === b; }
+  }
+  function escapeHtml(s) {
+    return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+    });
+  }
+  function timeAgo(ts) {
+    var s = Math.round((Date.now() - ts) / 1000);
+    if (s < 60) return s + "s ago";
+    if (s < 3600) return Math.round(s / 60) + "m ago";
+    if (s < 86400) return Math.round(s / 3600) + "h ago";
+    return Math.round(s / 86400) + "d ago";
+  }
+  function grade(ms) {
+    if (ms == null) return { label: "—", cls: "" };
+    if (ms < 250) return { label: "Fast", cls: "tag-ok" };
+    if (ms < 700) return { label: "Good", cls: "tag-ok" };
+    if (ms < SLOW_MS) return { label: "Okay", cls: "" };
+    if (ms < 3000) return { label: "Slow", cls: "tag-warn" };
+    return { label: "Very slow", cls: "tag-bad" };
+  }
+
+  /* ------------------------------------------------------------------
+     Probes
+     ------------------------------------------------------------------ */
+  function probeReach(url, timeoutMs) {
+    return new Promise(function (resolve) {
+      var controller = new AbortController();
+      var timer = setTimeout(function () { controller.abort(); }, timeoutMs);
+      var t0 = performance.now();
+      fetch(url, { mode: "no-cors", cache: "no-store", redirect: "follow", signal: controller.signal })
+        .then(function () {
+          clearTimeout(timer);
+          resolve({ ok: true, ms: Math.round(performance.now() - t0) });
+        })
+        .catch(function (err) {
+          clearTimeout(timer);
+          resolve({ ok: false, ms: Math.round(performance.now() - t0), error: err && err.name === "AbortError" ? "timeout" : "network" });
+        });
+    });
+  }
+
+  async function probeReachWithConfirm(url) {
+    var first = await probeReach(url, MAIN_TIMEOUT);
+    if (first.ok) return first;
+    // A failed attempt may be a transient blip — confirm with a shorter retry.
+    var second = await probeReach(url, CONFIRM_TIMEOUT);
+    if (second.ok) return second;
+    return { ok: false, ms: first.ms, error: first.error || second.error };
+  }
+
+  function probeStatus(url, timeoutMs) {
+    return new Promise(function (resolve) {
+      var controller = new AbortController();
+      var timer = setTimeout(function () { controller.abort(); }, timeoutMs);
+      var t0 = performance.now();
+      fetch(PROXY + encodeURIComponent(url), { cache: "no-store", signal: controller.signal })
+        .then(function (res) {
+          if (!res.ok) throw new Error("proxy " + res.status);
+          return res.json();
+        })
+        .then(function (data) {
+          clearTimeout(timer);
+          var s = (data && data.status) || {};
+          resolve({
+            ok: true,
+            httpCode: typeof s.http_code === "number" ? s.http_code : null,
+            contentType: s.content_type || null,
+            finalUrl: s.url || null,
+            ms: Math.round(performance.now() - t0)
+          });
+        })
+        .catch(function (err) {
+          clearTimeout(timer);
+          resolve({ ok: false, error: err && err.name === "AbortError" ? "timeout" : "error" });
+        });
+    });
+  }
+
+  function queryDoh(hostname, type, timeoutMs) {
+    return new Promise(function (resolve) {
+      var controller = new AbortController();
+      var timer = setTimeout(function () { controller.abort(); }, timeoutMs);
+      fetch(DOH + "?name=" + encodeURIComponent(hostname) + "&type=" + type, {
+        headers: { accept: "application/dns-json" },
+        cache: "no-store",
+        signal: controller.signal
+      })
+        .then(function (res) { return res.ok ? res.json() : null; })
+        .then(function (data) {
+          clearTimeout(timer);
+          resolve(data && Array.isArray(data.Answer) ? data.Answer : []);
+        })
+        .catch(function () { clearTimeout(timer); resolve(null); });
+    });
+  }
+
+  async function probeDns(hostname) {
+    var results = await Promise.all([
+      queryDoh(hostname, "A", 5000),
+      queryDoh(hostname, "AAAA", 5000)
+    ]);
+    var aRecords = results[0] || [];
+    var aaaaRecords = results[1] || [];
+    var data = aRecords.length ? aRecords : aaaaRecords;
+    var a = data.filter(function (r) { return r.type === 1; }).map(function (r) { return r.data; });
+    var aaaa = data.filter(function (r) { return r.type === 28; }).map(function (r) { return r.data; });
+    var cname = data.filter(function (r) { return r.type === 5; }).map(function (r) { return r.data; });
+    var resolved = aRecords !== null || aaaaRecords !== null;
+    return { ok: resolved, a: a, aaaa: aaaa, cname: cname };
+  }
+
+  /* ------------------------------------------------------------------
+     Verdict
+     ------------------------------------------------------------------ */
+  function decide(target, reach, status) {
+    var code = status.ok ? status.httpCode : null;
+    var proxyReachable = status.ok && code !== null;
+    var reachable = reach.ok;
+
+    if (!reachable && !proxyReachable) {
+      return { v: "down", label: "Offline", note: reach.error === "timeout" ? "No response within " + Math.round(MAIN_TIMEOUT / 1000) + "s" : "Connection could not be established" };
+    }
+
+    var finalUrl = status.ok ? status.finalUrl : null;
+    var redirected = !!(finalUrl && !sameUrl(finalUrl, target));
+
+    if (code !== null && code >= 500) {
+      return { v: "down", label: "Server error", note: "The server answered with HTTP " + code };
+    }
+    if (code !== null && code >= 400) {
+      return { v: "error", label: "Reachable, page error", note: "Server responded HTTP " + code + " — the page itself is the problem" };
+    }
+    if (reachable && reach.ms > SLOW_MS) {
+      return { v: "slow", label: "Online · slow", note: "Responded in " + reach.ms + "ms" };
+    }
+    if (redirected) {
+      return { v: "redirect", label: "Online · redirects", note: "Redirects to another address" };
+    }
+    return { v: "up", label: "Online", note: code !== null ? "HTTP " + code : "Server responded" };
+  }
+
+  /* ------------------------------------------------------------------
+     Render
+     ------------------------------------------------------------------ */
+  function renderResult(info) {
+    var v = info.verdict;
+    var g = grade(info.ms);
+    var latPct = info.ms == null ? 0 : Math.max(6, Math.min(100, Math.round((info.ms / 3000) * 100)));
+    var latColor = v === "down" ? "var(--danger)" : v === "slow" ? "var(--warn)" : v === "error" ? "var(--cf)" : "var(--accent)";
+
+    var ipList = [];
+    if (info.dns && info.dns.a && info.dns.a.length) ipList = info.dns.a;
+    else if (info.dns && info.dns.aaaa && info.dns.aaaa.length) ipList = info.dns.aaaa;
+    var ip = ipList.length ? ipList[0] : "—";
+
+    var dnsText = "—";
+    var dnsParts = [];
+    if (info.dns && info.dns.cname && info.dns.cname.length) dnsParts.push("CNAME " + info.dns.cname.join(", "));
+    if (info.dns && info.dns.a && info.dns.a.length) dnsParts.push("A " + info.dns.a.join(", "));
+    if (info.dns && info.dns.aaaa && info.dns.aaaa.length) dnsParts.push("AAAA " + info.dns.aaaa.join(", "));
+    if (dnsParts.length) dnsText = dnsParts.join(" · ");
+
+    var method = [];
+    method.push(info.reachable ? "Direct request succeeded" : "Direct request failed");
+    method.push(info.statusOk ? "status via proxy" : "status proxy unavailable");
+    method.push(info.dnsOk ? "DNS resolved" : "DNS unresolved");
+
+    var rows = "";
+    if (info.finalUrl && !sameUrl(info.finalUrl, info.url)) {
+      rows += '<div class="row"><span class="rk">Redirected to</span><span class="rv">' + escapeHtml(info.finalUrl) + "</span></div>";
+    }
+    rows += '<div class="row"><span class="rk">Content type</span><span class="rv">' + escapeHtml(info.contentType || "—") + "</span></div>";
+    rows += '<div class="row"><span class="rk">DNS records</span><span class="rv">' + escapeHtml(dnsText) + "</span></div>";
+    rows += '<div class="row"><span class="rk">Protocol</span><span class="rv">' + escapeHtml(info.protocol.toUpperCase()) + " · " + (info.protocol === "https:" ? '<span class="tag-ok">encrypted (TLS)</span>' : '<span class="tag-warn">insecure HTTP</span>') + "</span></div>";
+    rows += '<div class="row"><span class="rk">Probes</span><span class="rv">' + escapeHtml(method.join(" · ")) + "</span></div>";
+    rows += '<div class="row"><span class="rk">Checked URL</span><span class="rv"><a href="' + escapeHtml(info.url) + '" target="_blank" rel="noopener noreferrer">' + escapeHtml(info.url) + "</a></span></div>";
+
+    resultSlot.innerHTML =
+      '<section class="result" data-v="' + v + '" role="status">' +
+        '<div class="result-head">' +
+          '<div class="verdict-icon" aria-hidden="true">' + ICON[v] + "</div>" +
+          '<div class="meta">' +
+            '<div class="host">' + escapeHtml(info.host) + "</div>" +
+            '<div class="verdict">' + escapeHtml(info.verdictLabel) + " — " + escapeHtml(info.note) + "</div>" +
+          "</div>" +
+          '<span class="badge"><span class="dot" aria-hidden="true"></span>' + escapeHtml(info.badgeText) + "</span>" +
+        "</div>" +
+        '<div class="metrics">' +
+          '<div class="metric"><div class="k">' + ICON.hash + "Status</div><div class=\"v\">" + (info.httpCode != null ? info.httpCode : "—") + "</div><div class=\"sub\">HTTP response</div></div>" +
+          '<div class="metric"><div class="k">' + ICON.bolt + "Response</div><div class=\"v\">" + (info.ms != null ? info.ms + " <span style=\"font-size:13px;color:var(--muted-2)\">ms</span>" : "—") + "</div><div class=\"lat-bar\"><i style=\"width:" + latPct + "%;background:" + latColor + "\"></i></div></div>" +
+          '<div class="metric"><div class="k">' + ICON.globe + "IP address</div><div class=\"v small\">" + escapeHtml(ip) + "</div><div class=\"sub\">" + (info.dnsOk ? "via DoH" : "unresolved") + "</div></div>" +
+          '<div class="metric"><div class="k">' + ICON.clock + "Latency grade</div><div class=\"v small " + g.cls + "\">" + g.label + "</div><div class=\"sub\">" + escapeHtml(info.checkedAt) + "</div></div>" +
+        "</div>" +
+        '<div class="details">' + rows + "</div>" +
+        '<div class="result-foot">' +
+          '<button class="btn-ghost" type="button" id="copyBtn">' + ICON.copy + "<span>Copy result</span></button>" +
+          '<button class="btn-ghost" type="button" id="againBtn">' + ICON.refresh + "<span>Re-check</span></button>" +
+          '<span class="spacer"></span>' +
+          '<label class="switch"><input type="checkbox" id="autoRefresh"' + (state.timer ? " checked" : "") + ' /><span class="track"></span>Auto every 30s</label>' +
+        "</div>" +
+      "</section>";
+
+    var copyBtn = document.getElementById("copyBtn");
+    var againBtn = document.getElementById("againBtn");
+    var autoBox = document.getElementById("autoRefresh");
+
+    copyBtn.addEventListener("click", function () { copyResult(copyBtn); });
+    againBtn.addEventListener("click", function () { runCheck(info.url); });
+    autoBox.addEventListener("change", function () {
+      if (autoBox.checked) startAuto(info.url); else stopAuto();
+    });
+  }
+
+  /* ------------------------------------------------------------------
+     Result actions
+     ------------------------------------------------------------------ */
+  function copyResult(btn) {
+    var info = state.last;
+    if (!info) return;
+    var text = info.badgeText + " — " + info.host +
+      " | HTTP " + (info.httpCode != null ? info.httpCode : "n/a") +
+      " | " + (info.ms != null ? info.ms + "ms" : "no response") +
+      " | IP " + (info.ip || "n/a") +
+      " | checked " + info.checkedAt + " via isitdown.base31.org";
+    var done = function () {
+      var span = btn.querySelector("span");
+      var old = span.textContent;
+      span.textContent = "Copied!";
+      setTimeout(function () { span.textContent = old; }, 1800);
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(done).catch(function () { fallbackCopy(text, done); });
+    } else {
+      fallbackCopy(text, done);
+    }
+  }
+  function fallbackCopy(text, cb) {
+    var ta = document.createElement("textarea");
+    ta.value = text;
+    ta.style.position = "fixed";
+    ta.style.opacity = "0";
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand("copy"); cb(); } catch (e) {}
+    document.body.removeChild(ta);
+  }
+
+  /* ------------------------------------------------------------------
+     Auto refresh
+     ------------------------------------------------------------------ */
+  function startAuto(url) {
+    stopAuto();
+    state.timer = setInterval(function () { runCheck(url, true); }, AUTO_REFRESH_MS);
+  }
+  function stopAuto() {
+    if (state.timer) { clearInterval(state.timer); state.timer = null; }
+  }
+
+  /* ------------------------------------------------------------------
+     Main check
+     ------------------------------------------------------------------ */
+  function setBusy(busy) {
+    state.busy = busy;
+    submitBtn.disabled = busy;
+    if (busy) {
+      kbdHint.style.display = "none";
+      btnLabel.innerHTML = '<span class="spinner" aria-hidden="true"></span>Checking…';
+    } else {
+      kbdHint.style.display = "";
+      btnLabel.textContent = "Check status";
+    }
+  }
+
+  function showInvalid() {
+    resultSlot.innerHTML =
+      '<section class="result" data-v="error" role="status">' +
+        '<div class="result-head">' +
+          '<div class="verdict-icon" aria-hidden="true">' + ICON.error + "</div>" +
+          '<div class="meta"><div class="host">That does not look like a web address</div>' +
+          '<div class="verdict" style="color:var(--muted)">Enter a domain like <span class="mono">example.com</span> or a full URL.</div></div>' +
+          '<span class="badge"><span class="dot" aria-hidden="true"></span>Invalid</span>' +
+        "</div>" +
+      "</section>";
+  }
+
+  async function runCheck(rawUrl, silent) {
+    if (state.busy) return;
+    var parsed = parse(rawUrl);
+    if (!parsed) { showInvalid(); stopAuto(); return; }
+
+    var target = parsed.href;
+    state.url = target;
+    state.host = parsed.hostname;
+    input.value = target;
+
+    if (!silent) stopAuto();
+    setBusy(true);
+
+    // Run all three probes in parallel so the slowest one sets the wait.
+    var reachP = probeReachWithConfirm(target);
+    var statusP = probeStatus(target, 12000);
+    var dnsP = probeDns(parsed.hostname);
+    var reach = await reachP;
+    var status = await statusP;
+    var dns = await dnsP;
+
+    var decision = decide(target, reach, status);
+    var now = new Date();
+    var checkedAt = now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+
+    var badgeText = decision.v === "up" ? "Online" : decision.v === "slow" ? "Degraded" : decision.v === "redirect" ? "Redirect" : decision.v === "error" ? "Page error" : "Offline";
+
+    var ip = (dns.a && dns.a[0]) || (dns.aaaa && dns.aaaa[0]) || null;
+
+    var info = {
+      url: target,
+      host: parsed.hostname,
+      verdict: decision.v,
+      verdictLabel: decision.label,
+      note: decision.note,
+      badgeText: badgeText,
+      httpCode: status.ok ? status.httpCode : null,
+      ms: reach.ok ? reach.ms : null,
+      finalUrl: status.ok ? status.finalUrl : null,
+      contentType: status.ok ? status.contentType : null,
+      protocol: parsed.protocol,
+      reachable: reach.ok,
+      statusOk: status.ok,
+      dnsOk: dns.ok,
+      dns: dns,
+      ip: ip,
+      checkedAt: checkedAt
     };
 
-    // DOM Elements
-    const form = document.getElementById('check-form');
-    const urlInput = document.getElementById('url-input');
-    const submitBtn = document.getElementById('submit-btn');
-    const loadingBadge = document.getElementById('loading-badge');
-    const shortcutKbd = document.getElementById('shortcut-kbd');
+    state.last = info;
+    renderResult(info);
+    pushRecent(info);
+    setBusy(false);
+  }
 
-    const resultsContainer = document.getElementById('results-container');
-    const cardUp = document.getElementById('card-up');
-    const cardDown = document.getElementById('card-down');
-    const cardInvalid = document.getElementById('card-invalid');
+  /* ------------------------------------------------------------------
+     Recent checks
+     ------------------------------------------------------------------ */
+  function readRecent() {
+    try { return JSON.parse(localStorage.getItem(RECENT_KEY) || "[]"); } catch (e) { return []; }
+  }
+  function pushRecent(info) {
+    var list = readRecent().filter(function (r) { return r.host !== info.host; });
+    list.unshift({ host: info.host, url: info.url, v: info.verdict, ms: info.ms, at: Date.now() });
+    list = list.slice(0, 8);
+    try { localStorage.setItem(RECENT_KEY, JSON.stringify(list)); } catch (e) {}
+    renderRecent();
+  }
+  function renderRecent() {
+    var list = readRecent();
+    if (!list.length) { recentSection.hidden = true; return; }
+    recentSection.hidden = false;
+    recentList.innerHTML = list.map(function (r) {
+      return '<button class="recent-item" type="button" data-url="' + escapeHtml(r.url) + '">' +
+        '<span class="rdot ' + r.v + '" aria-hidden="true"></span>' +
+        '<span class="rhost">' + escapeHtml(r.host) + "</span>" +
+        '<span class="rms">' + (r.ms != null ? r.ms + "ms" : "—") + "</span>" +
+        '<span class="rt">' + timeAgo(r.at) + "</span>" +
+      "</button>";
+    }).join("");
+  }
+  recentList.addEventListener("click", function (e) {
+    var btn = e.target.closest(".recent-item");
+    if (btn) runCheck(btn.getAttribute("data-url"));
+  });
+  clearRecentBtn.addEventListener("click", function () {
+    try { localStorage.removeItem(RECENT_KEY); } catch (e) {}
+    renderRecent();
+  });
 
-    // Up Card Elements
-    const upHostname = document.getElementById('up-hostname');
-    const upTime = document.getElementById('up-time');
-    const upGrade = document.getElementById('up-grade');
-    const upProtocol = document.getElementById('up-protocol');
-    const upSsl = document.getElementById('up-ssl');
-    const upIp = document.getElementById('up-ip');
-    const upTimestamp = document.getElementById('up-timestamp');
-    const upTargetUrl = document.getElementById('up-target-url');
-
-    // Down Card Elements
-    const downHostname = document.getElementById('down-hostname');
-    const downReason = document.getElementById('down-reason');
-    const downTimestamp = document.getElementById('down-timestamp');
-
-    // History Elements
-    const range24hBtn = document.getElementById('range-24h');
-    const range30dBtn = document.getElementById('range-30d');
-    const histUptimePct = document.getElementById('hist-uptime-pct');
-    const histAvgLatency = document.getElementById('hist-avg-latency');
-    const histPeakLatency = document.getElementById('hist-peak-latency');
-    const histIncidents = document.getElementById('hist-incidents');
-    const historyBarsContainer = document.getElementById('history-bars-container');
-    const hoverBarDetail = document.getElementById('hover-bar-detail');
-    const rangeStartLabel = document.getElementById('range-start-label');
-    const latencySvg = document.getElementById('latency-svg');
-    const latencyHoverVal = document.getElementById('latency-hover-val');
-
-    // Modal Elements
-    const modal = document.getElementById('policy-modal');
-    const modalTitle = document.getElementById('modal-title');
-    const modalUpdated = document.getElementById('modal-updated');
-    const modalBody = document.getElementById('modal-body');
-    const modalCloseBtn = document.getElementById('modal-close-btn');
-    const modalUnderstandBtn = document.getElementById('modal-understand-btn');
-    const policyBtns = document.querySelectorAll('.policy-btn');
-
-    let currentStatus = 'idle';
-    let currentHistoryRange = '24h'; // '24h' or '30d'
-    let currentDomain = '';
-    let currentResponseTime = 0;
-    let currentIp = '--';
-    let currentStatusData = {};
-
-    // Keyboard Shortcuts
-    window.addEventListener('keydown', (e) => {
-      if ((e.key === 'k' && (e.metaKey || e.ctrlKey)) || (e.key === '/' && document.activeElement !== urlInput)) {
-        e.preventDefault();
-        urlInput.focus();
-        urlInput.select();
-      }
-
-      if (e.key === 'Escape') {
-        if (!modal.classList.contains('hidden')) {
-          closeModal();
-        } else if (currentStatus !== 'idle') {
-          hideResults();
-        }
-      }
+  /* ------------------------------------------------------------------
+     Events
+     ------------------------------------------------------------------ */
+  form.addEventListener("submit", function (e) {
+    e.preventDefault();
+    runCheck(input.value);
+  });
+  document.querySelectorAll(".chip").forEach(function (chip) {
+    chip.addEventListener("click", function () {
+      input.value = chip.getAttribute("data-example");
+      runCheck(input.value);
     });
-
-    // RANGE TOGGLE HANDLERS
-    range24hBtn.addEventListener('click', () => {
-      currentHistoryRange = '24h';
-      range24hBtn.className = "px-2.5 py-1 rounded-md bg-black text-white shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] transition-all";
-      range30dBtn.className = "px-2.5 py-1 rounded-md text-gray-700 hover:text-black transition-all";
-      rangeStartLabel.innerText = "24 hours ago";
-      if (currentDomain) renderHistorySection(currentDomain, currentResponseTime);
-    });
-
-    range30dBtn.addEventListener('click', () => {
-      currentHistoryRange = '30d';
-      range30dBtn.className = "px-2.5 py-1 rounded-md bg-black text-white shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] transition-all";
-      range24hBtn.className = "px-2.5 py-1 rounded-md text-gray-700 hover:text-black transition-all";
-      rangeStartLabel.innerText = "30 days ago";
-      if (currentDomain) renderHistorySection(currentDomain, currentResponseTime);
-    });
-
-    function formatUrl(input) {
-      let formatted = input.trim();
-      if (!formatted) return '';
-      if (!/^https?:\/\//i.test(formatted)) {
-        formatted = `https://${formatted}`;
-      }
-      return formatted;
-    }
-
-    function hideResults() {
-      currentStatus = 'idle';
-      resultsContainer.classList.add('hidden', 'opacity-0', 'translate-y-4');
-      cardUp.classList.add('hidden');
-      cardDown.classList.add('hidden');
-      cardInvalid.classList.add('hidden');
-    }
-
-    // Form Submission & Reachability Check
-    form.addEventListener('submit', async (e) => {
+  });
+  window.addEventListener("keydown", function (e) {
+    var typing = /^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement.tagName);
+    if ((e.key === "k" && (e.metaKey || e.ctrlKey)) || (e.key === "/" && !typing)) {
       e.preventDefault();
-      
-      const rawUrl = urlInput.value;
-      const targetUrl = formatUrl(rawUrl);
-      if (!targetUrl) return;
-
-      let parsedUrl;
-      try {
-        parsedUrl = new URL(targetUrl);
-      } catch (_) {
-        showInvalidState();
-        return;
-      }
-
-      setLoadingState(true);
-
-      const startTime = performance.now();
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 8000);
-
-      try {
-        // Start DoH IP lookup concurrently
-        let ipPromise = fetch(`https://cloudflare-dns.com/dns-query?name=${parsedUrl.hostname}&type=A`, {
-          headers: { 'accept': 'application/dns-json' },
-          signal: controller.signal
-        }).then(res => res.json()).then(data => {
-          if (data.Status === 0 && data.Answer && data.Answer.length > 0) return data.Answer[0].data;
-          return 'Unresolved';
-        }).catch(() => 'Unresolved');
-
-        await fetch(targetUrl, { 
-          mode: 'no-cors',
-          cache: 'no-store',
-          signal: controller.signal 
-        });
-        
-        clearTimeout(timeoutId);
-        const endTime = performance.now();
-        const elapsed = Math.round(endTime - startTime);
-
-        currentIp = await ipPromise;
-
-        let quality = 'Fast';
-        let qualityColor = 'text-emerald-700 bg-emerald-100 border-emerald-300';
-        if (elapsed > 400) {
-          quality = 'Moderate';
-          qualityColor = 'text-amber-700 bg-amber-100 border-amber-300';
-        }
-        if (elapsed > 1200) {
-          quality = 'Slow';
-          qualityColor = 'text-orange-700 bg-orange-100 border-orange-300';
-        }
-
-        const now = new Date();
-        const formattedTime = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-
-        currentDomain = parsedUrl.hostname;
-        currentResponseTime = elapsed;
-
-        // Save real ping to local history dataset
-        savePingToLocalHistory(parsedUrl.hostname, elapsed, true);
-
-        currentStatusData = {
-          hostname: parsedUrl.hostname,
-          responseTime: `${elapsed} ms`,
-          latencyGrade: quality,
-          latencyColor: qualityColor,
-          protocol: parsedUrl.protocol.replace(':', '').toUpperCase(),
-          isSecure: parsedUrl.protocol === 'https:',
-          timestamp: formattedTime,
-          targetUrl: targetUrl,
-          ip: currentIp
-        };
-
-        showUpState(currentStatusData);
-
-      } catch (error) {
-        clearTimeout(timeoutId);
-        const now = new Date();
-        const formattedTime = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-
-        savePingToLocalHistory(parsedUrl.hostname, 0, false);
-
-        currentStatusData = {
-          hostname: parsedUrl.hostname,
-          reason: error.name === 'AbortError' ? 'Connection timed out (>8000ms)' : 'DNS lookup or network connection failed',
-          timestamp: formattedTime
-        };
-
-        showDownState(currentStatusData);
-      } finally {
-        setLoadingState(false);
-      }
-    });
-
-    function setLoadingState(isLoading) {
-      if (isLoading) {
-        currentStatus = 'loading';
-        submitBtn.disabled = true;
-        submitBtn.innerText = 'Pinging & Fetching History...';
-        loadingBadge.classList.remove('hidden');
-        loadingBadge.classList.add('flex');
-        shortcutKbd.classList.add('hidden');
-      } else {
-        submitBtn.disabled = false;
-        submitBtn.innerText = 'Check Status & History';
-        loadingBadge.classList.add('hidden');
-        loadingBadge.classList.remove('flex');
-        shortcutKbd.classList.remove('hidden');
-      }
+      input.focus();
+      input.select();
     }
-
-    function showUpState(data) {
-      currentStatus = 'up';
-      
-      upHostname.innerText = data.hostname;
-      upTime.innerText = data.responseTime;
-      upGrade.innerText = data.latencyGrade;
-      upGrade.className = `text-[10px] font-bold px-1.5 py-0.5 rounded border ${data.latencyColor}`;
-      upProtocol.innerText = data.protocol;
-      upSsl.innerText = data.isSecure ? 'SSL Encrypted' : 'Insecure HTTP';
-      upIp.innerText = data.ip;
-      upIp.title = data.ip;
-      upTimestamp.innerText = data.timestamp;
-      upTargetUrl.innerText = data.targetUrl;
-
-      // Render Historical Uptime Graph
-      renderHistorySection(data.hostname, parseInt(data.responseTime));
-
-      cardDown.classList.add('hidden');
-      cardInvalid.classList.add('hidden');
-      cardUp.classList.remove('hidden');
-      cardUp.classList.add('flex');
-
-      resultsContainer.classList.remove('hidden');
-      setTimeout(() => {
-        resultsContainer.classList.remove('opacity-0', 'translate-y-4');
-      }, 10);
+    if (e.key === "Escape" && document.activeElement === input) {
+      input.blur();
     }
+  });
 
-    function showDownState(data) {
-      currentStatus = 'down';
-
-      downHostname.innerText = data.hostname;
-      downReason.innerText = data.reason;
-      downTimestamp.innerText = data.timestamp;
-
-      cardUp.classList.add('hidden');
-      cardInvalid.classList.add('hidden');
-      cardDown.classList.remove('hidden');
-      cardDown.classList.add('flex');
-
-      resultsContainer.classList.remove('hidden');
-      setTimeout(() => {
-        resultsContainer.classList.remove('opacity-0', 'translate-y-4');
-      }, 10);
-    }
-
-    function showInvalidState() {
-      currentStatus = 'invalid';
-
-      cardUp.classList.add('hidden');
-      cardDown.classList.add('hidden');
-      cardInvalid.classList.remove('hidden');
-      cardInvalid.classList.add('flex');
-
-      resultsContainer.classList.remove('hidden');
-      setTimeout(() => {
-        resultsContainer.classList.remove('opacity-0', 'translate-y-4');
-      }, 10);
-    }
-
-    // LocalStorage History Sync
-    function getStoredHistory(domain) {
-      try {
-        const stored = localStorage.getItem(`neo_history_${domain}`);
-        return stored ? JSON.parse(stored) : [];
-      } catch (e) {
-        return [];
-      }
-    }
-
-    function savePingToLocalHistory(domain, responseTime, isUp) {
-      try {
-        const history = getStoredHistory(domain);
-        history.push({
-          timestamp: Date.now(),
-          responseTime: responseTime,
-          isUp: isUp
-        });
-        // Keep max 100 recent entries
-        if (history.length > 100) history.shift();
-        localStorage.setItem(`neo_history_${domain}`, JSON.stringify(history));
-      } catch (e) {}
-    }
-
-    // Generates a deterministic time-series history dataset for any domain
-    function generateDomainHistoryDataset(domain, currentPingMs, is24h) {
-      const numPoints = 30;
-      const points = [];
-      
-      // Hash domain for reproducible baseline values
-      let hash = 0;
-      for (let i = 0; i < domain.length; i++) {
-        hash = domain.charCodeAt(i) + ((hash << 5) - hash);
-      }
-      const seed = Math.abs(hash);
-
-      const baseLatency = Math.max(30, (seed % 180) + 20);
-      const isGenerallyReliable = (seed % 10) !== 0; // 90% of sites are highly reliable
-
-      const now = Date.now();
-      const interval = is24h ? (24 * 60 * 60 * 1000) / numPoints : (30 * 24 * 60 * 60 * 1000) / numPoints;
-
-      for (let i = 0; i < numPoints; i++) {
-        const pointTime = new Date(now - (numPoints - 1 - i) * interval);
-        const pointSeed = seed + i * 17;
-        
-        let pointUp = true;
-        let latency = baseLatency + (pointSeed % 40) - 20;
-
-        // Rare outage simulation for testing realism
-        if (!isGenerallyReliable && (i === 12 || i === 22)) {
-          pointUp = false;
-          latency = 0;
-        } else if (pointSeed % 13 === 0) {
-          // Degraded spike
-          latency += 250 + (pointSeed % 200);
-        }
-
-        // Final point matches real live check
-        if (i === numPoints - 1) {
-          latency = currentPingMs;
-          pointUp = true;
-        }
-
-        points.push({
-          date: pointTime,
-          isUp: pointUp,
-          latency: Math.max(15, latency),
-          uptimePct: pointUp ? (latency > 350 ? 98.2 : 100) : 0
-        });
-      }
-
-      return points;
-    }
-
-    // Render History Section (Bars & SVG Trend Sparkline)
-    function renderHistorySection(domain, livePingMs) {
-      const is24h = currentHistoryRange === '24h';
-      const dataset = generateDomainHistoryDataset(domain, livePingMs, is24h);
-
-      // 1. Calculate Summary Stats
-      let totalUptime = 0;
-      let totalLatency = 0;
-      let peakLatency = 0;
-      let incidents = 0;
-
-      dataset.forEach(p => {
-        if (p.isUp) {
-          totalUptime += p.uptimePct;
-          totalLatency += p.latency;
-          if (p.latency > peakLatency) peakLatency = p.latency;
-        } else {
-          incidents++;
-        }
-      });
-
-      const avgUptime = (totalUptime / dataset.length).toFixed(2);
-      const avgLatency = Math.round(totalLatency / dataset.length);
-
-      histUptimePct.innerText = `${avgUptime}%`;
-      histAvgLatency.innerText = `${avgLatency} ms`;
-      histPeakLatency.innerText = `${peakLatency} ms`;
-      histIncidents.innerText = incidents === 0 ? "0 detected" : `${incidents} incident(s)`;
-      histIncidents.className = incidents === 0 ? "font-black text-emerald-700 text-sm" : "font-black text-red-600 text-sm";
-
-      // 2. Render 30 Status Bars
-      historyBarsContainer.innerHTML = '';
-      dataset.forEach((item, index) => {
-        const bar = document.createElement('div');
-        bar.className = 'flex-1 h-full rounded-sm border border-black/30 cursor-pointer transition-transform hover:scale-125 hover:z-20';
-        
-        if (!item.isUp) {
-          bar.classList.add('bg-red-500');
-        } else if (item.latency > 300) {
-          bar.classList.add('bg-amber-400');
-        } else {
-          bar.classList.add('bg-emerald-500');
-        }
-
-        // Hover Event
-        bar.addEventListener('mouseenter', () => {
-          const timeStr = is24h 
-            ? item.date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-            : item.date.toLocaleDateString([], { month: 'short', day: 'numeric' });
-          
-          const statusText = !item.isUp ? 'Outage' : (item.latency > 300 ? 'Degraded' : 'Operational');
-          hoverBarDetail.innerHTML = `<span class="text-black font-bold">${timeStr}</span> • ${statusText} (${item.latency} ms)`;
-          latencyHoverVal.innerText = `Hover: ${item.latency} ms (${timeStr})`;
-        });
-
-        bar.addEventListener('mouseleave', () => {
-          hoverBarDetail.innerText = 'Hover over bars for details';
-          latencyHoverVal.innerText = `Current: ${livePingMs} ms`;
-        });
-
-        historyBarsContainer.appendChild(bar);
-      });
-
-      // 3. Render SVG Latency Sparkline Graph
-      renderLatencySvg(dataset);
-    }
-
-    function renderLatencySvg(dataset) {
-      const width = 600;
-      const height = 90;
-      const padding = 10;
-
-      const latencies = dataset.map(d => d.latency);
-      const maxLat = Math.max(...latencies, 200);
-      const minLat = Math.min(...latencies, 20);
-
-      const getX = (i) => padding + (i / (dataset.length - 1)) * (width - 2 * padding);
-      const getY = (val) => height - padding - ((val - minLat) / (maxLat - minLat)) * (height - 2 * padding);
-
-      let pointsString = '';
-      dataset.forEach((d, i) => {
-        const x = getX(i);
-        const y = getY(d.latency);
-        pointsString += `${x},${y} `;
-      });
-
-      // Create Area Gradient Fill Path
-      const firstX = getX(0);
-      const lastX = getX(dataset.length - 1);
-      const areaString = `${firstX},${height} ${pointsString} ${lastX},${height}`;
-
-      latencySvg.innerHTML = `
-        <defs>
-          <linearGradient id="latencyGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" stop-color="#4ADE80" stop-opacity="0.6"/>
-            <stop offset="100%" stop-color="#4ADE80" stop-opacity="0.0"/>
-          </linearGradient>
-        </defs>
-
-        <!-- Horizontal Guide Grid Lines -->
-        <line x1="0" y1="${height / 2}" x2="${width}" y2="${height / 2}" stroke="#e5e7eb" stroke-dasharray="3,3" stroke-width="1" />
-        
-        <!-- Area Gradient -->
-        <polygon points="${areaString}" fill="url(#latencyGrad)" />
-
-        <!-- Line Graph Path -->
-        <polyline points="${pointsString}" fill="none" stroke="#000000" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" />
-
-        <!-- Data Points -->
-        ${dataset.map((d, i) => `
-          <circle 
-            cx="${getX(i)}" 
-            cy="${getY(d.latency)}" 
-            r="3" 
-            fill="${d.latency > 300 ? '#F59E0B' : '#000000'}" 
-            stroke="#ffffff" 
-            stroke-width="1.5"
-          />
-        `).join('')}
-      `;
-    }
-
-    // Policy Modal Controls
-    policyBtns.forEach(btn => {
-      btn.addEventListener('click', () => {
-        const policyKey = btn.getAttribute('data-policy');
-        openModal(policyKey);
-      });
-    });
-
-    function openModal(key) {
-      const data = LEGAL_CONTENTS[key];
-      if (!data) return;
-
-      modalTitle.innerText = data.title;
-      modalUpdated.innerText = data.updated;
-
-      modalBody.innerHTML = data.sections.map(sec => `
-        <div class="bg-[#f8f9fa] border-2 border-black p-4 rounded-xl shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
-          <h4 class="font-black text-black mb-1.5 text-base">${sec.heading}</h4>
-          <p class="font-medium text-gray-700">${sec.content}</p>
-        </div>
-      `).join('');
-
-      modal.classList.remove('hidden');
-    }
-
-    function closeModal() {
-      modal.classList.add('hidden');
-    }
-
-    modalCloseBtn.addEventListener('click', closeModal);
-    modalUnderstandBtn.addEventListener('click', closeModal);
-    modal.addEventListener('click', (e) => {
-      if (e.target === modal) closeModal();
-    });
-
-    // Share & Download Handlers
-    function shareResult(btn) {
-      const text = currentStatus === 'up' 
-        ? `🟢 ${currentDomain} is UP!\n⏱ Response: ${currentResponseTime}ms\n🌐 IP: ${currentIp}\n🔍 Checked via Neo-Status`
-        : `🔴 ${currentDomain} is DOWN!\n⚠️ Reason: ${currentStatusData.reason}\n🔍 Checked via Neo-Status`;
-      
-      const textarea = document.createElement('textarea');
-      textarea.value = text;
-      document.body.appendChild(textarea);
-      textarea.select();
-      try {
-        document.execCommand('copy');
-        const originalText = btn.querySelector('span').innerText;
-        btn.querySelector('span').innerText = 'Copied!';
-        btn.classList.add('bg-emerald-100');
-        setTimeout(() => {
-          btn.querySelector('span').innerText = originalText;
-          btn.classList.remove('bg-emerald-100');
-        }, 2000);
-      } catch(e) {
-        console.error('Failed to copy');
-      }
-      document.body.removeChild(textarea);
-    }
-
-    function downloadReceipt(btn) {
-      const text = currentStatus === 'up'
-        ? `NEO-STATUS RECEIPT\n------------------\nDomain: ${currentDomain}\nStatus: ONLINE\nIP Address: ${currentIp}\nResponse Time: ${currentResponseTime}ms\nTimestamp: ${currentStatusData.timestamp}\nTested URL: ${currentStatusData.targetUrl}\n`
-        : `NEO-STATUS RECEIPT\n------------------\nDomain: ${currentDomain}\nStatus: OFFLINE\nReason: ${currentStatusData.reason}\nTimestamp: ${currentStatusData.timestamp}\n`;
-        
-      const blob = new Blob([text], { type: 'text/plain' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `neo-status-${currentDomain.replace(/[^a-z0-9]/gi, '_').toLowerCase()}-${Date.now()}.txt`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-
-      const originalText = btn.querySelector('span').innerText;
-      btn.querySelector('span').innerText = 'Downloaded!';
-      btn.classList.add('bg-blue-100');
-      setTimeout(() => {
-        btn.querySelector('span').innerText = originalText;
-        btn.classList.remove('bg-blue-100');
-      }, 2000);
-    }
-  </script>
+  /* ------------------------------------------------------------------
+     Init
+     ------------------------------------------------------------------ */
+  renderRecent();
+})();
+</script>
 </body>
 </html>

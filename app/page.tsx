@@ -1255,10 +1255,10 @@ export default function HomePage() {
                   role="listitem"
                   style={{ "--i": index } as CSSProperties}
                 >
-                  {/* The whole information block is one link — preview, icon,
-                      name, host, description and tags — while the pin (top
-                      right, over the preview) and the votes (footer bar) sit
-                      outside it, so no control is ever nested in the link. */}
+                  {/* The link covers the preview, icon, name and host; the
+                      description + vote row and the tags sit outside it, and
+                      the pin floats over the preview, so no control is ever
+                      nested in the link. */}
                   <a href={site.url} className="site-link site-card-body" target="_blank" rel="noreferrer">
                     <SitePreview site={site} />
                     <span className="site-card-info">
@@ -1277,27 +1277,15 @@ export default function HomePage() {
                         <span className="site-open mono" aria-hidden="true">↗</span>
                         <span className="sr-only"> (opens in a new tab)</span>
                       </span>
-                      {site.description && <span className="site-description">{site.description}</span>}
-                      {site.tags && site.tags.length > 0 && (
-                        <span className="tags" aria-label="Tags">
-                          {site.tags.map((tag) => <span key={tag} className="tag mono">{tag}</span>)}
-                        </span>
-                      )}
                     </span>
                   </a>
-                  {/* The pin floats at the card's top-right corner, over the
-                      preview, but stays outside the link so the two controls
-                      never overlap in the tab order. */}
-                  <button
-                    type="button"
-                    className={`favorite-button${pinned ? " is-active" : ""}`}
-                    onClick={() => toggleFavorite(site.subdomain)}
-                    aria-pressed={pinned}
-                    aria-label={pinned ? `Unpin ${site.name}` : `Pin ${site.name} to the top`}
-                  >
-                    <HeartIcon filled={pinned} />
-                  </button>
-                  <div className="site-card-foot">
+                  {/* The description and the two votes share one row that sits
+                      above the divider line, so the thumbs read as part of the
+                      card's copy instead of a bar of their own. The description
+                      is plain text and the votes stay outside the card's link,
+                      so nothing interactive is nested inside it. */}
+                  <div className="site-card-lower">
+                    {site.description && <p className="site-description">{site.description}</p>}
                     <div className="site-actions">
                       {/* Thumbs up sits directly above thumbs down, so the
                           pair reads as one control. */}
@@ -1328,6 +1316,23 @@ export default function HomePage() {
                       </span>
                     </div>
                   </div>
+                  {site.tags && site.tags.length > 0 && (
+                    <span className="tags" aria-label="Tags">
+                      {site.tags.map((tag) => <span key={tag} className="tag mono">{tag}</span>)}
+                    </span>
+                  )}
+                  {/* The pin floats at the card's top-right corner, over the
+                      preview, but stays outside the link so the two controls
+                      never overlap in the tab order. */}
+                  <button
+                    type="button"
+                    className={`favorite-button${pinned ? " is-active" : ""}`}
+                    onClick={() => toggleFavorite(site.subdomain)}
+                    aria-pressed={pinned}
+                    aria-label={pinned ? `Unpin ${site.name}` : `Pin ${site.name} to the top`}
+                  >
+                    <HeartIcon filled={pinned} />
+                  </button>
                 </article>
               );
             })}

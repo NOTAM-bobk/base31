@@ -45,6 +45,8 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     <html lang="en">
       <head>
         <meta name="impact-site-verification" content="0c13bbc7-5a07-4070-84da-1b320feed539" />
+        {/* Trustpilot one-time domain verification (documented in README.md). */}
+        <meta name="trustpilot-one-time-domain-verification-id" content="c33dc438-a677-4add-a519-04714888e931" />
         <script id="base31-theme" dangerouslySetInnerHTML={{ __html: themeScript }} />
         <noscript><style>{`.site-skeleton,.cursor-layer{display:none!important}`}</style></noscript>
       </head>

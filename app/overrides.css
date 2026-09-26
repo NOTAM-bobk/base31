@@ -507,7 +507,7 @@ html[data-theme="light"] .site-card:hover { box-shadow: var(--shadow), inset 0 1
 
 .site-card-body { display: flex; flex-direction: column; padding: 0; }
 /* The padded half of the card, below the preview band. */
-.site-card-info { display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 15px 15px 13px; text-align: center; }
+.site-card-info { display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 15px 15px 0; text-align: center; }
 /* The site name is the card's title: centred on its own line, above a
    gradient strip that fades into the meta row (favicon + host) and the
    description underneath it. */
@@ -527,11 +527,11 @@ html[data-theme="light"] .site-card:hover { box-shadow: var(--shadow), inset 0 1
 .site-card-body .site-url { margin: 0; color: var(--subtle); font-size: 10.5px; }
 .site-open { flex: 0 0 auto; color: var(--subtle); font-size: 13px; transition: color 160ms ease, transform 160ms ease; }
 .site-card:hover .site-open { color: var(--live); transform: translate(2px, -2px); }
-.site-card-body .site-description { display: block; max-width: 100%; margin: 0; color: var(--muted); font-size: 12.5px; line-height: 1.55; }
-.site-card-body .tags { margin: 0; gap: 6px; }
+.site-description { display: block; flex: 1; min-width: 0; margin: 0; color: var(--muted); font-size: 12px; line-height: 1.45; }
+.site-card .tags { margin: 0; padding: 9px 15px 13px; gap: 6px; }
 /* Card tags are filled chips rather than tinted outlines, so they read as
    the same solid material as the card they sit on. */
-.site-card-body .tag {
+.site-card .tag {
   padding: 4px 8px; border: 1px solid color-mix(in srgb, var(--line-strong) 55%, var(--line));
   border-radius: 7px;
   background: color-mix(in srgb, var(--surface-hover) 86%, var(--background));
@@ -556,23 +556,25 @@ html[data-theme="light"] .site-card:hover { box-shadow: var(--shadow), inset 0 1
   background: color-mix(in srgb, #000 62%, transparent);
   transform: scale(1.06);
 }
-/* The footer bar now holds only the two votes, so it hugs them on the right
-   and stays shallow, which lifts the thumbs a little higher in the card. */
-.site-card-foot {
-  display: flex; align-items: center; justify-content: flex-end; gap: 10px;
-  padding: 3px 15px 7px; border-top: 1px solid var(--line);
-  background: color-mix(in srgb, var(--background) 45%, transparent);
+/* The description and the two votes share one compact row that sits above the
+   divider line: the text is compressed so the thumbs sit beside it instead of
+   in a bar of their own, and the votes stay outside the card's link. */
+.site-card-lower {
+  display: flex; align-items: center; gap: 12px;
+  padding: 2px 15px 10px; border-bottom: 1px solid var(--line);
 }
-.site-actions { margin-left: auto; }
+.site-actions { flex: 0 0 auto; margin-left: auto; }
 /* The two thumbs are stacked instead of sitting side by side: the up vote is
    the common one, and putting it directly above the down vote makes the pair
    read as one control — and much harder to hit by accident. */
 .vote-stack { display: flex; flex-direction: column; gap: 4px; }
-/* Phones tighten the footer further. The extra `.site-card` class gives this
-   rule one more class than the media query's `.site-card-foot` rule far below
-   the fold, so it wins whatever the source order. */
+/* Phones tighten the lower row and the tag strip. The extra `.site-card` class
+   gives each rule one more class than the plain media-query rule far below the
+   fold, so these win whatever the source order. */
 @media (max-width: 600px) {
-  .site-card .site-card-foot { padding: 3px 13px 7px; }
+  .site-card .site-card-info { padding: 12px 13px 0; }
+  .site-card .site-card-lower { padding: 2px 13px 9px; }
+  .site-card .tags { padding: 8px 13px 11px; }
 }
 .search-icon { color: var(--subtle); font-size: 13px; }
 .shortcut-hint {
@@ -691,13 +693,15 @@ body:has(.site-header) { padding-top: 64px; }
 [id] { scroll-margin-top: 96px; }
 
 /* Code backdrop -------------------------------------------------------
-   A fixed wallpaper of code typing itself out behind the page. Server
-   rendered with no JavaScript and no timers: every line is a CSS width
-   animation with a stepped timing function, offset by a negative delay so
-   the lines never restart in sync. It sits at z-index -1 (above the page
-   background, below every piece of content) and is decorative only. */
+   A wallpaper of code typing itself out behind the page. It is pinned to the
+   very top of the viewport (`position: fixed`, anchored at `top: 0`) so it
+   stays put instead of scrolling away with the page. Server rendered with no
+   JavaScript and no timers: every line is a CSS width animation with a stepped
+   timing function, offset by a negative delay so the lines never restart in
+   sync. It sits at z-index -1 (above the page background, below every piece of
+   content) and is decorative only. */
 .code-backdrop {
-  position: fixed; inset: 0; z-index: -1; overflow: hidden;
+  position: fixed; top: 0; left: 0; right: 0; z-index: -1; overflow: hidden;
   padding: 92px 0 0 3vw; pointer-events: none; opacity: 0.5;
   mask-image: linear-gradient(180deg, #000 62%, transparent);
   -webkit-mask-image: linear-gradient(180deg, #000 62%, transparent);

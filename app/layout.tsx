@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
 import Script from "next/script";
+import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 import "./overrides.css";
 import CodeBackdrop from "@/components/code-backdrop";
@@ -71,6 +72,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <PrivacyConsent />
         <ConsentAwareAnalytics />
         <ConsentAwareAds />
+        <Analytics />
       </body>
     </html>
   );

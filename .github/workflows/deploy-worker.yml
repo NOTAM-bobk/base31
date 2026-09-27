@@ -38,3 +38,7 @@ jobs:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           workingDirectory: worker
+          # Wrangler 3.90 (the action's default for the "3" line) predates
+          # wrangler.jsonc config support, so it cannot find the worker's
+          # entry point. Pin the current major, which reads the JSONC config.
+          wranglerVersion: "4"

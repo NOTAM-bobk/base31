@@ -72,3 +72,75 @@
 @media (prefers-reduced-motion: reduce) {
   .footer-sparkle { display: none; }
 }
+
+/* Desktop footer -------------------------------------------------------
+   Two organized zones instead of one cramped 10px strip: the contact pills
+   on top, then the copyright on the left and the links on the right, split
+   by a hairline so the row reads as two groups rather than one long blob.
+   Phones keep the card-style grid from overrides.css. */
+@media (min-width: 601px) {
+  .footer-links { align-items: center; gap: 10px 18px; }
+  /* Undo the phone-size card treatment so the links read as a tidy text row. */
+  .footer-links a,
+  .footer-links button.footer-link-button {
+    display: inline-flex; align-items: center; gap: 5px; min-height: 0;
+    padding: 2px 0; border: 0; border-radius: 0; background: transparent;
+    color: var(--muted); font-size: 11.5px;
+  }
+  .footer-links a:hover,
+  .footer-links button.footer-link-button:hover {
+    border: 0; color: var(--text-strong);
+    text-decoration: underline; text-underline-offset: 3px;
+    text-decoration-color: var(--subtle);
+  }
+}
+@media (min-width: 1000px) {
+  .site-footer-inner { gap: 0 24px; padding: 30px 0 34px; font-size: 11.5px; }
+  /* The hairline between copyright and links, plus a little air around it. */
+  .footer-links { margin-left: 28px; padding-left: 28px; border-left: 1px solid var(--line); }
+  /* Pull the contact row a touch closer to the link row so the footer reads
+     as one organized block instead of two unrelated strips. */
+  .footer-meta { padding-bottom: 8px; }
+}
+
+/* Visitor counter -------------------------------------------------------
+   The little "views" pill in the corner. It keeps its fixed spot, but now
+   reads as a deliberate status chip: a live-green pulse dot, the label in
+   small caps, the number bright and tabular so digits do not jitter as it
+   ticks, all on a blurred glass surface with a soft green-tinted edge. */
+.view-counter {
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 8px 13px 8px 11px;
+  border: 1px solid color-mix(in srgb, var(--live) 28%, var(--line-strong));
+  background: color-mix(in srgb, var(--surface) 86%, transparent);
+  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  box-shadow: 0 10px 30px rgb(0 0 0 / 35%), inset 0 1px 0 rgb(255 255 255 / 6%);
+  color: var(--muted); font-size: 11px; letter-spacing: 0.02em;
+  transition: border-color 200ms ease, box-shadow 200ms ease;
+}
+.view-counter::before {
+  content: ""; width: 6px; height: 6px; flex: 0 0 auto; border-radius: 50%;
+  background: var(--live);
+  box-shadow: 0 0 8px color-mix(in srgb, var(--live) 80%, transparent);
+}
+.view-counter span { color: var(--subtle); font-size: 9px; text-transform: uppercase; letter-spacing: 0.14em; }
+.view-counter strong { color: var(--text-strong); font-size: 12.5px; font-variant-numeric: tabular-nums; }
+.view-counter:hover {
+  border-color: color-mix(in srgb, var(--live) 70%, var(--line-strong));
+  box-shadow:
+    0 12px 34px rgb(0 0 0 / 45%),
+    0 0 18px -6px color-mix(in srgb, var(--live) 70%, transparent);
+}
+
+/* The counter finally uses the bump flag the page has always set on a view
+   milestone: a short pop so the pill draws the eye to the new number. */
+.view-counter.is-bumped { animation: counter-bump 640ms cubic-bezier(0.22, 1.2, 0.36, 1); }
+@keyframes counter-bump {
+  0% { transform: scale(1); }
+  35% { transform: scale(1.12); }
+  100% { transform: scale(1); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .view-counter.is-bumped { animation: none; }
+  .view-counter, .view-counter::before { transition: none; }
+}

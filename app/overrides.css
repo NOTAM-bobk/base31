@@ -291,8 +291,10 @@ html[data-motion="enabled"] [data-reveal][data-revealed] { opacity: 1; transform
 
 /* FAQ (the collapsible SEO block above the footer) ---------------------
    Every item is a native <details>, so it opens and closes with no
-   JavaScript, starts closed, and still ships its answer text to crawlers. */
-.faq-section { max-width: 600px; margin-top: 108px; padding-top: 34px; border-top: 1px solid var(--line); }
+   JavaScript, starts closed, and still ships its answer text to crawlers.
+   The block is narrower than the 720px page column, so it centers itself
+   inside the column rather than hugging the left edge. */
+.faq-section { max-width: 600px; margin-left: auto; margin-right: auto; margin-top: 108px; padding-top: 34px; border-top: 1px solid var(--line); }
 .faq-section h2 { margin: 0; color: var(--text-strong); font-size: 17px; font-weight: 500; }
 .faq-list { display: grid; margin: 22px 0 0; padding: 0; }
 .faq-item { padding: 15px 0; border-top: 1px solid var(--line); }
@@ -341,12 +343,14 @@ html[data-motion="enabled"] [data-reveal][data-revealed] { opacity: 1; transform
 
 /* Trustpilot rating row. A static five-star row plus the score sits above the
    hosted collector so the rating reads at a glance, even before the TrustBox
-   finishes loading. The stars carry Trustpilot's green, not a generic amber. */
+   finishes loading. The star row itself is gold — the colour people already
+   read as "rating" — while the Trustpilot badge and wordmark above keep the
+   brand green, so the lockup still says Trustpilot. */
 .trustpilot-rating { display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 16px; }
-.trustpilot-stars { display: flex; gap: 4px; color: #00b67a; }
-.trustpilot-stars svg { width: 22px; height: 22px; filter: drop-shadow(0 0 7px rgb(0 182 122 / 45%)); }
+.trustpilot-stars { display: flex; gap: 4px; color: #f5b301; }
+.trustpilot-stars svg { width: 22px; height: 22px; filter: drop-shadow(0 0 7px rgb(245 179 1 / 45%)); }
 .trustpilot-score {
-  padding: 3px 9px; border: 1px solid color-mix(in srgb, #00b67a 45%, var(--line-strong));
+  padding: 3px 9px; border: 1px solid color-mix(in srgb, #f5b301 45%, var(--line-strong));
   border-radius: 999px; color: var(--text-strong); font-size: 12px; font-weight: 600; line-height: 1;
 }
 @media (max-width: 600px) {
@@ -555,8 +559,11 @@ html[data-theme="light"] { --subtle: #6b6b6b; }
    sponsored referrals and the paid support button. Each of those blocks
    normally carries a large top margin so it can stand alone on the page, so
    inside the panel the first one drops its margin and the rest step down
-   tighter — otherwise the group reads as a column of gaps. */
+   tighter — otherwise the group reads as a column of gaps. Like the FAQ below
+   it, the section itself centers inside the wider desktop column instead of
+   hugging the left edge. */
 .support-section {
+  margin-left: auto; margin-right: auto; max-width: 720px;
   margin-top: 108px; padding-top: 34px;
   border-top: 1px solid var(--line);
 }
@@ -585,6 +592,26 @@ html[data-theme="light"] { --subtle: #6b6b6b; }
 }
 @media (prefers-reduced-motion: reduce) {
   .support-section.is-vibrating { animation: none; }
+}
+
+/* Centered disclosures. The Support section and its closed-state note now
+   share the centered 720px column, and the Featured sites' closed-state note
+   centers with a readable measure rather than stretching across the desktop
+   column. A phone keeps the current left alignment, where the full-width
+   column needs no help. */
+@media (min-width: 601px) {
+  .support-section .section-closed-note,
+  .directory-section .section-closed-note { margin-left: auto; margin-right: auto; }
+  .directory-section .section-closed-note,
+  .support-section .section-closed-note { max-width: 640px; }
+}
+
+/* The same wobble the Support section gets, shared with the Featured sites
+   directory: the class is applied by the toggle handler for the animation's
+   length and removed after, so it can replay on every open and close. */
+.directory-section.is-vibrating { animation: support-vibrate 440ms cubic-bezier(0.36, 0.07, 0.19, 0.97); }
+@media (prefers-reduced-motion: reduce) {
+  .directory-section.is-vibrating { animation: none; }
 }
 
 @media (max-width: 600px) {

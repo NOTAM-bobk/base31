@@ -1,5 +1,18 @@
 [
   {
+    "version": "1.5.0",
+    "date": "2026-09-27",
+    "title": "A calmer desktop, golden stars, and a shake for the directory",
+    "summary": "The pieces at the bottom of the page line up on a desktop, and the two collapsible sections now behave the same way.",
+    "highlights": [
+      "The Support hub and the FAQ center in the page on a desktop instead of hugging the left edge.",
+      "Review stars are gold now — the Trustpilot badge and wordmark keep their green.",
+      "The footer's contact row and link row are organized into two spaced zones on a desktop.",
+      "The corner visitor counter is restyled as a status chip with a live pulse dot, and it pops on a view milestone.",
+      "Closing or opening Featured sites gives the section the same little shake the Support section has."
+    ]
+  },
+  {
     "version": "1.4.0",
     "date": "2026-09-27",
     "title": "Sponsorship has a page, and the hero is tidier",

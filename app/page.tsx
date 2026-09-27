@@ -373,6 +373,9 @@ export default function HomePage() {
   const [sortMode, setSortMode] = useState<SortMode>("liked");
   // Lets a visitor fold the directory away without losing their filters.
   const [sitesCollapsed, setSitesCollapsed] = useState(false);
+  // True for the moment after the fold, so the whole section can wobble like
+  // the Support section does when its panel opens or closes.
+  const [sitesVibrating, setSitesVibrating] = useState(false);
   const [shareOpen, setShareOpen] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
   // The banner lives in the layout; this page only needs to know the choice so
@@ -402,6 +405,22 @@ export default function HomePage() {
   useDialogFocus(milestone != null, milestoneRef);
   useDialogFocus(submitOpen, submitRef);
   useDialogFocus(exitNudge != null, exitRef);
+
+  // The directory's own shake, mirroring the Support section's: it starts on
+  // the toggle after mount (so the initial open is not a "change"), runs for
+  // the length of the CSS animation, then clears so the next toggle replays
+  // it. The haptic tick rides along on devices that support it.
+  const sitesMounted = useRef(false);
+  useEffect(() => {
+    if (!sitesMounted.current) {
+      sitesMounted.current = true;
+      return;
+    }
+    setSitesVibrating(true);
+    buzz(6);
+    const timer = window.setTimeout(() => setSitesVibrating(false), 460);
+    return () => window.clearTimeout(timer);
+  }, [sitesCollapsed]);
 
   // Load saved preferences after mount so SSR markup stays stable.
   useEffect(() => {
@@ -1064,7 +1083,7 @@ export default function HomePage() {
           </div>
         </section>
 
-        <section id="sites" className="directory-section" aria-labelledby="sites-heading">
+        <section id="sites" className={`directory-section${sitesVibrating ? " is-vibrating" : ""}`} aria-labelledby="sites-heading">
           <div className="section-heading" data-reveal>
             {/* The heading is the disclosure control: the label and the arrow
                 live in one button, so clicking either one toggles the panel. */}
@@ -1072,7 +1091,7 @@ export default function HomePage() {
               <button
                 type="button"
                 className={`sites-toggle${sitesCollapsed ? " is-collapsed" : ""}`}
-                onClick={() => { buzz(6); setSitesCollapsed((collapsed) => !collapsed); }}
+                onClick={() => { setSitesCollapsed((collapsed) => !collapsed); }}
                 aria-expanded={!sitesCollapsed}
                 aria-controls="sites-panel"
               >

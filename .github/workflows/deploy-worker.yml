@@ -1,0 +1,40 @@
+# Deploys the Cloudflare Worker (view counter, votes, email updates, push).
+#
+# The worker's code only reaches Cloudflare through `wrangler deploy`, which
+# used to mean somebody had to run it from a computer. This workflow removes
+# that requirement: every push that touches `worker/` redeploys it, and it can
+# also be run by hand from the "Run workflow" button on the Actions tab.
+#
+# One-time setup (repo Settings -> Secrets and variables -> Actions):
+#   CLOUDFLARE_API_TOKEN  — an API token with the "Edit Cloudflare Workers"
+#                           permission (Cloudflare dashboard -> My Profile ->
+#                           API Tokens -> template "Edit Cloudflare Workers").
+#   CLOUDFLARE_ACCOUNT_ID — the account ID shown in the Cloudflare dashboard
+#                           sidebar. Optional: with a single account, wrangler
+#                           can infer it, but setting it avoids surprises.
+#
+# Runtime secrets for the worker itself (VAPID_*, RESEND_*, COUNTER_SECRET)
+# live in the Cloudflare dashboard under the worker's Variables and Secrets;
+# deploys never overwrite them.
+name: Deploy worker
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "worker/**"
+      - ".github/workflows/deploy-worker.yml"
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Deploy to Cloudflare Workers
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          workingDirectory: worker

@@ -1,0 +1,43 @@
+# Automated dependency updates.
+#
+# One npm entry covers the whole project: the Next.js app and the Cloudflare
+# worker both resolve from the root package.json (the worker is deployed with
+# the root `wrangler` devDependency and has no manifest of its own), so there is
+# nothing to point at `worker/`.
+#
+# Minor and patch bumps arrive as a single grouped pull request each week, so a
+# week of small updates is one review rather than a dozen. Major versions are
+# deliberately left out of the group: they open on their own, which is how a
+# framework upgrade should be reviewed.
+version: 2
+
+updates:
+  - package-ecosystem: npm
+    directory: "/"
+    schedule:
+      interval: weekly
+      day: monday
+      time: "09:00"
+      timezone: America/Chicago
+    open-pull-requests-limit: 5
+    versioning-strategy: increase-if-necessary
+    commit-message:
+      prefix: "deps"
+    labels:
+      - dependencies
+    groups:
+      minor-and-patch:
+        patterns:
+          - "*"
+        update-types:
+          - minor
+          - patch
+
+# No `github-actions` entry on purpose: the repository has no workflows yet, so
+# Dependabot would have nothing to update. Add
+#
+#   - package-ecosystem: github-actions
+#     directory: "/"
+#     schedule: { interval: weekly }
+#
+# here once .github/workflows/ exists.

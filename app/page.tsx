@@ -978,7 +978,14 @@ export default function HomePage() {
 
       <header className="site-header">
         <div className="site-header-inner">
-          <a className="wordmark mono" href="/" aria-label="base31.org home">base31.org</a>
+          <a className="wordmark mono" href="/" aria-label="base31.org home">
+            {/* Decorative: the link already carries its own label. Served from
+                public/ so the page keeps one origin; see app/overrides.css for
+                why, and the footer for the credit. */}
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img className="wordmark-sparkle" src="/header-sparkle.gif" alt="" width={40} height={40} aria-hidden="true" />
+            base31.org
+          </a>
           <nav className="site-nav" aria-label="Main navigation">
             <a href="/blog">Blog</a>
           </nav>
@@ -1314,7 +1321,10 @@ export default function HomePage() {
           <a className="footer-version" href="/whats-new" title="What's new in this version">v{pkg.version}</a>
         </div>
         <div className="site-footer-inner mono">
-          <span>© {new Date().getFullYear()} base31.org · built by Sawyer Schulz</span>
+          <span>
+            © {new Date().getFullYear()} base31.org · built by Sawyer Schulz · sparkle gif from{" "}
+            <a href="https://www.glitter-graphics.com" target="_blank" rel="noreferrer">glitter-graphics.com</a>
+          </span>
           <nav className="footer-links" aria-label="Footer navigation">
             <a href="/blog">Blog</a>
             <a href="/tools">Tools</a>

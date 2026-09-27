@@ -178,6 +178,13 @@ bundler. Two ways to do that by accident:
   has no guide, if a guide has no matching site, or if a guide's copy is thin
   (missing headline, an out-of-range meta description, fewer than two intro
   paragraphs, three features or two questions).
+- The animated sparkle beside the homepage wordmark is `public/header-sparkle.gif`
+  (40×40 with a transparent background), served from this origin rather than
+  hotlinked: a third-party image would be an unconsented request to someone
+  else's CDN, and the file could be swapped upstream at any time. It is
+  decorative (`alt=""` inside a link that already has a label) and hidden
+  under `prefers-reduced-motion`. The credit required by its source sits in the
+  footer next to the copyright line.
 - `app/inner-pages.css` styles those two routes and is imported after
   `overrides.css` in `app/layout.tsx`. `overrides.css` is deliberately left to
   the homepage: it is large enough that edits to it are no longer reliable.

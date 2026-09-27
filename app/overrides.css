@@ -885,6 +885,18 @@ html[data-theme="light"] .search-wrap { box-shadow: 0 8px 22px rgb(0 0 0 / 6%), 
 /* Scoped to the pages that actually render the bar: the blog, about, privacy
    and error pages have no header, so they must not inherit its offset. */
 body:has(.site-header) { padding-top: 64px; }
+/* Wordmark sparkle ----------------------------------------------------
+   The animated sparkle beside the wordmark is a 40x40 GIF with a transparent
+   background. It is served from public/ rather than hotlinked: the page then
+   keeps a single origin (no unconsented third-party request, no reliance on
+   someone else's CDN staying up) and the file cannot be swapped upstream.
+   Site-authored GIFs are decorative only, so a reduced-motion visitor gets
+   none of it. */
+.wordmark { display: inline-flex; align-items: center; gap: 8px; }
+.wordmark-sparkle { flex: 0 0 auto; width: 40px; height: 40px; }
+@media (max-width: 600px) { .wordmark-sparkle { width: 32px; height: 32px; } }
+@media (prefers-reduced-motion: reduce) { .wordmark-sparkle { display: none; } }
+
 .site-header {
   position: fixed; inset: 0 0 auto; z-index: 45;
   border-bottom: 1px solid color-mix(in srgb, var(--line) 85%, transparent);

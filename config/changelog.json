@@ -1,5 +1,17 @@
 [
   {
+    "version": "1.3.0",
+    "date": "2026-09-27",
+    "title": "An image compressor, and a sparkle in the header",
+    "summary": "A twentieth tool joins the directory, and the header picks up a small animated flourish.",
+    "highlights": [
+      "New Image Compressor: shrink or resize JPEG, PNG and WebP images, a batch at a time, without uploading anything to a server.",
+      "It reports the before-and-after size of every file and the total saved, and converts to WebP, JPEG or PNG as you choose.",
+      "A new guide page at /tools/imagecompressor explains when to pick which format, and why a PNG will not shrink.",
+      "An animated sparkle now sits beside the base31.org wordmark, with the credit in the footer."
+    ]
+  },
+  {
     "version": "1.2.0",
     "date": "2026-09-27",
     "title": "A guide page for every tool",

@@ -104,6 +104,14 @@
     "show": true
   },
   {
+    "name": "Image Compressor",
+    "subdomain": "imagecompressor",
+    "url": "https://imagecompressor.base31.org",
+    "tags": ["image", "compress", "resize", "utility", "tool"],
+    "description": "Compress and resize images in the browser, with batch processing, before-and-after sizes and no upload.",
+    "show": true
+  },
+  {
     "name": "Joke Generator",
     "subdomain": "jokegenrator",
     "url": "https://jokegenrator.base31.org",

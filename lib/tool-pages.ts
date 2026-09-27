@@ -334,6 +334,35 @@ export const toolPages: Record<string, ToolPage> = {
     ],
   },
 
+  imagecompressor: {
+    headline: "Compress and resize images without uploading them",
+    metaDescription:
+      "Compress and resize JPEG, PNG and WebP images in your browser. Batch process, compare before and after sizes, and download — free, private, no sign-up.",
+    summary: "Shrink images and change their dimensions, entirely on your own device.",
+    intro: [
+      "Image Compressor takes the weight out of photos and screenshots. Add files, choose how much to shrink them and how large they should be, and download the results — a batch at a time if you like.",
+      "The work happens in your browser rather than on a server, which is both faster and more private: your files are never uploaded, so there is no copy to expire, log, or leak. Redrawing the image also strips its metadata, including GPS coordinates.",
+    ],
+    features: [
+      { title: "Compress or resize, or both", body: "Cut the file size at the same dimensions, cap the width and height, or do both in one pass." },
+      { title: "Batch friendly", body: "Add as many images as you want, watch the total savings, then download them individually or all at once." },
+      { title: "Choose the format", body: "Keep the original, or convert to WebP for the web, JPEG for compatibility, or PNG when you need lossless quality." },
+      { title: "Nothing is uploaded", body: "Files are decoded and re-encoded on your device with the canvas API, so they never leave it." },
+    ],
+    steps: [
+      "Drop your images onto the page, paste a screenshot, or use the file picker.",
+      "Pick an output format and quality, and set a maximum width or height if the images need to be smaller.",
+      "Press Compress & resize, check the before-and-after sizes, then download what you need.",
+    ],
+    faqs: [
+      { question: "Are my images uploaded to a server?", answer: "No. Your browser decodes and re-encodes each image locally, so the files never leave your device. You can unplug your connection after the page loads and it still works." },
+      { question: "Which format should I choose?", answer: "WebP is usually the smallest at a quality nobody can tell apart, and every current browser supports it. Choose JPEG when another program has to read the file, and keep PNG only when you need lossless quality or transparency." },
+      { question: "Why is my PNG not getting smaller?", answer: "PNG is lossless, so the quality setting does not apply — the same pixels always produce roughly the same bytes. Convert it to WebP or JPEG to shrink it meaningfully." },
+      { question: "Does compressing remove EXIF and GPS data?", answer: "Yes. Redrawing the image drops the metadata block entirely, including the camera model, timestamps, and GPS coordinates — which is usually what you want before publishing a photo." },
+    ],
+    related: ["appscreenshot", "qrgenerator", "share"],
+  },
+
   jokegenrator: {
     headline: "A joke for the moment you need one",
     metaDescription:

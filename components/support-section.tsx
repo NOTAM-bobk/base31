@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import DonationBoard from "@/components/donation-board";
 import ReferralCarousel from "@/components/referral-carousel";
 import TrustpilotReviews from "@/components/trustpilot-reviews";
@@ -11,12 +11,34 @@ import TrustpilotReviews from "@/components/trustpilot-reviews";
    opens and closes, exactly like the "Featured sites" heading. It starts open;
    the heading button is a real disclosure control with `aria-expanded` and
    `aria-controls`, and a line of text spells out the closed state so a visitor
-   never faces an empty gap with no explanation. */
+   never faces an empty gap with no explanation. Toggling gives the whole
+   block a short shake (and a haptic tick on devices that support it) so the
+   open/close reads as a physical response rather than a silent swap. */
 export default function SupportSection() {
   const [collapsed, setCollapsed] = useState(false);
+  const [vibrating, setVibrating] = useState(false);
+  const mounted = useRef(false);
+
+  useEffect(() => {
+    // Skip the first render: the section starts open, and that is not a toggle.
+    if (!mounted.current) {
+      mounted.current = true;
+      return;
+    }
+    setVibrating(true);
+    if (typeof navigator !== "undefined" && typeof navigator.vibrate === "function") {
+      navigator.vibrate(20);
+    }
+    const timer = window.setTimeout(() => setVibrating(false), 460);
+    return () => window.clearTimeout(timer);
+  }, [collapsed]);
 
   return (
-    <section id="support" className="support-section directory-section" aria-labelledby="support-heading">
+    <section
+      id="support"
+      className={`support-section directory-section${vibrating ? " is-vibrating" : ""}`}
+      aria-labelledby="support-heading"
+    >
       <div className="section-heading">
         <h2 id="support-heading" className="section-heading-main">
           <button
@@ -43,7 +65,6 @@ export default function SupportSection() {
             </svg>
           </button>
         </h2>
-        <span className="section-count mono">{collapsed ? "closed" : "open"}</span>
       </div>
 
       {collapsed && (

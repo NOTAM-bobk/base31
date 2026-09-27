@@ -384,8 +384,10 @@ withdraw or change consent later without clearing site data by hand.
 ## One-time Vercel/domain setup
 
 Wildcard subdomains on Vercel require your domain to use **Vercel's
-nameservers** (this is required on every plan, including the free Hobby
-plan — it's how Vercel issues a certificate for each subdomain on the fly).
+nameservers** (this is required on every plan, including the free Hobby plan).
+The wildcard certificate is proved with a DNS-01 challenge, so Vercel has to own
+the zone to answer it. Nothing else here depends on the nameservers — only
+`*.base31.org` does.
 
 1. Push this repo to GitHub and import it as a new Vercel project.
 2. In the project's **Settings → Domains**, add `base31.org`.
@@ -396,6 +398,51 @@ plan — it's how Vercel issues a certificate for each subdomain on the fly).
 5. Push a commit — that's it. Any folder you add under `public/sites/` with
    a matching `config/sites.json` entry is live on its subdomain right
    away, no per-site deploy needed.
+
+Run `npm run check:domain` after any DNS change. It resolves the nameservers,
+the apex, `www`, one real directory subdomain and the mail records, and exits
+non-zero while something required is missing.
+
+### Do not move the nameservers away from Vercel
+
+Pointing the domain at another DNS host — Cloudflare, for example, to use
+**Cloudflare Email Routing** for an `@base31.org` inbox — moves the zone, and
+the web records do not come with it. The domain then resolves to nothing:
+
+- `base31.org`, `www.base31.org` and every `*.base31.org` answer NXDOMAIN, so
+  the directory is unreachable however the last deploy went.
+- Vercel lists `base31.org` and `*.base31.org` as **Invalid Configuration** and
+  cannot issue the wildcard certificate while the zone is hosted elsewhere.
+- A deployment that looks like it failed is usually this: the build is fine and
+  the domain is what is broken. Check **Settings → Domains** before rebuilding.
+- Record types do not carry over either. Resend's DKIM and `send` records, for
+  instance, live in whatever zone held them before the switch.
+
+Cloudflare Email Routing requires Cloudflare's nameservers, so it cannot be
+combined with the wildcard. Pick one:
+
+- **Keep the wildcard (recommended).** Set the nameservers back to
+  `ns1.vercel-dns.com` and `ns2.vercel-dns.com`. Vercel's zone still holds the
+  records added there — the apex, `www`, the wildcard, and the Resend ones from
+  the section below — so they start resolving again as the change propagates
+  (NS answers are cached for up to a day). Then get the `hello@base31.org`
+  inbox from a provider that works through plain MX records: a mailbox host, or
+  a forwarding service such as ImprovMX or ForwardEmail, with its MX and TXT
+  records added in Vercel's DNS.
+- **Keep Cloudflare's nameservers.** Recreate the web records in the Cloudflare
+  DNS dashboard with **Proxy off** (grey cloud) on each one:
+
+  | Type | Name | Value |
+  | --- | --- | --- |
+  | `A` | `@` | `76.76.21.21` |
+  | `CNAME` | `www` | `cname.vercel-dns.com` |
+  | `CNAME` | `*` | `cname.vercel-dns.com` |
+
+  Leave the existing apex MX/TXT alone, since Cloudflare Email Routing needs
+  them, and re-add Resend's records (`npm run check:mail` names the missing
+  ones). The catch: Vercel still cannot verify `*.base31.org` without its own
+  nameservers, so every subdomain has to be added in **Settings → Domains** by
+  hand and a new folder under `public/sites/` is no longer live on its own.
 
 ## Local development
 
@@ -544,10 +591,11 @@ the account owner. Verify the domain once to send from `reports@base31.org`
    - optionally `TXT` on `_dmarc` → `v=DMARC1; p=none;`
 
    Copy what Resend actually shows: the region changes the MX host.
-3. The domain's nameservers are Vercel's (`ns1`/`ns2.vercel-dns.com`), so add
-   the records under Vercel → Domains → `base31.org` → DNS Records. The
-   Cloudflare zone for `base31.org` exists but is still **pending** (DNS was
-   never delegated to it), so records created there do not resolve.
+3. Add the records at whichever host actually answers for the domain — see
+   **Do not move the nameservers away from Vercel** above. While the
+   nameservers are Vercel's that is Vercel → Domains → `base31.org` → DNS
+   Records; while they are Cloudflare's it is the Cloudflare DNS dashboard. A
+   record added to a zone that does not answer for the domain never resolves.
 4. Once the records propagate, run `npm run check:mail` to confirm SPF, DKIM,
    and MX resolve, then press **Verify DNS Records** in Resend.
 5. After verification, set `RESEND_FROM_EMAIL` to `base31 <reports@base31.org>`

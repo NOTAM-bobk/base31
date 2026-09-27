@@ -10,6 +10,7 @@
     "lint": "next lint",
     "validate:content": "node scripts/validate-content.mjs",
     "check:mail": "node scripts/check-mail-dns.mjs",
+    "check:domain": "node scripts/check-domain.mjs",
     "check": "npm run validate:content && npm run typecheck && npm run lint",
     "deploy:worker": "cd worker && npx wrangler deploy"
   },

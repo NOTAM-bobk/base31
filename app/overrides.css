@@ -557,12 +557,36 @@ html[data-theme="light"] { --subtle: #6b6b6b; }
   margin-top: 108px; padding-top: 34px;
   border-top: 1px solid var(--line);
 }
-.support-panel > :first-child { margin-top: 0; }
+/* A little breathing room under the "Support" heading so the review card
+   does not crowd the disclosure control. */
+.support-panel > :first-child { margin-top: 30px; }
 .support-panel .donation-board { margin-top: 44px; }
 .support-panel .referral-block { margin-top: 44px; }
 .support-panel .support-ad { margin-top: 26px; }
+
+/* Toggle shake. A brief horizontal wobble runs when the section opens or
+   closes, so the change reads as a physical response. The class is added for
+   the duration of the animation and removed after, letting it replay on the
+   next toggle; reduced-motion visitors get no shake at all. */
+.support-section.is-vibrating { animation: support-vibrate 440ms cubic-bezier(0.36, 0.07, 0.19, 0.97); }
+@keyframes support-vibrate {
+  0%, 100% { transform: translateX(0); }
+  10% { transform: translateX(-4px); }
+  20% { transform: translateX(4px); }
+  30% { transform: translateX(-3px); }
+  40% { transform: translateX(3px); }
+  50% { transform: translateX(-2px); }
+  60% { transform: translateX(2px); }
+  70% { transform: translateX(-1px); }
+  80% { transform: translateX(1px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .support-section.is-vibrating { animation: none; }
+}
+
 @media (max-width: 600px) {
   .support-section { margin-top: 84px; padding-top: 28px; }
+  .support-panel > :first-child { margin-top: 24px; }
   .support-panel .donation-board,
   .support-panel .referral-block { margin-top: 32px; }
 }

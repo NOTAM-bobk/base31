@@ -80,6 +80,14 @@ export default function SupportSection() {
 
         <ReferralCarousel />
 
+        {/* The affiliate slot's own pitch: this is where a sponsored card
+            lives, so it is also where someone asks how to get one. */}
+        <p className="support-sponsor-line">
+          Want your link in that carousel or on the support button?{" "}
+          <a href="/sponsor">Sponsor base31.org</a> — or email{" "}
+          <a href="mailto:hello@base31.org">hello@base31.org</a>.
+        </p>
+
         {/* The sponsored support button: an ad slot that pays for the rest of
             the page. It is a plain link, so it needs no consent gate. */}
         <a

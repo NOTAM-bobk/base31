@@ -10,6 +10,7 @@ import { SITE_GLYPHS } from "@/components/site-glyphs";
 import Cursor from "@/components/cursor";
 import Faq from "@/components/faq";
 import DirectoryNotifications from "@/components/directory-notifications";
+import FooterSponsor from "@/components/footer-sponsor";
 import GithubStats from "@/components/github-stats";
 import { resetConsent, useConsent } from "@/lib/consent";
 
@@ -1019,8 +1020,10 @@ export default function HomePage() {
             <span className="h1-line">people.</span>
           </h1>
           <p className="subtitle">Discover fun websites, useful online tools, and creative web projects built on base31.org and the open web.</p>
+          {/* Two calls to action, side by side on a desktop and stacked on a
+              phone. The old "Browse all sites" anchor is gone: the directory is
+              the next thing down the page, so it only duplicated a scroll. */}
           <div className="intro-links">
-            <a className="text-link" href="#sites">Browse all sites <span aria-hidden="true">↓</span></a>
             <a className="text-link muted-link" href="#about">Why base31? <span aria-hidden="true">→</span></a>
             <button type="button" className="surprise-button" onClick={surpriseMe} title="Open a random site from the directory">
               <span className="surprise-icon" aria-hidden="true">↯</span>
@@ -1287,6 +1290,10 @@ export default function HomePage() {
         {/* The subscribe block sits below the FAQ as the final thing before
             the footer, so the page ends on the call to action. */}
         <DirectoryNotifications />
+
+        {/* The bottom of the page: the decorative sparkle and the sponsorship
+            invitation, directly above the footer. */}
+        <FooterSponsor />
       </main>
 
       <footer className="site-footer">

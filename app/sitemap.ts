@@ -48,6 +48,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.7,
     })),
     {
+      // Sponsorship slots, and the page-level disclosure for the paid cards.
+      url: `${siteUrl}/sponsor`,
+      changeFrequency: "monthly",
+      priority: 0.5,
+    },
+    {
       url: `${siteUrl}/whats-new`,
       lastModified: newestRelease,
       changeFrequency: "monthly",

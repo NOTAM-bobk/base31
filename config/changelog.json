@@ -1,5 +1,16 @@
 [
   {
+    "version": "1.4.0",
+    "date": "2026-09-27",
+    "title": "Sponsorship has a page, and the hero is tidier",
+    "summary": "There is now somewhere to send people who want to advertise here, and the top of the homepage no longer offers two ways to reach the same list.",
+    "highlights": [
+      "New /sponsor page: the two paid slots, how to book one, the house rules, and a straight answer about what sponsorship does not buy — a directory listing, which stays free.",
+      "The sponsored placements link to it, and the bottom of the homepage carries the invitation with a second animated sparkle.",
+      "The hero lost its redundant \"Browse all sites\" link and gained a Surprise me button that reads like a button, sitting beside \"Why base31?\" on a desktop and under it on a phone."
+    ]
+  },
+  {
     "version": "1.3.0",
     "date": "2026-09-27",
     "title": "An image compressor, and a sparkle in the header",

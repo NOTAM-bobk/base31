@@ -178,13 +178,29 @@ bundler. Two ways to do that by accident:
   has no guide, if a guide has no matching site, or if a guide's copy is thin
   (missing headline, an out-of-range meta description, fewer than two intro
   paragraphs, three features or two questions).
-- The animated sparkle beside the homepage wordmark is `public/header-sparkle.gif`
-  (40×40 with a transparent background), served from this origin rather than
-  hotlinked: a third-party image would be an unconsented request to someone
-  else's CDN, and the file could be swapped upstream at any time. It is
-  decorative (`alt=""` inside a link that already has a label) and hidden
-  under `prefers-reduced-motion`. The credit required by its source sits in the
-  footer next to the copyright line.
+- There are two decorative sparkles, both Glitter Graphics GIFs with
+  transparent backgrounds, served from this origin rather than hotlinked: a
+  third-party image would be an unconsented request to someone else's CDN, and
+  the file could be swapped upstream at any time. `public/header-sparkle.gif`
+  (40×40) sits inside the wordmark link in the header; `public/footer-sparkle.gif`
+  (64×64) sits in the bottom-of-page block, beside the sponsor line. Both are
+  decorative (`alt=""`, the header one inside a link that already has a label),
+  both are hidden under `prefers-reduced-motion`, and the credit their source
+  asks for is in the footer next to the copyright line.
+- The bottom block is `components/footer-sponsor.tsx`, rendered at the end of
+  `main` just above the footer. It exists as its own component so the bottom of
+  the page can be edited without opening `app/page.tsx`, which is long enough
+  that edits near its end are awkward.
+- `/sponsor` documents the two paid slots (a referral carousel card and the
+  support button), how to book one, and the house rules, and it doubles as the
+  page-level disclosure for the sponsored cards. It is linked from the line
+  under the referral carousel, from the bottom block, and from the footer. A
+  directory listing is deliberately *not* for sale: publishing a community site
+  is free, and that is stated on the page so nobody buys the wrong thing.
+- `app/late.css` is imported last and holds small corrections to rules that
+  already exist in `overrides.css`: same specificity, later file, so it wins.
+  It is not the place for a component's main styling — that belongs in
+  `overrides.css` or `inner-pages.css`.
 - `app/inner-pages.css` styles those two routes and is imported after
   `overrides.css` in `app/layout.tsx`. `overrides.css` is deliberately left to
   the homepage: it is large enough that edits to it are no longer reliable.
@@ -485,7 +501,14 @@ npm run dev
 
 Subdomains don't resolve on `localhost` by default. To test one locally,
 visit `http://example.localhost:3000` (the middleware treats `*.localhost`
-the same way it treats `*.base31.org`).## Counters and votes (Cloudflare Workers)
+the same way it treats `*.base31.org`).
+
+Run `npm run check` before pushing: it validates the content files, typechecks,
+and lints. Dependabot (`.github/dependabot.yml`) opens one grouped pull request
+each week for minor and patch bumps and leaves major versions as their own PR,
+so a red check on a dependency PR is worth reading before merging it.
+
+## Counters and votes (Cloudflare Workers)
 
 The directory's live view counter and the shared thumbs up/down totals are
 served by a small Cloudflare Worker backed by Cloudflare KV, deployed from

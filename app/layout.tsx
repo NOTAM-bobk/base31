@@ -5,8 +5,11 @@ import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 import "./overrides.css";
 // Styles for the inner pages that live outside the homepage (/stats,
-// /whats-new); loaded last so it can layer over the two above.
+// /whats-new, /tools); loaded after the two above so it can layer over them.
 import "./inner-pages.css";
+// Small corrections that must win over overrides.css (same specificity, later
+// file). See the file header for why it exists.
+import "./late.css";
 import CodeBackdrop from "@/components/code-backdrop";
 import ConsentAwareAds from "@/components/consent-aware-ads";
 import ConsentAwareAnalytics from "@/components/consent-aware-analytics";

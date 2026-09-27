@@ -3,160 +3,266 @@
     "name": "App Screenshot",
     "subdomain": "appscreenshot",
     "url": "https://appscreenshot.base31.org",
-    "tags": ["utility", "screenshot", "tools"],
+    "tags": [
+      "utility",
+      "screenshot",
+      "tools"
+    ],
     "description": "Generate polished app screenshots for product pages, portfolios, and presentations.",
-    "show": true
+    "show": true,
+    "language": "en"
   },
   {
     "name": "Donation",
     "subdomain": "donation",
     "url": "https://donation.base31.org",
-    "tags": ["donations", "support", "base31"],
+    "tags": [
+      "donations",
+      "support",
+      "base31"
+    ],
     "description": "Support the independent tools and experiments hosted by base31.org.",
-    "show": true
+    "show": true,
+    "language": "en"
   },
   {
     "name": "Chat With Your Garmin Data",
     "subdomain": "chatwithyourdatagarmin",
     "url": "https://chatwithyourdatagarmin.base31.org",
-    "tags": ["ai", "garmin", "data", "fitness"],
+    "tags": [
+      "ai",
+      "garmin",
+      "data",
+      "fitness"
+    ],
     "description": "Ask questions about Garmin activity data through an interactive AI chat interface.",
-    "show": false
+    "show": false,
+    "language": "en"
   },
   {
     "name": "Share Files",
     "subdomain": "share",
     "url": "https://share.base31.org",
-    "tags": ["utility", "free", "online", "files"],
+    "tags": [
+      "utility",
+      "free",
+      "online",
+      "files"
+    ],
     "description": "Upload a file and get a shareable link without creating an account.",
-    "show": true
+    "show": true,
+    "language": "en"
   },
   {
     "name": "CompMails",
     "subdomain": "compmails",
     "url": "https://compmails.base31.org",
-    "tags": ["email", "privacy", "utility"],
+    "tags": [
+      "email",
+      "privacy",
+      "utility"
+    ],
     "description": "Use a disposable inbox for temporary signups and quick online testing.",
-    "show": true
+    "show": true,
+    "language": "en"
   },
   {
     "name": "Daily Wordle",
     "subdomain": "dailywordel",
     "url": "https://dailywordel.base31.org",
-    "tags": ["game", "word", "puzzle"],
+    "tags": [
+      "game",
+      "word",
+      "puzzle"
+    ],
     "description": "Solve a fresh daily word puzzle and test your vocabulary.",
-    "show": true
+    "show": true,
+    "language": "en"
   },
   {
     "name": "iframe tester",
     "subdomain": "iframetester",
     "url": "https://iframetester.base31.org",
-    "tags": ["iframe", "dev"],
+    "tags": [
+      "iframe",
+      "dev"
+    ],
     "description": "Test any url with this tool, iframe testing.",
-    "show": true
+    "show": true,
+    "language": "en"
   },
   {
     "name": "Focus Canvas",
     "subdomain": "focuscanvas",
     "url": "https://focuscanvas.base31.org",
-    "tags": ["productivity", "canvas", "utility"],
+    "tags": [
+      "productivity",
+      "canvas",
+      "utility"
+    ],
     "description": "Plan focused work and explore ideas on a visual productivity canvas.",
-    "show": false
+    "show": false,
+    "language": "en"
   },
   {
     "name": "Is It Down",
     "subdomain": "isitdown",
     "url": "https://isitdown.base31.org",
-    "tags": ["utility", "network", "status"],
+    "tags": [
+      "utility",
+      "network",
+      "status"
+    ],
     "description": "Check whether a website is reachable and verify its current status.",
-    "show": true
+    "show": true,
+    "language": "en"
   },
   {
     "name": "Is It Taken",
     "subdomain": "isittaken",
     "url": "https://isittaken.base31.org",
-    "tags": ["domains", "utility", "tool"],
+    "tags": [
+      "domains",
+      "utility",
+      "tool"
+    ],
     "description": "Check whether a domain name is available and see registration insights and instant alternatives.",
-    "show": true
+    "show": true,
+    "language": "en"
   },
   {
     "name": "GitHub Explorer",
     "subdomain": "githubexplorer",
     "url": "https://githubexplorer.base31.org",
-    "tags": ["github", "developer", "ai", "code"],
+    "tags": [
+      "github",
+      "developer",
+      "ai",
+      "code"
+    ],
     "description": "Browse any GitHub repository's files and code, explore a user's repositories, and draft READMEs and docs with AI.",
-    "show": true
+    "show": true,
+    "language": "en"
   },
   {
     "name": "QR Code Generator",
     "subdomain": "qrgenerator",
     "url": "https://qrgenerator.base31.org",
-    "tags": ["qr", "utility", "tool", "generator"],
+    "tags": [
+      "qr",
+      "utility",
+      "tool",
+      "generator"
+    ],
     "description": "Create free custom QR codes for links, Wi-Fi, contacts and messages, with PNG and SVG download.",
-    "show": true
+    "show": true,
+    "language": "en"
   },
   {
     "name": "Password Generator",
     "subdomain": "passwordgen",
     "url": "https://passwordgen.base31.org",
-    "tags": ["security", "password", "utility", "tool"],
+    "tags": [
+      "security",
+      "password",
+      "utility",
+      "tool"
+    ],
     "description": "Generate strong random passwords and passphrases, and save them in a vault encrypted with your own master passphrase.",
-    "show": true
+    "show": true,
+    "language": "en"
   },
   {
     "name": "Image Compressor",
     "subdomain": "imagecompressor",
     "url": "https://imagecompressor.base31.org",
-    "tags": ["image", "compress", "resize", "utility", "tool"],
+    "tags": [
+      "image",
+      "compress",
+      "resize",
+      "utility",
+      "tool"
+    ],
     "description": "Compress and resize images in the browser, with batch processing, before-and-after sizes and no upload.",
-    "show": true
+    "show": true,
+    "language": "en"
   },
   {
     "name": "Joke Generator",
     "subdomain": "jokegenrator",
     "url": "https://jokegenrator.base31.org",
-    "tags": ["entertainment", "fun", "utility"],
+    "tags": [
+      "entertainment",
+      "fun",
+      "utility"
+    ],
     "description": "Generate a quick joke whenever you need a little entertainment.",
-    "show": true
+    "show": true,
+    "language": "en"
   },
   {
     "name": "Voice Transcribe",
     "subdomain": "voicetransrib",
     "url": "https://voicetransrib.base31.org",
-    "tags": ["audio", "transcription", "utility"],
+    "tags": [
+      "audio",
+      "transcription",
+      "utility"
+    ],
     "description": "Turn spoken audio into text quickly with a simple transcription tool.",
-    "show": false
+    "show": false,
+    "language": "en"
   },
   {
     "name": "What's My Device",
     "subdomain": "whatsmydevice",
     "url": "https://whatsmydevice.base31.org",
-    "tags": ["utility", "device", "privacy"],
+    "tags": [
+      "utility",
+      "device",
+      "privacy"
+    ],
     "description": "View your browser, device, screen, and system details in one place.",
-    "show": false
+    "show": false,
+    "language": "en"
   },
   {
     "name": "snip.fm",
     "subdomain": "snipfm",
     "url": "https://snipfm.base31.org",
-    "tags": ["music", "discovery", "social"],
+    "tags": [
+      "music",
+      "discovery",
+      "social"
+    ],
     "description": "Discover music through a short-form, swipeable feed.",
-    "show": false
+    "show": false,
+    "language": "en"
   },
   {
     "name": "Word of the Day",
     "subdomain": "wordoftheday",
     "url": "https://wordoftheday.base31.org",
-    "tags": ["education", "vocabulary", "learning"],
+    "tags": [
+      "education",
+      "vocabulary",
+      "learning"
+    ],
     "description": "Learn a new word each day with definitions and example sentences.",
-    "show": true
+    "show": true,
+    "language": "en"
   },
   {
     "name": "Subdomain Finder",
     "subdomain": "subdomain",
     "url": "https://subdomain.base31.org",
-    "tags": ["subdomain", "utility", "tool"],
+    "tags": [
+      "subdomain",
+      "utility",
+      "tool"
+    ],
     "description": "Find any domains of any URL.",
-    "show": true
+    "show": true,
+    "language": "en"
   }
 ]

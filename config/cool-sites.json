@@ -1,0 +1,56 @@
+[
+  {
+    "name": "Window Swap",
+    "url": "https://window-swap.com",
+    "tags": ["travel", "relax"],
+    "description": "Open a window somewhere in the world — views from strangers' homes, submitted by people everywhere."
+  },
+  {
+    "name": "The Useless Web",
+    "url": "https://theuselessweb.com",
+    "tags": ["fun", "random"],
+    "description": "A one-button router into the internet's strangest corners. The classic starting point for a pointless adventure."
+  },
+  {
+    "name": "Neal.fun",
+    "url": "https://neal.fun",
+    "tags": ["interactive", "toys"],
+    "description": "Spend Bill Gates' money, scale the Space Elevator, dive the Deep Sea — a shelf of the web's best interactive toys."
+  },
+  {
+    "name": "A Soft Murmur",
+    "url": "https://asoftmurmur.com",
+    "tags": ["ambient", "focus"],
+    "description": "Mix rain, thunder, waves, fires and coffee shops into a background ambience for working or drifting off."
+  },
+  {
+    "name": "Radio Garden",
+    "url": "https://radio.garden",
+    "tags": ["music", "radio"],
+    "description": "Spin a glowing globe and drop in on live radio stations from almost every town on Earth."
+  },
+  {
+    "name": "Pointer Pointer",
+    "url": "https://pointerpointer.com",
+    "tags": ["fun", "silly"],
+    "description": "Move your mouse anywhere and a photo of someone pointing at exactly that spot appears. Pointless, perfect."
+  },
+  {
+    "name": "Zoomquilt",
+    "url": "https://zoomquilt.org",
+    "tags": ["art", "animation"],
+    "description": "An endlessly zooming collaborative painting — keep going deeper and the scene never stops unfolding."
+  },
+  {
+    "name": "Music for Programming",
+    "url": "https://musicforprogramming.net",
+    "tags": ["music", "coding"],
+    "description": "Hour-long, carefully sequenced mixes designed to sit behind long stretches of focused work."
+  },
+  {
+    "name": "Httpster",
+    "url": "https://httpster.net",
+    "tags": ["design", "inspiration"],
+    "description": "A curated showcase of simply beautiful websites — proof that great design is not the same as heavy design."
+  }
+]

@@ -1,0 +1,46 @@
+# Continuous checks for every push and pull request.
+#
+# The repo carries content validators and a typecheck that were only ever run
+# by hand before a push; this workflow makes them un-skippable. The Next build
+# also catches broken imports and metadata mistakes (duplicated tags, bad
+# canonical URLs) that tsc cannot see, and the cool-sites section ships
+# external favicons, so the link check asks each configured host for a 2xx —
+# soft-fail for now: a dead external link should open a conversation, not
+# block a deploy.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Validate content config
+        run: npm run validate:content
+
+      - name: Check external cool-sites links
+        run: node scripts/check-cool-sites.mjs
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Build
+        run: npm run build
+        env:
+          # The build pre-renders the API-free pages; nothing here needs live
+          # secrets, but the counter URL must resolve for the client bundle.
+          NEXT_PUBLIC_COUNTER_URL: https://base31-directory-counter.sawyerbobk563.workers.dev

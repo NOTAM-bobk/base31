@@ -30,7 +30,7 @@ export default function StructuredData() {
           email: "hello@base31.org",
           telephone: "+1-612-444-3853",
           areaServed: "US",
-          availableLanguage: "en",
+          availableLanguage: ["en", "es", "fr", "pt"],
         },
       },
       {
@@ -40,7 +40,7 @@ export default function StructuredData() {
         name: "base31.org",
         description:
           "An independent directory of cool sites, fun websites, creative web projects, and useful online tools.",
-        inLanguage: "en-US",
+        inLanguage: ["en", "es", "fr", "pt"],
         publisher: { "@id": `${siteUrl}/#organization` },
       },
     ],

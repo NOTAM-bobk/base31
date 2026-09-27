@@ -81,6 +81,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "monthly" as const,
       priority: 0.7,
     })),
+    // The translated homepages ship as static routes, so crawlers can find
+    // every language variant directly from the sitemap (hreflang tags cover
+    // the variant mapping; these entries make sure each URL is discovered).
+    { url: `${siteUrl}/es`, changeFrequency: "weekly" as const, priority: 0.8 },
+    { url: `${siteUrl}/fr`, changeFrequency: "weekly" as const, priority: 0.8 },
+    { url: `${siteUrl}/pt`, changeFrequency: "weekly" as const, priority: 0.8 },
     // One URL per listed subdomain site.
     ...listedSites.map((site) => ({
       url: site.url,

@@ -73,6 +73,80 @@
   .footer-sparkle { display: none; }
 }
 
+/* Language switcher -----------------------------------------------------
+   A compact EN/ES/FR/PT row in the header: quiet until hover, the active
+   language marked with the live green. Wraps under the wordmark on phones. */
+.lang-switch { display: inline-flex; align-items: center; gap: 2px; padding: 2px; border: 1px solid var(--line); border-radius: 999px; background: color-mix(in srgb, var(--surface) 70%, transparent); }
+.lang-link {
+  padding: 3px 8px; border-radius: 999px;
+  color: var(--subtle); font-size: 10px; letter-spacing: 0.05em; text-decoration: none;
+  transition: color 150ms ease, background 150ms ease;
+}
+.lang-link:hover { color: var(--text-strong); background: var(--surface-hover); }
+.lang-link.is-active { color: var(--live); background: color-mix(in srgb, var(--live) 12%, transparent); }
+@media (max-width: 600px) {
+  .site-header-inner { flex-wrap: wrap; row-gap: 6px; }
+  .lang-switch { order: 3; margin-left: 0; }
+  .site-nav { margin-left: auto; }
+}
+
+/* Directory card polish --------------------------------------------------
+   Same card, sharper tail: the description moves under the title so the
+   link covers everything a visitor reads before choosing, and the vote row
+   sits between hairlines instead of floating loose. */
+.site-card .tags { margin: 9px 0 0 15px; }
+.site-card .site-description { display: block; margin: 8px 15px 0; font-size: 12px; }
+.site-card-lower {
+  display: flex; align-items: center; justify-content: flex-end;
+  margin-top: 10px; padding: 8px 12px;
+  border-top: 1px solid color-mix(in srgb, var(--line) 70%, transparent);
+  background: color-mix(in srgb, var(--surface-hover) 55%, transparent);
+}
+.site-card-lower .site-actions { width: 100%; justify-content: space-between; }
+
+/* Other cool sites -------------------------------------------------------
+   Off-directory picks from config/cool-sites.json. The cards are smaller and
+   quieter than the directory's: no preview, no votes — name, host, one line,
+   in a denser three-across grid on a desktop. */
+.cool-section { margin-top: 72px; }
+.cool-lede { max-width: 560px; margin: 0 0 16px; color: var(--muted); font-size: 12.5px; line-height: 1.6; }
+.cool-grid { display: grid; gap: 8px; }
+.cool-card {
+  display: flex; flex-direction: column; gap: 3px;
+  padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px;
+  background: color-mix(in srgb, var(--surface) 60%, transparent);
+  color: inherit; text-decoration: none;
+  transition: border-color 150ms ease, background 150ms ease, transform 150ms ease;
+}
+.cool-card:hover { border-color: var(--line-strong); background: var(--surface-hover); transform: translateY(-1px); }
+.cool-card-top { display: flex; align-items: center; gap: 8px; }
+.cool-favicon { flex: 0 0 auto; display: grid; place-items: center; width: 18px; height: 18px; border-radius: 5px; background: var(--surface-hover); }
+.cool-favicon img { width: 14px; height: 14px; }
+.cool-name { overflow: hidden; color: var(--text-strong); font-size: 12.5px; font-weight: 500; text-overflow: ellipsis; white-space: nowrap; }
+.cool-arrow { margin-left: auto; color: var(--subtle); font-size: 11px; transition: color 150ms ease, transform 150ms ease; }
+.cool-card:hover .cool-arrow { color: var(--live); transform: translate(1px, -1px); }
+.cool-host { color: var(--subtle); font-size: 9.5px; }
+.cool-desc { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; color: var(--muted); font-size: 11px; line-height: 1.5; }
+@media (min-width: 640px) { .cool-grid { grid-template-columns: 1fr 1fr; gap: 10px; } }
+@media (min-width: 1000px) { .cool-grid { grid-template-columns: 1fr 1fr 1fr; } }
+@media (prefers-reduced-motion: reduce) {
+  .cool-card, .cool-arrow { transition: none; }
+  .cool-card:hover { transform: none; }
+}
+
+/* Consistency pass ------------------------------------------------------
+   Shared focus ring and lede rhythm for the pieces this release added, so
+   keyboard users get the same affordance everywhere and the sections under
+   the directory all introduce themselves the same way. */
+.lang-link:focus-visible,
+.cool-card:focus-visible {
+  outline: 2px solid var(--live);
+  outline-offset: 2px;
+}
+.cool-lede,
+.tools-hub-link { font-size: 12.5px; line-height: 1.6; }
+.cool-section .section-heading { margin-bottom: 10px; }
+
 /* Desktop footer -------------------------------------------------------
    Two organized zones instead of one cramped 10px strip: the contact pills
    on top, then the copyright on the left and the links on the right, split

@@ -32,6 +32,32 @@ checkUnique(posts.map((post) => String(post.slug)), "blog slug");
 checkUnique(referrals.map((referral) => String(referral.url)), "referral URL");
 checkUnique(releases.map((release) => String(release.version)), "release version");
 
+// config/cool-sites.json backs the homepage's "Other cool sites" strip.
+// These are external URLs — deliberately not base31 subdomains — so the URL
+// check rejects a hostname that looks like the directory's own.
+const coolSites = JSON.parse(fs.readFileSync(path.join(root, "config", "cool-sites.json"), "utf8"));
+if (!Array.isArray(coolSites) || coolSites.length === 0) errors.push("cool-sites.json needs at least one site");
+checkUnique(coolSites.map((site) => String(site.url)), "cool site URL");
+const base31Host = /^https:\/\/[a-z0-9-]+\.base31\.org/;
+for (const [index, site] of coolSites.entries()) {
+  const at = `Cool site ${index + 1}`;
+  if (typeof site.name !== "string" || !site.name.trim()) errors.push(`${at} needs a name`);
+  if (typeof site.url !== "string" || !https.test(site.url)) errors.push(`${at} needs an HTTPS URL`);
+  else if (base31Host.test(site.url)) errors.push(`${at} points at a base31.org subdomain — directory entries belong in sites.json, not here`);
+  if (typeof site.description !== "string" || site.description.trim().length < 20) errors.push(`${at} needs a useful description`);
+  if (!Array.isArray(site.tags) || site.tags.length === 0) errors.push(`${at} needs at least one tag`);
+}
+
+// Language codes on directory entries (BGR 47 short form; "en" is the default
+// the loader assumes). Entries without the field stay valid — the field is
+// for future translated filtering.
+const languageCode = /^[a-z]{2,3}(-[A-Za-z0-9]{2,8})?$/;
+for (const [index, site] of sites.entries()) {
+  if (site.language !== undefined && (typeof site.language !== "string" || !languageCode.test(site.language))) {
+    errors.push(`Site ${index + 1} (${site.subdomain}) has an invalid language code`);
+  }
+}
+
 for (const [index, site] of sites.entries()) {
   if (typeof site.name !== "string" || !site.name.trim()) errors.push(`Site ${index + 1} needs a name`);
   if (typeof site.subdomain !== "string" || !slug.test(site.subdomain)) errors.push(`Site ${index + 1} has an invalid subdomain`);

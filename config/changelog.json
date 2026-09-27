@@ -1,5 +1,20 @@
 [
   {
+    "version": "1.6.0",
+    "date": "2026-09-27",
+    "title": "Three new languages, off-directory picks, and checks that run themselves",
+    "summary": "The homepage now speaks Spanish, French and Portuguese, a strip of hand-picked external sites sits under the directory, and CI keeps watch on every push.",
+    "highlights": [
+      "The homepage ships in Español, Français and Português at /es, /fr and /pt, with hreflang tags, localized metadata and a language switcher in the header.",
+      "A new “Other cool sites” section links nine hand-picked corners of the web that live outside the directory — smaller, quieter cards, edited through config/cool-sites.json.",
+      "Site cards read better: the description and tags moved under the title so the whole pitch is one link, with the vote row separated beneath.",
+      "Continuous integration now validates content, checks the external links, typechecks and builds on every push and pull request.",
+      "A GitHub Actions workflow deploys the Cloudflare Worker automatically, so push notifications and /stats stay live without a local machine.",
+      "Deeper SEO groundwork: sitemap entries for the new languages, richer structured data, and keyword coverage for plain “base31” searches.",
+      "Search accepts ?q= deep links, and directory entries carry a language field ready for translated filtering."
+    ]
+  },
+  {
     "version": "1.5.0",
     "date": "2026-09-27",
     "title": "A calmer desktop, golden stars, and a shake for the directory",

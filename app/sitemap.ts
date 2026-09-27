@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 import { blogPosts } from "@/lib/blogs";
+import changelog from "@/config/changelog.json";
 import sites from "@/config/sites.json";
 
 const siteUrl = "https://base31.org";
@@ -12,6 +13,8 @@ type Site = { url: string; show?: boolean };
 export default function sitemap(): MetadataRoute.Sitemap {
   const listedSites = (sites as Site[]).filter((site) => site.show !== false);
   const newestPost = blogPosts[0]?.date ? new Date(blogPosts[0].date) : undefined;
+  // config/changelog.json is newest-first, so entry 0 is the latest release.
+  const newestRelease = changelog[0]?.date ? new Date(changelog[0].date) : undefined;
 
   return [
     {
@@ -30,6 +33,18 @@ export default function sitemap(): MetadataRoute.Sitemap {
       lastModified: newestPost,
       changeFrequency: "weekly",
       priority: 0.8,
+    },
+    {
+      url: `${siteUrl}/whats-new`,
+      lastModified: newestRelease,
+      changeFrequency: "monthly",
+      priority: 0.6,
+    },
+    {
+      url: `${siteUrl}/stats`,
+      lastModified: newestPost,
+      changeFrequency: "daily",
+      priority: 0.5,
     },
     {
       url: `${siteUrl}/privacy`,

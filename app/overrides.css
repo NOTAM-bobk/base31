@@ -417,7 +417,10 @@ html[data-motion="enabled"] [data-reveal][data-revealed] { opacity: 1; transform
 .footer-version {
   padding: 5px 10px; border: 1px dashed var(--line-strong); border-radius: 999px;
   color: var(--subtle); font-size: 10.5px; line-height: 1;
+  transition: border-color 150ms ease, color 150ms ease;
 }
+/* The version doubles as the link into /whats-new. */
+a.footer-version:hover { border-color: var(--live); border-style: solid; color: var(--text-strong); }
 @media (min-width: 1000px) { .footer-meta { width: min(100% - 64px, 1080px); } }
 @media (max-width: 600px) {
   .footer-meta { width: min(100% - 24px, 720px); padding-bottom: 22px; justify-content: center; gap: 10px; }

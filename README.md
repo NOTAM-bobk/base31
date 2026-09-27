@@ -154,8 +154,21 @@ bundler. Two ways to do that by accident:
 - `app/sitemap.ts` is generated at build time from `lib/blogs.ts` (which reads
   `config/blogs.json` plus the editorial posts) and `config/sites.json`, so a
   new blog post or directory entry shows up in `/sitemap.xml` on the next
-  deploy with nothing to update by hand. Sites with `"show": false` are left
-  out, and community uploads are not listed (they are only known at runtime).
+  deploy with nothing to update by hand. Sites with `"show": false` are  left out, and community uploads are not listed (they are only known at runtime).
+- `/stats` and `/whats-new` are server-rendered inner pages. Neither uses
+  `data-reveal`: the reveal observer lives in `app/page.tsx`, so a section
+  marked for it on another route would stay at opacity 0. `/stats` reads
+  `GET /stats` from the worker and caches for five minutes; `/whats-new`
+  renders `config/changelog.json`. Both carry their own `openGraph` for the
+  usual reason (see below).
+- The changelog is newest-first, and its **top entry must match the `version`
+  in `package.json`** — the footer prints that version and links it to
+  `/whats-new`, and `/whats-new` opens by naming it. `npm run validate:content`
+  fails if the two drift or if the list is out of order, so bump both in the
+  same commit.
+- `app/inner-pages.css` styles those two routes and is imported after
+  `overrides.css` in `app/layout.tsx`. `overrides.css` is deliberately left to
+  the homepage: it is large enough that edits to it are no longer reliable.
 - `components/faq.tsx` renders the FAQ above the footer together with its
   matching `FAQPage` structured data. Edit the `FAQS` array there and both the
   copy and the schema stay in sync. Every question is a native
@@ -469,7 +482,8 @@ served by a small Cloudflare Worker backed by Cloudflare KV, deployed from
 
 | Route | Purpose |
 | --- | --- |
-| `GET /?key=<name>` | Increments the view counter, returns `{ "views": n }` |
+| `GET /?key=<name>` | Increments the view counter, returns `{ "views": n }`; also bumps that day's bucket for the stats graph |
+| `GET /stats?days=<n>` | Totals plus the daily view series that `/stats` renders (cached for five minutes) |
 | `GET /votes?keys=a,b,c` | Reads totals without incrementing, returns `{ "votes": { a: { up, down }, … } }` |
 | `POST /vote` | Body `{ key, from, to }` where each of `from`/`to` is `1`, `-1` or `0`; returns the key's new `{ key, up, down }` |
 | `GET /sites` | Lists community-published sites, newest first |
@@ -499,6 +513,25 @@ votable under its slug.
   but it can call the worker's own API. If this ever needs locking down, set
   `COUNTER_SECRET` as a worker secret and/or move the publish endpoint behind
   auth.
+
+### Stats
+
+`/stats` on the site reads `GET /stats` on the worker, which reports the
+directory's all-time views, a daily series for the visitor graph, vote totals,
+published sites, subscriber counts, and the most liked entries. The daily
+buckets are written under an `@day:<YYYY-MM-DD>` key: the `@` is outside the
+characters `?key=` accepts, so a visitor can never aim the public counter at a
+day bucket. They carry a 400-day lifetime, so the namespace stays bounded on
+its own.
+
+Two consequences worth knowing:
+
+- History starts the day this shipped. The graph draws `0` for earlier days and
+  says so on the page, and the all-time total is unaffected because it is a
+  separate key (`base31-directory`).
+- The feature is live only once the worker is redeployed (`npm run
+  deploy:worker`). Until then `/stats` shows its "not available yet" state and
+  nothing on the rest of the site changes.
 
 Views are stored under the key itself (so existing counts keep working) and
 votes under `votes:<key>:up` / `votes:<key>:down`. Votes are per browser:

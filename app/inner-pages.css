@@ -1,0 +1,80 @@
+/* Styles for the server-rendered inner pages (/stats, /whats-new).
+   They live in their own file because overrides.css is already large and
+   these are self-contained: nothing here carries `data-reveal`, because the
+   reveal observer lives on the homepage and anything marked for it would
+   stay at opacity 0 on these routes. Imported after overrides.css. */
+
+.stats-page { width: min(100% - 48px, 980px); min-height: 100vh; margin: 0 auto; padding: 72px 0 120px; }
+.stats-page h1 { max-width: 720px; margin: 12px 0 0; color: var(--text-strong); font-size: clamp(30px, 5vw, 46px); letter-spacing: -0.03em; }
+.whats-new-page { width: min(100% - 48px, 760px); }
+.privacy-updated strong { color: var(--text-strong); font-weight: 500; }
+
+/* Stat cards ---------------------------------------------------------- */
+.stats-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; margin: 48px 0 0; }
+.stats-card {
+  display: flex; flex-direction: column; gap: 6px;
+  padding: 18px 18px 16px; border: 1px solid var(--line); border-radius: 16px;
+  background: linear-gradient(155deg, var(--surface), color-mix(in srgb, var(--surface) 88%, var(--live)));
+}
+.stats-card-label { color: var(--subtle); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; }
+.stats-card-value { color: var(--text-strong); font-size: 28px; font-weight: 600; letter-spacing: -0.03em; font-variant-numeric: tabular-nums; }
+.stats-card-note { color: var(--muted); font-size: 12px; line-height: 1.5; }
+
+/* Graph and ranking panels -------------------------------------------- */
+.stats-panel { margin: 22px 0 0; padding: 22px; border: 1px solid var(--line); border-radius: var(--radius-card); background: var(--surface); }
+.stats-panel-head { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+.stats-panel-head h2 { margin: 0; color: var(--text-strong); font-size: 15px; font-weight: 500; letter-spacing: -0.02em; }
+.stats-panel-metric { color: var(--subtle); font-size: 11px; }
+
+.stats-chart { display: block; width: 100%; height: auto; margin: 18px 0 0; overflow: visible; }
+.stats-chart-peak { fill: var(--live); font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.04em; }
+.stats-chart-label { fill: var(--subtle); font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.04em; }
+
+.stats-notice {
+  margin: 22px 0 0; padding: 16px 18px; border: 1px dashed var(--line-strong); border-radius: 14px;
+  color: var(--muted); font-size: 13px; line-height: 1.7;
+}
+.stats-notice a { color: var(--live); }
+
+.stats-ranking { margin: 14px 0 0; padding: 0; list-style: none; }
+.stats-rank-row { display: flex; align-items: center; gap: 14px; padding: 11px 0; border-bottom: 1px solid var(--line); }
+.stats-rank-row:last-child { border-bottom: 0; padding-bottom: 0; }
+.stats-rank { width: 22px; color: var(--subtle); font-size: 11px; }
+.stats-rank-name { flex: 1; min-width: 0; color: var(--text); font-size: 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.stats-rank-votes { display: flex; gap: 12px; font-size: 11px; }
+.stats-rank-up { color: var(--live); }
+.stats-rank-down { color: var(--danger); }
+
+.stats-foot { margin: 56px 0 0; color: var(--subtle); font-size: 12.5px; line-height: 1.8; }
+.stats-foot a { color: var(--live); }
+
+/* Changelog timeline: a rail with one dot per release. ----------------- */
+.changelog { margin: 56px 0 0; padding: 0; list-style: none; }
+.changelog-entry { display: grid; grid-template-columns: 22px 1fr; gap: 18px; position: relative; padding-bottom: 48px; }
+.changelog-entry:last-child { padding-bottom: 0; }
+.changelog-rail { position: relative; display: flex; justify-content: center; }
+.changelog-rail::before { content: ""; position: absolute; top: 8px; bottom: -48px; left: 50%; width: 1px; transform: translateX(-50%); background: var(--line); }
+.changelog-entry:last-child .changelog-rail::before { display: none; }
+.changelog-dot { position: relative; width: 9px; height: 9px; margin-top: 6px; border-radius: 50%; background: var(--line-strong); }
+.changelog-entry:first-child .changelog-dot { background: var(--live); box-shadow: 0 0 0 4px color-mix(in srgb, var(--live) 16%, transparent); }
+.changelog-meta { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; }
+.changelog-version { padding: 3px 9px; border: 1px solid var(--line-strong); border-radius: 999px; color: var(--text-strong); font-size: 11px; letter-spacing: 0.06em; }
+.changelog-date { color: var(--subtle); font-size: 11px; }
+.changelog-latest { color: var(--live); font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; }
+.changelog-body h2 { margin: 14px 0 0; color: var(--text-strong); font-size: 19px; font-weight: 500; letter-spacing: -0.02em; }
+.changelog-summary { margin: 8px 0 0; color: var(--muted); font-size: 14px; line-height: 1.7; }
+.changelog-list { display: flex; flex-direction: column; gap: 10px; margin: 16px 0 0; padding: 0; list-style: none; }
+.changelog-list li { position: relative; padding-left: 20px; color: var(--muted); font-size: 13.5px; line-height: 1.65; }
+.changelog-list li::before { content: ""; position: absolute; top: 8px; left: 4px; width: 5px; height: 5px; border-radius: 50%; background: color-mix(in srgb, var(--live) 55%, var(--line-strong)); }
+
+@media (max-width: 600px) {
+  .stats-page { padding: 56px 0 96px; }
+  .stats-cards { grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-top: 36px; }
+  .stats-card { padding: 15px 14px 14px; border-radius: 14px; }
+  .stats-card-value { font-size: 23px; }
+  .stats-panel { padding: 18px 14px; }
+  .stats-foot { margin-top: 44px; }
+  .changelog { margin-top: 40px; }
+  .changelog-entry { gap: 14px; padding-bottom: 38px; }
+  .changelog-body h2 { font-size: 17px; }
+}

@@ -4,6 +4,9 @@ import Script from "next/script";
 import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 import "./overrides.css";
+// Styles for the inner pages that live outside the homepage (/stats,
+// /whats-new); loaded last so it can layer over the two above.
+import "./inner-pages.css";
 import CodeBackdrop from "@/components/code-backdrop";
 import ConsentAwareAds from "@/components/consent-aware-ads";
 import ConsentAwareAnalytics from "@/components/consent-aware-analytics";

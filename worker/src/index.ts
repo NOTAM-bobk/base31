@@ -165,6 +165,34 @@ const readCount = async (env: Env, storageKey: string): Promise<number> => {
   return Number.isFinite(value) && value > 0 ? value : 0;
 };
 
+// The directory's own view counter. The homepage increments this key on every
+// visit and `/stats` reports it as the headline total.
+const DIRECTORY_KEY = "base31-directory";
+
+// Daily view history, which is what `/stats` draws its graph from. The "@"
+// prefix sits outside `isValidKey`'s allowed characters on purpose: a visitor
+// can never send `?key=@day:…`, so a day bucket can't be overwritten or
+// collided with through the public counter endpoint.
+const DAY_PREFIX = "@day:";
+// Day buckets are tiny but there is one per day forever, so give them a
+// lifetime slightly longer than a year of history.
+const DAY_TTL_SECONDS = 400 * 24 * 60 * 60;
+const STATS_MAX_DAYS = 90;
+const dayKey = (date: string) => `${DAY_PREFIX}${date}`;
+const utcDate = (offsetDays = 0) => new Date(Date.now() - offsetDays * 86_400_000).toISOString().slice(0, 10);
+
+// Records today's view. Deliberately best-effort: the graph is a nice-to-have
+// and must never be the reason a view fails to count.
+const bumpDay = async (env: Env): Promise<void> => {
+  try {
+    const key = dayKey(utcDate());
+    const next = (await readCount(env, key)) + 1;
+    await env.VIEW_COUNTER.put(key, String(next), { expirationTtl: DAY_TTL_SECONDS });
+  } catch {
+    // Ignored on purpose; see above.
+  }
+};
+
 const voteKey = (key: string, side: "up" | "down") => `votes:${key}:${side}`;
 
 const readVotes = async (env: Env, key: string): Promise<VoteTotals> => {
@@ -197,6 +225,113 @@ const applyVote = async (env: Env, key: string, from: Vote, to: Vote): Promise<V
 
 const parseVote = (value: unknown): Vote | null =>
   value === 1 || value === 0 || value === -1 ? (value as Vote) : null;
+
+// Counting keys by prefix means paging the whole namespace. `/stats` runs these
+// behind a five-minute cache and the namespace holds a few hundred keys, so the
+// cost stays trivial.
+const countPrefix = async (env: Env, prefix: string, keep?: (value: unknown) => boolean): Promise<number> => {
+  let total = 0;
+  let cursor: string | undefined;
+  for (;;) {
+    const page = await env.VIEW_COUNTER.list({ prefix, limit: 200, cursor });
+    if (!keep) {
+      total += page.keys.length;
+    } else {
+      for (const entry of page.keys) {
+        const raw = await env.VIEW_COUNTER.get(entry.name);
+        if (!raw) continue;
+        try {
+          if (keep(JSON.parse(raw) as unknown)) total += 1;
+        } catch {
+          // A record that no longer parses simply is not counted.
+        }
+      }
+    }
+    if (page.list_complete || !page.cursor) break;
+    cursor = page.cursor;
+  }
+  return total;
+};
+
+// `votes:<key>:<side>` keys folded back into per-key totals. The key capture is
+// greedy, so a key that itself contains a colon stays in one bucket.
+const readAllVotes = async (env: Env): Promise<Record<string, VoteTotals>> => {
+  const totals: Record<string, VoteTotals> = {};
+  let cursor: string | undefined;
+  for (;;) {
+    const page = await env.VIEW_COUNTER.list({ prefix: "votes:", limit: 200, cursor });
+    for (const entry of page.keys) {
+      const match = /^votes:(.+):(up|down)$/.exec(entry.name);
+      if (!match) continue;
+      const value = await readCount(env, entry.name);
+      if (value <= 0) continue;
+      const side = match[2] as "up" | "down";
+      const record = totals[match[1]] ?? (totals[match[1]] = { up: 0, down: 0 });
+      record[side] = value;
+    }
+    if (page.list_complete || !page.cursor) break;
+    cursor = page.cursor;
+  }
+  return totals;
+};
+
+// GET /stats?days=<n> → the visitor graph and the numbers behind /stats.
+const handleStats = async (env: Env, url: URL): Promise<Response> => {
+  const requested = parseInt(url.searchParams.get("days") || "30", 10);
+  const days = Number.isFinite(requested) ? Math.min(Math.max(requested, 7), STATS_MAX_DAYS) : 30;
+
+  try {
+    const dates = Array.from({ length: days }, (_, index) => utcDate(days - 1 - index));
+    const counts = await Promise.all(dates.map((date) => readCount(env, dayKey(date))));
+    const series = dates.map((date, index) => ({ date, views: counts[index] }));
+
+    const [views, votes, sites, subscribers, pushDevices] = await Promise.all([
+      readCount(env, DIRECTORY_KEY),
+      readAllVotes(env),
+      countPrefix(env, SITE_PREFIX),
+      countPrefix(env, SUBSCRIBER_PREFIX, (value) => !!(value as { verified?: boolean } | null)?.verified),
+      countPrefix(env, PUSH_PREFIX),
+    ]);
+
+    const sum = (window: { views: number }[]) => window.reduce((running, point) => running + point.views, 0);
+    const voteTotals = Object.values(votes).reduce(
+      (running, totals) => ({ up: running.up + totals.up, down: running.down + totals.down }),
+      { up: 0, down: 0 },
+    );
+    const top = Object.entries(votes)
+      .map(([key, totals]) => ({ key, ...totals }))
+      .sort((a, b) => b.up - a.up || a.down - b.down || a.key.localeCompare(b.key))
+      .slice(0, 12);
+
+    return new Response(
+      JSON.stringify({
+        generatedAt: Date.now(),
+        days,
+        series,
+        totals: {
+          views,
+          last7: sum(series.slice(-7)),
+          prev7: sum(series.slice(-14, -7)),
+          sites,
+          subscribers,
+          pushDevices,
+          votes: voteTotals,
+        },
+        top,
+      }),
+      {
+        headers: {
+          "Content-Type": "application/json; charset=utf-8",
+          ...CORS_HEADERS,
+          // The page caches for the same window, so the two agree.
+          "Cache-Control": "public, max-age=300",
+        },
+      },
+    );
+  } catch {
+    return json({ error: "Counter temporarily unavailable" }, 503);
+  }
+};
 
 const validEmail = (value: unknown): value is string => {
   if (typeof value !== "string" || value.length > 254) return false;
@@ -697,6 +832,12 @@ export default {
       return handleServe(url, env);
     }
 
+    // GET /stats → the numbers and daily history behind /stats on the site.
+    if (url.pathname === "/stats") {
+      if (request.method !== "GET") return json({ error: "Method not allowed" }, 405);
+      return handleStats(env, url);
+    }
+
     // GET /?key=<name> → { views } (increments the view counter).
     if (url.pathname !== "/") return notFound();
     if (request.method !== "GET") return new Response("Method not allowed", { status: 405, headers: CORS_HEADERS });
@@ -711,6 +852,9 @@ export default {
     } catch {
       return json({ error: "Counter temporarily unavailable" }, 503);
     }
+
+    // Off the critical path: the response doesn't wait on the daily bucket.
+    context.waitUntil(bumpDay(env));
 
     return json({ views });
   },

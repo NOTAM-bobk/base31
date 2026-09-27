@@ -1304,13 +1304,16 @@ export default function HomePage() {
               Minneapolis, Minnesota
             </span>
           </address>
-          <span className="footer-version">v{pkg.version}</span>
+          {/* Links to the changelog, so the version number has somewhere to go. */}
+          <a className="footer-version" href="/whats-new" title="What's new in this version">v{pkg.version}</a>
         </div>
         <div className="site-footer-inner mono">
           <span>© {new Date().getFullYear()} base31.org · built by Sawyer Schulz</span>
           <nav className="footer-links" aria-label="Footer navigation">
             <a href="/blog">Blog</a>
             <a href="#updates">Updates</a>
+            <a href="/whats-new">What&rsquo;s new</a>
+            <a href="/stats">Stats</a>
             <a href="/about">About</a>
             <a href="/terms">Terms of service</a>
             <a href="/privacy">Privacy</a>

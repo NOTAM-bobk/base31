@@ -10,10 +10,13 @@ const sites = read("sites.json");
 const posts = read("blogs.json");
 const referrals = read("referrals.json");
 const donations = read("donations.json");
+const releases = read("changelog.json");
+const pkg = JSON.parse(fs.readFileSync(path.join(root, "package.json"), "utf8"));
 
 const slug = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const date = /^\d{4}-\d{2}-\d{2}$/;
 const https = /^https:\/\//;
+const semver = /^\d+\.\d+\.\d+$/;
 const errors = [];
 
 const checkUnique = (values, label) => {
@@ -27,6 +30,7 @@ const checkUnique = (values, label) => {
 checkUnique(sites.map((site) => String(site.subdomain)), "site subdomain");
 checkUnique(posts.map((post) => String(post.slug)), "blog slug");
 checkUnique(referrals.map((referral) => String(referral.url)), "referral URL");
+checkUnique(releases.map((release) => String(release.version)), "release version");
 
 for (const [index, site] of sites.entries()) {
   if (typeof site.name !== "string" || !site.name.trim()) errors.push(`Site ${index + 1} needs a name`);
@@ -66,11 +70,38 @@ for (const [index, donation] of donations.entries()) {
   if (typeof donation.amount !== "number" || donation.amount <= 0) errors.push(`Donation ${index + 1} needs a positive amount`);
 }
 
+// config/changelog.json backs /whats-new. It is kept newest-first, and the
+// newest entry is what the page's "latest" badge and the footer's version
+// number both read, so a release must not be added without bumping
+// package.json (or the footer would advertise a version the changelog does not
+// describe).
+for (const [index, release] of releases.entries()) {
+  const at = `Release ${index + 1}`;
+  if (typeof release.version !== "string" || !semver.test(release.version)) errors.push(`${at} has an invalid version`);
+  if (typeof release.date !== "string" || !date.test(release.date) || Number.isNaN(Date.parse(release.date))) errors.push(`${at} has an invalid date`);
+  if (typeof release.title !== "string" || !release.title.trim()) errors.push(`${at} needs a title`);
+  if (typeof release.summary !== "string" || release.summary.trim().length < 20) errors.push(`${at} needs a useful summary`);
+  if (!Array.isArray(release.highlights) || release.highlights.length === 0) {
+    errors.push(`${at} needs at least one highlight`);
+  } else if (release.highlights.some((line) => typeof line !== "string" || !line.trim())) {
+    errors.push(`${at} has an empty highlight`);
+  }
+  if (index > 0 && releases[index - 1].date < release.date) {
+    errors.push(`${at} (${release.version}) is newer than the entry above it; keep changelog.json newest-first`);
+  }
+}
+
+if (releases.length > 0 && releases[0].version !== pkg.version) {
+  errors.push(
+    `package.json version (${pkg.version}) does not match the newest changelog entry (${releases[0].version}); bump both together`,
+  );
+}
+
 if (errors.length > 0) {
   console.error(`Content validation failed:\n- ${errors.join("\n- ")}`);
   process.exitCode = 1;
 } else {
   console.log(
-    `Content validation passed: ${sites.length} sites, ${posts.length} blog posts, ${referrals.length} referrals, ${donations.length} donations.`,
+    `Content validation passed: ${sites.length} sites, ${posts.length} blog posts, ${referrals.length} referrals, ${donations.length} donations, ${releases.length} releases.`,
   );
 }

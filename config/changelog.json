@@ -1,0 +1,55 @@
+[
+  {
+    "version": "1.1.0",
+    "date": "2026-09-27",
+    "title": "Stats, what's new, and a security policy",
+    "summary": "The directory now shows its own numbers in public, keeps a changelog you can read, and publishes a security contact.",
+    "highlights": [
+      "New /stats page: a 30-day visitor graph, all-time views, vote totals, subscriber counts, and the most liked tools.",
+      "New /whats-new page — this changelog, so a returning visitor can see what actually changed.",
+      "Contact details in the footer and in the site's Organization structured data.",
+      "A security.txt file at /.well-known/security.txt, so vulnerabilities have a private route in.",
+      "Google Analytics and Microsoft Clarity now load only after a cookie choice is made.",
+      "Bug and feature reports are delivered to hello@base31.org."
+    ]
+  },
+  {
+    "version": "1.0.2",
+    "date": "2026-09-26",
+    "title": "Reviews, a support hub, and vote accents",
+    "summary": "The homepage gained a real review section and one collapsible place for everything that keeps base31 running.",
+    "highlights": [
+      "A Trustpilot review card with a five-star row, Trustpilot branding, and a rotating rainbow ring.",
+      "A collapsible Support section that gathers the reviews, the donation board, the sponsored links, and the ad in one spot.",
+      "The featured sites list can be collapsed, and a note explains when it is closed.",
+      "Thumbs up and thumbs down now carry green and red accents, and the chosen vote fills in.",
+      "The display stays awake while someone is reading, and the code backdrop is pinned to the top of the viewport."
+    ]
+  },
+  {
+    "version": "1.0.1",
+    "date": "2026-09-26",
+    "title": "Four new tools, including two with AI",
+    "summary": "Four more single-purpose sites joined the directory, three of them built from scratch.",
+    "highlights": [
+      "QR Code Generator — custom QR codes for links, Wi-Fi, contacts, and messages, with PNG and SVG download.",
+      "Password Generator — strong passwords and passphrases, plus a vault encrypted with your own master passphrase.",
+      "GitHub Explorer — browse any repository's files and draft READMEs and docs with AI.",
+      "Is It Taken — check whether a domain is available, with instant alternatives.",
+      "Is It Down was rebuilt with live HTTP, DNS, and latency checks."
+    ]
+  },
+  {
+    "version": "1.0.0",
+    "date": "2026-09-20",
+    "title": "base31.org goes live",
+    "summary": "A directory for the interesting internet opened its doors.",
+    "highlights": [
+      "19 hand-built tools and experiments, each on its own subdomain.",
+      "A blog for longer writing about the open web.",
+      "Thumbs up and thumbs down on every entry, with shared totals.",
+      "Community uploads: anyone can publish a small static site into the directory.",
+      "Email and browser push notifications for new additions, plus a donation board and sponsored links."
+    ]
+  }
+]

@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 import { blogPosts } from "@/lib/blogs";
+import { publishedToolSlugs } from "@/lib/tool-pages";
 import changelog from "@/config/changelog.json";
 import sites from "@/config/sites.json";
 
@@ -34,6 +35,18 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "weekly",
       priority: 0.8,
     },
+    {
+      // The hub for the tool guides. Each guide is listed below, and they all
+      // interlink through their "More tools" blocks.
+      url: `${siteUrl}/tools`,
+      changeFrequency: "monthly",
+      priority: 0.8,
+    },
+    ...publishedToolSlugs().map((slug) => ({
+      url: `${siteUrl}/tools/${slug}`,
+      changeFrequency: "monthly" as const,
+      priority: 0.7,
+    })),
     {
       url: `${siteUrl}/whats-new`,
       lastModified: newestRelease,

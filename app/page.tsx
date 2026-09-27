@@ -1250,6 +1250,12 @@ export default function HomePage() {
             )}
           </div>
           </div>
+          {/* One link from the homepage into the tool guides. Those pages
+              carry the in-depth copy and the FAQ schema, so this is the entry
+              point that lets a visitor (and a crawler) reach them. */}
+          <p className="tools-hub-link">
+            Want the full story on any of these? <a href="/tools">Read the tool guides →</a>
+          </p>
         </section>
 
         <AboutSection />
@@ -1311,6 +1317,7 @@ export default function HomePage() {
           <span>© {new Date().getFullYear()} base31.org · built by Sawyer Schulz</span>
           <nav className="footer-links" aria-label="Footer navigation">
             <a href="/blog">Blog</a>
+            <a href="/tools">Tools</a>
             <a href="#updates">Updates</a>
             <a href="/whats-new">What&rsquo;s new</a>
             <a href="/stats">Stats</a>

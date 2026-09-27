@@ -67,6 +67,119 @@
 .changelog-list li { position: relative; padding-left: 20px; color: var(--muted); font-size: 13.5px; line-height: 1.65; }
 .changelog-list li::before { content: ""; position: absolute; top: 8px; left: 4px; width: 5px; height: 5px; border-radius: 50%; background: color-mix(in srgb, var(--live) 55%, var(--line-strong)); }
 
+/* Tool guides (/tools and /tools/<slug>) -----------------------------
+   One landing page per tool in the directory, written for search intent
+   rather than as a second copy of the tool itself. */
+.tool-page { width: min(100% - 48px, 780px); min-height: 100vh; margin: 0 auto; padding: 72px 0 120px; }
+.tools-index { width: min(100% - 48px, 980px); min-height: 100vh; margin: 0 auto; padding: 72px 0 120px; }
+.tool-page h1,
+.tools-index h1 { max-width: 760px; margin: 12px 0 0; color: var(--text-strong); font-size: clamp(29px, 5vw, 44px); letter-spacing: -0.03em; }
+
+.breadcrumb { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin-bottom: 56px; color: var(--subtle); font-size: 11px; letter-spacing: 0.04em; }
+.breadcrumb a { color: var(--muted); transition: color 150ms ease; }
+.breadcrumb a:hover { color: var(--text-strong); }
+.breadcrumb span[aria-current] { color: var(--subtle); }
+
+.tool-summary { max-width: 620px; margin: 18px 0 0; color: var(--muted); font-size: 16px; line-height: 1.65; }
+
+/* The primary call to action: open the tool. */
+.tool-cta {
+  display: flex; align-items: center; gap: 12px; width: 100%; max-width: 620px;
+  margin: 32px 0 0; padding: 14px 18px;
+  border: 1px solid color-mix(in srgb, var(--live) 42%, var(--line)); border-radius: 14px;
+  background: linear-gradient(120deg, var(--surface), color-mix(in srgb, var(--surface) 84%, var(--live)));
+  transition: border-color 160ms ease, transform 160ms ease, box-shadow 160ms ease;
+}
+.tool-cta:hover { border-color: var(--live); transform: translateY(-2px); box-shadow: 0 16px 40px rgb(0 0 0 / 32%); }
+.tool-cta-icon { flex: 0 0 auto; border-radius: 8px; }
+.tool-cta-label { color: var(--text-strong); font-size: 15px; font-weight: 500; }
+.tool-cta-host { margin-left: auto; color: var(--subtle); font-size: 11px; }
+.tool-cta-arrow { color: var(--live); font-size: 14px; }
+
+.tool-copy { max-width: 660px; margin: 44px 0 0; }
+.tool-copy p { margin: 0 0 18px; color: var(--muted); font-size: 14.5px; line-height: 1.75; }
+.tool-copy p:last-child { margin-bottom: 0; }
+
+.tool-block { margin: 56px 0 0; }
+.tool-block h2 { margin: 0; color: var(--text-strong); font-size: 19px; font-weight: 500; letter-spacing: -0.02em; }
+
+.tool-features { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 20px 0 0; padding: 0; list-style: none; }
+.tool-features li { padding: 18px; border: 1px solid var(--line); border-radius: 14px; background: var(--surface); }
+.tool-features h3 { margin: 0; color: var(--text-strong); font-size: 14px; font-weight: 500; }
+.tool-features p { margin: 8px 0 0; color: var(--muted); font-size: 13.5px; line-height: 1.65; }
+
+.tool-steps { margin: 20px 0 0; padding: 0; list-style: none; counter-reset: tool-step; }
+.tool-steps li { position: relative; margin: 0 0 14px; padding: 0 0 0 44px; color: var(--muted); font-size: 14px; line-height: 1.7; counter-increment: tool-step; }
+.tool-steps li::before {
+  content: counter(tool-step); position: absolute; left: 0; top: 1px;
+  display: flex; width: 26px; height: 26px; align-items: center; justify-content: center;
+  border: 1px solid color-mix(in srgb, var(--live) 40%, var(--line)); border-radius: 8px;
+  color: var(--live); font-family: var(--font-mono); font-size: 11px;
+}
+
+.tool-faqs { display: flex; flex-direction: column; gap: 10px; margin: 20px 0 0; padding: 0; list-style: none; }
+.tool-faqs details { border: 1px solid var(--line); border-radius: 12px; background: var(--surface); }
+.tool-faqs summary {
+  display: flex; align-items: center; justify-content: space-between; gap: 14px;
+  padding: 14px 16px; cursor: pointer; color: var(--text-strong); font-size: 14px; list-style: none;
+}
+.tool-faqs summary::-webkit-details-marker { display: none; }
+.tool-faqs summary:hover { background: var(--surface-hover); }
+.tool-faq-chevron { flex: 0 0 auto; color: var(--subtle); font-size: 15px; transition: transform 160ms ease, color 160ms ease; }
+.tool-faqs details[open] .tool-faq-chevron { transform: rotate(45deg); color: var(--live); }
+.tool-faqs details p { margin: 0; padding: 0 16px 16px; color: var(--muted); font-size: 13.5px; line-height: 1.7; }
+
+.tool-related { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin: 20px 0 0; padding: 0; list-style: none; }
+.tool-related a {
+  display: flex; flex-direction: column; gap: 6px; height: 100%; padding: 16px;
+  border: 1px solid var(--line); border-radius: 14px; background: var(--surface);
+  transition: border-color 150ms ease, transform 150ms ease;
+}
+.tool-related a:hover { border-color: var(--line-strong); transform: translateY(-2px); }
+.tool-related-name { color: var(--text-strong); font-size: 14px; font-weight: 500; }
+.tool-related-summary { color: var(--muted); font-size: 13px; line-height: 1.6; }
+
+/* The tools index. */
+.tools-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px; margin: 48px 0 0; padding: 0; list-style: none; }
+.tools-grid-card {
+  display: flex; flex-direction: column; gap: 8px;
+  padding: 20px; border: 1px solid var(--line); border-radius: 16px;
+  background: linear-gradient(155deg, var(--surface), color-mix(in srgb, var(--surface) 90%, var(--live)));
+}
+.tools-grid-icon { border-radius: 8px; }
+.tools-grid-card h2 { margin: 2px 0 0; font-size: 16px; font-weight: 500; letter-spacing: -0.02em; }
+.tools-grid-card h2 a { color: var(--text-strong); }
+.tools-grid-card h2 a:hover { color: var(--live); }
+.tools-grid-summary { margin: 0; color: var(--muted); font-size: 13.5px; line-height: 1.6; }
+.tools-grid-tags { color: var(--subtle); font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; }
+.tools-grid-actions { display: flex; align-items: center; gap: 14px; margin-top: auto; padding-top: 12px; border-top: 1px solid var(--line); }
+.tools-grid-guide { color: var(--live); font-size: 12.5px; }
+.tools-grid-guide:hover { text-decoration: underline; }
+.tools-grid-open { margin-left: auto; color: var(--subtle); font-size: 11.5px; }
+.tools-grid-open:hover { color: var(--text-strong); }
+
+/* One link from the homepage into the guides; see app/page.tsx. */
+.tools-hub-link { margin: 28px 0 0; color: var(--subtle); font-size: 13px; }
+.tools-hub-link a { color: var(--live); }
+.tools-hub-link a:hover { text-decoration: underline; }
+
+@media (prefers-reduced-motion: reduce) {
+  .tool-cta, .tool-related a, .tool-faq-chevron { transition: none; }
+  .tool-cta:hover, .tool-related a:hover { transform: none; }
+}
+
+@media (max-width: 600px) {
+  .tool-page,
+  .tools-index { padding: 56px 0 96px; }
+  .breadcrumb { margin-bottom: 40px; }
+  .tool-features { grid-template-columns: 1fr; gap: 10px; }
+  .tool-block { margin-top: 44px; }
+  .tool-cta { flex-wrap: wrap; gap: 8px; }
+  .tool-cta-host { width: 100%; margin-left: 0; }
+  .tool-steps li { padding-left: 38px; }
+  .tools-grid { margin-top: 36px; }
+}
+
 @media (max-width: 600px) {
   .stats-page { padding: 56px 0 96px; }
   .stats-cards { grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-top: 36px; }

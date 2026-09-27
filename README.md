@@ -166,6 +166,18 @@ bundler. Two ways to do that by accident:
   `/whats-new`, and `/whats-new` opens by naming it. `npm run validate:content`
   fails if the two drift or if the list is out of order, so bump both in the
   same commit.
+- Every published tool also has a guide at `/tools/<subdomain>`, generated
+  from `lib/tool-pages.ts` plus its `config/sites.json` entry, with an index at
+  `/tools`. The copy there is written fresh for search intent ("free qr code
+  generator") rather than copied from the tool's own subdomain, so the two
+  pages do not compete for the same query — each guide links out to the live
+  tool, and the subdomain keeps its own canonical. A guide publishes one
+  `@graph` with `WebPage`, `SoftwareApplication`, `BreadcrumbList` and
+  `FAQPage`; it references the layout's `#website` and `#organization` by id
+  instead of repeating them. `npm run validate:content` fails if a listed site
+  has no guide, if a guide has no matching site, or if a guide's copy is thin
+  (missing headline, an out-of-range meta description, fewer than two intro
+  paragraphs, three features or two questions).
 - `app/inner-pages.css` styles those two routes and is imported after
   `overrides.css` in `app/layout.tsx`. `overrides.css` is deliberately left to
   the homepage: it is large enough that edits to it are no longer reliable.

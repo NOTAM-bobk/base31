@@ -97,11 +97,61 @@ if (releases.length > 0 && releases[0].version !== pkg.version) {
   );
 }
 
+// lib/tool-pages.ts backs the /tools/<slug> guides. It is TypeScript, so this
+// reads it as text: the compiler is what enforces the shape of a field, and
+// this is what enforces that every published site actually has a guide and that
+// each guide carries copy instead of an empty array. The object literal's shape
+// (two-space indented `slug: {` entries) is what the regexes below rely on.
+const toolPagesSource = fs.readFileSync(path.join(root, "lib", "tool-pages.ts"), "utf8");
+const toolPagesStart = toolPagesSource.indexOf("export const toolPages");
+const toolPagesBody = toolPagesSource.slice(toolPagesStart, toolPagesSource.indexOf("\n};", toolPagesStart));
+
+const guideBlocks = toolPagesBody
+  // No `$` anchor here on purpose: without the `m` flag it would only match at
+  // the end of the file and the split would return nothing.
+  .split(/\n(?=  [a-z0-9-]+: \{)/)
+  .map((chunk) => ({ slug: (chunk.match(/^\s*([a-z0-9-]+): \{/) || [])[1], text: chunk }))
+  .filter((block) => block.slug);
+const guideSlugs = guideBlocks.map((block) => block.slug);
+const listedSlugs = sites.filter((site) => site.show !== false).map((site) => site.subdomain);
+
+if (guideBlocks.length === 0) {
+  errors.push("lib/tool-pages.ts has no readable entries; every /tools guide would be empty");
+} else {
+  for (const subdomain of listedSlugs) {
+    if (!guideSlugs.includes(subdomain)) {
+      errors.push(`Site "${subdomain}" is listed in sites.json but has no guide in lib/tool-pages.ts`);
+    }
+  }
+  for (const slugName of guideSlugs) {
+    if (!listedSlugs.includes(slugName)) {
+      errors.push(`lib/tool-pages.ts has a guide for "${slugName}", which is not a listed site`);
+    }
+  }
+}
+
+for (const guide of guideBlocks) {
+  const at = `Tool guide "${guide.slug}"`;
+  if (!/\bheadline: "/.test(guide.text)) errors.push(`${at} needs a headline`);
+  if (!/\bsummary: "/.test(guide.text)) errors.push(`${at} needs a summary line`);
+
+  // Meta descriptions are what a search result shows, so keep them in the range
+  // Google will actually display rather than truncate.
+  const description = (guide.text.match(/metaDescription:\s*\n?\s*"([^"]+)"/) || [])[1] || "";
+  if (description.length < 70 || description.length > 170) {
+    errors.push(`${at} has a meta description of ${description.length} characters; keep it between 70 and 170`);
+  }
+
+  if ((guide.text.match(/\n      "/g) || []).length < 2) errors.push(`${at} needs at least two intro paragraphs`);
+  if ((guide.text.match(/\{ title: "/g) || []).length < 3) errors.push(`${at} needs at least three features`);
+  if ((guide.text.match(/\{ question: "/g) || []).length < 2) errors.push(`${at} needs at least two questions`);
+}
+
 if (errors.length > 0) {
   console.error(`Content validation failed:\n- ${errors.join("\n- ")}`);
   process.exitCode = 1;
 } else {
   console.log(
-    `Content validation passed: ${sites.length} sites, ${posts.length} blog posts, ${referrals.length} referrals, ${donations.length} donations, ${releases.length} releases.`,
+    `Content validation passed: ${sites.length} sites, ${posts.length} blog posts, ${referrals.length} referrals, ${donations.length} donations, ${releases.length} releases, ${guideBlocks.length} tool guides.`,
   );
 }

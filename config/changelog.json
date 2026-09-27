@@ -1,5 +1,18 @@
 [
   {
+    "version": "1.2.0",
+    "date": "2026-09-27",
+    "title": "A guide page for every tool",
+    "summary": "Every tool in the directory now has its own page on base31.org, written for people who want to know what a tool does before they open it.",
+    "highlights": [
+      "14 tool guides at /tools/<name>, each covering what the tool does, how to use it, and the questions people actually ask.",
+      "A tools index at /tools that lists every tool with its summary and tags, and links straight to each live tool.",
+      "Every guide publishes structured data — the page, the application, a breadcrumb trail, and its questions — so search engines can read what the tool is without guessing.",
+      "Guides link to related tools, and the directory now links through to the guides, so the pages are reachable rather than buried in a sitemap.",
+      "Content validation now fails if a published tool has no guide, or if a guide's copy is missing pieces."
+    ]
+  },
+  {
     "version": "1.1.0",
     "date": "2026-09-27",
     "title": "Stats, what's new, and a security policy",

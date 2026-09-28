@@ -1,18 +1,19 @@
 # base31.org
-Google Analytics verification. The tag below is implemented in
-`components/consent-aware-analytics.tsx`, which appends the loader and runs the
-config once the cookie banner is accepted.
 
+  add this code to the main page of base31:   
   <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-Y5N2FYK786"></script>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-W6J79P13FT"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
 
-  gtag('config', 'G-Y5N2FYK786');
+  gtag('config', 'G-W6J79P13FT');
 </script>  
 
+
+   Below is the Google tag for this account. Copy and paste it in the code of every page of your website, immediately after the <head> element. Don’t add more than one Google tag to each page.  
+     
   
 A homepage/directory for `base31.org` that lists every subdomain site, plus
 the sites themselves — all deployed together as one Vercel project.

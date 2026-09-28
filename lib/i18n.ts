@@ -43,6 +43,12 @@ export const EN = {
   featured: "Featured sites",
   featuredClosed:
     "Featured sites are closed right now. Open the “Featured sites” heading above to browse every site again.",
+  coolSites: "Other cool sites",
+  coolSitesLede:
+    "Hand-picked corners of the web that live at their own addresses — not made by base31, just worth the trip.",
+  coolSitesClosed:
+    "Other cool sites are closed right now. Open the “Other cool sites” heading above to see the off-directory picks again.",
+  links: "links",
   allTag: "All",
   filterByTag: "Filter by tag",
   liked: "Liked",
@@ -70,6 +76,12 @@ export const ES: Dictionary = {
   featured: "Sitios destacados",
   featuredClosed:
     "Los sitios destacados están cerrados ahora mismo. Abre el encabezado «Sitios destacados» para volver a verlos todos.",
+  coolSites: "Otros sitios geniales",
+  coolSitesLede:
+    "Rincones de la web elegidos a mano que viven en sus propias direcciones: no los hizo base31, solo valen el viaje.",
+  coolSitesClosed:
+    "Otros sitios geniales están cerrados ahora mismo. Abre el encabezado «Otros sitios geniales» para volver a ver los sitios externos.",
+  links: "enlaces",
   allTag: "Todos",
   filterByTag: "Filtrar por etiqueta",
   liked: "Me gustados",
@@ -96,6 +108,12 @@ export const FR: Dictionary = {
   featured: "Sites en vedette",
   featuredClosed:
     "Les sites en vedette sont fermés pour le moment. Ouvrez le titre « Sites en vedette » ci-dessus pour les revoir.",
+  coolSites: "Autres sites sympas",
+  coolSitesLede:
+    "Des coins du web choisis à la main qui vivent à leurs propres adresses — pas réalisés par base31, juste dignes du détour.",
+  coolSitesClosed:
+    "Les autres sites sympas sont fermés pour le moment. Ouvrez le titre « Autres sites sympas » ci-dessus pour les revoir.",
+  links: "liens",
   allTag: "Tous",
   filterByTag: "Filtrer par étiquette",
   liked: "Aimés",
@@ -122,6 +140,12 @@ export const PT: Dictionary = {
   featured: "Sites em destaque",
   featuredClosed:
     "Os sites em destaque estão fechados agora. Abra o título “Sites em destaque” acima para vê-los de novo.",
+  coolSites: "Outros sites legais",
+  coolSitesLede:
+    "Cantos da web escolhidos a dedo que vivem em seus próprios endereços — não são feitos pela base31, apenas valem a viagem.",
+  coolSitesClosed:
+    "Os outros sites legais estão fechados agora. Abra o título “Outros sites legais” acima para vê-los de novo.",
+  links: "links",
   allTag: "Todos",
   filterByTag: "Filtrar por tag",
   liked: "Curtidos",

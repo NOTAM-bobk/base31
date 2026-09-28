@@ -1,5 +1,19 @@
 [
   {
+    "version": "1.7.0",
+    "date": "2026-09-28",
+    "title": "A foldable off-directory strip, and the language row moves to the footer",
+    "summary": "The hand-picked external picks can be folded away like the directory, the about section has its own sparkle, and the bottom of the page carries the language switcher on a tint of its own.",
+    "highlights": [
+      "“Other cool sites” opens and closes exactly like Featured sites and Support: the same wobble, the same haptic tick, and a line of text that says so while it is shut.",
+      "The strip follows the language you are reading — its heading, lede, link count and closed-state note are translated on /es, /fr and /pt.",
+      "The “about the directory” heading has a third Glitter Graphics sparkle, credited in place and skipped under prefers-reduced-motion like the other two.",
+      "The language switcher moved out of the header and into the footer, so the top bar is down to the wordmark, the blog link and the account actions.",
+      "The footer sits on a solid tint of its own instead of the page background, so the bottom of the page has a defined edge in both themes.",
+      "The header markup moved into components/site-header.tsx, which leaves the whole footer editable on its own."
+    ]
+  },
+  {
     "version": "1.6.0",
     "date": "2026-09-27",
     "title": "Three new languages, off-directory picks, and checks that run themselves",

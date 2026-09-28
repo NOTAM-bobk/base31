@@ -12,8 +12,8 @@ import Faq from "@/components/faq";
 import DirectoryNotifications from "@/components/directory-notifications";
 import FooterSponsor from "@/components/footer-sponsor";
 import CoolSites from "@/components/cool-sites";
+import SiteHeader from "@/components/site-header";
 import { LOCALES, LOCALE_TAGS, type Dictionary, type Locale, EN } from "@/lib/i18n";
-import GithubStats from "@/components/github-stats";
 import { resetConsent, useConsent } from "@/lib/consent";
 
 type Site = { name: string; subdomain: string; url: string; tags?: string[]; description?: string; show?: boolean; community?: boolean; createdAt?: number; icon?: string };
@@ -131,23 +131,6 @@ const stripCommonFolder = (entries: { path: string; data: string }[]) => {
 
 const formatBytes = (bytes: number) =>
   bytes < 1024 ? `${bytes} B` : bytes < 1024 * 1024 ? `${(bytes / 1024).toFixed(0)} KB` : `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
-
-function SunIcon() {
-  return (
-    <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" aria-hidden="true">
-      <circle cx="12" cy="12" r="4" />
-      <path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M19.1 4.9l-1.4 1.4M6.3 17.7l-1.4 1.4" />
-    </svg>
-  );
-}
-
-function MoonIcon() {
-  return (
-    <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <path d="M21 12.8A8.5 8.5 0 1 1 11.2 3a6.4 6.4 0 0 0 9.8 9.8Z" />
-    </svg>
-  );
-}
 
 function HeartIcon({ filled }: { filled: boolean }) {
   return (
@@ -1008,54 +991,7 @@ export default function HomePage({ dict = EN, locale = "en" }: { dict?: Dictiona
 
       <a className="skip-link" href="#sites">Skip to the directory</a>
 
-      <header className="site-header">
-        <div className="site-header-inner">
-          <a className="wordmark mono" href="/" aria-label="base31.org home">
-            {/* Decorative: the link already carries its own label. Served from
-                public/ so the page keeps one origin; see app/overrides.css for
-                why, and the footer for the credit. */}
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img className="wordmark-sparkle" src="/header-sparkle.gif" alt="" width={40} height={40} aria-hidden="true" />
-            base31.org
-          </a>
-          <nav className="site-nav" aria-label="Main navigation">
-            <a href="/blog">Blog</a>
-          </nav>
-          <div className="header-actions">
-            {/* Language switcher: the four shipped locales, hand-rolled rather
-                than Next's built-in i18n (the routes are explicit folders, so
-                a static switcher is all the routing that exists). The active
-                language is hidden from the tab order but remains announced
-                via aria-current. */}
-            <nav className="lang-switch mono" aria-label="Language">
-              {LOCALES.map((locale) => (
-                <a
-                  key={locale.code}
-                  href={locale.code === "en" ? "/" : `/${locale.code}`}
-                  className={`lang-link${locale.code === localeCode ? " is-active" : ""}`}
-                  aria-current={locale.code === localeCode ? "page" : undefined}
-                  title={locale.label}
-                >
-                  {locale.short}
-                </a>
-              ))}
-            </nav>
-            {/* The header used to carry a Share button; it shows the
-                repository's commit count now and links to the source. The
-                share sheet is still reachable with the S shortcut. */}
-            <GithubStats />
-            <button
-              type="button"
-              className="icon-button theme-toggle"
-              onClick={switchTheme}
-              aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}
-              title={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}
-            >
-              {theme === "dark" ? <SunIcon /> : <MoonIcon />}
-            </button>
-          </div>
-        </div>
-      </header>
+      <SiteHeader theme={theme} onToggleTheme={switchTheme} />
 
       <main>
         <section className="intro" aria-labelledby="page-title">
@@ -1323,7 +1259,7 @@ export default function HomePage({ dict = EN, locale = "en" }: { dict?: Dictiona
 
         {/* Off-directory picks: external cool sites from config/cool-sites.json,
             rendered as smaller, quieter cards than the directory's own. */}
-        <CoolSites />
+        <CoolSites dict={dict} />
 
         <AboutSection />
 
@@ -1383,6 +1319,29 @@ export default function HomePage({ dict = EN, locale = "en" }: { dict?: Dictiona
           </address>
           {/* Links to the changelog, so the version number has somewhere to go. */}
           <a className="footer-version" href="/whats-new" title="What's new in this version">v{pkg.version}</a>
+        </div>
+        {/* The language switcher: the four shipped locales, hand-rolled rather
+            than Next's built-in i18n (the routes are explicit folders, so a
+            static switcher is all the routing that exists). It sits in the
+            footer now, with the rest of the site's small print, instead of
+            competing with the wordmark and the account actions up top. The
+            active language is hidden from the tab order but stays announced
+            via aria-current. `order` puts it below the two other footer rows. */}
+        <div className="footer-lang mono">
+          <span className="footer-lang-label">Language</span>
+          <nav className="lang-switch" aria-label="Language">
+            {LOCALES.map((item) => (
+              <a
+                key={item.code}
+                href={item.code === "en" ? "/" : `/${item.code}`}
+                className={`lang-link${item.code === localeCode ? " is-active" : ""}`}
+                aria-current={item.code === localeCode ? "page" : undefined}
+                title={item.label}
+              >
+                {item.short}
+              </a>
+            ))}
+          </nav>
         </div>
         <div className="site-footer-inner mono">
           <span>

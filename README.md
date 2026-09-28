@@ -178,15 +178,17 @@ bundler. Two ways to do that by accident:
   has no guide, if a guide has no matching site, or if a guide's copy is thin
   (missing headline, an out-of-range meta description, fewer than two intro
   paragraphs, three features or two questions).
-- There are two decorative sparkles, both Glitter Graphics GIFs with
+- There are three decorative sparkles, all Glitter Graphics GIFs with
   transparent backgrounds, served from this origin rather than hotlinked: a
   third-party image would be an unconsented request to someone else's CDN, and
   the file could be swapped upstream at any time. `public/header-sparkle.gif`
   (40×40) sits inside the wordmark link in the header; `public/footer-sparkle.gif`
-  (64×64) sits in the bottom-of-page block, beside the sponsor line. Both are
-  decorative (`alt=""`, the header one inside a link that already has a label),
-  both are hidden under `prefers-reduced-motion`, and the credit their source
-  asks for is in the footer next to the copyright line.
+  (64×64) sits in the bottom-of-page block, beside the sponsor line; and
+  `public/about-sparkle.gif` sits at the top right of the "about the directory"
+  heading, with its own credit link under the copy. All three are decorative
+  (`alt=""`, the header one inside a link that already has a label), all three
+  are hidden under `prefers-reduced-motion`, and the credit their source asks
+  for is next to the copyright line in the footer.
 - The bottom block is `components/footer-sponsor.tsx`, rendered at the end of
   `main` just above the footer. It exists as its own component so the bottom of
   the page can be edited without opening `app/page.tsx`, which is long enough
@@ -295,6 +297,11 @@ bundler. Two ways to do that by accident:
     It is cached in `localStorage` for an hour because the unauthenticated API
     allows only 60 requests per hour per IP. A refused request leaves the dash
     in place — the link still works, it just shows no number.
+- The header markup lives in `components/site-header.tsx` so the homepage below
+  the fold stays editable. The language switcher is no longer in it: the four
+  locales sit in the footer on their own row, under the links and the contact
+  details, and the footer band itself carries a solid `--surface` tint instead
+  of the page background.
 - The subscribe block (`components/directory-notifications.tsx`, `#updates`)
   is the last thing in `main`, directly above the footer and *below* the FAQ,
   so the page ends on the call to action. Its email field and the button beside

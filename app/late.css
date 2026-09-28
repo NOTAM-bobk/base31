@@ -74,8 +74,10 @@
 }
 
 /* Language switcher -----------------------------------------------------
-   A compact EN/ES/FR/PT row in the header: quiet until hover, the active
-   language marked with the live green. Wraps under the wordmark on phones. */
+   A compact EN/ES/FR/PT row: quiet until hover, the active language marked
+   with the live green. It lives in the footer now, on its own row under the
+   links and the contact details, matching them in width so the bottom of the
+   page keeps one left edge on a desktop. */
 .lang-switch { display: inline-flex; align-items: center; gap: 2px; padding: 2px; border: 1px solid var(--line); border-radius: 999px; background: color-mix(in srgb, var(--surface) 70%, transparent); }
 .lang-link {
   padding: 3px 8px; border-radius: 999px;
@@ -84,11 +86,44 @@
 }
 .lang-link:hover { color: var(--text-strong); background: var(--surface-hover); }
 .lang-link.is-active { color: var(--live); background: color-mix(in srgb, var(--live) 12%, transparent); }
-@media (max-width: 600px) {
-  .site-header-inner { flex-wrap: wrap; row-gap: 6px; }
-  .lang-switch { order: 3; margin-left: 0; }
-  .site-nav { margin-left: auto; }
+/* `order: 3` is what puts the row below `.site-footer-inner` (1) and
+   `.footer-meta` (2) in the footer's flex column. */
+.footer-lang {
+  order: 3; display: flex; width: min(100% - 48px, 720px); margin: 0 auto;
+  padding: 16px 0 26px; align-items: center; gap: 10px;
 }
+.footer-lang-label {
+  margin-right: 3px; color: var(--subtle); font-size: 9.5px;
+  letter-spacing: 0.14em; text-transform: uppercase;
+}
+/* The switcher's translucent pill vanishes against the footer's own tint, so
+   on its own row it gets a solid surface and the edge the contact pills use. */
+.footer-lang .lang-switch {
+  border-color: color-mix(in srgb, var(--line-strong) 52%, var(--line));
+  background: var(--surface-hover);
+}
+@media (min-width: 1000px) { .footer-lang { width: min(100% - 64px, 1080px); } }
+@media (max-width: 600px) {
+  .footer-lang { width: min(100% - 24px, 720px); padding: 14px 0 22px; justify-content: center; }
+}
+
+/* Solid footer ----------------------------------------------------------
+   The footer sits on its own tint instead of the page background, so the
+   bottom of the page closes on a distinct band in both themes. */
+.site-footer { background: var(--surface); }
+
+/* About the directory ---------------------------------------------------
+   The decorative sparkle (from glitter-graphics.com, served from public/
+   like the header and footer ones) sits at the top right of the heading, with
+   its credit line under the copy. Both are decoration-plus-attribution, so
+   reduced-motion visitors lose the animation and nobody loses meaning. */
+.about-heading-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 20px; }
+.about-sparkle { flex: 0 0 auto; display: block; width: 56px; height: 56px; }
+.about-section .about-sparkle-credit { margin: 16px 0 0; color: var(--subtle); font-size: 9.5px; letter-spacing: 0.04em; }
+.about-section .about-sparkle-credit a { color: var(--muted); text-decoration: none; }
+.about-section .about-sparkle-credit a:hover { color: var(--text-strong); text-decoration: underline; text-underline-offset: 3px; }
+@media (max-width: 600px) { .about-sparkle { width: 42px; height: 42px; } }
+@media (prefers-reduced-motion: reduce) { .about-sparkle { display: none; } }
 
 /* Directory card polish --------------------------------------------------
    Same card, sharper tail: the description moves under the title so the

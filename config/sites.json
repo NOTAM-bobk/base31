@@ -10,7 +10,8 @@
     ],
     "description": "Generate polished app screenshots for product pages, portfolios, and presentations.",
     "show": true,
-    "language": "en"
+    "language": "en",
+    "lastChecked": "2026-09-28"
   },
   {
     "name": "Donation",
@@ -51,7 +52,8 @@
     ],
     "description": "Upload a file and get a shareable link without creating an account.",
     "show": true,
-    "language": "en"
+    "language": "en",
+    "lastChecked": "2026-09-27"
   },
   {
     "name": "CompMails",
@@ -77,7 +79,8 @@
     ],
     "description": "Solve a fresh daily word puzzle and test your vocabulary.",
     "show": true,
-    "language": "en"
+    "language": "en",
+    "lastChecked": "2026-09-28"
   },
   {
     "name": "iframe tester",
@@ -115,7 +118,8 @@
     ],
     "description": "Check whether a website is reachable and verify its current status.",
     "show": true,
-    "language": "en"
+    "language": "en",
+    "lastChecked": "2026-09-26"
   },
   {
     "name": "Is It Taken",
@@ -128,7 +132,8 @@
     ],
     "description": "Check whether a domain name is available and see registration insights and instant alternatives.",
     "show": true,
-    "language": "en"
+    "language": "en",
+    "lastChecked": "2026-09-25"
   },
   {
     "name": "GitHub Explorer",
@@ -156,7 +161,8 @@
     ],
     "description": "Create free custom QR codes for links, Wi-Fi, contacts and messages, with PNG and SVG download.",
     "show": true,
-    "language": "en"
+    "language": "en",
+    "lastChecked": "2026-09-28"
   },
   {
     "name": "Password Generator",
@@ -170,7 +176,8 @@
     ],
     "description": "Generate strong random passwords and passphrases, and save them in a vault encrypted with your own master passphrase.",
     "show": true,
-    "language": "en"
+    "language": "en",
+    "lastChecked": "2026-09-24"
   },
   {
     "name": "Image Compressor",
@@ -185,7 +192,8 @@
     ],
     "description": "Compress and resize images in the browser, with batch processing, before-and-after sizes and no upload.",
     "show": true,
-    "language": "en"
+    "language": "en",
+    "lastChecked": "2026-09-28"
   },
   {
     "name": "Joke Generator",
@@ -250,7 +258,8 @@
     ],
     "description": "Learn a new word each day with definitions and example sentences.",
     "show": true,
-    "language": "en"
+    "language": "en",
+    "lastChecked": "2026-09-27"
   },
   {
     "name": "Subdomain Finder",
@@ -263,6 +272,7 @@
     ],
     "description": "Find any domains of any URL.",
     "show": true,
-    "language": "en"
+    "language": "en",
+    "lastChecked": "2026-09-26"
   }
 ]

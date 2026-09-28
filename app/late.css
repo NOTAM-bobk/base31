@@ -125,6 +125,19 @@
 @media (max-width: 600px) { .about-sparkle { width: 42px; height: 42px; } }
 @media (prefers-reduced-motion: reduce) { .about-sparkle { display: none; } }
 
+/* Hero -------------------------------------------------------------------
+   The headline is one line of three words now, not three stacked lines, so it
+   takes the width of the page instead of the narrow column and the type is
+   sized to keep those three words on a single line for as long as the viewport
+   allows (a phone wraps it to two, which is why balance is on). */
+.intro h1 {
+  max-width: 100%;
+  font-size: clamp(26px, 6vw, 44px);
+  letter-spacing: -0.05em;
+  text-wrap: balance;
+}
+.intro h1 .h1-title { display: block; }
+
 /* Directory card polish --------------------------------------------------
    Same card, sharper tail: the description moves under the title so the
    link covers everything a visitor reads before choosing, and the vote row
@@ -137,7 +150,48 @@
   border-top: 1px solid color-mix(in srgb, var(--line) 70%, transparent);
   background: color-mix(in srgb, var(--surface-hover) 55%, transparent);
 }
-.site-card-lower .site-actions { width: 100%; justify-content: space-between; }
+.site-card-lower .site-actions { width: 100%; }
+
+/* The "last checked" stamp: a quiet tick in the badge row, tinted the same
+   green the directory's live accents use, so a maintained entry reads as
+   maintained without shouting. */
+.site-card .site-badge.is-checked {
+  border-color: color-mix(in srgb, var(--live) 34%, var(--line));
+  color: color-mix(in srgb, var(--live) 70%, var(--muted));
+}
+
+/* The vote bar -----------------------------------------------------------
+   One short, wide bar instead of two stacked chips: the thumbs sit side by
+   side and each claims exactly half the foot of the card, so the whole width
+   is a target and there is no dead space between them. */
+.site-card-lower .vote-stack { display: flex; flex-direction: row; gap: 8px; width: 100%; }
+.site-card-lower .vote-button {
+  flex: 1 1 0;
+  min-width: 0;
+  height: 26px;
+  padding: 0 10px;
+  font-size: 11px;
+  font-weight: 500;
+}
+.site-card-lower .vote-count { font-size: 11px; }
+
+/* A vote travels upward: the +1 (or -1) rises out of the thumb it came from
+   and fades before it reaches the row above. The base opacity is 0, so with
+   animations switched off (prefers-reduced-motion) it simply never shows. */
+.vote-button { position: relative; }
+.vote-pop {
+  position: absolute; left: 50%; bottom: calc(100% - 3px); z-index: 2;
+  transform: translate(-50%, 8px);
+  opacity: 0; pointer-events: none;
+  color: var(--live); font-size: 10px; font-weight: 600; letter-spacing: 0.04em;
+  animation: vote-scroll-up 720ms cubic-bezier(0.22, 0.72, 0.28, 1) forwards;
+}
+.vote-button.down .vote-pop { color: var(--danger); }
+@keyframes vote-scroll-up {
+  0% { opacity: 0; transform: translate(-50%, 8px) scale(0.86); }
+  22% { opacity: 1; transform: translate(-50%, -2px) scale(1); }
+  100% { opacity: 0; transform: translate(-50%, -34px) scale(1.04); }
+}
 
 /* Other cool sites -------------------------------------------------------
    Off-directory picks from config/cool-sites.json. The cards are smaller and

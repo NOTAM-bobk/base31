@@ -31,6 +31,7 @@ export const LOCALE_TAGS: Record<Locale, string> = {
 // The English strings double as the Dictionary type. Keep every string
 // sentence-case plain text — they are dropped into markup as-is.
 export const EN = {
+  heroTitle: "Totally Not Boring Websites",
   heroTop: "Cool sites for",
   heroBottom: "people.",
   heroWords: ["curious", "bored", "restless", "picky"],
@@ -64,6 +65,7 @@ export const EN = {
 export type Dictionary = typeof EN;
 // Spanish — used by /es. Neutral Latin American Spanish, no regional slang.
 export const ES: Dictionary = {
+  heroTitle: "Sitios web nada aburridos",
   heroTop: "Sitios geniales para",
   heroBottom: "personas.",
   heroWords: ["curiosas", "aburridas", "inquietas", "exigentes"],
@@ -96,6 +98,7 @@ export const ES: Dictionary = {
 
 // French — used by /fr.
 export const FR: Dictionary = {
+  heroTitle: "Des sites web pas ennuyeux",
   heroTop: "Des sites géniaux pour",
   heroBottom: "personnes.",
   heroWords: ["curieuses", "occupées", "aventureuses", "fatiguées"],
@@ -128,6 +131,7 @@ export const FR: Dictionary = {
 
 // Brazilian Portuguese — used by /pt. BR spelling is the largest PT audience.
 export const PT: Dictionary = {
+  heroTitle: "Sites nada entediantes",
   heroTop: "Sites legais para",
   heroBottom: "pessoas.",
   heroWords: ["curiosas", "entediadas", "agitadas", "exigentes"],

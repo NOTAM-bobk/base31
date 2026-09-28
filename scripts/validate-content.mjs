@@ -56,6 +56,11 @@ for (const [index, site] of sites.entries()) {
   if (site.language !== undefined && (typeof site.language !== "string" || !languageCode.test(site.language))) {
     errors.push(`Site ${index + 1} (${site.subdomain}) has an invalid language code`);
   }
+  // Optional "last checked" stamp, drawn as a badge on the card. It has to be
+  // an ISO day string so the client can format it without a locale parser.
+  if (site.lastChecked !== undefined && (typeof site.lastChecked !== "string" || !date.test(site.lastChecked) || Number.isNaN(Date.parse(site.lastChecked)))) {
+    errors.push(`Site ${index + 1} (${site.subdomain}) has an invalid lastChecked date`);
+  }
 }
 
 for (const [index, site] of sites.entries()) {

@@ -1,5 +1,18 @@
 [
   {
+    "version": "1.8.0",
+    "date": "2026-09-28",
+    "title": "A one-line headline, a wider vote bar, and a checked stamp",
+    "summary": "The hero heading is three words across the top, the two thumbs now split the foot of every card, votes visibly travel upward, and maintained entries carry a checked badge.",
+    "highlights": [
+      "The header headline is one line of three words — “Totally Not Boring Websites” — instead of three stacked lines, sized to stay on a single line, and translated on /es, /fr and /pt.",
+      "Both vote buttons sit side by side and each takes exactly half the bottom of the card: one short, wide bar instead of two stacked chips, so the whole width of the foot is a target.",
+      "A vote now scrolls upward: the +1 (or -1) rises out of the thumb it came from and fades before it reaches the row above, and it replays on every click.",
+      "Some entries carry a “checked” badge — the date they were last verified is set per site in config/sites.json and validated by the content check.",
+      "“Surprise me” draws from the “Other cool sites” strip as well as the directory, so an off-directory pick is always in the mix."
+    ]
+  },
+  {
     "version": "1.7.0",
     "date": "2026-09-28",
     "title": "A foldable off-directory strip, and the language row moves to the footer",

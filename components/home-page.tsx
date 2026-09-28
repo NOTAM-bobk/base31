@@ -15,8 +15,19 @@ import CoolSites from "@/components/cool-sites";
 import SiteHeader from "@/components/site-header";
 import { LOCALES, LOCALE_TAGS, type Dictionary, type Locale, EN } from "@/lib/i18n";
 import { resetConsent, useConsent } from "@/lib/consent";
+import coolSites from "@/lib/cool-sites";
 
-type Site = { name: string; subdomain: string; url: string; tags?: string[]; description?: string; show?: boolean; community?: boolean; createdAt?: number; icon?: string };
+type Site = { name: string; subdomain: string; url: string; tags?: string[]; description?: string; show?: boolean; community?: boolean; createdAt?: number; icon?: string; lastChecked?: string };
+
+// Rendered in the "checked" badge on a card. The month names are hard-coded
+// instead of using toLocaleDateString so the server and the first client render
+// always produce the same string (no hydration mismatch).
+const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+function formatChecked(value: string) {
+  const [year, month, day] = value.split("-").map(Number);
+  if (!year || !month || !day || month < 1 || month > 12) return value;
+  return `${MONTHS[month - 1]} ${day}`;
+}
 type Theme = "dark" | "light";
 // This visitor's own choice, stored locally.
 type Vote = 1 | -1;
@@ -269,29 +280,6 @@ function SitePreview({ site }: { site: Site }) {
   );
 }
 
-// Words the headline cycles through on load. The first one is server-rendered,
-// so the sentence still reads (and indexes) without JavaScript.
-const ROTATING_WORDS = ["curious", "cool", "amazing", "interested", "creative", "restless", "adventurous"];
-
-function WordRotator({ words = ROTATING_WORDS }: { words?: string[] }) {
-  const [index, setIndex] = useState(0);
-
-  useEffect(() => {
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    const id = window.setInterval(() => setIndex((current) => (current + 1) % words.length), 2600);
-    return () => window.clearInterval(id);
-  }, [words.length]);
-
-  const word = words[index] ?? words[0];
-
-  return (
-    <span className="rotator">
-      {/* keyed so the word replays its slide-in on every switch */}
-      <span key={word} className="rotator-word">{word}</span>
-    </span>
-  );
-}
-
 // A live odometer-style clock counting up from base31's launch
 // (`LAUNCHED_AT`). Rendered client-only — the elapsed value starts null so
 // the server and first client render match.
@@ -346,6 +334,9 @@ export default function HomePage({ dict = EN, locale = "en" }: { dict?: Dictiona
   const [favorites, setFavorites] = useState<string[]>([]);
   const [votes, setVotes] = useState<Record<string, Vote>>({});
   const [voteTotals, setVoteTotals] = useState<Record<string, VoteTotals>>({});
+  // One rising "+1"/"-1" per click, counted per site so a repeat click on the
+  // same thumb replays the animation instead of sitting still.
+  const [votePops, setVotePops] = useState<Record<string, { up: number; down: number }>>({});
   const [theme, setTheme] = useState<Theme>("dark");
   const [views, setViews] = useState<number | null>(null);
   const [bump, setBump] = useState(false);
@@ -719,6 +710,11 @@ export default function HomePage({ dict = EN, locale = "en" }: { dict?: Dictiona
     const previous: VoteValue = votes[key] ?? 0;
     const next: VoteValue = previous === direction ? 0 : direction;
     buzz(next === 0 ? 6 : 12);
+    // Send the count up out of the thumb it came from, once per click.
+    setVotePops((current) => {
+      const entry = current[key] ?? { up: 0, down: 0 };
+      return { ...current, [key]: direction === 1 ? { ...entry, up: entry.up + 1 } : { ...entry, down: entry.down + 1 } };
+    });
     setVotes((current) => {
       const updated = { ...current };
       if (next === 0) delete updated[key];
@@ -808,9 +804,12 @@ export default function HomePage({ dict = EN, locale = "en" }: { dict?: Dictiona
   }, [query, activeTag, sortMode, favorites, allSites, netLikes, voteTotals]);
 
   // "Surprise me" opens a random entry from whatever is currently listed, so an
-  // active search narrows the pool instead of being ignored.
+  // active search narrows the pool instead of being ignored. The "Other cool
+  // sites" strip is part of the same draw — those live off-directory, so they
+  // are always in the pool whatever the search or filter is set to.
   const surpriseMe = useCallback(() => {
-    const pool = list.length > 0 ? list : allSites;
+    const directoryPool = list.length > 0 ? list : allSites;
+    const pool = [...directoryPool, ...coolSites];
     if (pool.length === 0) return;
     const pick = pool[Math.floor(Math.random() * pool.length)];
     buzz(12);
@@ -996,13 +995,11 @@ export default function HomePage({ dict = EN, locale = "en" }: { dict?: Dictiona
       <main>
         <section className="intro" aria-labelledby="page-title">
           <p className="eyebrow mono">the real web directory</p>
-          {/* The explicit spaces keep the heading readable as one sentence when
-              it is flattened to text (search snippets, screen readers), even
-              though each line is a block box visually. */}
+          {/* One line, three words: the title is a single phrase now, so it
+              needs no per-line spaces to read correctly when flattened to
+              text (search snippets, screen readers). */}
           <h1 id="page-title">
-            <span className="h1-line">{dict.heroTop} </span>
-            <span className="h1-line h1-rotator"><WordRotator words={dict.heroWords} /> </span>
-            <span className="h1-line">{dict.heroBottom}</span>
+            <span className="h1-line h1-title">{dict.heroTitle}</span>
           </h1>
           <p className="subtitle">{dict.subtitle}</p>
           {/* Two calls to action, side by side on a desktop and stacked on a
@@ -1010,7 +1007,7 @@ export default function HomePage({ dict = EN, locale = "en" }: { dict?: Dictiona
               the next thing down the page, so it only duplicated a scroll. */}
           <div className="intro-links">
             <a className="text-link muted-link" href="#about">{dict.whyLink} <span aria-hidden="true">→</span></a>
-            <button type="button" className="surprise-button" onClick={surpriseMe} title="Open a random site from the directory">
+            <button type="button" className="surprise-button" onClick={surpriseMe} title="Open a random site from the directory or the cool sites strip">
               <span className="surprise-icon" aria-hidden="true">↯</span>
               <span className="surprise-label">{dict.surprise}</span>
             </button>
@@ -1138,6 +1135,7 @@ export default function HomePage({ dict = EN, locale = "en" }: { dict?: Dictiona
               const pinned = favorites.includes(site.subdomain);
               const vote = votes[site.subdomain];
               const totals = voteTotals[site.subdomain];
+              const pops = votePops[site.subdomain];
               const isNew = !!site.createdAt && site.createdAt > newCutoff;
               return (
                 <article
@@ -1167,6 +1165,11 @@ export default function HomePage({ dict = EN, locale = "en" }: { dict?: Dictiona
                         <span className="site-name">{site.name}</span>
                         {site.community && <span className="site-badge mono">community</span>}
                         {isNew && <span className="site-badge is-new mono">new</span>}
+                        {site.lastChecked && (
+                          <span className="site-badge is-checked mono" title={`Last checked on ${site.lastChecked}`}>
+                            checked {formatChecked(site.lastChecked)}
+                          </span>
+                        )}
                       </span>
                       <span className="site-card-strip" aria-hidden="true" />
                       <span className="site-card-head">
@@ -1188,8 +1191,9 @@ export default function HomePage({ dict = EN, locale = "en" }: { dict?: Dictiona
                       pin floats over the preview. */}
                   <div className="site-card-lower">
                     <div className="site-actions">
-                      {/* Thumbs up sits directly above thumbs down, so the
-                          pair reads as one control. */}
+                      {/* The two thumbs split the bar down the middle — half
+                          the width each — so the card's whole foot is a
+                          target and there is no dead space between them. */}
                       <span className="vote-stack">
                         <button
                           type="button"
@@ -1203,6 +1207,12 @@ export default function HomePage({ dict = EN, locale = "en" }: { dict?: Dictiona
                               the number is in the button's label, so this is
                               decorative to avoid reading the same value twice. */}
                           <span key={totals ? totals.up : "none"} className="vote-count mono" aria-hidden="true">{totals ? totals.up : "–"}</span>
+                          {/* Keyed on the click count so it replays on every
+                              vote: a rising +1 that scrolls up out of the
+                              button and fades, decoration only. */}
+                          {pops?.up ? (
+                            <span key={`pop-${pops.up}`} className="vote-pop mono" aria-hidden="true">+1</span>
+                          ) : null}
                         </button>
                         <button
                           type="button"
@@ -1213,6 +1223,9 @@ export default function HomePage({ dict = EN, locale = "en" }: { dict?: Dictiona
                         >
                           <ThumbIcon down />
                           <span key={totals ? totals.down : "none"} className="vote-count mono" aria-hidden="true">{totals ? totals.down : "–"}</span>
+                          {pops?.down ? (
+                            <span key={`pop-${pops.down}`} className="vote-pop mono" aria-hidden="true">-1</span>
+                          ) : null}
                         </button>
                       </span>
                     </div>

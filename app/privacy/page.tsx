@@ -40,10 +40,11 @@ export default function PrivacyPage() {
 
         <h2>Cookies and your choice</h2>
         <p>
-          We only set our own preference after you choose. The Google tag runs on every visit —
-          before you answer the notice and whatever you answer — because that is what lets Google
-          confirm the property; it is the only script that does. Session recording and advertising
-          stay switched off until you confirm, and the directory works exactly the same either way.
+          We only set our own preference after you choose. Two counters run on every visit — before
+          you answer the notice and whatever you answer: the Google tag, because that is what lets
+          Google confirm the property, and Umami, a cookieless page counter that sets no cookie and
+          stores nothing on your device. Session recording and advertising stay switched off until
+          you confirm, and the directory works exactly the same either way.
         </p>
         <p>
           Choosing “Confirm” allows Microsoft Clarity to record sessions and our ad network to load.
@@ -80,9 +81,12 @@ export default function PrivacyPage() {
         <p>
           The Google tag is part of every page and runs on every visit, so Google can see that the
           property is installed and we can see which pages are viewed and where visitors click —
-          whether you confirm the cookie notice or deny it. If you confirm, Microsoft Clarity also
+          whether you confirm the cookie notice or deny it. Umami also counts page views on every
+          visit, and it is cookieless: no cookie, no identifier kept for you, nothing stored on your
+          device. Google Analytics and Umami both report traffic in aggregate. If you confirm,
+          Microsoft Clarity also
           records sessions, which shows how a visit actually unfolded. If you deny, Clarity is not
-          loaded at all. Google Analytics reports traffic only in aggregate. See
+          loaded at all. See
           the{" "}
           <a href="https://privacy.microsoft.com/privacystatement" target="_blank" rel="noreferrer">
             Microsoft privacy statement
@@ -90,6 +94,10 @@ export default function PrivacyPage() {
           and the{" "}
           <a href="https://policies.google.com/privacy" target="_blank" rel="noreferrer">
             Google privacy policy
+          </a>{" "}
+          and the{" "}
+          <a href="https://umami.is/privacy" target="_blank" rel="noreferrer">
+            Umami privacy policy
           </a>{" "}
           for details.
         </p>

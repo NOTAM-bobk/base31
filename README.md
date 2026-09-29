@@ -272,6 +272,13 @@ bundler. Two ways to do that by accident:
   styled as a green pill with a bolt badge (`.surprise-button` in
   `app/overrides.css`) rather than a plain text link, and its sheen/spin is
   disabled under `prefers-reduced-motion`.
+- Three quick-jump boxes sit under the search field — Featured sites, Other
+  cool sites and Cool APIs — each an in-page anchor to `#sites`,
+  `#cool-sites` and `#cool-apis` with the list's length as its caption. They are
+  plain anchors on purpose (no routing): the browser scrolls, `scroll-margin-top`
+  on the target keeps the heading clear of the fixed header, and the rail
+  follows the move like any other scroll. They share the search field's 480px
+  measure and stack into three compact rows below 600px.
 - The hero search reaches both strips under the directory, not only the
 directory itself: `searchCoolSites` in `lib/cool-sites.ts` and
 `searchCoolApis` in `lib/cool-apis.ts` are the matchers those places share, so a
@@ -287,14 +294,18 @@ the directory's empty state instead of dead-ending there.
   cannot drift apart. Entries are external URLs by design — the validator
   rejects anything pointing at a base31.org subdomain, which belongs in
   `sites.json` instead.
-- A column of small lines down the right edge (`components/section-rail.tsx`)
-is the section readout and the fast way between sections. It is always visible,
-from the first screen on at every width: full size with sliding labels on a
-wide monitor, shorter bars without labels below 1180px, and a slim strip of bars
+- Three small lines down the right edge (`components/section-rail.tsx`) are the
+section readout and the fast way between sections. The rail shows the section
+you are reading and the two beside it, not all eight — `RAIL_WINDOW = 3` slices
+the list around the current index, so the column stays a short pill and the
+three lines travel along as you read down the page. It is always visible, from
+the first screen on at every width: a small pill with sliding labels on a wide
+monitor, shorter bars without labels below 1180px, and a slim strip of bars
 below 820px.
 The line for the section you are reading rotates flat-to-vertical and turns
 green while its label slides out; clicking a line scrolls there and a wheel over
-the rail steps one section at a time. That listener is attached by hand with
+the rail steps one section at a time — the keys are the section ids, so a line
+keeps its DOM node as it moves through the window. That listener is attached by hand with
 `{ passive: false }` because React registers `wheel` passively, so
 `preventDefault` inside `onWheel` would be a no-op. The section list and its
 labels live in `components/home-page.tsx`. Every step it takes buzzes once
@@ -465,9 +476,9 @@ never needs its own guard.
 
 ## Cookies, ads and analytics
 
-The Google tag runs on every visit and is deliberately not gated; everything
-else waits for the visitor's answer, and that answer is the switch for session
-recording and for ads. The tag is not gated because Google verifies the property
+The Google tag and Umami both run on every visit and are deliberately not
+gated; everything else waits for the visitor's answer, and that answer is the
+switch for session recording and for ads. The tag is not gated because Google verifies the property
 from the tag it is served — anything that waits for a click fails the check it
 exists for. The other things that load either way are the destination preview
 images on every directory card and in the referral carousel and each community
@@ -476,6 +487,7 @@ upload's own favicon — both decorative, both cookie-free:
 | Component | Runs when |
 | --- | --- |
 | `app/layout.tsx` | The Google tag (gtag.js) for `G-W6J79P13FT`, in `<head>` on every page, on every visit — before the answer and whatever it is |
+| `app/layout.tsx` | Umami (`data-website-id="7f63f1fe-aefd-4110-a01b-44171627ac64"`) from `cloud.umami.is`, `defer`red in `<head>` on every page. It is cookieless and stores nothing on the visitor's device, so like the Google tag there is nothing for the notice to gate |
 | `components/consent-aware-analytics.tsx` | Microsoft Clarity (`ylsxc7fokm`), only on `accepted` |
 | `components/consent-aware-ads.tsx` | Adcash auto-tag (`iy7zk7mmw`), only on `accepted` |
 | `components/support-banner-ad.tsx` | The 160x300 banner in the support hub (`d1495d5e568642fb60c4f1232a9af565`), only on `accepted` |

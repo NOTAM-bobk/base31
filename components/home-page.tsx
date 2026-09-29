@@ -17,7 +17,7 @@ import SiteHeader from "@/components/site-header";
 import { LOCALES, LOCALE_TAGS, type Dictionary, type Locale, EN } from "@/lib/i18n";
 import { resetConsent, useConsent } from "@/lib/consent";
 import coolSites, { searchCoolSites } from "@/lib/cool-sites";
-import { searchCoolApis } from "@/lib/cool-apis";
+import coolApis, { searchCoolApis } from "@/lib/cool-apis";
 import { tick } from "@/lib/haptics";
 import SectionRail, { type RailSection } from "@/components/section-rail";
 
@@ -56,7 +56,7 @@ const NEW_WINDOW_MS = 14 * 24 * 60 * 60 * 1000;
 type SortMode = "liked" | "newest" | "az";
 // Labels resolve through the active dictionary at render time (see dict.sortLabel).
 const SORT_OPTIONS: { value: SortMode }[] = [{ value: "liked" }, { value: "newest" }, { value: "az" }];
-const MAX_TAG_CHIPS = 12;
+const MAX_TAG_CHIPS = 11;
 
 // Keeps keyboard focus inside an open dialog, moves it in on open, and hands it
 // back to whatever opened the dialog on close.
@@ -1070,6 +1070,26 @@ export default function HomePage({ dict = EN, locale = "en" }: { dict?: Dictiona
             )}
             <span id="site-search-hint" className="sr-only">Press the slash key to jump here from anywhere on the page.</span>
           </div>
+          {/* Three boxes that jump straight into a section, for the visitor who
+              would rather browse than type. Each one is an in-page anchor, so
+              it needs no routing: the browser scrolls, the section's own
+              scroll-margin keeps it clear of the header, and the rail follows
+              the move like any other scroll. */}
+          <nav className="quick-jumps" aria-label="Jump to a section">
+            {[
+              { href: "#sites", label: dict.featured, count: `${allSites.length} sites` },
+              { href: "#cool-sites", label: dict.coolSites, count: `${coolSites.length} sites` },
+              { href: "#cool-apis", label: dict.coolApis, count: `${coolApis.length} APIs` },
+            ].map((jump) => (
+              <a key={jump.href} className="quick-jump" href={jump.href} onClick={() => tick(12)}>
+                <span className="quick-jump-label">{jump.label}</span>
+                <span className="quick-jump-meta">
+                  <span className="quick-jump-count mono">{jump.count}</span>
+                  <span className="quick-jump-arrow mono" aria-hidden="true">→</span>
+                </span>
+              </a>
+            ))}
+          </nav>
         </section>
 
         <section id="sites" className={`directory-section${sitesVibrating ? " is-vibrating" : ""}`} aria-labelledby="sites-heading">

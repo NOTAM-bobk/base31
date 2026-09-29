@@ -10,15 +10,25 @@ export type RailSection = { id: string; label: string };
 // a trackpad is flicked.
 const WHEEL_COOLDOWN_MS = 420;
 
+// How many lines the rail shows at once. The page has more sections than this,
+// so the window travels with the reader instead of the rail growing to fit the
+// whole page — three small marks in the gutter, not a full-height ladder.
+const RAIL_WINDOW = 3;
+
 /**
- * The section rail: a column of small lines pinned to the right edge of the
- * homepage, one per section, top to bottom in page order.
+ * The section rail: a short column of small lines pinned to the right edge of
+ * the homepage, one per section, top to bottom in page order — but only ever
+ * three of them on screen at a time.
  *
- * The line for the section you are reading stands up — it rotates from flat to
- * vertical and brightens — and its label slides out beside it, so the rail
- * doubles as a position readout and as a menu. Clicking a line scrolls there;
- * scrolling *on* the rail walks one section at a time instead of scrolling the
- * page, which is the quick way through a long homepage.
+ * That is the whole trick: the rail shows the section you are reading and its
+ * neighbours, and as you read down the page the three lines move down the list
+ * and up the screen, so a long homepage still gets a small, quiet indicator
+ * instead of eight stacked bars. The line for the section you are reading
+ * stands up — it rotates from flat to vertical and brightens — and its label
+ * slides out beside it, so the rail doubles as a position readout and as a
+ * menu. Clicking a line scrolls there; scrolling *on* the rail walks one
+ * section at a time instead of scrolling the page, which is the quick way
+ * through a long homepage.
  *
  * It is always there, from the first screen on, at every width: on a wide
  * monitor it sits in the gutter beside the centered column, on a phone it is
@@ -39,7 +49,7 @@ export default function SectionRail({ sections }: { sections: RailSection[] }) {
   // Which section is on screen: the last one whose top has passed a third of
   // the way down the viewport. Measured on scroll inside a rAF so a fast wheel
   // cannot queue a layout per event. The rail itself never hides, so this only
-  // ever picks the line that stands up.
+  // ever picks the line that stands up and slides the three-line window along.
   useEffect(() => {
     let frame = 0;
     const measure = () => {
@@ -108,6 +118,14 @@ export default function SectionRail({ sections }: { sections: RailSection[] }) {
     [active, goTo],
   );
 
+  // The three lines on screen: the current section in the middle wherever it
+  // fits, clamped at both ends of the page so the window never runs short. The
+  // keys stay the section ids, so React keeps a line's node alive as it moves
+  // through the window and only the entering and leaving lines swap.
+  const windowSize = Math.min(RAIL_WINDOW, sections.length);
+  const start = Math.min(Math.max(active - 1, 0), Math.max(0, sections.length - windowSize));
+  const visible = sections.slice(start, start + windowSize);
+
   return (
     <nav
       ref={rail}
@@ -115,7 +133,8 @@ export default function SectionRail({ sections }: { sections: RailSection[] }) {
       aria-label="Page sections"
       onKeyDown={onKeyDown}
     >
-      {sections.map((section, index) => {
+      {visible.map((section, offset) => {
+        const index = start + offset;
         const current = index === active;
         return (
           <button

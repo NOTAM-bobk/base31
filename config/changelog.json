@@ -1,5 +1,18 @@
 [
   {
+    "version": "1.14.0",
+    "date": "2026-09-29",
+    "title": "A shorter rail, a footer that sinks, a line that loads",
+    "summary": "The section rail is down to three lines that travel with you, the footer closes on a grey-to-black gradient, and the green line across the top now animates as a loading bar whenever you follow a link inside the site. Three quick-jump boxes sit under the hero search, the support hub starts at the same left edge as the rest of the page, and Umami joins the analytics in the head.",
+    "highlights": [
+      "The section rail shows three lines instead of eight: the section you are reading and the two beside it, so the column in the gutter stays a small pill and the lines travel along as you read down the page. Clicking a line, scrolling on it and the arrow keys still walk the whole page.",
+      "The green rule across the top of every page doubles as the loading indicator. Follow a link that stays on base31.org — \"What's new\", the blog, the footer — and the solid line dims while a brighter bar grows out of the left edge, then completes, fades and leaves the solid line behind. Nothing is gated behind it and it never blocks a click.",
+      "Three quick-jump boxes sit under the hero search: Featured sites, Other cool sites and Cool APIs, each an in-page anchor with the list's length as its caption, so the directory is one tap away without typing or scrolling.",
+      "The footer closes on a gradient now — grey where it meets the page, deepening to black at the very bottom edge — and the light theme gets the same shape in its own greys.",
+      "The support hub was the one section centered inside the desktop column; it now starts at the same left edge as every other section, keeping its 720px measure. One tag chip is gone from the filter row, and Umami joins the Google tag in the head as a second, cookieless page counter that runs on every visit."
+    ]
+  },
+  {
     "version": "1.13.0",
     "date": "2026-09-29",
     "title": "A banner in Support, a buzz in the nav",

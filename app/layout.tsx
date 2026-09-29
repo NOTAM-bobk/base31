@@ -19,6 +19,7 @@ import PrivacyConsent from "@/components/privacy-consent";
 import StructuredData from "@/components/structured-data";
 import BlogTransitions from "@/components/blog-transitions";
 import PageBehaviors from "@/components/page-behaviors";
+import TopAccent from "@/components/top-accent";
 
 // Two display faces from Google Fonts. next/font downloads and self-hosts the
 // files at build time, so nothing on the page ever asks fonts.googleapis.com
@@ -78,6 +79,12 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             the visitor accepts. One tag per page — this is the only one. */}
         <script async src={`https://www.googletagmanager.com/gtag/js?id=${GOOGLE_ANALYTICS_ID}`} />
         <script id="google-analytics" dangerouslySetInnerHTML={{ __html: googleTagSnippet }} />
+        {/* Umami, the site's second analytics service: a cookieless page-view
+            counter, so like the Google tag it runs on every visit and is not
+            gated by the cookie notice — there is no cookie to ask about. The
+            `defer` is Umami's own snippet, and the website id is the one in
+            the dashboard for base31.org. */}
+        <script defer src="https://cloud.umami.is/script.js" data-website-id="7f63f1fe-aefd-4110-a01b-44171627ac64" />
         <meta name="impact-site-verification" content="0c13bbc7-5a07-4070-84da-1b320feed539" />
         {/* Trustpilot one-time domain verification (documented in README.md). */}
         <meta name="trustpilot-one-time-domain-verification-id" content="c33dc438-a677-4add-a519-04714888e931" />
@@ -86,7 +93,9 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       </head>
       <body>
         <CodeBackdrop />
-        <div className="top-accent" aria-hidden="true" />
+        {/* The line across the top of every page, which also animates as the
+            loading bar when a visitor follows an in-site link. */}
+        <TopAccent />
         <StructuredData />
         <BlogTransitions />
         {/* Screen Wake Lock plus the leave warning; see the component for why. */}

@@ -109,8 +109,18 @@
 
 /* Solid footer ----------------------------------------------------------
    The footer sits on its own tint instead of the page background, so the
-   bottom of the page closes on a distinct band in both themes. */
-.site-footer { background: var(--surface); }
+   bottom of the page closes on a distinct band in both themes. The band is a
+   gradient now: grey where it meets the page, darkening to black at the very
+   bottom edge, so the page reads as sinking into the footer. The light theme
+   keeps the same shape in its own material — light grey down to a mid grey —
+   because a black band under white content would be a hole, not an ending. */
+.site-footer {
+  background: linear-gradient(180deg, var(--surface-hover) 0%, var(--surface) 44%, #000 100%);
+  border-top-color: var(--line-strong);
+}
+html[data-theme="light"] .site-footer {
+  background: linear-gradient(180deg, #f4f4f4 0%, #e8e8e8 50%, #d6d6d6 100%);
+}
 
 /* About the directory ---------------------------------------------------
    The decorative sparkle (from glitter-graphics.com, served from public/
@@ -309,51 +319,54 @@
 }
 
 /* Section rail ---------------------------------------------------------
-   The lines down the right edge, one per section of the homepage. It is a
-   readout and a menu at once: the line for the section you are reading stands
-   on end and turns green, its label slides out beside it, clicking a line
-   goes there, and scrolling on the rail itself walks the page one section at
-   a time. Fixed to the right edge, so it never moves the page.
+   Three lines down the right edge, showing the section you are reading and the
+   two beside it — a readout and a menu at once. The line for the current
+   section stands on end and turns green, its label slides out beside it,
+   clicking a line goes there, and scrolling on the rail itself walks the page
+   one section at a time. The page has more sections than three, so the window
+   travels along as you read down it and the column stays a short pill instead
+   of a full-height ladder. Fixed to the right edge, so it never moves the
+   page.
 
    It is always on, from the first screen and at every width — nothing to
    scroll past to find it. The column it sits beside is a centered 720px, so
-   the gutter is where it lives and it only has to fit there: full size on a
+   the gutter is where it lives and it only has to fit there: a small pill on a
    desktop, bars only where the gutter narrows, and a slim strip of bars on a
    phone, where there is no hover to open a label anyway. */
 .section-rail {
-  position: fixed; top: 50%; right: 16px; z-index: 40;
-  display: flex; flex-direction: column; align-items: flex-end; gap: 7px;
-  padding: 11px 9px;
+  position: fixed; top: 50%; right: 14px; z-index: 40;
+  display: flex; flex-direction: column; align-items: flex-end; gap: 4px;
+  padding: 7px 6px;
   transform: translateY(-50%);
-  border: 1px solid color-mix(in srgb, var(--line-strong) 58%, var(--line));
+  border: 1px solid color-mix(in srgb, var(--line-strong) 46%, var(--line));
   border-radius: 999px;
-  background: color-mix(in srgb, var(--surface) 88%, transparent);
+  background: color-mix(in srgb, var(--surface) 80%, transparent);
   backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
-  box-shadow: 0 16px 36px -20px rgb(0 0 0 / 72%), inset 0 1px 0 rgb(255 255 255 / 5%);
+  box-shadow: 0 10px 26px -20px rgb(0 0 0 / 68%), inset 0 1px 0 rgb(255 255 255 / 5%);
 }
 /* Labels need a pointer to open them, so they go first as the gutter tightens. */
 @media (max-width: 1179px) {
-  .section-rail { right: 12px; gap: 6px; padding: 9px 7px; }
-  .rail-bar { width: 12px; }
+  .section-rail { right: 10px; gap: 3px; padding: 6px 5px; }
+  .rail-bar { width: 10px; }
   .rail-item:hover .rail-bar,
-  .rail-item.is-active .rail-bar { width: 15px; }
+  .rail-item.is-active .rail-bar { width: 12px; }
 }
 @media (max-width: 819px) {
   .section-rail {
-    right: 6px; gap: 4px; padding: 7px 5px;
+    right: 6px; gap: 3px; padding: 6px 5px;
     background: color-mix(in srgb, var(--surface) 74%, transparent);
-    box-shadow: 0 10px 24px -16px rgb(0 0 0 / 70%), inset 0 1px 0 rgb(255 255 255 / 5%);
+    box-shadow: 0 8px 20px -16px rgb(0 0 0 / 70%), inset 0 1px 0 rgb(255 255 255 / 5%);
   }
-  .rail-item { min-height: 20px; padding: 0; }
+  .rail-item { min-height: 16px; padding: 0; }
   .rail-label { display: none; }
-  .rail-bar { width: 10px; }
+  .rail-bar { width: 9px; }
   .rail-item:hover .rail-bar,
-  .rail-item.is-active .rail-bar { width: 13px; }
+  .rail-item.is-active .rail-bar { width: 11px; }
 }
 
 .rail-item {
-  display: flex; align-items: center; justify-content: flex-end; gap: 8px;
-  width: 100%; padding: 2px 1px; border: 0; border-radius: 6px;
+  display: flex; align-items: center; justify-content: flex-end; gap: 7px;
+  width: 100%; padding: 1px 1px; border: 0; border-radius: 6px;
   background: transparent; color: var(--subtle); cursor: pointer;
 }
 .rail-item:hover { color: var(--text-strong); }
@@ -362,24 +375,24 @@
    in), sliding out of the rail, so the bars stay the quiet part. */
 .rail-label {
   max-width: 0; overflow: hidden; white-space: nowrap;
-  font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase;
+  font-size: 8.5px; letter-spacing: 0.09em; text-transform: uppercase;
   opacity: 0;
   transition: max-width 200ms ease, opacity 200ms ease;
 }
 .rail-item:hover .rail-label,
-.rail-item.is-active .rail-label { max-width: 96px; opacity: 1; }
+.rail-item.is-active .rail-label { max-width: 88px; opacity: 1; }
 
 /* The bar is the point: flat while you are elsewhere, standing on end for the
    section you are reading, so the rotation is the position readout. */
 .rail-bar {
-  flex: 0 0 auto; width: 14px; height: 2px; border-radius: 2px;
+  flex: 0 0 auto; width: 11px; height: 2px; border-radius: 2px;
   background: color-mix(in srgb, var(--line-strong) 76%, var(--muted));
   transition: transform 260ms cubic-bezier(0.22, 1.1, 0.34, 1), width 260ms ease, background 200ms ease, box-shadow 200ms ease;
 }
-.rail-item:hover .rail-bar { width: 18px; background: var(--muted); }
+.rail-item:hover .rail-bar { width: 14px; background: var(--muted); }
 .rail-item.is-active .rail-bar {
-  width: 18px; background: var(--live); transform: rotate(90deg);
-  box-shadow: 0 0 12px color-mix(in srgb, var(--live) 60%, transparent);
+  width: 14px; background: var(--live); transform: rotate(90deg);
+  box-shadow: 0 0 10px color-mix(in srgb, var(--live) 60%, transparent);
 }
 .rail-item:focus-visible { outline: 2px solid var(--live); outline-offset: 2px; }
 @media (prefers-reduced-motion: reduce) {
@@ -526,4 +539,96 @@ html[data-theme="light"] .cool-card {
   /* Handwriting needs a little more air than the tight display leading the
      headline shipped with, or the descenders clip the line below. */
   line-height: 1.14;
+}
+
+/* Quick jumps -----------------------------------------------------------
+   Three boxes under the search field that go straight to a section, for the
+   visitor who would rather browse than type: Featured sites, Other cool sites
+   and Cool APIs. Each is an in-page anchor, so there is no routing involved —
+   the browser scrolls, the section's own `scroll-margin-top` keeps it clear of
+   the header, and the rail follows the move like any other scroll. They sit on
+   the same 480px measure as the search field above them, and stack into three
+   compact rows on a phone. */
+.quick-jumps {
+  display: grid; gap: 8px; width: 100%; max-width: 480px; margin-top: 14px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+.quick-jump {
+  display: flex; flex-direction: column; gap: 6px; min-height: 62px; padding: 11px 12px;
+  border: 1px solid color-mix(in srgb, var(--line-strong) 62%, var(--line));
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--surface) 92%, var(--surface-hover));
+  color: var(--muted); text-decoration: none;
+  transition: border-color 150ms ease, background 150ms ease, transform 150ms ease, box-shadow 150ms ease;
+}
+.quick-jump:hover {
+  border-color: color-mix(in srgb, var(--live) 45%, var(--line-strong));
+  background: var(--surface-hover); transform: translateY(-2px); box-shadow: var(--shadow);
+}
+.quick-jump-label { color: var(--text-strong); font-size: 11.5px; line-height: 1.3; }
+.quick-jump-meta {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 6px; margin-top: auto;
+}
+.quick-jump-count { color: var(--subtle); font-size: 9.5px; letter-spacing: 0.06em; text-transform: uppercase; }
+.quick-jump-arrow { color: var(--live); font-size: 12px; transition: transform 150ms ease; }
+.quick-jump:hover .quick-jump-arrow { transform: translate(2px, -2px); }
+@media (max-width: 600px) {
+  .quick-jumps { grid-template-columns: 1fr; max-width: none; gap: 7px; }
+  .quick-jump {
+    flex-direction: row; align-items: center; justify-content: space-between;
+    min-height: 0; padding: 10px 12px;
+  }
+  .quick-jump-meta { margin-top: 0; }
+}
+
+/* Support, flush left ---------------------------------------------------
+   The support hub was the one section centered inside the desktop column,
+   which left its heading, its ad chip and its copy indented away from every
+   other section on the page. It now starts at the same left edge as Featured
+   sites and the two cool strips, keeping its 720px measure so the panel and
+   the 160x300 tray still read at their intended size. */
+.support-section { margin-left: 0; margin-right: 0; }
+@media (min-width: 601px) {
+  .support-section .section-closed-note { margin-left: 0; margin-right: 0; }
+}
+
+/* Top accent as a loading bar -------------------------------------------
+   The green rule across the top of every page doubles as the site's loading
+   indicator (see components/top-accent.tsx). While a link to another page on
+   this site is in flight the solid line dims and a brighter bar grows out of
+   the left edge; when the page arrives the bar completes, fades and leaves the
+   solid line behind. This is a 2px strip, so the whole effect is carried by
+   the width of one child — nothing here can move the page. */
+.top-accent {
+  overflow: hidden;
+  transition: background 200ms ease, box-shadow 200ms ease;
+}
+.top-accent.is-loading {
+  background: color-mix(in srgb, var(--live) 20%, transparent);
+  box-shadow: none;
+}
+.top-accent-fill {
+  position: absolute; top: 0; bottom: 0; left: 0; width: 0; border-radius: 2px;
+  background: linear-gradient(90deg, color-mix(in srgb, var(--live) 40%, transparent), var(--live) 55%, #eafff4);
+  box-shadow: 0 0 12px color-mix(in srgb, var(--live) 70%, transparent);
+  opacity: 0;
+}
+/* The animation is named on both states on purpose: the bar keeps growing
+   while it fades, instead of snapping back to nothing the moment it finishes. */
+.top-accent.is-loading .top-accent-fill,
+.top-accent.is-done .top-accent-fill {
+  opacity: 1;
+  animation: top-accent-load 2.4s cubic-bezier(0.16, 0.84, 0.24, 1) forwards;
+}
+.top-accent.is-done .top-accent-fill { opacity: 0; transition: opacity 320ms ease; }
+@keyframes top-accent-load {
+  0% { width: 0; }
+  60% { width: 72%; }
+  100% { width: 94%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  /* No sweep for reduced motion: the line just reads as full while it waits. */
+  .top-accent.is-loading .top-accent-fill { width: 100%; }
+  .top-accent { transition: none; }
 }

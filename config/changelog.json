@@ -1,5 +1,17 @@
 [
   {
+    "version": "1.13.0",
+    "date": "2026-09-29",
+    "title": "A banner in Support, a buzz in the nav",
+    "summary": "The support hub carries a 160x300 banner that waits for the cookie answer like every other ad on the site. The section rail and the header's nav links now buzz through the Vibration API as you move between sections, and the hero's \"Why base31?\" shortcut is gone.",
+    "highlights": [
+      "A 160x300 banner sits under the sponsored support button, with a fixed-size slot so the section never reflows while the network decides whether to fill it.",
+      "It is a real ad script, so it follows the site's one rule: nothing is fetched from the ad network until you answer the cookie notice, and withdrawing that answer removes the script and the frame it built. Before the answer the slot points at the privacy page instead of sitting empty.",
+      "Every step on the section rail buzzes once through the Vibration API — a click, a wheel notch or an arrow key — and the header's nav links do the same on the way out.",
+      "The hero keeps one call to action. The \"Why base31?\" link is gone: the rail already steps to About, so it only duplicated what was a click away."
+    ]
+  },
+  {
     "version": "1.12.0",
     "date": "2026-09-29",
     "title": "Cool APIs, two new typefaces",

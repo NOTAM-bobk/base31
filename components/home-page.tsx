@@ -18,6 +18,7 @@ import { LOCALES, LOCALE_TAGS, type Dictionary, type Locale, EN } from "@/lib/i1
 import { resetConsent, useConsent } from "@/lib/consent";
 import coolSites, { searchCoolSites } from "@/lib/cool-sites";
 import { searchCoolApis } from "@/lib/cool-apis";
+import { tick } from "@/lib/haptics";
 import SectionRail, { type RailSection } from "@/components/section-rail";
 
 type Site = { name: string; subdomain: string; url: string; tags?: string[]; description?: string; show?: boolean; community?: boolean; createdAt?: number; icon?: string; lastChecked?: string };
@@ -570,15 +571,10 @@ export default function HomePage({ dict = EN, locale = "en" }: { dict?: Dictiona
     }
   }, []);
 
-  // Light haptic feedback on meaningful actions, via the Vibration API. Does
-  // nothing on browsers/devices that lack it, and respects reduced motion.
-  const buzz = useCallback((pattern: number | number[]) => {
-    if (typeof navigator === "undefined" || typeof navigator.vibrate !== "function") return;
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    try {
-      navigator.vibrate(pattern);
-    } catch {}
-  }, []);
+  // Light haptic feedback on meaningful actions. The guard, the reduced-motion
+  // rule and the try/catch all live in lib/haptics.ts, which the rail and the
+  // header nav share.
+  const buzz = useCallback((pattern: number | number[]) => tick(pattern), []);
 
   // Confetti when a milestone fires.
   useEffect(() => {
@@ -1032,11 +1028,11 @@ export default function HomePage({ dict = EN, locale = "en" }: { dict?: Dictiona
             <span className="h1-line h1-title">{dict.heroTitle}</span>
           </h1>
           <p className="subtitle">{dict.subtitle}</p>
-          {/* Two calls to action, side by side on a desktop and stacked on a
-              phone. The old "Browse all sites" anchor is gone: the directory is
-              the next thing down the page, so it only duplicated a scroll. */}
+          {/* One call to action. The "Why base31?" anchor and the old "Browse
+              all sites" link are both gone: the directory is the next thing
+              down the page, and the rail already steps to About, so each only
+              duplicated something else. */}
           <div className="intro-links">
-            <a className="text-link muted-link" href="#about">{dict.whyLink} <span aria-hidden="true">→</span></a>
             <button type="button" className="surprise-button" onClick={surpriseMe} title="Open a random site from the directory or the cool sites strip">
               <span className="surprise-icon" aria-hidden="true">↯</span>
               <span className="surprise-label">{dict.surprise}</span>

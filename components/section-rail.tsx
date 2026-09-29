@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { KeyboardEvent } from "react";
+import { tick } from "@/lib/haptics";
 
 export type RailSection = { id: string; label: string };
 
@@ -23,6 +24,12 @@ const WHEEL_COOLDOWN_MS = 420;
  * monitor it sits in the gutter beside the centered column, on a phone it is
  * slit down to a slim strip of bars in the same gutter. Nothing to scroll past
  * to find it, and nothing it covers.
+ *
+ * Every step it takes — a click, a wheel notch or an arrow key — buzzes once
+ * through the Vibration API, so moving a section lands as a physical tick on a
+ * phone instead of only a scroll. The pattern is deliberately tiny, and
+ * `lib/haptics.ts` turns it off entirely for visitors who asked for reduced
+ * motion.
  */
 export default function SectionRail({ sections }: { sections: RailSection[] }) {
   const [active, setActive] = useState(0);
@@ -69,6 +76,7 @@ export default function SectionRail({ sections }: { sections: RailSection[] }) {
       // everything else stops just below the fixed header.
       const top = section.id === "page-title" ? 0 : element.getBoundingClientRect().top + window.scrollY - 84;
       window.scrollTo({ top: Math.max(0, top), behavior: reduced ? "auto" : "smooth" });
+      tick(12);
     },
     [sections],
   );

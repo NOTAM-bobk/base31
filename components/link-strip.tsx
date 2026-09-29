@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { tick } from "@/lib/haptics";
 
 export type LinkStripItem = { name: string; url: string; tags: string[]; description: string };
 
@@ -63,9 +64,7 @@ export default function LinkStrip({ id, items, search, copy, query = "" }: LinkS
       return;
     }
     setVibrating(true);
-    if (typeof navigator !== "undefined" && typeof navigator.vibrate === "function") {
-      navigator.vibrate(20);
-    }
+    tick(20);
     const timer = window.setTimeout(() => setVibrating(false), 460);
     return () => window.clearTimeout(timer);
   }, [collapsed]);

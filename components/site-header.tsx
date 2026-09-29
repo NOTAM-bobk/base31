@@ -1,6 +1,7 @@
 "use client";
 
 import GithubStats from "@/components/github-stats";
+import { tick } from "@/lib/haptics";
 
 /* The site header: the wordmark, the one navigation link, and the
    account-level actions (the repository commit count and the theme toggle).
@@ -27,8 +28,11 @@ export default function SiteHeader({
           <img className="wordmark-sparkle" src="/header-sparkle.gif" alt="" width={40} height={40} aria-hidden="true" />
           base31.org
         </a>
+        {/* The nav links buzz on the way out through the Vibration API, so
+            tapping one registers on a phone. `tick` is silent on a device
+            without a motor and for anyone who prefers reduced motion. */}
         <nav className="site-nav" aria-label="Main navigation">
-          <a href="/blog">Blog</a>
+          <a href="/blog" onClick={() => tick(12)}>Blog</a>
         </nav>
         <div className="header-actions">
           {/* The header used to carry a Share button; it shows the

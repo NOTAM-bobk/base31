@@ -3,7 +3,9 @@
 import { useEffect, useRef, useState } from "react";
 import DonationBoard from "@/components/donation-board";
 import ReferralCarousel from "@/components/referral-carousel";
+import SupportBannerAd from "@/components/support-banner-ad";
 import TrustpilotReviews from "@/components/trustpilot-reviews";
+import { tick } from "@/lib/haptics";
 
 /* The support hub. Everything that asks the visitor for something —
    the Trustpilot review collector, the donation board, the sponsored
@@ -26,9 +28,7 @@ export default function SupportSection() {
       return;
     }
     setVibrating(true);
-    if (typeof navigator !== "undefined" && typeof navigator.vibrate === "function") {
-      navigator.vibrate(20);
-    }
+    tick(20);
     const timer = window.setTimeout(() => setVibrating(false), 460);
     return () => window.clearTimeout(timer);
   }, [collapsed]);
@@ -101,6 +101,11 @@ export default function SupportSection() {
           <span className="support-ad-text">Want to support base31? Click this button to help</span>
           <span className="support-ad-arrow mono" aria-hidden="true">↗</span>
         </a>
+
+        {/* The banner slot. It is a real ad script, so it waits for the
+            cookie answer exactly like the Adcash auto-tag does; before that
+            the slot explains itself instead of leaving a gap. */}
+        <SupportBannerAd />
       </div>
     </section>
   );

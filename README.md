@@ -263,6 +263,10 @@ bundler. Two ways to do that by accident:
   without clearing the visitor's search or tag. The panel is
   `<div id="sites-panel">` behind `aria-expanded`/`aria-controls`, hidden with
   the `hidden` attribute, and the arrow rotates to `-90deg` when collapsed.
+- The hero carries one call to action: "Surprise me". The "Why base31?" anchor
+  and the original "Browse all sites" link are both gone — the directory is the
+  next thing down the page and the rail already steps to About, so each only
+  duplicated something else within reach.
 - "Surprise me" in the hero opens a random entry — from the current filter
   results when a search is active, otherwise from the whole directory. It is
   styled as a green pill with a bolt badge (`.surprise-button` in
@@ -293,7 +297,9 @@ green while its label slides out; clicking a line scrolls there and a wheel over
 the rail steps one section at a time. That listener is attached by hand with
 `{ passive: false }` because React registers `wheel` passively, so
 `preventDefault` inside `onWheel` would be a no-op. The section list and its
-labels live in `components/home-page.tsx`.
+labels live in `components/home-page.tsx`. Every step it takes buzzes once
+through the Vibration API, and the header's nav links do the same on the way
+out.
 - The directory is filterable by tag (chips built from `config/sites.json`,
   most used first, capped at `MAX_TAG_CHIPS`) and sortable by **Most liked**,
   **Newest** or **A–Z**. Pinned sites stay on top in every mode, and a tag or
@@ -446,6 +452,17 @@ labels live in `components/home-page.tsx`.
   `<link rel="alternate">`. Posts also show a reading time and a "read next"
   list of the other posts.
 
+## Haptics
+
+`lib/haptics.ts` exports `tick(pattern)`, the one place the Vibration API is
+called from: the section rail on every click, wheel notch and arrow key, the
+header's nav links, the support hub and the two link strips when their headings
+toggle, and the actions in the directory and the referral carousel that already
+buzzed. It returns early when the browser has no `navigator.vibrate`, when the
+visitor prefers reduced motion, and inside a `try` for the browsers that expose
+the method but refuse the call — so calling it is always safe and a component
+never needs its own guard.
+
 ## Cookies, ads and analytics
 
 The Google tag runs on every visit and is deliberately not gated; everything
@@ -461,6 +478,7 @@ upload's own favicon — both decorative, both cookie-free:
 | `app/layout.tsx` | The Google tag (gtag.js) for `G-W6J79P13FT`, in `<head>` on every page, on every visit — before the answer and whatever it is |
 | `components/consent-aware-analytics.tsx` | Microsoft Clarity (`ylsxc7fokm`), only on `accepted` |
 | `components/consent-aware-ads.tsx` | Adcash auto-tag (`iy7zk7mmw`), only on `accepted` |
+| `components/support-banner-ad.tsx` | The 160x300 banner in the support hub (`d1495d5e568642fb60c4f1232a9af565`), only on `accepted` |
 | `public/sites/appscreenshot/index.html`, `public/sites/share/index.html` | Never gated: these static subdomain pages render outside Next.js and carry no cookie banner, so the same Adcash auto-tag sits directly in their `<head>` (the async loader is polled for `aclib` before the tag runs). |
 | `components/referral-carousel.tsx` | Never gated: the destination preview image loads straight from the destination (or a screenshot service) because the card is unusable without it. It sets no cookies, the sponsored links stay inert until clicked, and the privacy page says so. |
 
@@ -468,6 +486,14 @@ The Adcash script loader (`https://acscdn.com/script/aclib.js`) is inserted only
 after the visitor accepts, then runs the supplied auto-tag for zone
 `iy7zk7mmw`. Denying or withdrawing consent prevents the loader from being
 inserted (and removes its script element if consent changes after it loads).
+
+The support hub's 160x300 banner follows the same rule. Its network's snippet
+is two parts — a global `atOptions` and a loader that reads it — and neither
+can be pasted into a React tree or run before the answer, so
+`components/support-banner-ad.tsx` sets the global and appends the loader into
+its own slot on `accepted` only, then removes both the script and the frame the
+loader wrote when the answer changes. Before the answer the slot shows a line
+of text pointing at the privacy page instead of an empty tray.
 
 Clarity is inserted into the page only on `accepted`, and its snippet appends its
 loader under `microsoft-clarity-loader` so withdrawing the choice removes what the

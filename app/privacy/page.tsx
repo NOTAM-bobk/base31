@@ -98,7 +98,9 @@ export default function PrivacyPage() {
         <p>
           base31.org is supported by ads served through Adcash. The Adcash auto-tag only loads after you
           confirm the cookie notice — deny it and no ad code, cookie, or tracking request from the
-          ad network is added to the page at all.
+          ad network is added to the page at all. The banner in the Support section follows the same
+          rule: its placement script is fetched only after you accept, and withdrawing your choice
+          removes it along with the frame it had built.
         </p>
         <p>
           The sponsored cards in the referral carousel and the cards in the directory are ordinary links: they request nothing from

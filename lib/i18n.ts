@@ -37,7 +37,6 @@ export const EN = {
   heroWords: ["curious", "bored", "restless", "picky"],
   subtitle:
     "Discover fun websites, useful online tools, and creative web projects built on base31.org and the open web.",
-  whyLink: "Why base31?",
   surprise: "Surprise me",
   searchPlaceholder: "Search all sites...",
   searchAria: "Search all sites",
@@ -78,7 +77,6 @@ export const ES: Dictionary = {
   heroWords: ["curiosas", "aburridas", "inquietas", "exigentes"],
   subtitle:
     "Descubre sitios divertidos, herramientas útiles en línea y proyectos web creativos hechos en base31.org y en la web abierta.",
-  whyLink: "¿Por qué base31?",
   surprise: "Sorpréndeme",
   searchPlaceholder: "Buscar todos los sitios...",
   searchAria: "Buscar todos los sitios",
@@ -118,7 +116,6 @@ export const FR: Dictionary = {
   heroWords: ["curieuses", "occupées", "aventureuses", "fatiguées"],
   subtitle:
     "Découvrez des sites amusants, des outils en ligne utiles et des projets web créatifs construits sur base31.org et le web ouvert.",
-  whyLink: "Pourquoi base31 ?",
   surprise: "Surprends-moi",
   searchPlaceholder: "Rechercher tous les sites...",
   searchAria: "Rechercher tous les sites",
@@ -158,7 +155,6 @@ export const PT: Dictionary = {
   heroWords: ["curiosas", "entediadas", "agitadas", "exigentes"],
   subtitle:
     "Descubra sites divertidos, ferramentas online úteis e projetos web criativos feitos no base31.org e na web aberta.",
-  whyLink: "Por que base31?",
   surprise: "Surpreenda-me",
   searchPlaceholder: "Pesquisar todos os sites...",
   searchAria: "Pesquisar todos os sites",

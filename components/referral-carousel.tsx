@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import referrals from "@/config/referrals.json";
+import { tick } from "@/lib/haptics";
 
 type Referral = {
   name: string;
@@ -86,13 +87,9 @@ export default function ReferralCarousel() {
     return () => window.clearInterval(id);
   }, [count, paused]);
 
-  const buzz = (pattern: number) => {
-    if (typeof navigator === "undefined" || typeof navigator.vibrate !== "function") return;
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    try {
-      navigator.vibrate(pattern);
-    } catch {}
-  };
+  // Haptics live in lib/haptics.ts: no motor, no vibration API, or reduced
+  // motion turns this into a no-op.
+  const buzz = (pattern: number) => tick(pattern);
 
   if (count === 0) return null;
 

@@ -432,6 +432,41 @@ html[data-theme="light"] .site-card:hover {
 }
 .site-card .site-icon { box-shadow: inset 0 1px 0 rgb(255 255 255 / 26%), 0 3px 9px rgb(0 0 0 / 40%); }
 
+/* Support-hub banner slot ------------------------------------------------
+   The 160x300 ad the support hub carries, under the sponsored support button.
+   The slot is a fixed-size tray so the section never reflows while the network
+   decides whether to fill it; before the visitor has answered the cookie
+   notice the tray is only as tall as its line of text, because the ad script
+   is not fetched at all until then (see components/support-banner-ad.tsx). */
+.support-banner-ad {
+  position: relative;
+  margin-top: 26px;
+  padding: 22px 16px 16px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  text-align: center;
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, var(--text-strong) 8%, transparent),
+    0 2px 3px rgb(0 0 0 / 38%),
+    0 14px 30px -16px rgb(0 0 0 / 62%);
+}
+.support-banner-ad > .support-ad-tag { position: absolute; top: 10px; left: 12px; }
+.support-banner-ad-slot {
+  display: flex; align-items: center; justify-content: center;
+  width: 160px; min-height: 300px; margin: 0 auto;
+}
+.support-banner-ad.is-waiting .support-banner-ad-slot { min-height: 0; }
+.support-banner-ad-note {
+  max-width: 340px; margin: 4px auto 6px;
+  color: var(--subtle); font-size: 11.5px; line-height: 1.6;
+}
+.support-banner-ad-note a {
+  color: var(--muted); text-decoration: underline;
+  text-underline-offset: 3px; text-decoration-color: var(--line-strong);
+}
+.support-banner-ad-note a:hover { color: var(--text-strong); }
+
 /* The smaller off-directory cards get the same material, so the page is one
    solid surface rather than two different ones. */
 .cool-card {

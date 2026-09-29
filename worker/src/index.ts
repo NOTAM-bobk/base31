@@ -22,6 +22,11 @@ export interface Env {
   VAPID_PUBLIC_KEY?: string;
   VAPID_PRIVATE_KEY?: string;
   VAPID_SUBJECT?: string;
+  // Optional: when set, every published community site is also committed to
+  // the repository under public/sites/<slug>/. See mirrorSiteToRepo.
+  GITHUB_TOKEN?: string;
+  GITHUB_REPO?: string;
+  GITHUB_BRANCH?: string;
 }
 
 interface WorkerContext {
@@ -412,6 +417,57 @@ const listSites = async (env: Env): Promise<PublishedSite[]> => {
   return sites.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0)).slice(0, MAX_LISTED_SITES);
 };
 
+// Community uploads are mirrored into the repository, in the same
+// public/sites/<slug>/ folder the hand-built sites live in, so a published site
+// is backed by git instead of only by KV. This is optional and best-effort:
+// with no GITHUB_TOKEN the upload still publishes.
+const DEFAULT_GITHUB_REPO = "NOTAM-bobk/base31";
+const DEFAULT_GITHUB_BRANCH = "main";
+
+/** One file, created or replaced, through the GitHub Contents API. */
+const putRepoFile = async (env: Env, path: string, base64: string, message: string): Promise<boolean> => {
+  const branch = env.GITHUB_BRANCH || DEFAULT_GITHUB_BRANCH;
+  const headers = {
+    Authorization: `Bearer ${env.GITHUB_TOKEN}`,
+    Accept: "application/vnd.github+json",
+    "X-GitHub-Api-Version": "2022-11-28",
+    "User-Agent": "base31-directory-worker",
+    "Content-Type": "application/json",
+  };
+  const endpoint = `https://api.github.com/repos/${env.GITHUB_REPO || DEFAULT_GITHUB_REPO}/contents/${path}`;
+
+  // Replacing a file needs the current blob's sha; a fresh slug has none and is
+  // created instead.
+  let sha: string | undefined;
+  const existing = await fetch(`${endpoint}?ref=${encodeURIComponent(branch)}`, { headers });
+  if (existing.ok) sha = ((await existing.json()) as { sha?: string }).sha;
+
+  const response = await fetch(endpoint, {
+    method: "PUT",
+    headers,
+    body: JSON.stringify({ message, content: base64, branch, ...(sha ? { sha } : {}) }),
+  });
+  return response.ok;
+};
+
+/**
+ * Commits every file of a published site to the repository. The bodies are the
+ * same base64 strings KV holds, in the same order as `site.files`.
+ */
+const mirrorSiteToRepo = async (env: Env, site: PublishedSite, bodies: { key: string; data: string }[]) => {
+  if (!env.GITHUB_TOKEN) return;
+  const message = `Add community site: ${site.title} (${site.slug})`;
+  for (const [index, file] of site.files.entries()) {
+    const body = bodies[index];
+    if (!body) continue;
+    try {
+      await putRepoFile(env, `public/sites/${site.slug}/${file.path}`, body.data, message);
+    } catch {
+      // A failed file must not fail the upload: the site is already live.
+    }
+  }
+};
+
 // POST /submit — validates and stores a community-published site.
 const handleSubmit = async (request: Request, env: Env, origin: string, context: WorkerContext): Promise<Response> => {
   let payload: Record<string, unknown>;
@@ -485,6 +541,7 @@ const handleSubmit = async (request: Request, env: Env, origin: string, context:
     await env.VIEW_COUNTER.put(siteKey(slug), JSON.stringify(site));
     for (const body of bodies) await env.VIEW_COUNTER.put(body.key, body.data);
     const published = publicSite(site, origin);
+    context.waitUntil(mirrorSiteToRepo(env, site, bodies));
     context.waitUntil(notifyPublished(env, site, published.url, authorEmail));
     return json({ site: published }, 201);
   } catch {

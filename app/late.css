@@ -307,3 +307,133 @@
   .view-counter.is-bumped { animation: none; }
   .view-counter, .view-counter::before { transition: none; }
 }
+
+/* Section rail ---------------------------------------------------------
+   The lines down the right edge, one per section of the homepage. It is a
+   readout and a menu at once: the line for the section you are reading stands
+   on end and turns green, its label slides out beside it, clicking a line
+   goes there, and scrolling on the rail itself walks the page one section at
+   a time. Fixed to the right edge, so it never moves the page. */
+.section-rail {
+  position: fixed; top: 50%; right: 16px; z-index: 40;
+  display: none; flex-direction: column; align-items: flex-end; gap: 7px;
+  padding: 11px 9px;
+  transform: translateY(-50%);
+  border: 1px solid color-mix(in srgb, var(--line-strong) 58%, var(--line));
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--surface) 88%, transparent);
+  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  box-shadow: 0 16px 36px -20px rgb(0 0 0 / 72%), inset 0 1px 0 rgb(255 255 255 / 5%);
+  opacity: 0; pointer-events: none;
+  transition: opacity 220ms ease;
+}
+.section-rail.is-visible { opacity: 1; pointer-events: auto; }
+/* Only on a desktop with room to spare: a fixed rail over a touch screen's own
+   gestures is worse than nothing, and below this the two-column shell would
+   reach under it. */
+@media (min-width: 1180px) { .section-rail { display: flex; } }
+
+.rail-item {
+  display: flex; align-items: center; justify-content: flex-end; gap: 8px;
+  width: 100%; padding: 2px 1px; border: 0; border-radius: 6px;
+  background: transparent; color: var(--subtle); cursor: pointer;
+}
+.rail-item:hover { color: var(--text-strong); }
+.rail-item.is-active { color: var(--live); }
+/* The label only appears for the section under the pointer (or the one you are
+   in), sliding out of the rail, so the bars stay the quiet part. */
+.rail-label {
+  max-width: 0; overflow: hidden; white-space: nowrap;
+  font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase;
+  opacity: 0;
+  transition: max-width 200ms ease, opacity 200ms ease;
+}
+.rail-item:hover .rail-label,
+.rail-item.is-active .rail-label { max-width: 96px; opacity: 1; }
+
+/* The bar is the point: flat while you are elsewhere, standing on end for the
+   section you are reading, so the rotation is the position readout. */
+.rail-bar {
+  flex: 0 0 auto; width: 14px; height: 2px; border-radius: 2px;
+  background: color-mix(in srgb, var(--line-strong) 76%, var(--muted));
+  transition: transform 260ms cubic-bezier(0.22, 1.1, 0.34, 1), width 260ms ease, background 200ms ease, box-shadow 200ms ease;
+}
+.rail-item:hover .rail-bar { width: 18px; background: var(--muted); }
+.rail-item.is-active .rail-bar {
+  width: 18px; background: var(--live); transform: rotate(90deg);
+  box-shadow: 0 0 12px color-mix(in srgb, var(--live) 60%, transparent);
+}
+.rail-item:focus-visible { outline: 2px solid var(--live); outline-offset: 2px; }
+@media (prefers-reduced-motion: reduce) {
+  .section-rail, .rail-bar, .rail-label { transition: none; }
+  .rail-item.is-active .rail-bar { transform: none; }
+}
+
+/* Solid cards -----------------------------------------------------------
+   The directory's cards read as objects now, not outlines: an opaque fill, a
+   real edge, a bottom-weighted shadow and an inner highlight, so each card
+   looks like something with thickness sitting on the page. Nothing but the
+   edge and the shadow reacts on hover — the preview's gradient fades into
+   `--surface`, so a moving fill would leave a seam where the two meet. */
+.site-card {
+  border-color: color-mix(in srgb, var(--line-strong) 82%, var(--muted));
+  background: var(--surface);
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, var(--text-strong) 8%, transparent),
+    0 2px 3px rgb(0 0 0 / 38%),
+    0 14px 30px -16px rgb(0 0 0 / 62%);
+}
+.site-card:hover {
+  transform: translateY(-1px);
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, var(--text-strong) 11%, transparent),
+    0 3px 5px rgb(0 0 0 / 40%),
+    0 20px 40px -18px rgb(0 0 0 / 70%);
+}
+html[data-theme="light"] .site-card {
+  box-shadow:
+    inset 0 1px 0 #fff,
+    0 1px 2px rgb(0 0 0 / 7%),
+    0 12px 26px -16px rgb(0 0 0 / 22%);
+}
+html[data-theme="light"] .site-card:hover {
+  box-shadow:
+    inset 0 1px 0 #fff,
+    0 2px 4px rgb(0 0 0 / 9%),
+    0 18px 34px -18px rgb(0 0 0 / 26%);
+}
+/* The foot of the card and its chips wear the same solid material as the card
+   they belong to, instead of a tint you can see the page through. */
+.site-card .site-card-lower {
+  border-top: 1px solid color-mix(in srgb, var(--line-strong) 58%, var(--line));
+  background: color-mix(in srgb, var(--surface-hover) 80%, var(--surface));
+}
+.site-card .tag {
+  border-color: color-mix(in srgb, var(--line-strong) 68%, var(--line));
+  background: color-mix(in srgb, var(--surface-hover) 88%, var(--surface));
+}
+.site-card .site-icon { box-shadow: inset 0 1px 0 rgb(255 255 255 / 26%), 0 3px 9px rgb(0 0 0 / 40%); }
+
+/* The smaller off-directory cards get the same material, so the page is one
+   solid surface rather than two different ones. */
+.cool-card {
+  border-color: color-mix(in srgb, var(--line-strong) 64%, var(--line));
+  background: color-mix(in srgb, var(--surface) 94%, var(--surface-hover));
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, var(--text-strong) 6%, transparent),
+    0 1px 2px rgb(0 0 0 / 32%),
+    0 10px 20px -14px rgb(0 0 0 / 55%);
+}
+.cool-card:hover {
+  transform: translateY(-1px);
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, var(--text-strong) 9%, transparent),
+    0 2px 3px rgb(0 0 0 / 34%),
+    0 14px 26px -14px rgb(0 0 0 / 62%);
+}
+html[data-theme="light"] .cool-card {
+  box-shadow:
+    inset 0 1px 0 #fff,
+    0 1px 2px rgb(0 0 0 / 6%),
+    0 8px 16px -12px rgb(0 0 0 / 20%);
+}

@@ -49,6 +49,7 @@ export const EN = {
     "Hand-picked corners of the web that live at their own addresses — not made by base31, just worth the trip.",
   coolSitesClosed:
     "Other cool sites are closed right now. Open the “Other cool sites” heading above to see the off-directory picks again.",
+  coolSitesNoMatch: "No other cool sites match that search — clear it to see all of them again.",
   links: "links",
   allTag: "All",
   filterByTag: "Filter by tag",
@@ -83,6 +84,7 @@ export const ES: Dictionary = {
     "Rincones de la web elegidos a mano que viven en sus propias direcciones: no los hizo base31, solo valen el viaje.",
   coolSitesClosed:
     "Otros sitios geniales están cerrados ahora mismo. Abre el encabezado «Otros sitios geniales» para volver a ver los sitios externos.",
+  coolSitesNoMatch: "Ningún otro sitio genial coincide con esa búsqueda: bórrala para volver a verlos todos.",
   links: "enlaces",
   allTag: "Todos",
   filterByTag: "Filtrar por etiqueta",
@@ -116,6 +118,7 @@ export const FR: Dictionary = {
     "Des coins du web choisis à la main qui vivent à leurs propres adresses — pas réalisés par base31, juste dignes du détour.",
   coolSitesClosed:
     "Les autres sites sympas sont fermés pour le moment. Ouvrez le titre « Autres sites sympas » ci-dessus pour les revoir.",
+  coolSitesNoMatch: "Aucun autre site sympa ne correspond à cette recherche — effacez-la pour tous les revoir.",
   links: "liens",
   allTag: "Tous",
   filterByTag: "Filtrer par étiquette",
@@ -149,6 +152,7 @@ export const PT: Dictionary = {
     "Cantos da web escolhidos a dedo que vivem em seus próprios endereços — não são feitos pela base31, apenas valem a viagem.",
   coolSitesClosed:
     "Os outros sites legais estão fechados agora. Abra o título “Outros sites legais” acima para vê-los de novo.",
+  coolSitesNoMatch: "Nenhum outro site legal corresponde a essa pesquisa — limpe-a para vê-los todos de novo.",
   links: "links",
   allTag: "Todos",
   filterByTag: "Filtrar por tag",

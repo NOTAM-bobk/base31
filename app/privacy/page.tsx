@@ -40,17 +40,16 @@ export default function PrivacyPage() {
 
         <h2>Cookies and your choice</h2>
         <p>
-          We only set our own preference after you choose. Until then the Google tag loads with its
-          storage switched off, so it writes no cookie and stores nothing that identifies you, and
-          no session recording or advertising script runs at all; the directory works exactly the
-          same either way.
+          We only set our own preference after you choose. The Google tag runs on every visit —
+          before you answer the notice and whatever you answer — because that is what lets Google
+          confirm the property; it is the only script that does. Session recording and advertising
+          stay switched off until you confirm, and the directory works exactly the same either way.
         </p>
         <p>
-          Choosing “Confirm” lets Google Analytics write its analytics cookies and lets Microsoft
-          Clarity and our ad network load. Choosing “Deny” keeps analytics storage off, clears any
-          Google Analytics cookies an earlier visit left behind, and leaves Clarity and the ad
-          network unloaded — the only thing stored is the preference itself. You can change your
-          answer whenever you like with the{" "}
+          Choosing “Confirm” allows Microsoft Clarity to record sessions and our ad network to load.
+          Choosing “Deny” leaves both switched off — Google Analytics keeps counting the visit
+          either way, as it also does before you answer — and the only thing stored is the
+          preference itself. You can change your answer whenever you like with the{" "}
           <strong>Cookie settings</strong> link in the footer, which brings the notice back so you
           can choose again.
         </p>
@@ -79,13 +78,11 @@ export default function PrivacyPage() {
 
         <h2>Analytics</h2>
         <p>
-          The Google tag is part of every page so Google can confirm the property is installed. It
-          runs with consent mode: storage is denied until you answer, so before you do no cookie is
-          written and nothing that identifies you is stored. If you confirm the cookie notice we
-          grant analytics storage and load Microsoft Clarity, so we can understand how the directory
-          is used — which pages are viewed and where visitors click — and improve it. If you deny,
-          analytics storage stays off, Google Analytics cookies from earlier visits are cleared, and
-          Clarity is not loaded at all. Google Analytics reports traffic only in aggregate. See
+          The Google tag is part of every page and runs on every visit, so Google can see that the
+          property is installed and we can see which pages are viewed and where visitors click —
+          whether you confirm the cookie notice or deny it. If you confirm, Microsoft Clarity also
+          records sessions, which shows how a visit actually unfolded. If you deny, Clarity is not
+          loaded at all. Google Analytics reports traffic only in aggregate. See
           the{" "}
           <a href="https://privacy.microsoft.com/privacystatement" target="_blank" rel="noreferrer">
             Microsoft privacy statement
@@ -138,10 +135,10 @@ export default function PrivacyPage() {
         <h2>Your choices</h2>
         <p>
           Use <strong>Cookie settings</strong> in the footer to change or withdraw your answer at
-          any time; withdrawing it takes the Clarity and ad loaders back out, switches Google
-          Analytics storage back to denied and clears its cookies, and all of it stays off until you
-          confirm. Clearing site data in
-          your browser also works. The directory and every link in it stay fully usable either way.
+          any time; withdrawing it takes the Clarity and ad loaders back out and they stay off until
+          you confirm, while Google Analytics keeps counting visits as described above. Clearing site
+          data in your browser also works. The directory and every link in it stay fully usable
+          either way.
         </p>
 
         <h2>Contact</h2>

@@ -15,7 +15,8 @@ import CoolSites from "@/components/cool-sites";
 import SiteHeader from "@/components/site-header";
 import { LOCALES, LOCALE_TAGS, type Dictionary, type Locale, EN } from "@/lib/i18n";
 import { resetConsent, useConsent } from "@/lib/consent";
-import coolSites from "@/lib/cool-sites";
+import coolSites, { searchCoolSites } from "@/lib/cool-sites";
+import SectionRail, { type RailSection } from "@/components/section-rail";
 
 type Site = { name: string; subdomain: string; url: string; tags?: string[]; description?: string; show?: boolean; community?: boolean; createdAt?: number; icon?: string; lastChecked?: string };
 
@@ -820,6 +821,24 @@ export default function HomePage({ dict = EN, locale = "en" }: { dict?: Dictiona
 
   const newCutoff = Date.now() - NEW_WINDOW_MS;
 
+  // The section rail walks the page in render order. The two labels the
+  // dictionary holds are used from it, so a translated homepage reads its own
+  // words there; the rest are the English names those sections already print
+  // on every locale.
+  const railSections = useMemo<RailSection[]>(() => [
+    { id: "page-title", label: "Top" },
+    { id: "sites", label: dict.featured },
+    { id: "cool-sites", label: dict.coolSites },
+    { id: "about", label: "About" },
+    { id: "support", label: "Support" },
+    { id: "faq-heading", label: "FAQ" },
+    { id: "updates", label: "Updates" },
+  ], [dict]);
+
+  // How many off-directory picks the same search found, so the directory's
+  // empty state can point at the strip instead of dead-ending.
+  const coolMatchCount = useMemo(() => (query.trim() ? searchCoolSites(query).length : 0), [query]);
+
   // Fade each section in as it scrolls into view. The motion flag on <html> is
   // set by the pre-paint script in the layout, so this can never leave content
   // hidden for visitors without JavaScript.
@@ -992,6 +1011,10 @@ export default function HomePage({ dict = EN, locale = "en" }: { dict?: Dictiona
 
       <SiteHeader theme={theme} onToggleTheme={switchTheme} />
 
+      {/* The lines down the right edge: where you are, and the fast way
+          between sections. */}
+      <SectionRail sections={railSections} />
+
       <main>
         <section className="intro" aria-labelledby="page-title">
           <p className="eyebrow mono">the real web directory</p>
@@ -1122,6 +1145,12 @@ export default function HomePage({ dict = EN, locale = "en" }: { dict?: Dictiona
               <p className="empty">
                 No sites match{activeTag ? <> the tag <strong>{activeTag}</strong></> : null}
                 {query.trim() ? <> “{query.trim()}”</> : null}.{" "}
+                {coolMatchCount > 0 && (
+                  <>
+                    {coolMatchCount} other cool site{coolMatchCount === 1 ? "" : "s"} in the strip below{" "}
+                    {coolMatchCount === 1 ? "does" : "do"} match.{" "}
+                  </>
+                )}
                 <button
                   type="button"
                   className="empty-reset"
@@ -1272,7 +1301,7 @@ export default function HomePage({ dict = EN, locale = "en" }: { dict?: Dictiona
 
         {/* Off-directory picks: external cool sites from config/cool-sites.json,
             rendered as smaller, quieter cards than the directory's own. */}
-        <CoolSites dict={dict} />
+        <CoolSites dict={dict} query={query} />
 
         <AboutSection />
 

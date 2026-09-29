@@ -1,12 +1,12 @@
 # base31.org
 Google Analytics verification. The tag below is Google's own snippet, served
 inline in the `<head>` from `app/layout.tsx` (the id lives in `lib/analytics.ts`)
-on every page, so it is part of the HTML Google is asked to verify instead of
-being appended after the page has loaded. It runs with Google Consent Mode
-defaults — all four storage types start `denied` — and
-`components/consent-aware-analytics.tsx` switches them to `granted` once the
-cookie banner is accepted, so the banner still decides whether anything is
-stored.
+first thing on every page, so it is part of the HTML Google is asked to verify
+instead of being appended after the page has loaded. It runs on every visit —
+before the cookie banner is answered and whatever the answer turns out to be —
+because a tag that waits for a click is invisible to the check it exists for.
+The banner still decides whether Microsoft Clarity records a session and whether
+the ad network loads.
 
   add this code to the main page of base31:   
   <!-- Google tag (gtag.js) -->
@@ -14,7 +14,6 @@ stored.
 <script>
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
-  gtag('consent', 'default', {ad_storage: 'denied', ad_user_data: 'denied', ad_personalization: 'denied', analytics_storage: 'denied', wait_for_update: 500});
   gtag('js', new Date());
 
   gtag('config', 'G-W6J79P13FT');
@@ -266,6 +265,20 @@ bundler. Two ways to do that by accident:
   styled as a green pill with a bolt badge (`.surprise-button` in
   `app/overrides.css`) rather than a plain text link, and its sheen/spin is
   disabled under `prefers-reduced-motion`.
+- The hero search reaches the "Other cool sites" strip, not only the
+directory: `searchCoolSites` in `lib/cool-sites.ts` is the one matcher both
+places use, so a query that matches an off-directory pick opens the strip (if it
+was folded away), filters its cards, changes its count to `n of <total>`, and is
+named in the directory's empty state instead of dead-ending there.
+- A column of small lines down the right edge (`components/section-rail.tsx`,
+shown from 1180px up and hidden below that) is the section readout and the fast
+way between sections.
+The line for the section you are reading rotates flat-to-vertical and turns
+green while its label slides out; clicking a line scrolls there and a wheel over
+the rail steps one section at a time. That listener is attached by hand with
+`{ passive: false }` because React registers `wheel` passively, so
+`preventDefault` inside `onWheel` would be a no-op. The section list and its
+labels live in `components/home-page.tsx`.
 - The directory is filterable by tag (chips built from `config/sites.json`,
   most used first, capped at `MAX_TAG_CHIPS`) and sortable by **Most liked**,
   **Newest** or **A–Z**. Pinned sites stay on top in every mode, and a tag or
@@ -413,19 +426,18 @@ bundler. Two ways to do that by accident:
 
 ## Cookies, ads and analytics
 
-Nothing is written to storage until the visitor answers the banner, and the
-answer is the single switch for all of it. One script is allowed to load before
-the answer: the Google tag, because it has to be part of the served HTML for
-Google to see it installed. It loads with Consent Mode defaults that deny every
-storage type, so it writes no cookie and reports nothing that identifies the
-visitor until the answer arrives. The only other things that load either way are
-the destination preview images on every directory card and
-in the referral carousel and each community upload's own favicon — both decorative, both cookie-free:
+The Google tag runs on every visit and is deliberately not gated; everything
+else waits for the visitor's answer, and that answer is the switch for session
+recording and for ads. The tag is not gated because Google verifies the property
+from the tag it is served — anything that waits for a click fails the check it
+exists for. The other things that load either way are the destination preview
+images on every directory card and in the referral carousel and each community
+upload's own favicon — both decorative, both cookie-free:
 
 | Component | Runs when |
 | --- | --- |
-| `app/layout.tsx` | The Google tag (gtag.js) for `G-W6J79P13FT`, in `<head>` on every page, with every Consent Mode storage type defaulted to `denied` |
-| `components/consent-aware-analytics.tsx` | Microsoft Clarity (`ylsxc7fokm`) only on `accepted`, plus the `gtag('consent', 'update', …)` that grants or denies Google Analytics storage |
+| `app/layout.tsx` | The Google tag (gtag.js) for `G-W6J79P13FT`, in `<head>` on every page, on every visit — before the answer and whatever it is |
+| `components/consent-aware-analytics.tsx` | Microsoft Clarity (`ylsxc7fokm`), only on `accepted` |
 | `components/consent-aware-ads.tsx` | Adcash auto-tag (`iy7zk7mmw`), only on `accepted` |
 | `public/sites/appscreenshot/index.html`, `public/sites/share/index.html` | Never gated: these static subdomain pages render outside Next.js and carry no cookie banner, so the same Adcash auto-tag sits directly in their `<head>` (the async loader is polled for `aclib` before the tag runs). |
 | `components/referral-carousel.tsx` | Never gated: the destination preview image loads straight from the destination (or a screenshot service) because the card is unusable without it. It sets no cookies, the sponsored links stay inert until clicked, and the privacy page says so. |
@@ -435,15 +447,13 @@ after the visitor accepts, then runs the supplied auto-tag for zone
 `iy7zk7mmw`. Denying or withdrawing consent prevents the loader from being
 inserted (and removes its script element if consent changes after it loads).
 
-Clarity is still inserted into the page only on `accepted`, and its snippet
-appends its loader under `microsoft-clarity-loader` so withdrawing the choice
-removes what the page can remove. A library that already fetched stays loaded
-until the next page load, which is what the privacy page says — so never claim a
-withdrawal unloads a script that has already run. Google Analytics is not
-removed that way: its tag stays in the page and `analytics_storage` goes back to
-`denied`, and `clearGoogleCookies` deletes the `_ga*` cookies an earlier visit
-wrote — denying is honoured without taking the tag Google looks for out of the
-HTML.
+Clarity is inserted into the page only on `accepted`, and its snippet appends its
+loader under `microsoft-clarity-loader` so withdrawing the choice removes what the
+page can remove. A library that already fetched stays loaded until the next page
+load, which is what the privacy page says — so never claim a withdrawal unloads a
+script that has already run. The Google tag is never removed: it is part of the
+page, it runs either way, and `lib/analytics.ts` holds the one measurement id
+that both the loader URL and the `config` call are built from.
 
 `lib/consent.ts` holds the `base31-consent` key, a `useConsent()` hook and the
 `base31-consent-change` event that keeps them in sync. `PrivacyConsent`
@@ -575,6 +585,14 @@ votable under its slug.
 - Cloudflare KV list is **eventually consistent**, so a freshly published site
   can take up to ~60s to appear in `GET /sites`. The homepage inserts the
   returned site into the list immediately so its author sees it right away.
+- Every published site is also committed to the repository under
+  `public/sites/<slug>/`, so an upload is backed by git and not only by KV. Set
+  `GITHUB_TOKEN` as a Worker secret to switch it on; `GITHUB_REPO` and
+  `GITHUB_BRANCH` override the defaults (`NOTAM-bobk/base31`, `main`). It is
+  best-effort and runs in `waitUntil`, so a missing token, a wrong scope or a
+  single failed file never becomes a failed upload. Nothing is written to
+  `config/sites.json`, so a mirrored folder does not become a second directory
+  entry and needs no tool guide.
 - Uploads are open and unmoderated. User HTML runs on the worker's own origin
   (not `base31.org`), so it cannot reach the directory's cookies or storage,
   but it can call the worker's own API. If this ever needs locking down, set
@@ -621,6 +639,9 @@ its new choice, which keeps switching or clearing a vote from double-counting.
 | `VAPID_PUBLIC_KEY` | Worker secret | Public VAPID key served to browsers for opt-in push notifications |
 | `VAPID_PRIVATE_KEY` | Worker secret | Private VAPID key used to sign push notifications; never expose it to the browser |
 | `VAPID_SUBJECT` | Worker secret | VAPID contact URI, for example a `mailto:` address |
+| `GITHUB_TOKEN` | Worker secret | Optional; when set, each published community site is committed to `public/sites/<slug>/` on `GITHUB_BRANCH`. Needs **Contents: read and write** on `GITHUB_REPO` (fine-grained) or the `repo` scope |
+| `GITHUB_REPO` | Worker secret | Optional; `owner/repo` to mirror uploads into, defaults to `NOTAM-bobk/base31` |
+| `GITHUB_BRANCH` | Worker secret | Optional; branch the mirror commits to, defaults to `main` |
 
 ### Deploying
 

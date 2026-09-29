@@ -1,42 +1,20 @@
 "use client";
 
 import { useEffect } from "react";
-import { CONSENT_TYPES } from "@/lib/analytics";
 import { useConsent } from "@/lib/consent";
 
 const clarityTag = "ylsxc7fokm";
 
 // The id the Clarity snippet gives the loader tag it appends, so a withdrawn
-// choice has something to take back out. The Google tag is deliberately not in
-// this list: it is served by `app/layout.tsx` and Consent Mode turns its
-// storage off instead of its script being pulled out of the page.
+// choice has something to take back out.
 const LOADER_IDS = ["microsoft-clarity-loader"];
 
-type AnalyticsWindow = Window & {
-  dataLayer?: unknown[];
-  gtag?: (...args: unknown[]) => void;
-};
-
-// The cookies the Google tag writes. Clearing them is the part of "withdraw
-// consent" a page can still perform after the library has loaded.
-const GOOGLE_COOKIE = /^_(ga|gid|gcl|gac)/;
-
-function clearGoogleCookies() {
-  for (const entry of document.cookie.split(";")) {
-    const name = entry.split("=")[0]?.trim();
-    if (!name || !GOOGLE_COOKIE.test(name)) continue;
-    for (const domain of ["", location.hostname, `.${location.hostname}`]) {
-      document.cookie = `${name}=; Max-Age=0; path=/${domain ? `; domain=${domain}` : ""}`;
-    }
-  }
-}
-
-// Microsoft Clarity only runs after the visitor confirms the cookie banner — it
-// records sessions, so it is the one that waits for the answer. The Google tag
-// is different: it is in the page on every load (see `app/layout.tsx`), and the
-// Consent Mode update below is what holds its storage back. The ad script lives
-// in `consent-aware-ads.tsx` so the three can be reasoned about — and switched
-// — separately.
+// Microsoft Clarity waits for the visitor's answer, because it records sessions
+// rather than counting visits. The Google tag deliberately does not: it is
+// served from the head on every page and runs either way, which is what Google
+// verifies (see `lib/analytics.ts`). The ad script waits too, and lives in
+// `consent-aware-ads.tsx` so the two gated scripts can be reasoned about — and
+// switched — separately.
 export default function ConsentAwareAnalytics() {
   const consent = useConsent();
 
@@ -58,28 +36,12 @@ export default function ConsentAwareAnalytics() {
     };
   }, [consent]);
 
-  // Removing a loader cannot unload the library it already pulled in, so a
-  // denied or withdrawn choice leaves the library idle rather than gone.
+  // Removing a loader cannot unload the library it already pulled in, but it
+  // does stop anything new being queued; a reload after withdrawing the choice
+  // starts clean, which is what the privacy page describes.
   useEffect(() => {
     if (consent === "accepted") return;
     for (const id of LOADER_IDS) document.getElementById(id)?.remove();
-  }, [consent]);
-
-  // The visitor's answer, handed to the Google tag as a Consent Mode update:
-  // `granted` lets it write its cookies, `denied` keeps them off and clears any
-  // an earlier visit left behind. A null answer is ignored — the default in the
-  // head snippet is already `denied`.
-  useEffect(() => {
-    if (consent === null) return;
-    const gtag = (window as AnalyticsWindow).gtag;
-    if (!gtag) return;
-
-    const granted = consent === "accepted";
-    const update: Record<string, string> = {};
-    for (const type of CONSENT_TYPES) update[type] = granted ? "granted" : "denied";
-    gtag("consent", "update", update);
-
-    if (!granted) clearGoogleCookies();
   }, [consent]);
 
   return null;

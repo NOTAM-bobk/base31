@@ -21,8 +21,8 @@ export default function PrivacyConsent() {
     <aside className="cookie-consent" aria-label="Cookie consent">
       <div className="cookie-inner">
         <p>
-          Analytics and ads stay switched off until you choose. Confirm to allow them, or deny to keep the page
-          script-free. <a href="/privacy">Privacy policy</a>.
+          Session recording and ads stay switched off until you choose. Google Analytics runs on every visit — it is
+          how the site is verified. <a href="/privacy">Privacy policy</a>.
         </p>
         <div className="cookie-actions">
           <button type="button" className="cookie-button cookie-deny" onClick={() => writeConsent("denied")}>

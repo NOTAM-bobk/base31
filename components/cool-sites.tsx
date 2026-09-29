@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import coolSites from "@/lib/cool-sites";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { allCoolSites, searchCoolSites } from "@/lib/cool-sites";
 import { EN, type Dictionary } from "@/lib/i18n";
 
 // The "Other cool sites" strip under the Featured sites directory. These are
@@ -10,14 +10,28 @@ import { EN, type Dictionary } from "@/lib/i18n";
 // smaller and quieter than the directory's cards: an external pointer, not a
 // full listing, and every one opens in a new tab.
 //
+// The hero search reaches this strip too: the same query that narrows the
+// directory narrows these cards, the section opens itself when it has
+// something to show, and the count says how many of the links matched.
+//
 // The heading is a disclosure control, exactly like "Featured sites" and
 // "Support": it folds the strip away, says so in words while it is shut, and
 // gives the section the same short wobble (plus a haptic tick) on every
 // open and close so the toggle reads as a physical response.
-export default function CoolSites({ dict = EN }: { dict?: Dictionary }) {
+export default function CoolSites({ dict = EN, query = "" }: { dict?: Dictionary; query?: string }) {
   const [collapsed, setCollapsed] = useState(false);
   const [vibrating, setVibrating] = useState(false);
   const mounted = useRef(false);
+
+  const matches = useMemo(() => searchCoolSites(query), [query]);
+  const searching = query.trim().length > 0;
+
+  // A search that reaches this strip opens it, so what it found is visible
+  // instead of folded away. Setting `false` when it is already open does not
+  // re-render, so this never fights the visitor's own toggle.
+  useEffect(() => {
+    if (searching && matches.length > 0) setCollapsed(false);
+  }, [searching, matches.length]);
 
   useEffect(() => {
     // Skip the first render: the section starts open, and that is not a toggle.
@@ -55,21 +69,29 @@ export default function CoolSites({ dict = EN }: { dict?: Dictionary }) {
             </svg>
           </button>
         </h2>
-        <span className="section-count mono">{coolSites.length} {dict.links}</span>
+        <span className="section-count mono" aria-live="polite">
+          {searching ? `${matches.length} of ${allCoolSites.length}` : allCoolSites.length} {dict.links}
+        </span>
       </div>
 
       {/* With the grid hidden the strip simply vanishes, so the closed state
-          says so in words instead of leaving a silent gap. */}
+          says so in words instead of leaving a silent gap. A search overrides
+          that: the strip opens itself, and an empty result says so here. */}
       {collapsed && (
         <p className="section-closed-note" role="status">
           {dict.coolSitesClosed}
+        </p>
+      )}
+      {searching && matches.length === 0 && (
+        <p className="section-closed-note" role="status">
+          {dict.coolSitesNoMatch}
         </p>
       )}
 
       <div id="cool-panel" className="sites-panel" hidden={collapsed}>
         <p className="cool-lede">{dict.coolSitesLede}</p>
         <div className="cool-grid" role="list">
-          {coolSites.map((site) => (
+          {matches.map((site) => (
             <a
               key={site.url}
               href={site.url}

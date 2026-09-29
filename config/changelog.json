@@ -1,5 +1,18 @@
 [
   {
+    "version": "1.10.0",
+    "date": "2026-09-29",
+    "title": "Solid cards, a rail down the side, and one search for the whole page",
+    "summary": "The directory's cards read as physical objects, a column of lines down the right edge tracks and jumps between sections, the hero search reaches the off-directory strip as well, and the Google tag runs on every visit.",
+    "highlights": [
+      "Cards are solid: an opaque fill, a real edge, a bottom-weighted shadow and an inner highlight, so each one looks like something sitting on the page with thickness rather than an outline drawn on it. Only the edge and the shadow react on hover.",
+      "A rail of small lines down the right edge shows where you are — the line for the current section stands on end and turns green, with its label sliding out beside it — and a click, a scroll on the rail itself, or the arrow keys steps to another section. It stays out of the way on phones.",
+      "The hero search also searches the “Other cool sites” strip: matching picks are filtered in place, the strip opens itself, its count reads n of the total, and the directory's empty state names how many off-directory picks matched.",
+      "The Google tag runs on every page and every visit, whichever way the cookie banner is answered, because Google verifies the property from the tag it is served; Microsoft Clarity and the ad network still wait for the answer.",
+      "Community uploads can be mirrored into the repository: set GITHUB_TOKEN as a Worker secret and each published site is committed under public/sites/<slug>/."
+    ]
+  },
+  {
     "version": "1.9.0",
     "date": "2026-09-29",
     "title": "The Google tag is in the page, and the banner still runs it",

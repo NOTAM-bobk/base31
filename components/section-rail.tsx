@@ -19,18 +19,20 @@ const WHEEL_COOLDOWN_MS = 420;
  * scrolling *on* the rail walks one section at a time instead of scrolling the
  * page, which is the quick way through a long homepage.
  *
- * It appears once the hero is behind you, and never on a phone: a fixed rail
- * over a touch screen's own gestures is worse than nothing.
+ * It is always there, from the first screen on, at every width: on a wide
+ * monitor it sits in the gutter beside the centered column, on a phone it is
+ * slit down to a slim strip of bars in the same gutter. Nothing to scroll past
+ * to find it, and nothing it covers.
  */
 export default function SectionRail({ sections }: { sections: RailSection[] }) {
   const [active, setActive] = useState(0);
-  const [visible, setVisible] = useState(false);
   const rail = useRef<HTMLElement | null>(null);
   const lastStep = useRef(0);
 
   // Which section is on screen: the last one whose top has passed a third of
   // the way down the viewport. Measured on scroll inside a rAF so a fast wheel
-  // cannot queue a layout per event.
+  // cannot queue a layout per event. The rail itself never hides, so this only
+  // ever picks the line that stands up.
   useEffect(() => {
     let frame = 0;
     const measure = () => {
@@ -42,7 +44,6 @@ export default function SectionRail({ sections }: { sections: RailSection[] }) {
         if (element && element.getBoundingClientRect().top <= line) current = index;
       });
       setActive(current);
-      setVisible(window.scrollY > 220);
     };
     const onScroll = () => {
       if (!frame) frame = window.requestAnimationFrame(measure);
@@ -102,7 +103,7 @@ export default function SectionRail({ sections }: { sections: RailSection[] }) {
   return (
     <nav
       ref={rail}
-      className={`section-rail${visible ? " is-visible" : ""}`}
+      className="section-rail"
       aria-label="Page sections"
       onKeyDown={onKeyDown}
     >

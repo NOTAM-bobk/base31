@@ -1,5 +1,16 @@
 [
   {
+    "version": "1.11.0",
+    "date": "2026-09-29",
+    "title": "The section rail is always there",
+    "summary": "The column of lines down the right edge no longer waits for a wide window or for a scroll before it shows up: it is on the first screen at every width, full size on a desktop and a slim strip of bars where the gutter tightens.",
+    "highlights": [
+      "The rail shows from the moment the page opens. It used to be hidden below 1180px and stay invisible until you had scrolled 220px, which is why it looked missing on a laptop window that was a little narrow or before the first scroll.",
+      "Where it does not fit at full size it degrades instead of disappearing: under 1180px the bars shorten and the labels go (there is no hover to open them on a touch screen), and on a phone it is a slim strip of bars in the same gutter.",
+      "It still marks the section you are reading — the current line stands on end and turns green with its label sliding out — and a click, a scroll on the rail itself, or the arrow keys steps to another section."
+    ]
+  },
+  {
     "version": "1.10.0",
     "date": "2026-09-29",
     "title": "Solid cards, a rail down the side, and one search for the whole page",

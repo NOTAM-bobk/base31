@@ -313,10 +313,16 @@
    readout and a menu at once: the line for the section you are reading stands
    on end and turns green, its label slides out beside it, clicking a line
    goes there, and scrolling on the rail itself walks the page one section at
-   a time. Fixed to the right edge, so it never moves the page. */
+   a time. Fixed to the right edge, so it never moves the page.
+
+   It is always on, from the first screen and at every width — nothing to
+   scroll past to find it. The column it sits beside is a centered 720px, so
+   the gutter is where it lives and it only has to fit there: full size on a
+   desktop, bars only where the gutter narrows, and a slim strip of bars on a
+   phone, where there is no hover to open a label anyway. */
 .section-rail {
   position: fixed; top: 50%; right: 16px; z-index: 40;
-  display: none; flex-direction: column; align-items: flex-end; gap: 7px;
+  display: flex; flex-direction: column; align-items: flex-end; gap: 7px;
   padding: 11px 9px;
   transform: translateY(-50%);
   border: 1px solid color-mix(in srgb, var(--line-strong) 58%, var(--line));
@@ -324,14 +330,26 @@
   background: color-mix(in srgb, var(--surface) 88%, transparent);
   backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
   box-shadow: 0 16px 36px -20px rgb(0 0 0 / 72%), inset 0 1px 0 rgb(255 255 255 / 5%);
-  opacity: 0; pointer-events: none;
-  transition: opacity 220ms ease;
 }
-.section-rail.is-visible { opacity: 1; pointer-events: auto; }
-/* Only on a desktop with room to spare: a fixed rail over a touch screen's own
-   gestures is worse than nothing, and below this the two-column shell would
-   reach under it. */
-@media (min-width: 1180px) { .section-rail { display: flex; } }
+/* Labels need a pointer to open them, so they go first as the gutter tightens. */
+@media (max-width: 1179px) {
+  .section-rail { right: 12px; gap: 6px; padding: 9px 7px; }
+  .rail-bar { width: 12px; }
+  .rail-item:hover .rail-bar,
+  .rail-item.is-active .rail-bar { width: 15px; }
+}
+@media (max-width: 819px) {
+  .section-rail {
+    right: 6px; gap: 4px; padding: 7px 5px;
+    background: color-mix(in srgb, var(--surface) 74%, transparent);
+    box-shadow: 0 10px 24px -16px rgb(0 0 0 / 70%), inset 0 1px 0 rgb(255 255 255 / 5%);
+  }
+  .rail-item { min-height: 20px; padding: 0; }
+  .rail-label { display: none; }
+  .rail-bar { width: 10px; }
+  .rail-item:hover .rail-bar,
+  .rail-item.is-active .rail-bar { width: 13px; }
+}
 
 .rail-item {
   display: flex; align-items: center; justify-content: flex-end; gap: 8px;

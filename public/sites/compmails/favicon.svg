@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="CompMails">
+  <defs>
+    <linearGradient id="cm-tile" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#43e0a4" />
+      <stop offset="1" stop-color="#0a7a4b" />
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="14" fill="url(#cm-tile)" />
+  <g fill="none" stroke="#04170e" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="15" y="21" width="34" height="23" rx="4.2" />
+    <path d="M16.6 23.6 32 34.6l15.4-11" />
+  </g>
+</svg>

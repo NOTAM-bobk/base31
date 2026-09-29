@@ -1,5 +1,18 @@
 [
   {
+    "version": "1.16.0",
+    "date": "2026-09-29",
+    "title": "CompMails, rebuilt",
+    "summary": "CompMails becomes a real temp-mail tool: an instant inbox, live refresh that pauses in a background tab, search with an unread filter, a reader with raw headers and attachment downloads, .eml export, a custom address and a list of the inboxes this browser has used — with the search-facing title and description it was missing, an app icon of its own, and the Adsterra banner the support hub runs, gated by the page's cookie notice.",
+    "highlights": [
+      "CompMails is rebuilt from scratch. An inbox is created the moment the page opens; the list refreshes itself and pauses while the tab is in the background; search and an unread filter cut a busy address down to what you have not read; and the reader renders HTML in a sandboxed frame with the raw headers, attachment downloads, .eml export and a JSON copy one click away. A custom address with your own name and password, a QR code for a phone, and a short list of the inboxes this browser has used all come with it.",
+      "It is faster to load, too: the Tailwind CDN, the icon CDN and the Google Fonts request are gone. The page is one stylesheet, one script and system fonts, so a first visit costs a handful of requests instead of a dozen.",
+      "The page now says what people search for. The title reads \"100% free and fast temp mails\", the description leads with \"Create free temp mail no sign up, fast, guaranteed\", and behind it sit a canonical URL, Open Graph and Twitter cards, and a WebSite / WebApplication / FAQPage graph — plus the subdomain's own robots.txt and sitemap.xml, which it never had before.",
+      "CompMails has an app icon: an emerald tile with a dark envelope, shipped as an SVG, as 48, 96, 192 and 512 pixel PNGs and as an opaque Apple touch icon, wired through a web manifest — so the tab, the home screen and the search result all carry the same mark. The card it shows in the directory was redrawn to match.",
+      "The 160x300 Adsterra banner the support hub already runs now fills a slot on CompMails as well, and it follows the site's one rule: the loader is only appended after the visitor accepts the cookie notice, and withdrawing that answer removes the script and the frame it built. The CompMails guide under /tools is rewritten so the subdomain and the directory page stop chasing the same query, and the privacy page names both ad networks instead of only one."
+    ]
+  },
+  {
     "version": "1.15.0",
     "date": "2026-09-29",
     "title": "A headline that arrives, and a lighter light mode",

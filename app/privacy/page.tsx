@@ -104,11 +104,12 @@ export default function PrivacyPage() {
 
         <h2>Advertising</h2>
         <p>
-          base31.org is supported by ads served through Adcash. The Adcash auto-tag only loads after you
-          confirm the cookie notice — deny it and no ad code, cookie, or tracking request from the
-          ad network is added to the page at all. The banner in the Support section follows the same
-          rule: its placement script is fetched only after you accept, and withdrawing your choice
-          removes it along with the frame it had built.
+          base31.org is supported by ads from two networks: Adcash, whose auto-tag runs on the
+          directory, and Adsterra, whose 160x300 banner fills the Support section as well as the same
+          slot on compmails.base31.org. Both follow one rule — no ad code, cookie, or tracking request
+          is added to the page until you confirm the cookie notice. Deny it and nothing is fetched from
+          either network. Withdrawing your choice afterwards takes the script back out along with the
+          frame it had built.
         </p>
         <p>
           The sponsored cards in the referral carousel and the cards in the directory are ordinary links: they request nothing from
@@ -123,6 +124,10 @@ export default function PrivacyPage() {
           See the{" "}
           <a href="https://adcash.com/legal/" target="_blank" rel="noreferrer">
             Adcash legal and privacy information
+          </a>{" "}
+          and the{" "}
+          <a href="https://adsterra.com/privacy-policy/" target="_blank" rel="noreferrer">
+            Adsterra privacy policy
           </a>{" "}
           for details.
         </p>

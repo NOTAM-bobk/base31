@@ -64,9 +64,10 @@
       "privacy",
       "utility"
     ],
-    "description": "Use a disposable inbox for temporary signups and quick online testing.",
+    "description": "Create free temp mail with no sign up: an instant disposable inbox you can read in the browser.",
     "show": true,
-    "language": "en"
+    "language": "en",
+    "lastChecked": "2026-09-29"
   },
   {
     "name": "Daily Wordle",

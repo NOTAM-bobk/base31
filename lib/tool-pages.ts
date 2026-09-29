@@ -117,29 +117,29 @@ export const toolPages: Record<string, ToolPage> = {
   },
 
   compmails: {
-    headline: "A disposable inbox for quick signups and testing",
+    headline: "Free temp mail that opens the moment you need it",
     metaDescription:
-      "Use a temporary email address for signups, trials, and testing. A disposable inbox you can read instantly, with nothing to install or configure.",
-    summary: "A throwaway email address you can read immediately in the browser.",
+      "Create free temp mail with no sign up: a fast, guaranteed disposable inbox that opens in one click and reads verification links instantly.",
+    summary: "A disposable inbox in one click — free, no sign up, no password to invent.",
     intro: [
-      "CompMails gives you a temporary inbox you can hand to a signup form instead of your real address. The mail arrives in the browser, and the address goes away afterwards.",
-      "It is meant for the small stuff: a one-off download, a trial that insists on an email, or a form you would rather not give your real inbox to.",
+      "A temp mail address is the address you hand out when you do not want to hand out yours. CompMails issues one the second the page opens, so there is no form to fill in, no confirmation mail to click, and nothing to remember afterwards.",
+      "It is built for the small jobs — a download gate, a trial that insists on an email, a one-off verification link — and for testing your own signup flow end to end without spending a real address on it.",
     ],
     features: [
-      { title: "No setup", body: "The inbox is ready when the page loads — nothing to register and nothing to confirm." },
-      { title: "Reads in the browser", body: "Messages appear on the page, so there is no mail client to install." },
-      { title: "Keeps your real inbox clean", body: "Signups that would otherwise generate years of newsletters land somewhere disposable instead." },
-      { title: "Good for testing", body: "Handy for walking through your own signup or password-reset flow without burning a real address." },
+      { title: "Instant, and no sign up", body: "The address exists before you finish reading the page, and it is kept in your own browser so a reload brings it back." },
+      { title: "Live inbox", body: "The page checks for new mail on its own and pauses while the tab is in the background, so a waiting code appears as soon as you look." },
+      { title: "Search, unread filter, reader", body: "Find a message by sender, subject or text, filter to unread only, then read it in a sandboxed frame with the raw headers a click away." },
+      { title: "Attachments and exports", body: "Download an attachment straight from the reader, or save the whole message as an .eml file to keep or forward." },
     ],
     steps: [
-      "Open the tool and copy the address it gives you.",
-      "Paste that address into the signup or form you are working with.",
-      "Come back to the page to read whatever arrives.",
+      "Open CompMails and copy the address it creates for you, or show it as a QR code and scan it with a phone.",
+      "Paste the address into the form, trial or download gate you are working with and send the mail.",
+      "Read it on the page — follow the link or download the attachment — then start a fresh inbox whenever you are done.",
     ],
     faqs: [
-      { question: "Is a disposable inbox private?", answer: "Treat it as public. Anyone who knows the address can read the inbox, so never use one for banking, account recovery, or anything sensitive." },
-      { question: "Should I use it for an account I care about?", answer: "No. Once you lose access to the inbox you also lose password resets, so use your own address for anything permanent." },
-      { question: "What is it best for?", answer: "One-off downloads, trials, and testing your own signup flows." },
+      { question: "Do I need to sign up for a temp mail address?", answer: "No. There is no account, no password and no confirmation step: the inbox is created for you and kept in this browser, and a fresh one is always one click away." },
+      { question: "Can I keep an address for later?", answer: "Yes — choose your own name, domain and password, and the address can be reopened from the inboxes kept in your browser. Random addresses can be saved the same way." },
+      { question: "What should I not use it for?", answer: "Anything you would be upset to lose. Disposable inboxes expire after a few days, so password resets and account recovery do not belong here — and anyone who knows the address can read it." },
     ],
   },
 

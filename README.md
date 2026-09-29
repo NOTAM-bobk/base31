@@ -527,6 +527,7 @@ upload's own favicon — both decorative, both cookie-free:
 | `components/consent-aware-ads.tsx` | Adcash auto-tag (`iy7zk7mmw`), only on `accepted` |
 | `components/support-banner-ad.tsx` | The 160x300 banner in the support hub (`d1495d5e568642fb60c4f1232a9af565`), only on `accepted` |
 | `public/sites/appscreenshot/index.html`, `public/sites/share/index.html` | Never gated: these static subdomain pages render outside Next.js and carry no cookie banner, so the same Adcash auto-tag sits directly in their `<head>` (the async loader is polled for `aclib` before the tag runs). |
+| `public/sites/compmails/index.html` | The same 160x300 Adsterra banner as the support hub (`d1495d5e568642fb60c4f1232a9af565`), appended by `app.js` only on `accepted`. This static page ships its own cookie notice, and that notice is what gates the ad. |
 | `components/referral-carousel.tsx` | Never gated: the destination preview image loads straight from the destination (or a screenshot service) because the card is unusable without it. It sets no cookies, the sponsored links stay inert until clicked, and the privacy page says so. |
 
 The Adcash script loader (`https://acscdn.com/script/aclib.js`) is inserted only
@@ -534,13 +535,18 @@ after the visitor accepts, then runs the supplied auto-tag for zone
 `iy7zk7mmw`. Denying or withdrawing consent prevents the loader from being
 inserted (and removes its script element if consent changes after it loads).
 
-The support hub's 160x300 banner follows the same rule. Its network's snippet
-is two parts — a global `atOptions` and a loader that reads it — and neither
+The support hub's 160x300 banner follows the same rule. Its network is
+**Adsterra**, and its snippet is two parts — a global `atOptions` describing the
+slot (`d1495d5e568642fb60c4f1232a9af565`) and a loader at
+`https://www.highrevenueformat.com/<key>/invoke.js` that reads it — and neither
 can be pasted into a React tree or run before the answer, so
 `components/support-banner-ad.tsx` sets the global and appends the loader into
 its own slot on `accepted` only, then removes both the script and the frame the
 loader wrote when the answer changes. Before the answer the slot shows a line
 of text pointing at the privacy page instead of an empty tray.
+`public/sites/compmails/app.js` runs the same key the same way, against the
+cookie notice that static page ships. The other static subdomain pages have no
+notice of their own, which is why they carry the Adcash tag ungated instead.
 
 Clarity is inserted into the page only on `accepted`, and its snippet appends its
 loader under `microsoft-clarity-loader` so withdrawing the choice removes what the

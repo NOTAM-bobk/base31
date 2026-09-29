@@ -274,5 +274,33 @@
     "show": true,
     "language": "en",
     "lastChecked": "2026-09-26"
+  },
+  {
+    "name": "Niko Schultz",
+    "subdomain": "nikoschultz",
+    "url": "https://nikoschultz.base31.org",
+    "tags": [
+      "running",
+      "sports",
+      "profile"
+    ],
+    "description": "Follow an 800m runner's verified results, milestones, videos, and official profile links.",
+    "show": true,
+    "language": "en",
+    "lastChecked": "2026-09-29"
+  },
+  {
+    "name": "Sawyer Schulz",
+    "subdomain": "sawyerschulz",
+    "url": "https://sawyerschulz.base31.org",
+    "tags": [
+      "portfolio",
+      "developer",
+      "running"
+    ],
+    "description": "A student developer and competitive distance runner's portfolio: projects, skills, race results, and contact details.",
+    "show": true,
+    "language": "en",
+    "lastChecked": "2026-09-29"
   }
 ]

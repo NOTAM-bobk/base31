@@ -440,6 +440,60 @@ export const toolPages: Record<string, ToolPage> = {
     ],
     related: ["isittaken", "isitdown", "iframetester"],
   },
+
+  nikoschultz: {
+    headline: "An 800m runner's results, milestones and videos in one place",
+    metaDescription:
+      "Follow Niko Schultz, a Puerto Rico-eligible 800m runner: verified meet results, career milestones, race videos and the official profile links.",
+    summary: "Verified results, milestones and race video for an 800m runner, with every official profile in one place.",
+    intro: [
+      "Niko Schultz runs the 800m. This is the page that keeps his season in one place: the meets he has run, the times that came out of them, and the marks that were worth remembering.",
+      "Everything on it is meant to be checkable. Results are listed alongside the meet and date they came from, videos sit next to the race they belong to, and the official profiles linked from the page are the ones that publish his entries.",
+    ],
+    features: [
+      { title: "Verified results", body: "Each mark is shown with the meet and the date it was run at, so a time can be traced back to the result that produced it." },
+      { title: "Milestones", body: "Personal bests, breakthroughs and season highlights are collected in one list instead of being spread across a feed." },
+      { title: "Race videos", body: "Races that were filmed are grouped with the result, so the time and the run that produced it are never far apart." },
+      { title: "Official profiles", body: "The outside profiles — results databases, social accounts — are linked in one place, so a recruiter does not have to hunt for them." },
+    ],
+    steps: [
+      "Open the page for the current season overview and the latest results.",
+      "Use the results list to read a specific meet, its date and the time run there.",
+      "Follow a video or an official profile link for the primary source behind a listing.",
+    ],
+    faqs: [
+      { question: "Who is Niko Schultz?", answer: "An 800m runner eligible to represent Puerto Rico. The page keeps his results, milestones, race videos and official profile links together." },
+      { question: "Where do the results come from?", answer: "They are listed with the meet and date they were run at. Where a race was recorded or published elsewhere, the page links out to that source rather than restating it." },
+      { question: "Can coaches or recruiters use the page?", answer: "Yes. That is what it is for: an at-a-glance record of times, milestones and video, plus the official profiles that carry the entries." },
+    ],
+  },
+
+  sawyerschulz: {
+    headline: "A student developer's portfolio, and the races beside it",
+    metaDescription:
+      "Sawyer's portfolio and running profile: student development projects, technical skills, competitive distance-running results, and how to get in touch.",
+    summary: "Projects, skills and technical work from a student developer, next to a competitive distance runner's race record.",
+    intro: [
+      "Sawyer is a student developer and a competitive distance runner. This site holds both halves of that: the things he has built, and the races he has run.",
+      "The portfolio side lists projects and the technical skills behind them. The running side lists race results. Both are written as a personal record rather than a product page, which is why contact details sit right at the end.",
+    ],
+    features: [
+      { title: "Project portfolio", body: "The development work is collected in one place, each project described by what it does rather than only by its name." },
+      { title: "Technical skills", body: "The languages, tools and platforms behind those projects are listed as a readable, honest summary of what he works in." },
+      { title: "Race results", body: "Distance-running results sit alongside the portfolio, so the competitive record is as easy to find as the code." },
+      { title: "Contact details", body: "A direct way to get in touch, for anyone who has read the work and wants to ask about it." },
+    ],
+    steps: [
+      "Open the site for the portfolio overview and the current project list.",
+      "Read a project for what it does and the skills it was built with.",
+      "Scroll on to the race results, or use the contact details at the end to get in touch.",
+    ],
+    faqs: [
+      { question: "Who is Sawyer?", answer: "A student developer and competitive distance runner from Minnetonka. His site is a portfolio of development work alongside his running record." },
+      { question: "What is on the site?", answer: "Projects and the technical skills behind them, a list of race results, and contact details — a personal record rather than a product page." },
+      { question: "Is the source code available?", answer: "The portfolio describes the work itself. If you want to talk about a specific project, the contact details at the end of the page are the way in." },
+    ],
+  },
 };
 
 const tagsBySlug = new Map(

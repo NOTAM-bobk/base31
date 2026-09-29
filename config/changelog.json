@@ -1,5 +1,18 @@
 [
   {
+    "version": "1.15.0",
+    "date": "2026-09-29",
+    "title": "A headline that arrives, and a lighter light mode",
+    "summary": "The hero headline rises word by word on load and its negation — the \"Not\" — wears a marker highlight under a green rule. The light theme gets a real pass on its shadows, hairlines and green, the footer's links finally look like links, the directory's cards are a little smaller with thumbs that are easier to hit, and \"Surprise me\" is a solid square instead of an outline pill.",
+    "highlights": [
+      "The headline arrives instead of appearing: each word fades up from below, a little out of focus, with a short stagger between them. The negation in the middle — \"Not\" — wears a green underline under a marker highlight, and because the accent follows the word rather than the language, \"nada\" and \"pas\" get the same treatment on the translated homepages.",
+      "Light mode got a pass rather than a token swap: a deeper green for the small accents so they clear AA on white, stronger hairlines so card edges and the header rule do not vanish into paper, and a lighter shadow, with light-theme weights for the view counter, the support board and the favicon tiles.",
+      "The footer's links are links: one blue with a real underline that thickens under the pointer. The contact details and the language switcher take the same blue but keep their pill shape.",
+      "The directory's cards are a little smaller — a 150px preview band and one size down on the name — and the thumbs in the card's foot are 32px tall, 38px under a thumb, instead of 26px.",
+      "\"Surprise me\" is a solid square now: the accent green as a fill, the label in whichever ink stays legible on it. Two new sites join the directory: an 800m runner's results page and a student developer's portfolio, each with its own guide under /tools."
+    ]
+  },
+  {
     "version": "1.14.0",
     "date": "2026-09-29",
     "title": "A shorter rail, a footer that sinks, a line that loads",

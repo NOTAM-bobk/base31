@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { CSSProperties, FormEvent, RefObject } from "react";
 import sites from "@/config/sites.json";
 import pkg from "@/package.json";
@@ -57,6 +57,15 @@ type SortMode = "liked" | "newest" | "az";
 // Labels resolve through the active dictionary at render time (see dict.sortLabel).
 const SORT_OPTIONS: { value: SortMode }[] = [{ value: "liked" }, { value: "newest" }, { value: "az" }];
 const MAX_TAG_CHIPS = 11;
+
+// The hero headline is laid out one span per word so it can rise into place on
+// load (the animation lives in app/late.css). One word in it also carries the
+// accent: the negation. English gets "Not" in "Totally Not Boring Websites",
+// Spanish and Portuguese "nada", French "pas" — the same slot in every locale,
+// so no translation renders a headline nobody has styled. A helper plus a
+// matcher keeps the JSX a plain list instead of a per-locale special case.
+const HERO_ACCENT_WORD = /^(not|no|nada|pas)$/i;
+const heroWordsOf = (title: string) => title.split(/\s+/).filter(Boolean);
 
 // Keeps keyboard focus inside an open dialog, moves it in on open, and hands it
 // back to whatever opened the dialog on close.
@@ -1023,9 +1032,25 @@ export default function HomePage({ dict = EN, locale = "en" }: { dict?: Dictiona
           <p className="eyebrow mono">the real web directory</p>
           {/* One line, three words: the title is a single phrase now, so it
               needs no per-line spaces to read correctly when flattened to
-              text (search snippets, screen readers). */}
+              text (search snippets, screen readers). It is rendered word by
+              word — one span each, with a real space between them so a phone
+              can still wrap the line — which is what lets the headline rise
+              into place on load. The negation in the middle wears the accent
+              (see `.h1-word.is-not` in app/late.css). */}
           <h1 id="page-title">
-            <span className="h1-line h1-title">{dict.heroTitle}</span>
+            <span className="h1-line h1-title">
+              {heroWordsOf(dict.heroTitle).map((word, index) => (
+                <Fragment key={`${word}-${index}`}>
+                  {index > 0 ? " " : null}
+                  <span
+                    className={`h1-word${HERO_ACCENT_WORD.test(word) ? " is-not" : ""}`}
+                    style={{ animationDelay: `${90 + index * 85}ms` }}
+                  >
+                    {word}
+                  </span>
+                </Fragment>
+              ))}
+            </span>
           </h1>
           <p className="subtitle">{dict.subtitle}</p>
           {/* One call to action. The "Why base31?" anchor and the old "Browse

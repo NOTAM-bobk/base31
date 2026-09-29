@@ -632,3 +632,215 @@ html[data-theme="light"] .cool-card {
   .top-accent.is-loading .top-accent-fill { width: 100%; }
   .top-accent { transition: none; }
 }
+
+/* The headline arrives ---------------------------------------------------
+   The hero headline is rendered one span per word (see components/home-page
+   .tsx), which is what lets it rise into place instead of appearing as a
+   finished line: each word fades up from below, a little out of focus and a
+   little rotated, with a short stagger between them. The delay is set inline
+   per word, so nothing here has to know how many words the phrase has — and
+   because the animation fills backwards, a word stays invisible until its turn
+   comes round rather than flashing in first and moving after.
+   Reduced motion keeps the words, only the movement goes: the global
+   animation reset in globals.css would otherwise leave them at opacity 0. */
+.intro h1 .h1-word {
+  display: inline-block;
+  opacity: 0;
+  animation: h1-word-in 640ms cubic-bezier(0.2, 0.86, 0.24, 1) both;
+}
+@keyframes h1-word-in {
+  from { opacity: 0; transform: translateY(0.4em) rotate(1.6deg); filter: blur(5px); }
+  60% { filter: blur(0); }
+  to { opacity: 1; transform: none; filter: blur(0); }
+}
+/* The accent word: the negation in the middle of the phrase — "Not" in
+   "Totally Not Boring Websites", "nada" and "pas" in the other locales. It
+   wears a marker highlight across its lower half and a green underline, both
+   measured in `em` so they scale with the handwriting instead of being pinned
+   to one font size. `text-decoration-skip-ink: none` keeps the underline one
+   unbroken stroke under the letterforms; the skip-ink gaps it turns off would
+   read as damage at this size. */
+.intro h1 .h1-word.is-not {
+  padding: 0 0.08em;
+  border-radius: 5px;
+  background-image: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--live) 22%, transparent),
+    color-mix(in srgb, var(--live) 38%, transparent)
+  );
+  background-repeat: no-repeat;
+  background-position: 0 86%;
+  background-size: 100% 62%;
+  color: var(--text-strong);
+  text-decoration: underline;
+  text-decoration-thickness: 0.07em;
+  text-decoration-color: color-mix(in srgb, var(--live) 92%, transparent);
+  text-underline-offset: 0.14em;
+  text-decoration-skip-ink: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .intro h1 .h1-word { opacity: 1; transform: none; filter: none; animation: none; }
+}
+
+/* Footer links read as links --------------------------------------------
+   The footer row was a set of grey words; they are links, so they are drawn as
+   links now: one blue in both themes, underlined, with the underline
+   thickening under the pointer. The blue is a token because two of them have
+   to exist — a light blue on black, a deep one on the light theme's grey — and
+   the underlined set is scoped on purpose: the contact details and the
+   language switcher are pill controls, and a link underline inside a pill
+   reads as a broken chip rather than a link. Those two take the blue and keep
+   their own material. */
+:root { --link: #6fb2ff; }
+html[data-theme="light"] { --link: #1450c8; }
+.site-footer .footer-links a,
+.site-footer .footer-links button.footer-link-button,
+.site-footer a.footer-version,
+.site-footer .footer-contact-item,
+.site-footer .site-footer-inner > span a { color: var(--link); }
+.site-footer .footer-links a,
+.site-footer .footer-links button.footer-link-button,
+.site-footer a.footer-version,
+.site-footer .site-footer-inner > span a {
+  text-decoration: underline;
+  text-decoration-thickness: 0.08em;
+  text-underline-offset: 3px;
+  text-decoration-color: color-mix(in srgb, currentColor 58%, transparent);
+}
+.site-footer .footer-links a:hover,
+.site-footer .footer-links button.footer-link-button:hover,
+.site-footer a.footer-version:hover,
+.site-footer .site-footer-inner > span a:hover {
+  color: var(--link);
+  text-decoration-thickness: 0.16em;
+  text-decoration-color: currentColor;
+}
+/* A pill darkens its blue instead of jumping to the text colour, so the whole
+   row reads as one family of links rather than two. */
+.site-footer .footer-contact-item:hover { color: color-mix(in srgb, var(--link) 74%, var(--text-strong)); }
+
+/* A slightly smaller directory card --------------------------------------
+   The cards were sized around a 200px preview band, which on a two-up desktop
+   grid made the picture most of the card and the description a caption under
+   it. The band comes down to 150px, the padded half tightens with it and the
+   name steps down one size, so a row shows more of the directory at a glance
+   while every part of the card keeps the same relationships as before — this
+   is the same card, a little smaller, not a different one. */
+.site-card .site-preview { max-height: 150px; }
+.site-card .site-card-info { gap: 8px; padding: 13px 14px 0; }
+.site-card-body .site-icon { width: 34px; height: 34px; border-radius: 11px; }
+.site-card .site-name { font-size: 14px; }
+.site-card .site-description { font-size: 11.5px; }
+.site-card .tags { padding: 8px 14px 11px; }
+.site-card .site-card-lower { padding: 2px 14px 9px; }
+@media (min-width: 1000px) { .site-list, .site-skeleton { gap: 10px; } }
+@media (max-width: 600px) {
+  .site-card .site-card-info { padding: 11px 12px 0; }
+  .site-card .tags { padding: 7px 12px 10px; }
+  .site-card .site-card-lower { padding: 2px 12px 9px; }
+}
+
+/* Thumbs worth aiming at -------------------------------------------------
+   The pair in the card's foot was 26px tall — under a thumb that is a
+   coin-toss between the two. It grows to 32px, and to the full 38px the rest
+   of the site already uses on a coarse pointer, which is the height a touch
+   target wants. The rule below has to carry the extra `.site-card-lower`
+   class: the plain `@media (pointer: coarse)` rule in overrides.css sits at
+   one class and would otherwise lose to the card's own sizing. */
+.site-card-lower .vote-button { height: 32px; }
+@media (pointer: coarse) {
+  .site-card-lower .vote-button { height: 38px; }
+}
+
+/* "Surprise me", squared off -------------------------------------------
+   The hero's one action was a green outline pill with a wash that rose inside
+   it on hover. It is a solid square now: the fill is the accent green and the
+   label sits on it in whichever ink stays legible on that green — dark ink on
+   the bright green the dark theme uses, white on the deeper light-theme one —
+   which is what `--on-live` names. With nothing left to fill, hover brightens
+   the fill and deepens the corner shadow instead, and the bolt badge inverts
+   with the label. The sheen is kept: a thin highlight across a solid button is
+   a lift, not a decoration. */
+:root { --on-live: #05170e; }
+html[data-theme="light"] { --on-live: #fff; }
+.surprise-button {
+  padding: 6px 14px 6px 7px;
+  border-color: var(--live);
+  border-radius: 7px;
+  background: var(--live);
+  color: var(--on-live);
+  box-shadow: 0 6px 18px -12px color-mix(in srgb, var(--live) 90%, transparent);
+}
+/* The pill's rising wash has nothing to fill behind a solid fill. */
+.surprise-button::before { display: none; }
+.surprise-button::after {
+  background: linear-gradient(100deg, transparent, color-mix(in srgb, var(--on-live) 26%, transparent), transparent);
+}
+.surprise-button:hover {
+  border-color: var(--live);
+  background: color-mix(in srgb, var(--live) 84%, var(--on-live));
+  color: var(--on-live);
+  transform: translateY(-1px);
+  box-shadow: 0 10px 22px -12px color-mix(in srgb, var(--live) 95%, transparent);
+}
+.surprise-button .surprise-icon {
+  background: color-mix(in srgb, var(--on-live) 18%, transparent);
+  color: var(--on-live);
+}
+.surprise-button:hover .surprise-icon { background: color-mix(in srgb, var(--on-live) 30%, transparent); }
+
+/* Light mode pass --------------------------------------------------------
+   The light theme shipped as a token swap, and a token swap is not a pass:
+   shadows tuned for black are holes on white, hairlines vanish into paper, and
+   the green that carries every small accent sat at 3.5:1 against the light
+   surface — under AA for the 9–11px text that uses it. All four are fixed on
+   the tokens below, so every surface that already reached for them inherits
+   the correction instead of needing a rule of its own. Dark mode is untouched:
+   each declaration is scoped to `html[data-theme="light"]`. */
+html[data-theme="light"] {
+  /* Paper needs more edge than black does: the card outline and the header
+     hairline are the whole card separation on a light page. */
+  --line: #e2e2e2;
+  --line-strong: #c4c4c4;
+  /* A deeper green (≈4.9:1 on #fff) so accent text clears AA, and so the
+     marker behind the hero's "Not" reads as ink rather than a highlight
+     pen running dry. */
+  --live: #0a8148;
+  /* A light-theme shadow is a suggestion, not a hole. Every `var(--shadow)`
+     lift on the page — the support board, the quick jumps, the pinned panel —
+     lightens at once. */
+  --shadow: 0 12px 30px rgb(0 0 0 / 12%);
+}
+/* Three surfaces still carry a shadow written for the dark theme. Each one sits
+   on a screenshot or on white, so it needs a light-theme weight of its own. */
+html[data-theme="light"] .view-counter {
+  box-shadow: 0 8px 22px rgb(0 0 0 / 10%), inset 0 1px 0 #fff;
+}
+html[data-theme="light"] .support-banner-ad,
+html[data-theme="light"] .support-ad {
+  box-shadow:
+    inset 0 1px 0 #fff,
+    0 1px 2px rgb(0 0 0 / 7%),
+    0 12px 26px -16px rgb(0 0 0 / 20%);
+}
+/* The tiles are coloured favicons, not paper: the dark theme's drop shadow is
+   there to lift them off black, where in light mode it just looks grubby. */
+html[data-theme="light"] .site-card .site-icon {
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 26%), 0 2px 6px rgb(0 0 0 / 18%);
+}
+/* The two lifted surfaces that shadow themselves rather than through
+   `--shadow`: the pinboard and the dialog. Both are 34–50% black in the dark
+   theme, which is a stain on a light page. */
+html[data-theme="light"] .donation-board {
+  box-shadow: 0 18px 44px rgb(0 0 0 / 14%), inset 0 1px 0 #fff;
+}
+html[data-theme="light"] .modal {
+  box-shadow: 0 24px 60px rgb(0 0 0 / 18%);
+}
+/* The typing wallpaper is decoration: on white it needs a touch more presence
+   than the dark theme gives it to stay visible at all. */
+html[data-theme="light"] .code-backdrop { opacity: 0.38; }
+/* The one place a dark ink is hard-coded on a green fill. With the deeper
+   light-theme green it would be dark-on-dark, so it follows `--on-live`. */
+html[data-theme="light"] .community-action.is-primary { color: var(--on-live); }
+

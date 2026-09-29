@@ -267,11 +267,46 @@ bundler. Two ways to do that by accident:
   and the original "Browse all sites" link are both gone — the directory is the
   next thing down the page and the rail already steps to About, so each only
   duplicated something else within reach.
+- The hero headline is rendered one `<span>` per word, which is what lets it
+  rise into place on load: `h1-word-in` in `app/late.css` fades each word up
+  from below with a per-word delay set inline in `components/home-page.tsx`,
+  and the animation fills backwards so a word is invisible until its turn.
+  The negation in the middle wears the accent — "Not" in "Totally Not Boring
+  Websites", "nada"/"pas" in the other locales, matched by `HERO_ACCENT_WORD`
+  — as a marker highlight and a green underline sized in `em`, so every
+  translation gets the same accent in the same slot instead of only the English
+  one being styled. Real spaces sit between the spans, so the line still wraps
+  on a phone, and `prefers-reduced-motion` shows the words in place.
 - "Surprise me" in the hero opens a random entry — from the current filter
-  results when a search is active, otherwise from the whole directory. It is
-  styled as a green pill with a bolt badge (`.surprise-button` in
-  `app/overrides.css`) rather than a plain text link, and its sheen/spin is
-  disabled under `prefers-reduced-motion`.
+  results when a search is active, otherwise from the whole directory. It is a
+  solid square now: the accent green as a fill, the label in whichever ink
+  stays legible on that green (`--on-live` — dark ink on the bright dark-theme
+  green, white on the deeper light-theme one), and a bolt badge that inverts
+  with it. The base pill rule is in `app/overrides.css`; `app/late.css` squares
+  it off, and its sheen/spin is disabled under `prefers-reduced-motion`.
+- Directory cards are sized around a 150px preview band with a tighter padded
+  half and a 14px name, and the vote pair in the card's foot is 32px tall —
+  38px on a coarse pointer, which is the height the rest of the site's touch
+  targets already use. The sizing and the taller thumbs live at the end of
+  `app/late.css`, deliberately after the card's material, because the card's
+  own rules in `globals.css` and `app/overrides.css` are what they have to win
+  against (the coarse-pointer rule needs the extra `.site-card-lower` class for
+  the same reason).
+- The footer's links read as links: one blue token (`--link`, a light blue on
+  black and a deep blue on the light theme's grey) with a real underline that
+  thickens on hover. The pill controls that sit among them — the contact
+  details and the language switcher — take the same blue but keep their own
+  material, because an underlined pill reads as a broken chip rather than a
+  link.
+- Both themes are one token set at the top of `app/globals.css`, and the light
+  one is finished in `app/late.css`: a deeper `--live` (≈4.9:1 on the light
+  surface, so 9–11px accent text clears AA), a stronger `--line` and
+  `--line-strong` because card edges on paper have less to work with, a much
+  lighter `--shadow`, and light-theme weights for the three surfaces that
+  carried a shadow written for black (the view counter, the support board and
+  the favicon tiles). Prefer a token; only write a
+  `html[data-theme="light"]` rule when a value is hard-coded, as `.view-counter`
+  and the community panel's primary action are.
 - Three quick-jump boxes sit under the search field — Featured sites, Other
   cool sites and Cool APIs — each an in-page anchor to `#sites`,
   `#cool-sites` and `#cool-apis` with the list's length as its caption. They are

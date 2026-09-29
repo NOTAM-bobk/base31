@@ -10,6 +10,7 @@ import "./inner-pages.css";
 // Small corrections that must win over overrides.css (same specificity, later
 // file). See the file header for why it exists.
 import "./late.css";
+import { GOOGLE_ANALYTICS_ID, googleTagSnippet } from "@/lib/analytics";
 import CodeBackdrop from "@/components/code-backdrop";
 import ConsentAwareAds from "@/components/consent-aware-ads";
 import ConsentAwareAnalytics from "@/components/consent-aware-analytics";
@@ -58,6 +59,15 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
       <head>
+        {/* Google tag (gtag.js), first in the head as Google's installation
+            instruction asks. The snippet documented at the top of README.md is
+            served here instead of being appended after hydration, so the tag is
+            part of the HTML of every page and Google can verify it. Consent Mode
+            keeps the cookie banner in charge: all four storage types start
+            `denied`, and components/consent-aware-analytics.tsx grants them when
+            the visitor accepts. One tag per page — this is the only one. */}
+        <script async src={`https://www.googletagmanager.com/gtag/js?id=${GOOGLE_ANALYTICS_ID}`} />
+        <script id="google-analytics" dangerouslySetInnerHTML={{ __html: googleTagSnippet }} />
         <meta name="impact-site-verification" content="0c13bbc7-5a07-4070-84da-1b320feed539" />
         {/* Trustpilot one-time domain verification (documented in README.md). */}
         <meta name="trustpilot-one-time-domain-verification-id" content="c33dc438-a677-4add-a519-04714888e931" />

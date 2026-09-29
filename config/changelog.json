@@ -1,5 +1,17 @@
 [
   {
+    "version": "1.9.0",
+    "date": "2026-09-29",
+    "title": "The Google tag is in the page, and the banner still runs it",
+    "summary": "Google Analytics is installed the way Google asks — the tag is served in the head of every page — with Consent Mode defaults that keep it from storing anything until the cookie banner is answered.",
+    "highlights": [
+      "The Google tag (gtag.js) is now served in the head of every page, with the corrected measurement ID G-W6J79P13FT, instead of being appended after someone pressed Confirm — which is why the tag was never in the HTML Google looks at and analytics stayed empty.",
+      "It runs with Google Consent Mode: all four storage types start denied, so the tag is installed and verifiable while no cookie is written and nothing that identifies a visitor is stored until they answer the banner.",
+      "Confirming switches analytics storage (and the ad storage types) to granted; denying or withdrawing switches them back to denied and clears the _ga* cookies an earlier visit left behind.",
+      "Microsoft Clarity is still inserted only on accept, the Adcash auto-tag is unchanged, and the privacy policy now describes the consent-mode behaviour."
+    ]
+  },
+  {
     "version": "1.8.0",
     "date": "2026-09-28",
     "title": "A one-line headline, a wider vote bar, and a checked stamp",

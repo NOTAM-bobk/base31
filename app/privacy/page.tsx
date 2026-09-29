@@ -29,7 +29,7 @@ export default function PrivacyPage() {
       <Link className="privacy-back mono" href="/">← base31.org</Link>
       <p className="eyebrow mono">privacy policy</p>
       <h1>Privacy, without the noise.</h1>
-      <p className="privacy-updated">Last updated: September 24, 2026</p>
+      <p className="privacy-updated">Last updated: September 29, 2026</p>
       <section className="privacy-copy">
         <h2>What we collect</h2>
         <p>
@@ -40,13 +40,17 @@ export default function PrivacyPage() {
 
         <h2>Cookies and your choice</h2>
         <p>
-          We only set our own preference after you choose. Until then, no analytics and no
-          advertising script runs; the directory works exactly the same either way.
+          We only set our own preference after you choose. Until then the Google tag loads with its
+          storage switched off, so it writes no cookie and stores nothing that identifies you, and
+          no session recording or advertising script runs at all; the directory works exactly the
+          same either way.
         </p>
         <p>
-          Choosing “Confirm” allows Microsoft Clarity, Google Analytics and our ad network to
-          load. Choosing “Deny” keeps all of them switched off — the only thing stored is the
-          preference itself. You can change your answer whenever you like with the{" "}
+          Choosing “Confirm” lets Google Analytics write its analytics cookies and lets Microsoft
+          Clarity and our ad network load. Choosing “Deny” keeps analytics storage off, clears any
+          Google Analytics cookies an earlier visit left behind, and leaves Clarity and the ad
+          network unloaded — the only thing stored is the preference itself. You can change your
+          answer whenever you like with the{" "}
           <strong>Cookie settings</strong> link in the footer, which brings the notice back so you
           can choose again.
         </p>
@@ -75,10 +79,13 @@ export default function PrivacyPage() {
 
         <h2>Analytics</h2>
         <p>
-          If you confirm the cookie notice, we load Microsoft Clarity and Google Analytics to
-          understand how the directory is used — which pages are viewed and where visitors click —
-          so we can improve it. Both may set cookies and record aggregated interaction data, and
-          Google Analytics reports traffic only in aggregate. If you deny, neither is loaded. See
+          The Google tag is part of every page so Google can confirm the property is installed. It
+          runs with consent mode: storage is denied until you answer, so before you do no cookie is
+          written and nothing that identifies you is stored. If you confirm the cookie notice we
+          grant analytics storage and load Microsoft Clarity, so we can understand how the directory
+          is used — which pages are viewed and where visitors click — and improve it. If you deny,
+          analytics storage stays off, Google Analytics cookies from earlier visits are cleared, and
+          Clarity is not loaded at all. Google Analytics reports traffic only in aggregate. See
           the{" "}
           <a href="https://privacy.microsoft.com/privacystatement" target="_blank" rel="noreferrer">
             Microsoft privacy statement
@@ -131,8 +138,9 @@ export default function PrivacyPage() {
         <h2>Your choices</h2>
         <p>
           Use <strong>Cookie settings</strong> in the footer to change or withdraw your answer at
-          any time; withdrawing it removes the analytics and ad loaders again and they stay off
-          until you confirm. Clearing site data in
+          any time; withdrawing it takes the Clarity and ad loaders back out, switches Google
+          Analytics storage back to denied and clears its cookies, and all of it stays off until you
+          confirm. Clearing site data in
           your browser also works. The directory and every link in it stay fully usable either way.
         </p>
 

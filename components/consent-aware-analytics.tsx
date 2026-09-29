@@ -1,71 +1,85 @@
 "use client";
 
 import { useEffect } from "react";
+import { CONSENT_TYPES } from "@/lib/analytics";
 import { useConsent } from "@/lib/consent";
 
 const clarityTag = "ylsxc7fokm";
-const googleAnalyticsTag = "G-Y5N2FYK786";
 
-// The ids the two snippets give the loader tags they append to the document,
-// so a withdrawn choice has something to take back out.
-const LOADER_IDS = ["microsoft-clarity-loader", "google-analytics-loader"];
+// The id the Clarity snippet gives the loader tag it appends, so a withdrawn
+// choice has something to take back out. The Google tag is deliberately not in
+// this list: it is served by `app/layout.tsx` and Consent Mode turns its
+// storage off instead of its script being pulled out of the page.
+const LOADER_IDS = ["microsoft-clarity-loader"];
 
 type AnalyticsWindow = Window & {
   dataLayer?: unknown[];
   gtag?: (...args: unknown[]) => void;
 };
 
-// Microsoft Clarity and Google Analytics run only after the visitor confirms
-// the cookie banner. The ad script lives in `consent-aware-ads.tsx` so the
-// three can be reasoned about — and switched — separately.
+// The cookies the Google tag writes. Clearing them is the part of "withdraw
+// consent" a page can still perform after the library has loaded.
+const GOOGLE_COOKIE = /^_(ga|gid|gcl|gac)/;
+
+function clearGoogleCookies() {
+  for (const entry of document.cookie.split(";")) {
+    const name = entry.split("=")[0]?.trim();
+    if (!name || !GOOGLE_COOKIE.test(name)) continue;
+    for (const domain of ["", location.hostname, `.${location.hostname}`]) {
+      document.cookie = `${name}=; Max-Age=0; path=/${domain ? `; domain=${domain}` : ""}`;
+    }
+  }
+}
+
+// Microsoft Clarity only runs after the visitor confirms the cookie banner — it
+// records sessions, so it is the one that waits for the answer. The Google tag
+// is different: it is in the page on every load (see `app/layout.tsx`), and the
+// Consent Mode update below is what holds its storage back. The ad script lives
+// in `consent-aware-ads.tsx` so the three can be reasoned about — and switched
+// — separately.
 export default function ConsentAwareAnalytics() {
   const consent = useConsent();
 
-  // Both snippets are written into real script elements rather than inline
-  // JSX. An inline `<script>` only runs if the browser prepares it as it is
-  // inserted, which is easy to lose when the element is created by the
-  // renderer instead of the parser — and a tag that silently never runs is
-  // exactly how analytics "stop working". Setting `text` on a detached
-  // element and then appending it runs every time, so the README snippet is
-  // reproduced faithfully here.
+  // The Clarity snippet is a small inline program that appends the real loader
+  // under `microsoft-clarity-loader`. It is written into a real script element
+  // rather than inline JSX: an inline `<script>` only runs if the browser
+  // prepares the element as it is inserted, which is easy to lose when the
+  // element is created by the renderer instead of the parser.
   useEffect(() => {
     if (consent !== "accepted") return;
 
-    // Google tag (gtag.js), from README.md. `gtag` queues into `dataLayer`
-    // before the loader arrives, so the config call does not have to wait.
-    const view = window as AnalyticsWindow;
-    view.dataLayer = view.dataLayer || [];
-    view.gtag = function gtag(...args: unknown[]) {
-      view.dataLayer?.push(args);
-    };
-    view.gtag("js", new Date());
-    view.gtag("config", googleAnalyticsTag);
-
-    const loader = document.createElement("script");
-    loader.id = "google-analytics-loader";
-    loader.async = true;
-    loader.src = `https://www.googletagmanager.com/gtag/js?id=${googleAnalyticsTag}`;
-
-    // The Clarity snippet is itself a small inline program that appends the
-    // real loader under `microsoft-clarity-loader`.
     const clarity = document.createElement("script");
     clarity.text = `(function(c,l,a,r,i,t,y){c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};t=l.createElement(r);t.id="microsoft-clarity-loader";t.async=1;t.src="https://www.clarity.ms/tag/"+i;y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y)})(window,document,"clarity","script","${clarityTag}");`;
-
-    document.head.append(clarity, loader);
+    document.head.append(clarity);
 
     return () => {
       clarity.remove();
-      loader.remove();
       document.getElementById("microsoft-clarity-loader")?.remove();
     };
   }, [consent]);
 
-  // Removing a loader cannot unload the library it already pulled in, but it
-  // does stop anything new being queued; a reload after withdrawing the choice
-  // starts clean, which is what the privacy page describes.
+  // Removing a loader cannot unload the library it already pulled in, so a
+  // denied or withdrawn choice leaves the library idle rather than gone.
   useEffect(() => {
     if (consent === "accepted") return;
     for (const id of LOADER_IDS) document.getElementById(id)?.remove();
+  }, [consent]);
+
+  // The visitor's answer, handed to the Google tag as a Consent Mode update:
+  // `granted` lets it write its cookies, `denied` keeps them off and clears any
+  // an earlier visit left behind. A null answer is ignored — the default in the
+  // head snippet is already `denied`.
+  useEffect(() => {
+    if (consent === null) return;
+    const gtag = (window as AnalyticsWindow).gtag;
+    if (!gtag) return;
+
+    const granted = consent === "accepted";
+    const update: Record<string, string> = {};
+    for (const type of CONSENT_TYPES) update[type] = granted ? "granted" : "denied";
+    gtag("consent", "update", update);
+
+    if (!granted) clearGoogleCookies();
   }, [consent]);
 
   return null;

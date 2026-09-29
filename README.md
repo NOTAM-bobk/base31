@@ -1,4 +1,12 @@
 # base31.org
+Google Analytics verification. The tag below is Google's own snippet, served
+inline in the `<head>` from `app/layout.tsx` (the id lives in `lib/analytics.ts`)
+on every page, so it is part of the HTML Google is asked to verify instead of
+being appended after the page has loaded. It runs with Google Consent Mode
+defaults — all four storage types start `denied` — and
+`components/consent-aware-analytics.tsx` switches them to `granted` once the
+cookie banner is accepted, so the banner still decides whether anything is
+stored.
 
   add this code to the main page of base31:   
   <!-- Google tag (gtag.js) -->
@@ -6,6 +14,7 @@
 <script>
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
+  gtag('consent', 'default', {ad_storage: 'denied', ad_user_data: 'denied', ad_personalization: 'denied', analytics_storage: 'denied', wait_for_update: 500});
   gtag('js', new Date());
 
   gtag('config', 'G-W6J79P13FT');
@@ -404,14 +413,19 @@ bundler. Two ways to do that by accident:
 
 ## Cookies, ads and analytics
 
-No analytics, ad script or ad cookie loads until the visitor answers the
-banner, and the answer is the single switch for all of it. The only things that
-load either way are the destination preview images on every directory card and
+Nothing is written to storage until the visitor answers the banner, and the
+answer is the single switch for all of it. One script is allowed to load before
+the answer: the Google tag, because it has to be part of the served HTML for
+Google to see it installed. It loads with Consent Mode defaults that deny every
+storage type, so it writes no cookie and reports nothing that identifies the
+visitor until the answer arrives. The only other things that load either way are
+the destination preview images on every directory card and
 in the referral carousel and each community upload's own favicon — both decorative, both cookie-free:
 
 | Component | Runs when |
 | --- | --- |
-| `components/consent-aware-analytics.tsx` | Microsoft Clarity (`ylsxc7fokm`) and Google Analytics 4 (`G-Y5N2FYK786`), only on `accepted` |
+| `app/layout.tsx` | The Google tag (gtag.js) for `G-W6J79P13FT`, in `<head>` on every page, with every Consent Mode storage type defaulted to `denied` |
+| `components/consent-aware-analytics.tsx` | Microsoft Clarity (`ylsxc7fokm`) only on `accepted`, plus the `gtag('consent', 'update', …)` that grants or denies Google Analytics storage |
 | `components/consent-aware-ads.tsx` | Adcash auto-tag (`iy7zk7mmw`), only on `accepted` |
 | `public/sites/appscreenshot/index.html`, `public/sites/share/index.html` | Never gated: these static subdomain pages render outside Next.js and carry no cookie banner, so the same Adcash auto-tag sits directly in their `<head>` (the async loader is polled for `aclib` before the tag runs). |
 | `components/referral-carousel.tsx` | Never gated: the destination preview image loads straight from the destination (or a screenshot service) because the card is unusable without it. It sets no cookies, the sponsored links stay inert until clicked, and the privacy page says so. |
@@ -421,12 +435,15 @@ after the visitor accepts, then runs the supplied auto-tag for zone
 `iy7zk7mmw`. Denying or withdrawing consent prevents the loader from being
 inserted (and removes its script element if consent changes after it loads).
 
-Clarity and Google Analytics work the same way and are declared in one
-component: each snippet appends its own loader tag with an id
-(`microsoft-clarity-loader`, `google-analytics-loader`) so withdrawing the
-choice removes what the page can remove. A library that already fetched stays
-loaded until the next page load, which is what the privacy page says — so
-never claim a withdrawal unloads a script that has already run.
+Clarity is still inserted into the page only on `accepted`, and its snippet
+appends its loader under `microsoft-clarity-loader` so withdrawing the choice
+removes what the page can remove. A library that already fetched stays loaded
+until the next page load, which is what the privacy page says — so never claim a
+withdrawal unloads a script that has already run. Google Analytics is not
+removed that way: its tag stays in the page and `analytics_storage` goes back to
+`denied`, and `clearGoogleCookies` deletes the `_ga*` cookies an earlier visit
+wrote — denying is honoured without taking the tag Google looks for out of the
+HTML.
 
 `lib/consent.ts` holds the `base31-consent` key, a `useConsent()` hook and the
 `base31-consent-change` event that keeps them in sync. `PrivacyConsent`

@@ -455,3 +455,40 @@ html[data-theme="light"] .cool-card {
     0 1px 2px rgb(0 0 0 / 6%),
     0 8px 16px -12px rgb(0 0 0 / 20%);
 }
+
+/* Typefaces -------------------------------------------------------------
+   Two display faces, downloaded and self-hosted at build time by next/font
+   (see app/layout.tsx) which hands each one over as a CSS variable. These are
+   the only rules that name them, so swapping a face is a one-line change, and
+   both fall back to the body sans if the files ever fail to load.
+
+   Card names wear Titan One: a chunky, single-weight display face that still
+   reads as a label at card size, which is why the name keeps its size and
+   loses the tracking a text face would want.
+   The header text wears Gochi Hand — the wordmark in the top bar and the
+   homepage headline — where the looser handwriting sits right next to the
+   tight-interlocked display type instead of fighting it. */
+.site-name,
+.cool-name {
+  font-family: var(--font-display), var(--font-sans);
+  font-weight: 400;
+  letter-spacing: 0.005em;
+}
+.site-name { font-size: 14.5px; }
+.cool-name { font-size: 13px; }
+
+.wordmark,
+.wordmark.mono {
+  font-family: var(--font-hand), var(--font-sans);
+  font-size: 16px;
+  font-weight: 400;
+  letter-spacing: 0.01em;
+}
+.intro h1 {
+  font-family: var(--font-hand), var(--font-sans);
+  font-weight: 400;
+  letter-spacing: 0.005em;
+  /* Handwriting needs a little more air than the tight display leading the
+     headline shipped with, or the descenders clip the line below. */
+  line-height: 1.14;
+}

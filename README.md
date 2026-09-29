@@ -44,7 +44,9 @@ the sites themselves — all deployed together as one Vercel project.
 │   ├── sites.json         ← the directory's data (edit this)
 │   ├── blogs.json         ← SEO blog posts
 │   ├── donations.json     ← donation board entries
-│   └── referrals.json     ← sponsored referral carousel
+│   ├── referrals.json     ← sponsored referral carousel
+│   ├── cool-sites.json    ← "Other cool sites" strip
+│   └── cool-apis.json     ← "Cool APIs" strip
 ├── public/
 │   ├── site-icons/        ← one favicon per directory entry
 │   └── sites/
@@ -146,9 +148,10 @@ support.
 
 Add entries to the array and the carousel picks them up — no code changes.
 Run `npm run validate:content` to check `sites.json`, `blogs.json`,
-`referrals.json` and `donations.json` in one go, and do it before pushing.
+`referrals.json` and `donations.json` (plus `cool-sites.json`,
+`cool-apis.json` and `changelog.json`) in one go, and do it before pushing.
 
-All four files under `config/` are imported straight into the build, so a file
+All the files under `config/` are imported straight into the build, so a file
 that is not valid JSON stops the deploy before a single page renders, with an
 unhelpful `Unexpected non-whitespace character` / `Expected ',' or ']'` from the
 bundler. Two ways to do that by accident:
@@ -265,14 +268,26 @@ bundler. Two ways to do that by accident:
   styled as a green pill with a bolt badge (`.surprise-button` in
   `app/overrides.css`) rather than a plain text link, and its sheen/spin is
   disabled under `prefers-reduced-motion`.
-- The hero search reaches the "Other cool sites" strip, not only the
-directory: `searchCoolSites` in `lib/cool-sites.ts` is the one matcher both
-places use, so a query that matches an off-directory pick opens the strip (if it
-was folded away), filters its cards, changes its count to `n of <total>`, and is
-named in the directory's empty state instead of dead-ending there.
-- A column of small lines down the right edge (`components/section-rail.tsx`,
-shown from 1180px up and hidden below that) is the section readout and the fast
-way between sections.
+- The hero search reaches both strips under the directory, not only the
+directory itself: `searchCoolSites` in `lib/cool-sites.ts` and
+`searchCoolApis` in `lib/cool-apis.ts` are the matchers those places share, so a
+query that matches an off-directory pick opens the strip (if it was folded
+away), filters its cards, changes its count to `n of <total>`, and is named in
+the directory's empty state instead of dead-ending there.
+- "Other cool sites" (`config/cool-sites.json`) and "Cool APIs"
+  (`config/cool-apis.json`) are the same section twice: a foldable strip of
+  small external cards, each one a name, a host and one line of why it is worth
+  the trip. Both are rendered by `components/link-strip.tsx`, which owns the
+  folding heading, the count, the search and the card markup; the two files
+  beside it only supply their list and their dictionary strings, so the strips
+  cannot drift apart. Entries are external URLs by design — the validator
+  rejects anything pointing at a base31.org subdomain, which belongs in
+  `sites.json` instead.
+- A column of small lines down the right edge (`components/section-rail.tsx`)
+is the section readout and the fast way between sections. It is always visible,
+from the first screen on at every width: full size with sliding labels on a
+wide monitor, shorter bars without labels below 1180px, and a slim strip of bars
+below 820px.
 The line for the section you are reading rotates flat-to-vertical and turns
 green while its label slides out; clicking a line scrolls there and a wheel over
 the rail steps one section at a time. That listener is attached by hand with
@@ -296,6 +311,13 @@ labels live in `components/home-page.tsx`.
 - The hero search is one solid control (`.search-wrap` in `app/overrides.css`):
   a raised field, the glyph in its own tile, a green ring on focus, and a
   clear button that takes the place of the `/` hint once there is a query.
+- Two display faces are loaded through `next/font/google` in `app/layout.tsx`,
+  which self-hosts the files and exposes them as `--font-display` (Titan One,
+  used for the names on the cards) and `--font-hand` (Gochi Hand, used for the
+  header text: the wordmark and the homepage headline). Because next/font
+  downloads them at build time, no page ever requests fonts.googleapis.com, and
+  `app/late.css` holds the rules that apply them — the only place a face is
+  named.
 - `.section-divider` is the styled `<hr>` between the homepage's standalone
   blocks (supporters, launch clock, referrals): a hairline that fades at both
   edges with a diamond marker. It owns the gap on both sides through

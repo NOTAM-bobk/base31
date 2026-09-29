@@ -12,10 +12,12 @@ import Faq from "@/components/faq";
 import DirectoryNotifications from "@/components/directory-notifications";
 import FooterSponsor from "@/components/footer-sponsor";
 import CoolSites from "@/components/cool-sites";
+import CoolApis from "@/components/cool-apis";
 import SiteHeader from "@/components/site-header";
 import { LOCALES, LOCALE_TAGS, type Dictionary, type Locale, EN } from "@/lib/i18n";
 import { resetConsent, useConsent } from "@/lib/consent";
 import coolSites, { searchCoolSites } from "@/lib/cool-sites";
+import { searchCoolApis } from "@/lib/cool-apis";
 import SectionRail, { type RailSection } from "@/components/section-rail";
 
 type Site = { name: string; subdomain: string; url: string; tags?: string[]; description?: string; show?: boolean; community?: boolean; createdAt?: number; icon?: string; lastChecked?: string };
@@ -829,15 +831,20 @@ export default function HomePage({ dict = EN, locale = "en" }: { dict?: Dictiona
     { id: "page-title", label: "Top" },
     { id: "sites", label: dict.featured },
     { id: "cool-sites", label: dict.coolSites },
+    { id: "cool-apis", label: dict.coolApis },
     { id: "about", label: "About" },
     { id: "support", label: "Support" },
     { id: "faq-heading", label: "FAQ" },
     { id: "updates", label: "Updates" },
   ], [dict]);
 
-  // How many off-directory picks the same search found, so the directory's
-  // empty state can point at the strip instead of dead-ending.
-  const coolMatchCount = useMemo(() => (query.trim() ? searchCoolSites(query).length : 0), [query]);
+  // How many off-directory picks the same search found — the cool sites and
+  // the cool APIs down the page — so the directory's empty state can point at
+  // the strips instead of dead-ending.
+  const coolMatchCount = useMemo(
+    () => (query.trim() ? searchCoolSites(query).length + searchCoolApis(query).length : 0),
+    [query],
+  );
 
   // Fade each section in as it scrolls into view. The motion flag on <html> is
   // set by the pre-paint script in the layout, so this can never leave content
@@ -1147,8 +1154,8 @@ export default function HomePage({ dict = EN, locale = "en" }: { dict?: Dictiona
                 {query.trim() ? <> “{query.trim()}”</> : null}.{" "}
                 {coolMatchCount > 0 && (
                   <>
-                    {coolMatchCount} other cool site{coolMatchCount === 1 ? "" : "s"} in the strip below{" "}
-                    {coolMatchCount === 1 ? "does" : "do"} match.{" "}
+                    {coolMatchCount} off-directory pick{coolMatchCount === 1 ? "" : "s"} in the strips below{" "}
+                    {coolMatchCount === 1 ? "matches" : "match"}.{" "}
                   </>
                 )}
                 <button
@@ -1302,6 +1309,11 @@ export default function HomePage({ dict = EN, locale = "en" }: { dict?: Dictiona
         {/* Off-directory picks: external cool sites from config/cool-sites.json,
             rendered as smaller, quieter cards than the directory's own. */}
         <CoolSites dict={dict} query={query} />
+
+        {/* A second strip in the same shape as the one above: free public
+            APIs from config/cool-apis.json, for visitors who came to build
+            something rather than only browse. */}
+        <CoolApis dict={dict} query={query} />
 
         <AboutSection />
 

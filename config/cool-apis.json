@@ -1,0 +1,380 @@
+[
+  {
+    "name": "Public APIs",
+    "url": "https://github.com/public-apis/public-apis",
+    "tags": ["directory", "reference"],
+    "description": "The community's master list of free APIs, sorted by category — the first place to look when you need a service for a side project."
+  },
+  {
+    "name": "Open-Meteo",
+    "url": "https://open-meteo.com/",
+    "tags": ["weather", "no-key"],
+    "description": "Free weather forecasts and historical climate data for any coordinate, with no API key and no signup."
+  },
+  {
+    "name": "NASA Open APIs",
+    "url": "https://api.nasa.gov/",
+    "tags": ["space", "science"],
+    "description": "Astronomy Picture of the Day, Mars rover photos and near-Earth objects, all on a demo key that works out of the box."
+  },
+  {
+    "name": "PokéAPI",
+    "url": "https://pokeapi.co/",
+    "tags": ["games", "fun"],
+    "description": "Every Pokémon, move, ability and sprite in one free REST API — a favourite first API for learning to fetch data."
+  },
+  {
+    "name": "REST Countries",
+    "url": "https://restcountries.com/",
+    "tags": ["geography", "data"],
+    "description": "Flags, capitals, currencies, languages and populations for every country on Earth, as clean JSON."
+  },
+  {
+    "name": "TheCatAPI",
+    "url": "https://thecatapi.com/",
+    "tags": ["images", "fun"],
+    "description": "Random cat photos, breed lookups and vote endpoints — a light-hearted way to test image handling."
+  },
+  {
+    "name": "Dog CEO",
+    "url": "https://dog.ceo/dog-api/",
+    "tags": ["images", "fun"],
+    "description": "Random dog pictures by breed, hosted over HTTPS with no key required and no rate-limit drama."
+  },
+  {
+    "name": "Open Library",
+    "url": "https://openlibrary.org/developers/api",
+    "tags": ["books", "data"],
+    "description": "Search millions of book records, covers and authors from the Internet Archive's open catalogue."
+  },
+  {
+    "name": "Wikipedia REST API",
+    "url": "https://www.mediawiki.org/wiki/API:REST_API",
+    "tags": ["reference", "knowledge"],
+    "description": "Article summaries, random pages, page images and full-text search straight from Wikipedia."
+  },
+  {
+    "name": "Datamuse",
+    "url": "https://www.datamuse.com/api/",
+    "tags": ["words", "language"],
+    "description": "A word-finding API for rhymes, synonyms and related terms — a poet's, or a word game's, toolbox."
+  },
+  {
+    "name": "Free Dictionary API",
+    "url": "https://dictionaryapi.dev/",
+    "tags": ["words", "language"],
+    "description": "Definitions, phonetics and audio pronunciations for English words, with no key and no signup."
+  },
+  {
+    "name": "Frankfurter",
+    "url": "https://frankfurter.dev/",
+    "tags": ["finance", "no-key"],
+    "description": "Reference exchange rates from the European Central Bank, published daily and served as simple JSON."
+  },
+  {
+    "name": "CoinGecko",
+    "url": "https://www.coingecko.com/en/api",
+    "tags": ["finance", "crypto"],
+    "description": "Live prices, market caps and historical charts for thousands of cryptocurrencies on a free tier."
+  },
+  {
+    "name": "ExchangeRate.host",
+    "url": "https://exchangerate.host/",
+    "tags": ["finance", "no-key"],
+    "description": "Currency conversion and historical rates with a free key that never asks for a credit card."
+  },
+  {
+    "name": "The Color API",
+    "url": "https://www.thecolorapi.com/",
+    "tags": ["design", "color"],
+    "description": "Turn a hex value into names, harmonies and schemes, or generate a full palette from a single colour."
+  },
+  {
+    "name": "DiceBear",
+    "url": "https://www.dicebear.com/",
+    "tags": ["avatars", "design"],
+    "description": "Generate identicon-style profile pictures as SVG or PNG straight from a URL, in dozens of styles."
+  },
+  {
+    "name": "Lorem Picsum",
+    "url": "https://picsum.photos/",
+    "tags": ["images", "placeholder"],
+    "description": "Placeholder images at any size, with blur and grayscale options, from nothing but a URL."
+  },
+  {
+    "name": "Unsplash API",
+    "url": "https://unsplash.com/developers",
+    "tags": ["images", "photos"],
+    "description": "Search and download millions of free high-resolution photographs, with attribution built into the rules."
+  },
+  {
+    "name": "Pexels API",
+    "url": "https://www.pexels.com/api/",
+    "tags": ["images", "photos"],
+    "description": "Free stock photos and videos through a simple keyed REST API with a generous monthly quota."
+  },
+  {
+    "name": "Random User Generator",
+    "url": "https://randomuser.me/",
+    "tags": ["testing", "mock-data"],
+    "description": "Fake user profiles with names, photos and addresses — perfect for seeding a UI with believable test data."
+  },
+  {
+    "name": "JSONPlaceholder",
+    "url": "https://jsonplaceholder.typicode.com/",
+    "tags": ["testing", "mock-data"],
+    "description": "Fake posts, comments, todos and users for prototyping a front end before the real backend exists."
+  },
+  {
+    "name": "httpbin",
+    "url": "https://httpbin.org/",
+    "tags": ["testing", "http"],
+    "description": "A tiny service that echoes your request back — headers, redirects, auth, cookies and all."
+  },
+  {
+    "name": "Open Trivia DB",
+    "url": "https://opentdb.com/",
+    "tags": ["games", "trivia"],
+    "description": "Thousands of multiple-choice questions with categories and difficulty, free for quizzes and bots."
+  },
+  {
+    "name": "TheMealDB",
+    "url": "https://www.themealdb.com/api.php",
+    "tags": ["food", "recipes"],
+    "description": "Recipes, ingredients and meal photos by category, cuisine, or a single random pick."
+  },
+  {
+    "name": "TheCocktailDB",
+    "url": "https://www.thecocktaildb.com/api.php",
+    "tags": ["food", "drinks"],
+    "description": "Cocktail recipes, glassware and ingredient images for a home-bar app or a quick lookup."
+  },
+  {
+    "name": "Open Food Facts",
+    "url": "https://world.openfoodfacts.org/data",
+    "tags": ["food", "open-data"],
+    "description": "A crowd-sourced database of packaged food: barcodes, ingredients, nutrition and label photos."
+  },
+  {
+    "name": "Open Brewery DB",
+    "url": "https://www.openbrewerydb.org/",
+    "tags": ["food", "directory"],
+    "description": "A free, key-less directory of breweries searchable by city, state, country and type."
+  },
+  {
+    "name": "Art Institute of Chicago",
+    "url": "https://api.artic.edu/docs/",
+    "tags": ["art", "culture"],
+    "description": "The museum's public collection — artworks, artists, images and descriptions — as open data."
+  },
+  {
+    "name": "The Met Collection",
+    "url": "https://metmuseum.github.io/",
+    "tags": ["art", "culture"],
+    "description": "Search the Metropolitan Museum's objects and pull high-resolution public-domain images."
+  },
+  {
+    "name": "OpenSky Network",
+    "url": "https://openskynetwork.github.io/opensky-api/",
+    "tags": ["aviation", "realtime"],
+    "description": "Live aircraft positions and flight states collected by a volunteer network of receivers."
+  },
+  {
+    "name": "Where the ISS at?",
+    "url": "https://wheretheiss.at/w/developer",
+    "tags": ["space", "realtime"],
+    "description": "The International Space Station's current latitude, longitude and altitude, refreshed every second."
+  },
+  {
+    "name": "USGS Earthquake Feed",
+    "url": "https://earthquake.usgs.gov/fdsnws/event/1/",
+    "tags": ["science", "realtime"],
+    "description": "Query real earthquakes by magnitude, place and date range from the USGS catalogue."
+  },
+  {
+    "name": "Nager.Date",
+    "url": "https://date.nager.at/",
+    "tags": ["calendar", "no-key"],
+    "description": "Public holidays for over a hundred countries, by year, as plain JSON."
+  },
+  {
+    "name": "WorldTimeAPI",
+    "url": "https://worldtimeapi.org/",
+    "tags": ["time", "no-key"],
+    "description": "The current time, timezone and UTC offset for a place or an IP address, with no key."
+  },
+  {
+    "name": "Zippopotam.us",
+    "url": "https://api.zippopotam.us/",
+    "tags": ["geography", "no-key"],
+    "description": "Postal code lookups that return the places, coordinates and timezone hiding behind them."
+  },
+  {
+    "name": "Nominatim",
+    "url": "https://nominatim.org/release-docs/latest/api/Overview/",
+    "tags": ["maps", "geocoding"],
+    "description": "OpenStreetMap's geocoder: turn an address into coordinates, or coordinates back into an address."
+  },
+  {
+    "name": "Wayback Machine API",
+    "url": "https://archive.org/help/wayback_api.php",
+    "tags": ["archive", "web"],
+    "description": "Ask whether a URL has been archived, and get back the closest snapshot to any date."
+  },
+  {
+    "name": "Hacker News API",
+    "url": "https://github.com/HackerNews/API",
+    "tags": ["news", "community"],
+    "description": "Stories, comments and user profiles from Hacker News — read-only, key-free and instant."
+  },
+  {
+    "name": "GitHub REST API",
+    "url": "https://docs.github.com/en/rest",
+    "tags": ["developer", "code"],
+    "description": "Repositories, issues, releases, commits and users — the API behind most developer dashboards."
+  },
+  {
+    "name": "Lichess API",
+    "url": "https://lichess.org/api",
+    "tags": ["games", "chess"],
+    "description": "Games, puzzles, ratings and live board streams from the free open-source chess server."
+  },
+  {
+    "name": "Deck of Cards",
+    "url": "https://deckofcardsapi.com/",
+    "tags": ["games", "cards"],
+    "description": "Shuffle, draw and deal a virtual deck — the simplest way to add cards to a side project."
+  },
+  {
+    "name": "Rick and Morty API",
+    "url": "https://rickandmortyapi.com/",
+    "tags": ["fun", "tv"],
+    "description": "Characters, locations and episodes from the show, with images and filters on every endpoint."
+  },
+  {
+    "name": "Star Wars API",
+    "url": "https://swapi.dev/",
+    "tags": ["fun", "movies"],
+    "description": "The classic Star Wars dataset — people, planets, films and starships, all with stable IDs."
+  },
+  {
+    "name": "Studio Ghibli API",
+    "url": "https://ghibliapi.vercel.app/",
+    "tags": ["fun", "movies"],
+    "description": "Films, characters, locations and species from Studio Ghibli's catalogue of animated features."
+  },
+  {
+    "name": "SpaceX API",
+    "url": "https://github.com/r-spacex/SpaceX-API",
+    "tags": ["space", "data"],
+    "description": "Launches, rockets, capsules and Starlink data compiled from public sources and kept current."
+  },
+  {
+    "name": "PubChem",
+    "url": "https://pubchem.ncbi.nlm.nih.gov/docs/pug-rest",
+    "tags": ["science", "chemistry"],
+    "description": "Chemical compounds, properties and structures from the NIH's enormous public database."
+  },
+  {
+    "name": "World Bank Data",
+    "url": "https://datahelpdesk.worldbank.org/knowledgebase/topics/125589",
+    "tags": ["data", "economics"],
+    "description": "Development indicators for every country going back decades, as free and open data."
+  },
+  {
+    "name": "Hugging Face Inference",
+    "url": "https://huggingface.co/docs/api-inference/index",
+    "tags": ["ai", "machine-learning"],
+    "description": "Run hosted open-source models — text, images and audio — from a single REST call."
+  },
+  {
+    "name": "LibreTranslate",
+    "url": "https://libretranslate.com/",
+    "tags": ["language", "translation"],
+    "description": "Open-source machine translation you can call from an app, or self-host and run for free."
+  },
+  {
+    "name": "IP-API",
+    "url": "https://ip-api.com/docs",
+    "tags": ["network", "geolocation"],
+    "description": "Look up a visitor's country, city, ISP and coordinates from their IP address."
+  },
+  {
+    "name": "ipwho.is",
+    "url": "https://ipwho.is/",
+    "tags": ["network", "no-key"],
+    "description": "Free IP geolocation with no key, no signup and a JSON-first response built for browsers."
+  },
+  {
+    "name": "QR Code API",
+    "url": "https://goqr.me/api/",
+    "tags": ["images", "generation"],
+    "description": "Generate QR codes as PNG, SVG or EPS just by building a URL — no key and no server needed."
+  },
+  {
+    "name": "RSS to JSON",
+    "url": "https://rss2json.com/",
+    "tags": ["feeds", "converter"],
+    "description": "Turn any RSS feed into JSON so a browser can read it without tripping over CORS."
+  },
+  {
+    "name": "Agify",
+    "url": "https://agify.io/",
+    "tags": ["fun", "prediction"],
+    "description": "Guess a person's age from their first name, with country-level breakdowns and sample sizes."
+  },
+  {
+    "name": "Nationalize",
+    "url": "https://nationalize.io/",
+    "tags": ["fun", "prediction"],
+    "description": "Guess the likely nationality behind a first name, returned with probability scores per country."
+  },
+  {
+    "name": "Genderize",
+    "url": "https://genderize.io/",
+    "tags": ["fun", "prediction"],
+    "description": "Predict the gender associated with a first name, from a large aggregated international dataset."
+  },
+  {
+    "name": "Cat Facts",
+    "url": "https://catfact.ninja/",
+    "tags": ["fun", "facts"],
+    "description": "A random cat fact on every request, plus breed lists and pagination for browsing."
+  },
+  {
+    "name": "Useless Facts",
+    "url": "https://uselessfacts.jsph.pl/",
+    "tags": ["fun", "facts"],
+    "description": "Random trivia delivered as JSON or plain text, with a daily-fact endpoint for a steady drip."
+  },
+  {
+    "name": "Advice Slip",
+    "url": "https://api.adviceslip.com/",
+    "tags": ["fun", "quotes"],
+    "description": "Random pieces of advice, searchable by word, each with a stable slip ID you can cite."
+  },
+  {
+    "name": "ZenQuotes",
+    "url": "https://zenquotes.io/",
+    "tags": ["quotes", "fun"],
+    "description": "Inspirational quotes and a today's-quote endpoint, free for non-commercial projects."
+  },
+  {
+    "name": "Yes No",
+    "url": "https://yesno.wtf/api",
+    "tags": ["fun", "decision"],
+    "description": "Answers yes, no or maybe, each with an animated GIF to match. That is the whole API."
+  },
+  {
+    "name": "Kanye Rest",
+    "url": "https://api.kanye.rest/",
+    "tags": ["fun", "quotes"],
+    "description": "One random Kanye West quote per request, plus an optional timestamp parameter."
+  },
+  {
+    "name": "Fruityvice",
+    "url": "https://www.fruityvice.com/",
+    "tags": ["food", "data"],
+    "description": "Nutrition facts for dozens of fruits, each filed under a genus, family and order."
+  }
+]

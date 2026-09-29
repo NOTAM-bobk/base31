@@ -50,6 +50,12 @@ export const EN = {
   coolSitesClosed:
     "Other cool sites are closed right now. Open the “Other cool sites” heading above to see the off-directory picks again.",
   coolSitesNoMatch: "No other cool sites match that search — clear it to see all of them again.",
+  coolApis: "Cool APIs",
+  coolApisLede:
+    "Free public APIs worth building with — no key hunting, no paid tier to start, just an endpoint and its docs.",
+  coolApisClosed:
+    "Cool APIs are closed right now. Open the “Cool APIs” heading above to see the free APIs again.",
+  coolApisNoMatch: "No cool APIs match that search — clear it to see all of them again.",
   links: "links",
   allTag: "All",
   filterByTag: "Filter by tag",
@@ -85,6 +91,12 @@ export const ES: Dictionary = {
   coolSitesClosed:
     "Otros sitios geniales están cerrados ahora mismo. Abre el encabezado «Otros sitios geniales» para volver a ver los sitios externos.",
   coolSitesNoMatch: "Ningún otro sitio genial coincide con esa búsqueda: bórrala para volver a verlos todos.",
+  coolApis: "APIs geniales",
+  coolApisLede:
+    "APIs públicas gratuitas con las que vale la pena construir: sin cazar claves ni pagar para empezar, solo un endpoint y su documentación.",
+  coolApisClosed:
+    "Las APIs geniales están cerradas ahora mismo. Abre el encabezado «APIs geniales» para volver a verlas.",
+  coolApisNoMatch: "Ninguna API genial coincide con esa búsqueda: bórrala para volver a verlas todas.",
   links: "enlaces",
   allTag: "Todos",
   filterByTag: "Filtrar por etiqueta",
@@ -119,6 +131,12 @@ export const FR: Dictionary = {
   coolSitesClosed:
     "Les autres sites sympas sont fermés pour le moment. Ouvrez le titre « Autres sites sympas » ci-dessus pour les revoir.",
   coolSitesNoMatch: "Aucun autre site sympa ne correspond à cette recherche — effacez-la pour tous les revoir.",
+  coolApis: "API sympas",
+  coolApisLede:
+    "Des API publiques gratuites avec lesquelles construire : aucune clé à chercher, aucune offre payante pour démarrer, juste un endpoint et sa documentation.",
+  coolApisClosed:
+    "Les API sympas sont fermées pour le moment. Ouvrez le titre « API sympas » ci-dessus pour les revoir.",
+  coolApisNoMatch: "Aucune API sympa ne correspond à cette recherche — effacez-la pour toutes les revoir.",
   links: "liens",
   allTag: "Tous",
   filterByTag: "Filtrer par étiquette",
@@ -153,6 +171,12 @@ export const PT: Dictionary = {
   coolSitesClosed:
     "Os outros sites legais estão fechados agora. Abra o título “Outros sites legais” acima para vê-los de novo.",
   coolSitesNoMatch: "Nenhum outro site legal corresponde a essa pesquisa — limpe-a para vê-los todos de novo.",
+  coolApis: "APIs legais",
+  coolApisLede:
+    "APIs públicas gratuitas que valem a pena usar: sem caçar chaves nem pagar para começar, apenas um endpoint e a documentação.",
+  coolApisClosed:
+    "As APIs legais estão fechadas agora. Abra o título “APIs legais” acima para vê-las de novo.",
+  coolApisNoMatch: "Nenhuma API legal corresponde a essa pesquisa — limpe-a para vê-las todas de novo.",
   links: "links",
   allTag: "Todos",
   filterByTag: "Filtrar por tag",

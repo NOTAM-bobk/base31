@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
 import Script from "next/script";
+import { Gochi_Hand, Titan_One } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 import "./overrides.css";
@@ -18,6 +19,15 @@ import PrivacyConsent from "@/components/privacy-consent";
 import StructuredData from "@/components/structured-data";
 import BlogTransitions from "@/components/blog-transitions";
 import PageBehaviors from "@/components/page-behaviors";
+
+// Two display faces from Google Fonts. next/font downloads and self-hosts the
+// files at build time, so nothing on the page ever asks fonts.googleapis.com
+// for them — no third-party request, no render-blocking stylesheet and no font
+// fetched before the visitor has answered the cookie banner. Card names wear
+// Titan One and the header text wears Gochi Hand; the rules that use them live
+// in app/late.css, which is why both hand over a CSS variable.
+const titanOne = Titan_One({ subsets: ["latin"], weight: "400", variable: "--font-display", display: "swap" });
+const gochiHand = Gochi_Hand({ subsets: ["latin"], weight: "400", variable: "--font-hand", display: "swap" });
 
 const siteUrl = "https://base31.org";
 
@@ -57,7 +67,7 @@ const themeScript = `try{if(localStorage.getItem("base31-theme")==="light"){docu
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" className={`${titanOne.variable} ${gochiHand.variable}`}>
       <head>
         {/* Google tag (gtag.js), first in the head as Google's installation
             instruction asks. The snippet documented at the top of README.md is

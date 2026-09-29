@@ -1,8 +1,10 @@
 // Plain Node ESM — run directly with `node`, no build step.
 //
-// Asks every site in config/cool-sites.json for its homepage and reports any
-// that fail. Exit code stays 0 on failures for now (CI shows the warnings
-// without blocking a deploy); flip `SOFT_FAIL` to true once the list is
+// Asks every entry in config/cool-sites.json and config/cool-apis.json for its
+// URL and reports any that fail. Both lists ship external favicons on the
+// homepage, so a dead link shows up as a broken tile before a visitor ever
+// clicks it. Exit code stays 0 on failures for now (CI shows the warnings
+// without blocking a deploy); flip `SOFT_FAIL` to true once the lists are
 // battle-tested and a dead link should block the build.
 import fs from "node:fs";
 import path from "node:path";
@@ -11,7 +13,10 @@ const SOFT_FAIL = false;
 const TIMEOUT_MS = 8000;
 
 const root = process.cwd();
-const sites = JSON.parse(fs.readFileSync(path.join(root, "config", "cool-sites.json"), "utf8"));
+const lists = [
+  { file: "cool-sites.json", label: "cool sites" },
+  { file: "cool-apis.json", label: "cool APIs" },
+];
 
 const check = async (url) => {
   const controller = new AbortController();
@@ -30,13 +35,22 @@ const check = async (url) => {
   }
 };
 
-const results = await Promise.all(
-  sites.map(async (site) => ({ name: site.name, url: site.url, ok: await check(site.url) })),
-);
+const results = [];
+for (const list of lists) {
+  const entries = JSON.parse(fs.readFileSync(path.join(root, "config", list.file), "utf8"));
+  const checked = await Promise.all(
+    entries.map(async (entry) => ({ name: entry.name, url: entry.url, ok: await check(entry.url) })),
+  );
+  results.push({ list: list.label, checked });
+}
 
-const failures = results.filter((r) => !r.ok);
-for (const result of results) {
-  console.log(`${result.ok ? "✓" : "✗"} ${result.name} — ${result.url}`);
+const failures = [];
+for (const { list, checked } of results) {
+  console.log(`\n${list}`);
+  for (const result of checked) {
+    console.log(`${result.ok ? "✓" : "✗"} ${result.name} — ${result.url}`);
+    if (!result.ok) failures.push(result);
+  }
 }
 
 if (failures.length > 0) {
@@ -47,5 +61,5 @@ if (failures.length > 0) {
   }
   console.warn(`\n⚠ ${failures.length} unreachable (soft-fail, not blocking): ${names}`);
 } else {
-  console.log("\nAll external cool-site links responded.");
+  console.log("\nAll external cool-site and cool-API links responded.");
 }

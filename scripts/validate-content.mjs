@@ -32,20 +32,29 @@ checkUnique(posts.map((post) => String(post.slug)), "blog slug");
 checkUnique(referrals.map((referral) => String(referral.url)), "referral URL");
 checkUnique(releases.map((release) => String(release.version)), "release version");
 
-// config/cool-sites.json backs the homepage's "Other cool sites" strip.
-// These are external URLs — deliberately not base31 subdomains — so the URL
-// check rejects a hostname that looks like the directory's own.
-const coolSites = JSON.parse(fs.readFileSync(path.join(root, "config", "cool-sites.json"), "utf8"));
-if (!Array.isArray(coolSites) || coolSites.length === 0) errors.push("cool-sites.json needs at least one site");
-checkUnique(coolSites.map((site) => String(site.url)), "cool site URL");
+// config/cool-sites.json and config/cool-apis.json back the two strips under
+// the directory ("Other cool sites" and "Cool APIs"). Both hold external URLs
+// — deliberately not base31 subdomains — so the URL check rejects a hostname
+// that looks like the directory's own. The two lists carry the same shape, so
+// they are checked by the same loop.
+const externalLists = [
+  { file: "cool-sites.json", label: "Cool site", count: 0 },
+  { file: "cool-apis.json", label: "Cool API", count: 0 },
+];
 const base31Host = /^https:\/\/[a-z0-9-]+\.base31\.org/;
-for (const [index, site] of coolSites.entries()) {
-  const at = `Cool site ${index + 1}`;
-  if (typeof site.name !== "string" || !site.name.trim()) errors.push(`${at} needs a name`);
-  if (typeof site.url !== "string" || !https.test(site.url)) errors.push(`${at} needs an HTTPS URL`);
-  else if (base31Host.test(site.url)) errors.push(`${at} points at a base31.org subdomain — directory entries belong in sites.json, not here`);
-  if (typeof site.description !== "string" || site.description.trim().length < 20) errors.push(`${at} needs a useful description`);
-  if (!Array.isArray(site.tags) || site.tags.length === 0) errors.push(`${at} needs at least one tag`);
+for (const list of externalLists) {
+  const entries = JSON.parse(fs.readFileSync(path.join(root, "config", list.file), "utf8"));
+  list.count = Array.isArray(entries) ? entries.length : 0;
+  if (!Array.isArray(entries) || entries.length === 0) errors.push(`${list.file} needs at least one entry`);
+  checkUnique(entries.map((entry) => String(entry.url)), `${list.label} URL`);
+  for (const [index, entry] of entries.entries()) {
+    const at = `${list.label} ${index + 1}`;
+    if (typeof entry.name !== "string" || !entry.name.trim()) errors.push(`${at} needs a name`);
+    if (typeof entry.url !== "string" || !https.test(entry.url)) errors.push(`${at} needs an HTTPS URL`);
+    else if (base31Host.test(entry.url)) errors.push(`${at} points at a base31.org subdomain — directory entries belong in sites.json, not here`);
+    if (typeof entry.description !== "string" || entry.description.trim().length < 20) errors.push(`${at} needs a useful description`);
+    if (!Array.isArray(entry.tags) || entry.tags.length === 0) errors.push(`${at} needs at least one tag`);
+  }
 }
 
 // Language codes on directory entries (BGR 47 short form; "en" is the default
@@ -183,6 +192,6 @@ if (errors.length > 0) {
   process.exitCode = 1;
 } else {
   console.log(
-    `Content validation passed: ${sites.length} sites, ${posts.length} blog posts, ${referrals.length} referrals, ${donations.length} donations, ${releases.length} releases, ${guideBlocks.length} tool guides.`,
+    `Content validation passed: ${sites.length} sites, ${posts.length} blog posts, ${referrals.length} referrals, ${donations.length} donations, ${releases.length} releases, ${guideBlocks.length} tool guides, ${externalLists[0].count} cool sites, ${externalLists[1].count} cool APIs.`,
   );
 }

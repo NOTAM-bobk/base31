@@ -1,5 +1,17 @@
 [
   {
+    "version": "1.12.0",
+    "date": "2026-09-29",
+    "title": "Cool APIs, two new typefaces",
+    "summary": "A second foldable strip sits under the directory — free public APIs worth building with, kept in its own config file and searched by the same hero search. The site also got a voice: card names wear Titan One and the header text wears Gochi Hand, both self-hosted from Google Fonts.",
+    "highlights": [
+      "\"Cool APIs\" joins \"Other cool sites\" under the directory: a foldable grid of free public APIs, each with a host and one line of why it is worth calling, edited entirely through the new config/cool-apis.json.",
+      "The hero search now narrows both strips, not just the directory. A query that matches an API opens that strip, filters its cards, changes its count to n of the total, and the directory's empty state names the off-directory picks instead of dead-ending.",
+      "The names on the cards wear Titan One, a chunky display face that still reads as a label at card size, and the header text — the wordmark and the homepage headline — wears Gochi Hand.",
+      "Both faces are downloaded and self-hosted at build time by next/font, so no page ever asks fonts.googleapis.com for a font and nothing renders differently while one loads."
+    ]
+  },
+  {
     "version": "1.11.0",
     "date": "2026-09-29",
     "title": "The section rail is always there",

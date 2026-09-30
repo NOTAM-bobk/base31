@@ -2,15 +2,14 @@
 
 import { useEffect, useState } from "react";
 
-// How long a figure takes to climb from zero to its final value. Short enough
-// that the number has landed before the eye leaves the headline.
-const COUNT_MS = 1600;
+// How long a figure takes to climb from zero to its final value. Deliberately
+// slow: the climb is meant to be watched, not missed on the way to something
+// else.
+const COUNT_MS = 3400;
 
-// The project's size, shown as a rounded floor. base31 is a little over fifty
-// thousand lines of source across the app, the components, the worker and the
-// hand-written subdomain pages, so the hero prints the round number plus a
-// "+" rather than a figure that would go stale on the next commit.
-const LINES_OF_CODE = 50000;
+// The project's size in lines of source, across the app, the components, the
+// worker and the hand-written subdomain pages.
+const LINES_OF_CODE = 51871;
 
 /**
  * Counts a figure up from zero to `target` with an ease-out, in a rAF loop.
@@ -63,14 +62,14 @@ export default function HeroStats({ visitors, sites }: { visitors: number | null
   const stats = [
     { label: "visitors", text: visitors == null ? "—" : visitorCount.toLocaleString() },
     { label: "websites linked", text: siteCount.toLocaleString() },
-    { label: "lines of code", text: `${codeCount.toLocaleString()}+` },
+    { label: "lines of code", text: codeCount.toLocaleString() },
   ];
 
   return (
     <ul className="hero-stats" aria-label="base31 at a glance">
       {stats.map((stat) => (
         <li key={stat.label} className="hero-stat">
-          <span className="hero-stat-value mono">{stat.text}</span>
+          <span className="hero-stat-value">{stat.text}</span>
           <span className="hero-stat-label mono">{stat.label}</span>
         </li>
       ))}

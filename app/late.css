@@ -208,6 +208,9 @@ html[data-theme="light"] .site-footer {
    quieter than the directory's: no preview, no votes — name, host, one line,
    in a denser three-across grid on a desktop. */
 .cool-section { margin-top: 72px; }
+/* The category chips above the Cool APIs grid; the directory's own chips are
+   styled in overrides.css and reused here. */
+.cool-filters { margin: 12px 0 14px; }
 .cool-lede { max-width: 560px; margin: 0 0 16px; color: var(--muted); font-size: 12.5px; line-height: 1.6; }
 .cool-grid { display: grid; gap: 8px; }
 .cool-card {
@@ -858,33 +861,54 @@ html[data-theme="light"] .community-action.is-primary { color: var(--on-live); }
 
 /* Hero stats -----------------------------------------------------------
    The three figures above the search: the directory's readership, how many
-   sites it links out to, and the size of the project. One compact tray split
-   into three, each figure counting up to its value and holding there. */
+   sites it links out to, and the size of the project. No tray — the numbers
+   sit straight on the page, in the display face, with only their small caps
+   label under each one. */
 .hero-stats {
   display: flex; flex-wrap: wrap; justify-content: center;
-  width: fit-content; max-width: 100%;
-  margin: 22px auto 0; padding: 0; list-style: none;
-  border: 1px solid var(--line); border-radius: 14px;
-  background: color-mix(in srgb, var(--surface) 70%, transparent);
-  overflow: hidden;
+  gap: 12px 34px; margin: 26px auto 0; padding: 0; list-style: none;
+  max-width: 100%;
 }
-.hero-stat {
-  display: flex; flex-direction: column; align-items: center; gap: 3px;
-  padding: 10px 24px;
-}
-.hero-stat + .hero-stat { border-left: 1px solid var(--line); }
+.hero-stat { display: flex; flex-direction: column; align-items: center; gap: 4px; }
 .hero-stat-value {
-  color: var(--text-strong); font-size: 22px; font-weight: 700;
-  letter-spacing: -0.02em; line-height: 1; font-variant-numeric: tabular-nums;
+  color: var(--text-strong);
+  font-family: var(--font-display, inherit);
+  font-size: 30px; font-weight: 400; letter-spacing: 0.01em; line-height: 1;
+  font-variant-numeric: tabular-nums;
 }
 .hero-stat-label {
-  color: var(--muted); font-size: 9.5px; letter-spacing: 0.12em;
+  color: var(--subtle); font-size: 9.5px; letter-spacing: 0.14em;
   text-transform: uppercase; white-space: nowrap;
 }
 @media (max-width: 600px) {
-  .hero-stats { margin-top: 18px; }
-  .hero-stat { padding: 9px 15px; gap: 2px; }
-  .hero-stat-value { font-size: 18px; }
-  .hero-stat-label { font-size: 8.5px; letter-spacing: 0.08em; }
+  .hero-stats { gap: 10px 24px; margin-top: 20px; }
+  .hero-stat-value { font-size: 23px; }
+  .hero-stat-label { font-size: 8.5px; letter-spacing: 0.1em; }
+}
+
+/* Next-section button --------------------------------------------------
+   A small pill in the bottom-left corner, shown only while the directory is
+   the section being read, so a long page is one tap from the next one. It is
+   narrow enough to share the corner with the donate button on the narrow
+   layouts where that drops to a fixed bar, and drawn above it. */
+.next-section {
+  position: fixed; left: 16px; bottom: 16px; z-index: 30;
+  display: inline-flex; align-items: center; gap: 8px;
+  max-width: min(60vw, 260px);
+  padding: 9px 13px; border: 1px solid var(--line-strong); border-radius: 999px;
+  background: var(--overlay); color: var(--text-strong);
+  font-size: 11px; cursor: pointer;
+  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  box-shadow: 0 10px 26px -20px rgb(0 0 0 / 66%);
+  animation: next-section-in 260ms ease both;
+}
+.next-section:hover { border-color: var(--live); color: var(--live); }
+.next-section-label {
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.next-section-arrow { flex: 0 0 auto; color: var(--live); }
+@keyframes next-section-in {
+  from { transform: translateY(8px); opacity: 0; }
+  to { transform: none; opacity: 1; }
 }
 

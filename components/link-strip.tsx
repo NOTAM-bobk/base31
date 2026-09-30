@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { tick } from "@/lib/haptics";
 
-export type LinkStripItem = { name: string; url: string; tags: string[]; description: string };
+export type LinkStripItem = { name: string; url: string; tags: string[]; description: string; category?: string };
 
 /** The dictionary strings one strip needs, so a translated homepage folds and
     searches its strips in its own words. */
@@ -18,6 +18,10 @@ export type LinkStripCopy = {
   noMatch: string;
   /** Count unit, e.g. "links". */
   unit: string;
+  /** The "everything" chip, shown only when the strip has category chips. */
+  all?: string;
+  /** Names the chip row for assistive tech. */
+  filterLabel?: string;
 };
 
 export type LinkStripProps = {
@@ -27,6 +31,9 @@ export type LinkStripProps = {
   search: (query: string) => LinkStripItem[];
   copy: LinkStripCopy;
   query?: string;
+  /** Category names, in chip order. When present the strip grows a filter row
+      that narrows the cards to one category (the "Cool APIs" strip uses it). */
+  categories?: string[];
 };
 
 // The foldable strips under the directory ("Other cool sites", "Cool APIs").
@@ -40,13 +47,24 @@ export type LinkStripProps = {
 // the strip away, says so in words while it is shut, and gives the section the
 // same short wobble (plus a haptic tick) on every open and close so the toggle
 // reads as a physical response.
-export default function LinkStrip({ id, items, search, copy, query = "" }: LinkStripProps) {
+//
+// A strip given `categories` also carries a chip row — the same control the
+// directory uses for tags — so a long list can be cut down without typing.
+// The chips combine with the hero search rather than replacing it: both narrow
+// the same set, and the count reflects the two together.
+export default function LinkStrip({ id, items, search, copy, query = "", categories }: LinkStripProps) {
   const [collapsed, setCollapsed] = useState(false);
   const [vibrating, setVibrating] = useState(false);
+  const [category, setCategory] = useState<string | null>(null);
   const mounted = useRef(false);
 
   const matches = useMemo(() => search(query), [search, query]);
+  const visible = useMemo(
+    () => (category ? matches.filter((item) => item.category === category) : matches),
+    [matches, category],
+  );
   const searching = query.trim().length > 0;
+  const filtering = searching || category !== null;
   const headingId = `${id}-heading`;
   const panelId = `${id}-panel`;
 
@@ -92,7 +110,7 @@ export default function LinkStrip({ id, items, search, copy, query = "" }: LinkS
           </button>
         </h2>
         <span className="section-count mono" aria-live="polite">
-          {searching ? `${matches.length} of ${items.length}` : items.length} {copy.unit}
+          {filtering ? `${visible.length} of ${items.length}` : items.length} {copy.unit}
         </span>
       </div>
 
@@ -104,7 +122,7 @@ export default function LinkStrip({ id, items, search, copy, query = "" }: LinkS
           {copy.closed}
         </p>
       )}
-      {searching && matches.length === 0 && (
+      {filtering && visible.length === 0 && (
         <p className="section-closed-note" role="status">
           {copy.noMatch}
         </p>
@@ -112,8 +130,31 @@ export default function LinkStrip({ id, items, search, copy, query = "" }: LinkS
 
       <div id={panelId} className="sites-panel" hidden={collapsed}>
         <p className="cool-lede">{copy.lede}</p>
+        {categories && categories.length > 0 && (
+          <div className="tag-filters cool-filters" role="group" aria-label={copy.filterLabel ?? "Filter by category"}>
+            <button
+              type="button"
+              className={`tag-chip${category === null ? " is-active" : ""}`}
+              aria-pressed={category === null}
+              onClick={() => { tick(6); setCategory(null); }}
+            >
+              {copy.all ?? "All"}
+            </button>
+            {categories.map((name) => (
+              <button
+                key={name}
+                type="button"
+                className={`tag-chip${category === name ? " is-active" : ""}`}
+                aria-pressed={category === name}
+                onClick={() => { tick(6); setCategory(name); }}
+              >
+                {name}
+              </button>
+            ))}
+          </div>
+        )}
         <div className="cool-grid" role="list">
-          {matches.map((site) => (
+          {visible.map((site) => (
             <a
               key={site.url}
               href={site.url}

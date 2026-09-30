@@ -10,9 +10,23 @@ export type CoolApi = {
   url: string;
   tags: string[];
   description: string;
+  /** The strip's filter chip. Coarser than `tags` on purpose: the free-form
+      tags run to sixty-odd values, which would be a wall of chips, so each API
+      is filed under one of the handful of categories below. */
+  category: string;
 };
 
 export const allCoolApis = coolApis as CoolApi[];
+
+/** The filter chips for the strip, busiest category first so the useful ones
+    are leftmost (then alphabetical, so the order is stable between builds). */
+export const coolApiCategories: string[] = (() => {
+  const counts = new Map<string, number>();
+  for (const api of allCoolApis) counts.set(api.category, (counts.get(api.category) ?? 0) + 1);
+  return [...counts.entries()]
+    .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
+    .map(([category]) => category);
+})();
 
 /** Everything about an API a search should look at, lowercased. */
 const index = (api: CoolApi) => `${api.name} ${api.url} ${api.tags.join(" ")} ${api.description}`.toLowerCase();

@@ -269,12 +269,14 @@ bundler. Two ways to do that by accident:
   duplicated something else within reach.
 - Three figures sit above the hero search (`components/hero-stats.tsx`): the
   directory's visitors (the live view counter), the websites it links out to
-  (`allSites` plus `coolSites`) and the project's size, printed as "50,000+"
-  lines of code. `useCountUp` climbs each one from zero with an ease-out in a
-  rAF loop and holds the final value; the visitors figure waits for the worker
-  to answer and shows an em dash until it does. Under `prefers-reduced-motion`
-  the hook jumps straight to the final number, because the figure is
-  information rather than decoration.
+  (`allSites` plus `coolSites`) and the project's size in lines of code
+  (`51,871`). They carry no tray — the numbers sit straight on the page in the
+  display face (`--font-display`), with only a small caps label under each.
+  `useCountUp` climbs each one from zero with an ease-out in a rAF loop and
+  holds the final value; the visitors figure waits for the worker to answer and
+  shows an em dash until it does. Under `prefers-reduced-motion` the hook jumps
+  straight to the final number, because the figure is information rather than
+  decoration.
 - The hero headline is rendered one `<span>` per word, which is what lets it
   rise into place on load: `h1-word-in` in `app/late.css` fades each word up
   from below with a per-word delay set inline in `components/home-page.tsx`,
@@ -337,6 +339,14 @@ the directory's empty state instead of dead-ending there.
   cannot drift apart. Entries are external URLs by design — the validator
   rejects anything pointing at a base31.org subdomain, which belongs in
   `sites.json` instead.
+- "Cool APIs" also carries a category chip row: each entry in
+  `config/cool-apis.json` names one of eleven broad `category` values (the
+  free-form `tags` run to sixty-odd values, which would be a wall of chips),
+  `coolApiCategories` in `lib/cool-apis.ts` lists them busiest first, and the
+  shared strip renders the row and narrows its cards to the chosen category.
+  The chips combine with the hero search rather than replacing it, and the
+  count reflects both. A strip only shows the row when it is handed
+  `categories`, which is why "Other cool sites" has none.
 - A slim column of small lines down the right edge
 (`components/section-rail.tsx`) is the section readout and the fast way between
 sections. Every section is rendered, so the whole page is reachable from the
@@ -353,6 +363,13 @@ keys walk the list one section at a time — the keys are the section ids. The
 section list and its labels live in `components/home-page.tsx`. Every step it
 takes buzzes once through the Vibration API, and the header's nav links do the
 same on the way out.
+- While "Featured sites" is the section being read, a small pill appears in the
+  bottom-left corner (`components/next-section-button.tsx`) that jumps to the
+  strip below it — the same rule the rail uses to pick the current section, so
+  it shows on the way into the directory and hides again once "Other cool
+  sites" reaches the line. It takes the corner the donate button drops into on
+  the narrow layouts and is drawn above it (`z-index`), which is the trade the
+  corner forces.
 - The directory is filterable by tag (chips built from `config/sites.json`,
   most used first, capped at `MAX_TAG_CHIPS`) and sortable by **Most liked**,
   **Newest** or **A–Z**. Pinned sites stay on top in every mode, and a tag or

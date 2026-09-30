@@ -21,6 +21,7 @@ import coolApis, { searchCoolApis } from "@/lib/cool-apis";
 import { tick } from "@/lib/haptics";
 import SectionRail, { type RailSection } from "@/components/section-rail";
 import HeroStats from "@/components/hero-stats";
+import NextSectionButton from "@/components/next-section-button";
 
 type Site = { name: string; subdomain: string; url: string; tags?: string[]; description?: string; show?: boolean; community?: boolean; createdAt?: number; icon?: string; lastChecked?: string };
 
@@ -1027,6 +1028,10 @@ export default function HomePage({ dict = EN, locale = "en" }: { dict?: Dictiona
       {/* The lines down the right edge: where you are, and the fast way
           between sections. */}
       <SectionRail sections={railSections} />
+
+      {/* While the directory is the section being read, a small shortcut to
+          the strip below it appears in the bottom-left corner. */}
+      <NextSectionButton fromId="sites" toId="cool-sites" label={dict.coolSites} />
 
       <main>
         <section className="intro" aria-labelledby="page-title">

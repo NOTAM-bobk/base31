@@ -1,5 +1,16 @@
 [
   {
+    "version": "1.18.0",
+    "date": "2026-09-30",
+    "title": "Category chips, numbers on the page, and a way out of the directory",
+    "summary": "The Cool APIs strip gains category chips that narrow it alongside the hero search, the three hero figures drop their tray and sit straight on the page in the display face, and a small pill in the bottom-left corner jumps from the directory to the strip below it.",
+    "highlights": [
+      "Every API in the Cool APIs strip is now filed under one of eleven categories, and the strip carries a chip row — the same control the directory uses for tags — so the list can be cut from sixty-three cards down to a handful without typing. The chips combine with the hero search instead of replacing it, and the count says how many of the links are showing.",
+      "The three figures above the hero search are out of their tray: no border, no background, just the numbers on the page in the display face, each counting up more slowly than before. The lines-of-code figure is the real figure now, 51,871.",
+      "A small pill in the bottom-left corner shows while \"Featured sites\" is the section you are reading. It jumps straight to \"Other cool sites\" and slips away once you are past the directory."
+    ]
+  },
+  {
     "version": "1.17.0",
     "date": "2026-09-30",
     "title": "Numbers that count, a rail that scrolls, a quieter review box",

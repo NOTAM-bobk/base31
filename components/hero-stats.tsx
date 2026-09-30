@@ -1,0 +1,79 @@
+"use client";
+
+import { useEffect, useState } from "react";
+
+// How long a figure takes to climb from zero to its final value. Short enough
+// that the number has landed before the eye leaves the headline.
+const COUNT_MS = 1600;
+
+// The project's size, shown as a rounded floor. base31 is a little over fifty
+// thousand lines of source across the app, the components, the worker and the
+// hand-written subdomain pages, so the hero prints the round number plus a
+// "+" rather than a figure that would go stale on the next commit.
+const LINES_OF_CODE = 50000;
+
+/**
+ * Counts a figure up from zero to `target` with an ease-out, in a rAF loop.
+ *
+ * `target` may arrive late (the visitor count is fetched), so the effect waits
+ * for a real number: while it is `null` the hook simply holds zero, and the
+ * climb starts when the value lands. Visitors who asked for reduced motion get
+ * the final number immediately — the figure is information, not decoration, so
+ * skipping the animation must not hide it.
+ */
+function useCountUp(target: number | null, duration = COUNT_MS) {
+  const [value, setValue] = useState(0);
+
+  useEffect(() => {
+    if (target == null || !Number.isFinite(target)) return;
+    const reduced =
+      typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduced || target <= 0) {
+      setValue(target);
+      return;
+    }
+    let frame = 0;
+    const start = performance.now();
+    const step = (now: number) => {
+      const t = Math.min(1, (now - start) / duration);
+      setValue(Math.round(target * (1 - Math.pow(1 - t, 3))));
+      if (t < 1) frame = window.requestAnimationFrame(step);
+    };
+    frame = window.requestAnimationFrame(step);
+    return () => window.cancelAnimationFrame(frame);
+  }, [target, duration]);
+
+  return value;
+}
+
+/**
+ * The three figures the hero prints directly above the search: how many people
+ * have read the directory, how many sites it links out to (the built-in
+ * entries plus the off-directory picks), and how much code the project is.
+ *
+ * The labels are deliberately English on every locale, like the rail's own
+ * labels — they name the same numbers the counters and the source already
+ * print in English elsewhere on the page.
+ */
+export default function HeroStats({ visitors, sites }: { visitors: number | null; sites: number }) {
+  const visitorCount = useCountUp(visitors);
+  const siteCount = useCountUp(sites);
+  const codeCount = useCountUp(LINES_OF_CODE);
+
+  const stats = [
+    { label: "visitors", text: visitors == null ? "—" : visitorCount.toLocaleString() },
+    { label: "websites linked", text: siteCount.toLocaleString() },
+    { label: "lines of code", text: `${codeCount.toLocaleString()}+` },
+  ];
+
+  return (
+    <ul className="hero-stats" aria-label="base31 at a glance">
+      {stats.map((stat) => (
+        <li key={stat.label} className="hero-stat">
+          <span className="hero-stat-value mono">{stat.text}</span>
+          <span className="hero-stat-label mono">{stat.label}</span>
+        </li>
+      ))}
+    </ul>
+  );
+}

@@ -6,50 +6,39 @@ import { tick } from "@/lib/haptics";
 
 export type RailSection = { id: string; label: string };
 
-// How long a wheel notch keeps its lock: one notch, one section, however hard
-// a trackpad is flicked.
-const WHEEL_COOLDOWN_MS = 420;
-
-// How many lines the rail shows at once. The page has more sections than this,
-// so the window travels with the reader instead of the rail growing to fit the
-// whole page — three small marks in the gutter, not a full-height ladder.
-const RAIL_WINDOW = 3;
-
 /**
- * The section rail: a short column of small lines pinned to the right edge of
- * the homepage, one per section, top to bottom in page order — but only ever
- * three of them on screen at a time.
+ * The section rail: a slim column of small lines pinned to the right edge of
+ * the homepage, one per section, in page order.
  *
- * That is the whole trick: the rail shows the section you are reading and its
- * neighbours, and as you read down the page the three lines move down the list
- * and up the screen, so a long homepage still gets a small, quiet indicator
- * instead of eight stacked bars. The line for the section you are reading
- * stands up — it rotates from flat to vertical and brightens — and its label
- * slides out beside it, so the rail doubles as a position readout and as a
- * menu. Clicking a line scrolls there; scrolling *on* the rail walks one
- * section at a time instead of scrolling the page, which is the quick way
- * through a long homepage.
+ * Every section is rendered, so the whole page is reachable from the rail
+ * itself: when the list is taller than the rail's cap the column scrolls —
+ * the wheel and a drag work inside it like any other scroll container — and
+ * the line for the section you are reading is kept scrolled into view as you
+ * read down the page, so the readout never slides out of the pill.
+ *
+ * The line for the current section stands on end and turns green while its
+ * label slides out beside it, so the rail is both a position readout and a
+ * menu. Clicking a line scrolls the page there, and the arrow keys walk the
+ * list one section at a time.
  *
  * It is always there, from the first screen on, at every width: on a wide
- * monitor it sits in the gutter beside the centered column, on a phone it is
- * slit down to a slim strip of bars in the same gutter. Nothing to scroll past
- * to find it, and nothing it covers.
+ * monitor it sits in the gutter beside the centered column, on a phone it is a
+ * slim strip of bars in the same gutter. Nothing to scroll past to find it, and
+ * nothing it covers.
  *
- * Every step it takes — a click, a wheel notch or an arrow key — buzzes once
- * through the Vibration API, so moving a section lands as a physical tick on a
- * phone instead of only a scroll. The pattern is deliberately tiny, and
- * `lib/haptics.ts` turns it off entirely for visitors who asked for reduced
- * motion.
+ * Every step it takes — a click or an arrow key — buzzes once through the
+ * Vibration API, so moving a section lands as a physical tick on a phone
+ * instead of only a scroll. `lib/haptics.ts` turns it off entirely for
+ * visitors who asked for reduced motion.
  */
 export default function SectionRail({ sections }: { sections: RailSection[] }) {
   const [active, setActive] = useState(0);
   const rail = useRef<HTMLElement | null>(null);
-  const lastStep = useRef(0);
 
   // Which section is on screen: the last one whose top has passed a third of
   // the way down the viewport. Measured on scroll inside a rAF so a fast wheel
   // cannot queue a layout per event. The rail itself never hides, so this only
-  // ever picks the line that stands up and slides the three-line window along.
+  // ever picks the line that stands up.
   useEffect(() => {
     let frame = 0;
     const measure = () => {
@@ -75,6 +64,19 @@ export default function SectionRail({ sections }: { sections: RailSection[] }) {
     };
   }, [sections]);
 
+  // Keep the current line inside the rail's own scroll area. The rail can be
+  // scrolled by hand to browse ahead, so this only runs when the *page* moves
+  // the current section — a manual scroll of the list is left alone.
+  useEffect(() => {
+    const node = rail.current;
+    if (!node) return;
+    const line = node.querySelector<HTMLElement>(".rail-item.is-active");
+    if (!line) return;
+    const top = line.offsetTop - (node.clientHeight - line.offsetHeight) / 2;
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    node.scrollTo({ top: Math.max(0, top), behavior: reduced ? "auto" : "smooth" });
+  }, [active]);
+
   const goTo = useCallback(
     (index: number) => {
       const section = sections[index];
@@ -91,50 +93,19 @@ export default function SectionRail({ sections }: { sections: RailSection[] }) {
     [sections],
   );
 
-  // Scrolling on the rail steps through the sections. React registers `wheel`
-  // at the root as a passive listener, so preventing the page scroll means a
-  // real listener of our own.
-  useEffect(() => {
-    const node = rail.current;
-    if (!node) return;
-    const onWheel = (event: WheelEvent) => {
-      if (!event.deltaY) return;
-      event.preventDefault();
-      const now = Date.now();
-      if (now - lastStep.current < WHEEL_COOLDOWN_MS) return;
-      lastStep.current = now;
-      goTo(Math.min(sections.length - 1, Math.max(0, active + (event.deltaY > 0 ? 1 : -1))));
-    };
-    node.addEventListener("wheel", onWheel, { passive: false });
-    return () => node.removeEventListener("wheel", onWheel);
-  }, [active, goTo, sections.length]);
-
   const onKeyDown = useCallback(
     (event: KeyboardEvent<HTMLElement>) => {
       if (event.key !== "ArrowUp" && event.key !== "ArrowDown") return;
       event.preventDefault();
-      goTo(active + (event.key === "ArrowDown" ? 1 : -1));
+      goTo(Math.min(sections.length - 1, Math.max(0, active + (event.key === "ArrowDown" ? 1 : -1))));
+      tick(10);
     },
-    [active, goTo],
+    [active, goTo, sections.length],
   );
 
-  // The three lines on screen: the current section in the middle wherever it
-  // fits, clamped at both ends of the page so the window never runs short. The
-  // keys stay the section ids, so React keeps a line's node alive as it moves
-  // through the window and only the entering and leaving lines swap.
-  const windowSize = Math.min(RAIL_WINDOW, sections.length);
-  const start = Math.min(Math.max(active - 1, 0), Math.max(0, sections.length - windowSize));
-  const visible = sections.slice(start, start + windowSize);
-
   return (
-    <nav
-      ref={rail}
-      className="section-rail"
-      aria-label="Page sections"
-      onKeyDown={onKeyDown}
-    >
-      {visible.map((section, offset) => {
-        const index = start + offset;
+    <nav ref={rail} className="section-rail" aria-label="Page sections" onKeyDown={onKeyDown}>
+      {sections.map((section, index) => {
         const current = index === active;
         return (
           <button

@@ -1,5 +1,16 @@
 [
   {
+    "version": "1.17.0",
+    "date": "2026-09-30",
+    "title": "Numbers that count, a rail that scrolls, a quieter review box",
+    "summary": "Three figures above the hero search count up from zero — the directory's visitors, the sites it links out to, and a project size reading 50,000+ lines of code. The section rail now renders every section and scrolls to the ones further down, and the Trustpilot card drops its own five-star row so the hosted review widget is the only rating surface.",
+    "highlights": [
+      "Three numbers now sit directly above the hero search and count up from zero when the page loads: how many people have read the directory (the live view counter), how many websites it links out to (the directory entries plus the off-directory picks), and the size of the project — a little over fifty thousand lines of code, so the figure reads \"50,000+\". Visitors who asked for reduced motion get the final value immediately.",
+      "The section rail renders every section now, and it scrolls. The wheel and a drag inside the pill reach the sections further down the list, the line for the section you are reading is kept scrolled into view as you read, and a click or the arrow keys still jump straight there.",
+      "The Trustpilot card no longer draws its own five-star row and score above the collector. The hosted TrustBox is the only rating surface, so the card reads as an invitation instead of a scoreboard that has to load before the widget it describes."
+    ]
+  },
+  {
     "version": "1.16.0",
     "date": "2026-09-29",
     "title": "CompMails, rebuilt",

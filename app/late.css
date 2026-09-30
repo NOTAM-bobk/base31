@@ -319,23 +319,27 @@ html[data-theme="light"] .site-footer {
 }
 
 /* Section rail ---------------------------------------------------------
-   Three lines down the right edge, showing the section you are reading and the
-   two beside it — a readout and a menu at once. The line for the current
-   section stands on end and turns green, its label slides out beside it,
-   clicking a line goes there, and scrolling on the rail itself walks the page
-   one section at a time. The page has more sections than three, so the window
-   travels along as you read down it and the column stays a short pill instead
-   of a full-height ladder. Fixed to the right edge, so it never moves the
-   page.
+   A slim column of lines down the right edge, one per section, showing where
+   you are and offering a shortcut to everywhere else. Every section is
+   rendered, so the rail doubles as a scroll container: when the column is
+   taller than its cap the wheel and a drag scroll the list itself, and the
+   line for the section you are reading is scrolled back into view as you read
+   down the page. The current line stands on end and turns green while its
+   label slides out beside it; clicking a line goes there and the arrow keys
+   walk the list.
 
-   It is always on, from the first screen and at every width — nothing to
-   scroll past to find it. The column it sits beside is a centered 720px, so
-   the gutter is where it lives and it only has to fit there: a small pill on a
-   desktop, bars only where the gutter narrows, and a slim strip of bars on a
-   phone, where there is no hover to open a label anyway. */
+   Fixed to the right edge, so it never moves the page. It is always on, from
+   the first screen and at every width — nothing to scroll past to find it. The
+   column it sits beside is a centered 720px, so the gutter is where it lives
+   and it only has to fit there: a small pill on a desktop, bars only where the
+   gutter narrows, and a slim strip of bars on a phone, where there is no hover
+   to open a label anyway. */
 .section-rail {
   position: fixed; top: 50%; right: 14px; z-index: 40;
-  display: flex; flex-direction: column; align-items: flex-end; gap: 4px;
+  display: flex; flex-direction: column; align-items: flex-end; gap: 5px;
+  max-height: min(56vh, 152px);
+  overflow-y: auto; overflow-x: hidden; overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
   padding: 7px 6px;
   transform: translateY(-50%);
   border: 1px solid color-mix(in srgb, var(--line-strong) 46%, var(--line));
@@ -343,6 +347,14 @@ html[data-theme="light"] .site-footer {
   background: color-mix(in srgb, var(--surface) 80%, transparent);
   backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
   box-shadow: 0 10px 26px -20px rgb(0 0 0 / 68%), inset 0 1px 0 rgb(255 255 255 / 5%);
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--line-strong) 70%, transparent) transparent;
+}
+.section-rail::-webkit-scrollbar { width: 4px; }
+.section-rail::-webkit-scrollbar-track { background: transparent; }
+.section-rail::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--line-strong) 70%, transparent);
 }
 /* Labels need a pointer to open them, so they go first as the gutter tightens. */
 @media (max-width: 1179px) {
@@ -366,7 +378,7 @@ html[data-theme="light"] .site-footer {
 
 .rail-item {
   display: flex; align-items: center; justify-content: flex-end; gap: 7px;
-  width: 100%; padding: 1px 1px; border: 0; border-radius: 6px;
+  width: 100%; padding: 4px 1px; border: 0; border-radius: 6px;
   background: transparent; color: var(--subtle); cursor: pointer;
 }
 .rail-item:hover { color: var(--text-strong); }
@@ -843,4 +855,36 @@ html[data-theme="light"] .code-backdrop { opacity: 0.38; }
 /* The one place a dark ink is hard-coded on a green fill. With the deeper
    light-theme green it would be dark-on-dark, so it follows `--on-live`. */
 html[data-theme="light"] .community-action.is-primary { color: var(--on-live); }
+
+/* Hero stats -----------------------------------------------------------
+   The three figures above the search: the directory's readership, how many
+   sites it links out to, and the size of the project. One compact tray split
+   into three, each figure counting up to its value and holding there. */
+.hero-stats {
+  display: flex; flex-wrap: wrap; justify-content: center;
+  width: fit-content; max-width: 100%;
+  margin: 22px auto 0; padding: 0; list-style: none;
+  border: 1px solid var(--line); border-radius: 14px;
+  background: color-mix(in srgb, var(--surface) 70%, transparent);
+  overflow: hidden;
+}
+.hero-stat {
+  display: flex; flex-direction: column; align-items: center; gap: 3px;
+  padding: 10px 24px;
+}
+.hero-stat + .hero-stat { border-left: 1px solid var(--line); }
+.hero-stat-value {
+  color: var(--text-strong); font-size: 22px; font-weight: 700;
+  letter-spacing: -0.02em; line-height: 1; font-variant-numeric: tabular-nums;
+}
+.hero-stat-label {
+  color: var(--muted); font-size: 9.5px; letter-spacing: 0.12em;
+  text-transform: uppercase; white-space: nowrap;
+}
+@media (max-width: 600px) {
+  .hero-stats { margin-top: 18px; }
+  .hero-stat { padding: 9px 15px; gap: 2px; }
+  .hero-stat-value { font-size: 18px; }
+  .hero-stat-label { font-size: 8.5px; letter-spacing: 0.08em; }
+}
 

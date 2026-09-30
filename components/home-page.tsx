@@ -20,6 +20,7 @@ import coolSites, { searchCoolSites } from "@/lib/cool-sites";
 import coolApis, { searchCoolApis } from "@/lib/cool-apis";
 import { tick } from "@/lib/haptics";
 import SectionRail, { type RailSection } from "@/components/section-rail";
+import HeroStats from "@/components/hero-stats";
 
 type Site = { name: string; subdomain: string; url: string; tags?: string[]; description?: string; show?: boolean; community?: boolean; createdAt?: number; icon?: string; lastChecked?: string };
 
@@ -1063,6 +1064,10 @@ export default function HomePage({ dict = EN, locale = "en" }: { dict?: Dictiona
               <span className="surprise-label">{dict.surprise}</span>
             </button>
           </div>
+          {/* Three figures above the search: the directory's readership, how
+              many sites it links out to, and the size of the project. They
+              count up on load and hold their final value. */}
+          <HeroStats visitors={views} sites={allSites.length + coolSites.length} />
           {/* A search landmark with an explicit name: the wrapping label used
               to name the field "/" (its only text was the shortcut hint). */}
           <div className="search-wrap" role="search">

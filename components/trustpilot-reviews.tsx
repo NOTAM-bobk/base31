@@ -1,9 +1,9 @@
 // The homepage's Trustpilot review collector. The TrustBox bootstrap script
 // lives in app/layout.tsx; it renders the hosted widget into this placeholder,
 // and the link inside it is the no-JS fallback. The card carries the Trustpilot
-// brand lockup, a static five-star row so the rating reads before the hosted
-// widget finishes loading, and the animated rainbow ring (styled in
-// app/overrides.css).
+// brand lockup, the invitation, and the animated rainbow ring (styled in
+// app/overrides.css). The hosted TrustBox is the only rating surface here —
+// there is no separate star row of our own.
 export default function TrustpilotReviews() {
   return (
     <section className="trustpilot-section" data-reveal aria-labelledby="trustpilot-heading">
@@ -20,16 +20,6 @@ export default function TrustpilotReviews() {
       </div>
       <h2 id="trustpilot-heading">Enjoying base31?</h2>
       <p className="trustpilot-lede">Tell other curious people what you found. Reviews are collected by Trustpilot.</p>
-      <div className="trustpilot-rating">
-        <div className="trustpilot-stars" role="img" aria-label="Rated 5 out of 5 stars">
-          {[0, 1, 2, 3, 4].map((star) => (
-            <svg key={star} viewBox="0 0 24 24" width="22" height="22" fill="currentColor" aria-hidden="true">
-              <path d="M12 2.6l2.9 5.88 6.49.94-4.7 4.58 1.11 6.46L12 17.4l-5.8 3.06 1.11-6.46-4.7-4.58 6.49-.94z" />
-            </svg>
-          ))}
-        </div>
-        <span className="trustpilot-score mono">5.0</span>
-      </div>
       <div
         className="trustpilot-widget"
         data-locale="en-US"

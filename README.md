@@ -267,6 +267,14 @@ bundler. Two ways to do that by accident:
   and the original "Browse all sites" link are both gone — the directory is the
   next thing down the page and the rail already steps to About, so each only
   duplicated something else within reach.
+- Three figures sit above the hero search (`components/hero-stats.tsx`): the
+  directory's visitors (the live view counter), the websites it links out to
+  (`allSites` plus `coolSites`) and the project's size, printed as "50,000+"
+  lines of code. `useCountUp` climbs each one from zero with an ease-out in a
+  rAF loop and holds the final value; the visitors figure waits for the worker
+  to answer and shows an em dash until it does. Under `prefers-reduced-motion`
+  the hook jumps straight to the final number, because the figure is
+  information rather than decoration.
 - The hero headline is rendered one `<span>` per word, which is what lets it
   rise into place on load: `h1-word-in` in `app/late.css` fades each word up
   from below with a per-word delay set inline in `components/home-page.tsx`,
@@ -329,23 +337,22 @@ the directory's empty state instead of dead-ending there.
   cannot drift apart. Entries are external URLs by design — the validator
   rejects anything pointing at a base31.org subdomain, which belongs in
   `sites.json` instead.
-- Three small lines down the right edge (`components/section-rail.tsx`) are the
-section readout and the fast way between sections. The rail shows the section
-you are reading and the two beside it, not all eight — `RAIL_WINDOW = 3` slices
-the list around the current index, so the column stays a short pill and the
-three lines travel along as you read down the page. It is always visible, from
-the first screen on at every width: a small pill with sliding labels on a wide
+- A slim column of small lines down the right edge
+(`components/section-rail.tsx`) is the section readout and the fast way between
+sections. Every section is rendered, so the whole page is reachable from the
+rail: `max-height` caps the pill and `overflow-y: auto` turns it into a scroll
+container, so the wheel and a drag walk the list itself, and the current line is
+scrolled back into view (`scrollTo` on the nav, not `scrollIntoView`, so the
+page never moves) whenever the page scrolls. It is always visible, from the
+first screen on at every width: a small pill with sliding labels on a wide
 monitor, shorter bars without labels below 1180px, and a slim strip of bars
 below 820px.
 The line for the section you are reading rotates flat-to-vertical and turns
-green while its label slides out; clicking a line scrolls there and a wheel over
-the rail steps one section at a time — the keys are the section ids, so a line
-keeps its DOM node as it moves through the window. That listener is attached by hand with
-`{ passive: false }` because React registers `wheel` passively, so
-`preventDefault` inside `onWheel` would be a no-op. The section list and its
-labels live in `components/home-page.tsx`. Every step it takes buzzes once
-through the Vibration API, and the header's nav links do the same on the way
-out.
+green while its label slides out; clicking a line scrolls there and the arrow
+keys walk the list one section at a time — the keys are the section ids. The
+section list and its labels live in `components/home-page.tsx`. Every step it
+takes buzzes once through the Vibration API, and the header's nav links do the
+same on the way out.
 - The directory is filterable by tag (chips built from `config/sites.json`,
   most used first, capped at `MAX_TAG_CHIPS`) and sortable by **Most liked**,
   **Newest** or **A–Z**. Pinned sites stay on top in every mode, and a tag or

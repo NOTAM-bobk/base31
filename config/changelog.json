@@ -1,5 +1,17 @@
 [
   {
+    "version": "1.19.0",
+    "date": "2026-09-30",
+    "title": "Unique visitors, dotted dividers, and a second ad slot",
+    "summary": "The counter now reports unique visitors as well as views — a person is counted once, not once per reload — and /stats shows the new number. The support hub gets a dotted rule between its blocks and a second consent-gated ad slot, and the directory's cards are a little smaller with a preview band the screenshot fits exactly.",
+    "highlights": [
+      "The worker counts unique visitors alongside views. A visitor is reduced to a one-way SHA-256 hash of the connection's address and the browser's User-Agent — neither is stored — and that hash is kept as a mark for 400 days; the total only moves the first time a visitor is seen, so reloads and second tabs do not count twice. The new number sits on /stats next to the total views, and the privacy page explains exactly what is hashed and what is not.",
+      "The support hub's blocks — the reviews, the donation board, the referrals and the ad slots — are separated by a dotted rule now, so each one reads as its own thing without a hard border.",
+      "A second ad slot joins the 160x300 banner, from the profitable-rate CPM network. It follows the same rule as everything else in that hub: the container is in the page, the loader is appended only after the cookie notice is accepted, and withdrawing the answer takes the script out and clears the frame it built.",
+      "Directory cards are a little smaller: the preview band is shorter, and both screenshot services are now asked for a 640x300 shot — the band's own ratio — so the picture fills it instead of being cropped."
+    ]
+  },
+  {
     "version": "1.18.0",
     "date": "2026-09-30",
     "title": "Category chips, numbers on the page, and a way out of the directory",

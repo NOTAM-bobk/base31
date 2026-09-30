@@ -32,6 +32,7 @@ export const revalidate = 300;
 type DayPoint = { date: string; views: number };
 type StatsTotals = {
   views: number;
+  unique: number;
   last7: number;
   prev7: number;
   sites: number;
@@ -175,7 +176,9 @@ export default async function StatsPage() {
       <p className="eyebrow mono">stats</p>
       <h1>What the directory is doing right now.</h1>
       <p className="privacy-updated">
-        Counted by the base31 counter, with no cookies and nothing that identifies a visitor. Refreshed every five minutes.
+        Counted by the base31 counter, with no cookies and nothing that identifies a visitor. Views count every
+        load; unique visitors are reduced to a one-way hash, so a reload does not count twice. Refreshed every five
+        minutes.
       </p>
 
       {!totals ? (
@@ -187,6 +190,11 @@ export default async function StatsPage() {
         <>
           <section className="stats-cards" aria-label="Directory totals">
             <Card label="total views" value={number.format(totals.views)} note="since launch, 20 Sep 2026" />
+            <Card
+              label="unique visitors"
+              value={number.format(totals.unique ?? 0)}
+              note="one per visitor — reloads do not count"
+            />
             <Card
               label="last 7 days"
               value={number.format(totals.last7)}

@@ -832,6 +832,7 @@ html[data-theme="light"] .view-counter {
   box-shadow: 0 8px 22px rgb(0 0 0 / 10%), inset 0 1px 0 #fff;
 }
 html[data-theme="light"] .support-banner-ad,
+html[data-theme="light"] .support-inline-ad,
 html[data-theme="light"] .support-ad {
   box-shadow:
     inset 0 1px 0 #fff,
@@ -911,4 +912,41 @@ html[data-theme="light"] .community-action.is-primary { color: var(--on-live); }
   from { transform: translateY(8px); opacity: 0; }
   to { transform: none; opacity: 1; }
 }
+
+/* Support-hub dividers --------------------------------------------------
+   A dotted rule between the hub's blocks — the reviews, the donation board,
+   the referral carousel and the ad slots — so each one reads as its own thing
+   without a hard border. `+ *` pulls the block back up so the rule sits in the
+   middle of the gap rather than on top of the next block's own margin. */
+.support-dots {
+  display: block; height: 0;
+  margin: 26px auto 0;
+  border-top: 2px dotted color-mix(in srgb, var(--line-strong) 72%, transparent);
+}
+.support-dots + * { margin-top: 26px; }
+
+/* Support-hub inline ad -------------------------------------------------
+   The profitable-rate CPM unit beside the 160x300 banner. Same rule as the
+   banner: the container is always in the page, the loader is only appended
+   once the visitor has answered the cookie notice, and before that the tray is
+   only as tall as its line of text instead of holding open an empty hole. */
+.support-inline-ad {
+  position: relative;
+  margin-top: 26px;
+  padding: 22px 16px 16px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  text-align: center;
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, var(--text-strong) 8%, transparent),
+    0 2px 3px rgb(0 0 0 / 38%),
+    0 14px 30px -16px rgb(0 0 0 / 62%);
+}
+.support-inline-ad > .support-ad-tag { position: absolute; top: 10px; left: 12px; }
+.support-inline-ad-slot {
+  display: flex; align-items: center; justify-content: center;
+  width: 100%; min-height: 250px; margin: 0 auto;
+}
+.support-inline-ad.is-waiting .support-inline-ad-slot { min-height: 0; }
 

@@ -198,6 +198,46 @@ const bumpDay = async (env: Env): Promise<void> => {
   }
 };
 
+// Unique visitors — a count of distinct people, not page loads.
+//
+// The view counter above counts every request, so a reload, a second tab or a
+// refresh from the same browser all add to it. This counter is the other half
+// of the picture: a visitor is counted once. Each visitor is reduced to a
+// one-way SHA-256 hash of the connection's address and the browser's
+// User-Agent string — neither is ever stored, and the hash cannot be turned
+// back into either — and that hash is written to KV as a mark. On a later
+// request the mark is already there, so the total does not move. The mark
+// expires after 400 days, so a visitor who comes back a year later counts once
+// more rather than never again.
+//
+// Both keys carry the "@" prefix, which `isValidKey` rejects: a visitor cannot
+// aim the public `?key=` endpoint at the total or at a visitor's mark.
+const UNIQUE_KEY = "@unique";
+const UNIQUE_PREFIX = "@uv:";
+const UNIQUE_TTL_SECONDS = 400 * 24 * 60 * 60;
+
+const sha256Hex = async (value: string): Promise<string> => {
+  const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(value));
+  return [...new Uint8Array(digest)].map((byte) => byte.toString(16).padStart(2, "0")).join("");
+};
+
+// Counts a visitor once. Deliberately best-effort, like `bumpDay`: the view
+// counter above is the number the visitor sees, and this must never be the
+// reason that request fails.
+const bumpUnique = async (env: Env, request: Request): Promise<void> => {
+  try {
+    const ip = request.headers.get("CF-Connecting-IP") || "";
+    const agent = request.headers.get("User-Agent") || "";
+    const mark = `${UNIQUE_PREFIX}${(await sha256Hex(`${ip}|${agent}`)).slice(0, 32)}`;
+    if (await env.VIEW_COUNTER.get(mark)) return;
+    await env.VIEW_COUNTER.put(mark, "1", { expirationTtl: UNIQUE_TTL_SECONDS });
+    const next = (await readCount(env, UNIQUE_KEY)) + 1;
+    await env.VIEW_COUNTER.put(UNIQUE_KEY, String(next));
+  } catch {
+    // Ignored on purpose; see above.
+  }
+};
+
 const voteKey = (key: string, side: "up" | "down") => `votes:${key}:${side}`;
 
 const readVotes = async (env: Env, key: string): Promise<VoteTotals> => {
@@ -290,8 +330,9 @@ const handleStats = async (env: Env, url: URL): Promise<Response> => {
     const counts = await Promise.all(dates.map((date) => readCount(env, dayKey(date))));
     const series = dates.map((date, index) => ({ date, views: counts[index] }));
 
-    const [views, votes, sites, subscribers, pushDevices] = await Promise.all([
+    const [views, unique, votes, sites, subscribers, pushDevices] = await Promise.all([
       readCount(env, DIRECTORY_KEY),
+      readCount(env, UNIQUE_KEY),
       readAllVotes(env),
       countPrefix(env, SITE_PREFIX),
       countPrefix(env, SUBSCRIBER_PREFIX, (value) => !!(value as { verified?: boolean } | null)?.verified),
@@ -315,6 +356,7 @@ const handleStats = async (env: Env, url: URL): Promise<Response> => {
         series,
         totals: {
           views,
+          unique,
           last7: sum(series.slice(-7)),
           prev7: sum(series.slice(-14, -7)),
           sites,
@@ -910,8 +952,10 @@ export default {
       return json({ error: "Counter temporarily unavailable" }, 503);
     }
 
-    // Off the critical path: the response doesn't wait on the daily bucket.
+    // Off the critical path: the response doesn't wait on the daily bucket or
+    // on the visitor mark that decides whether this is a new unique visitor.
     context.waitUntil(bumpDay(env));
+    context.waitUntil(bumpUnique(env, request));
 
     return json({ views });
   },

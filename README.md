@@ -294,8 +294,10 @@ bundler. Two ways to do that by accident:
   green, white on the deeper light-theme one), and a bolt badge that inverts
   with it. The base pill rule is in `app/overrides.css`; `app/late.css` squares
   it off, and its sheen/spin is disabled under `prefers-reduced-motion`.
-- Directory cards are sized around a 150px preview band with a tighter padded
-  half and a 14px name, and the vote pair in the card's foot is 32px tall —
+- Directory cards are sized around a shorter preview band — a 640x300 shot
+  that matches the band's own `aspect-ratio: 640 / 300`, so the screenshot is
+  neither cropped nor letterboxed — with a tighter padded half and a 15px name,
+  and the vote pair in the card's foot is 32px tall —
   38px on a coarse pointer, which is the height the rest of the site's touch
   targets already use. The sizing and the taller thumbs live at the end of
   `app/late.css`, deliberately after the card's material, because the card's
@@ -460,7 +462,9 @@ same on the way out.
 - Every card opens with a screenshot of its destination — the WordPress mShots
   call the referral carousel uses, with thum.io (which the App Screenshot page
   already depends on) as a second try, so every kept site gets a preview with
-  no image to maintain and no API key (see `SitePreview` in `app/page.tsx`). A gradient fades the shot into `--surface`, which is why the
+  no image to maintain and no API key (see `SitePreview` in `app/page.tsx`).
+  Both services are asked for a 640x300 shot, the band's own ratio, so the
+  screenshot lands in it whole. A gradient fades the shot into `--surface`, which is why the
   card's fill is a solid `--surface` and never changes on hover: a moving fill
   would leave a seam where the fade meets the body. The band keeps the site's
   hashed gradient underneath, so a slow or blocked screenshot still shows a
@@ -550,6 +554,7 @@ upload's own favicon — both decorative, both cookie-free:
 | `components/consent-aware-analytics.tsx` | Microsoft Clarity (`ylsxc7fokm`), only on `accepted` |
 | `components/consent-aware-ads.tsx` | Adcash auto-tag (`iy7zk7mmw`), only on `accepted` |
 | `components/support-banner-ad.tsx` | The 160x300 banner in the support hub (`d1495d5e568642fb60c4f1232a9af565`), only on `accepted` |
+| `components/support-inline-ad.tsx` | The profitable-rate CPM unit beside that banner, only on `accepted` |
 | `public/sites/appscreenshot/index.html`, `public/sites/share/index.html` | Never gated: these static subdomain pages render outside Next.js and carry no cookie banner, so the same Adcash auto-tag sits directly in their `<head>` (the async loader is polled for `aclib` before the tag runs). |
 | `public/sites/compmails/index.html` | The same 160x300 Adsterra banner as the support hub (`d1495d5e568642fb60c4f1232a9af565`), appended by `app.js` only on `accepted`. This static page ships its own cookie notice, and that notice is what gates the ad. |
 | `components/referral-carousel.tsx` | Never gated: the destination preview image loads straight from the destination (or a screenshot service) because the card is unusable without it. It sets no cookies, the sponsored links stay inert until clicked, and the privacy page says so. |
@@ -571,6 +576,14 @@ of text pointing at the privacy page instead of an empty tray.
 `public/sites/compmails/app.js` runs the same key the same way, against the
 cookie notice that static page ships. The other static subdomain pages have no
 notice of their own, which is why they carry the Adcash tag ungated instead.
+
+The second slot in the support hub is the profitable-rate CPM network's unit.
+Its snippet is also two pieces — a loader at
+`https://pl31451992.profitableratecpmnetwork.com/<id>/invoke.js` and an empty
+container it fills — so `components/support-inline-ad.tsx` renders the
+container always and appends the loader only on `accepted`, removing the script
+and clearing the container when the answer changes. Before the answer the slot
+shows the same line of text as the banner, pointing at the privacy page.
 
 Clarity is inserted into the page only on `accepted`, and its snippet appends its
 loader under `microsoft-clarity-loader` so withdrawing the choice removes what the
@@ -684,7 +697,7 @@ served by a small Cloudflare Worker backed by Cloudflare KV, deployed from
 
 | Route | Purpose |
 | --- | --- |
-| `GET /?key=<name>` | Increments the view counter, returns `{ "views": n }`; also bumps that day's bucket for the stats graph |
+| `GET /?key=<name>` | Increments the view counter, returns `{ "views": n }`; also bumps that day's bucket and, for a visitor it has not seen, the unique-visitor total |
 | `GET /stats?days=<n>` | Totals plus the daily view series that `/stats` renders (cached for five minutes) |
 | `GET /votes?keys=a,b,c` | Reads totals without incrementing, returns `{ "votes": { a: { up, down }, … } }` |
 | `POST /vote` | Body `{ key, from, to }` where each of `from`/`to` is `1`, `-1` or `0`; returns the key's new `{ key, up, down }` |
@@ -727,12 +740,29 @@ votable under its slug.
 ### Stats
 
 `/stats` on the site reads `GET /stats` on the worker, which reports the
-directory's all-time views, a daily series for the visitor graph, vote totals,
-published sites, subscriber counts, and the most liked entries. The daily
-buckets are written under an `@day:<YYYY-MM-DD>` key: the `@` is outside the
-characters `?key=` accepts, so a visitor can never aim the public counter at a
-day bucket. They carry a 400-day lifetime, so the namespace stays bounded on
-its own.
+directory's all-time views, its unique visitors, a daily series for the visitor
+graph, vote totals, published sites, subscriber counts, and the most liked
+entries. The daily buckets are written under an `@day:<YYYY-MM-DD>` key: the `@`
+is outside the characters `?key=` accepts, so a visitor can never aim the public
+counter at a day bucket. They carry a 400-day lifetime, so the namespace stays
+bounded on its own.
+
+### Unique visitors
+
+Views count every load, so a reload, a second tab or a refresh all add to the
+total. The unique-visitor count is the other half: a person is counted once.
+`bumpUnique` reduces the request to a one-way SHA-256 hash of
+`CF-Connecting-IP` and `User-Agent`, writes that hash under `@uv:<hash>` as a
+mark with a 400-day lifetime, and raises `@unique` only the first time it sees
+it. The raw address and browser string are never stored, and the hash cannot be
+turned back into either. Two visitors behind one address with the same browser
+share a mark, and one visitor who clears that browser's User-Agent counts
+again — the count is an aggregate, not an identity.
+
+Both keys carry the `@` prefix, which `isValidKey` rejects, so the public
+`?key=` endpoint cannot be aimed at the unique total or at a visitor's mark.
+The bump runs in `waitUntil`, alongside the daily bucket, so it is off the
+critical path: the visitor still gets their view count if it fails.
 
 Two consequences worth knowing:
 
@@ -743,7 +773,8 @@ Two consequences worth knowing:
   deploy:worker`). Until then `/stats` shows its "not available yet" state and
   nothing on the rest of the site changes.
 
-Views are stored under the key itself (so existing counts keep working) and
+Views are stored under the key itself (so existing counts keep working),
+unique visitors under `@unique` with a `@uv:<hash>` mark per visitor, and
 votes under `votes:<key>:up` / `votes:<key>:down`. Votes are per browser:
 the visitor's own choice lives in `localStorage` and the worker only keeps the
 shared totals, so the same person cannot stack votes by reloading but also

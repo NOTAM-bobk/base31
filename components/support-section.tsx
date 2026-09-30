@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import DonationBoard from "@/components/donation-board";
 import ReferralCarousel from "@/components/referral-carousel";
 import SupportBannerAd from "@/components/support-banner-ad";
+import SupportInlineAd from "@/components/support-inline-ad";
 import TrustpilotReviews from "@/components/trustpilot-reviews";
 import { tick } from "@/lib/haptics";
 
@@ -76,7 +77,11 @@ export default function SupportSection() {
       <div id="support-panel" className="sites-panel support-panel" hidden={collapsed}>
         <TrustpilotReviews />
 
+        <span className="support-dots" aria-hidden="true" />
+
         <DonationBoard />
+
+        <span className="support-dots" aria-hidden="true" />
 
         <ReferralCarousel />
 
@@ -102,10 +107,18 @@ export default function SupportSection() {
           <span className="support-ad-arrow mono" aria-hidden="true">↗</span>
         </a>
 
+        <span className="support-dots" aria-hidden="true" />
+
         {/* The banner slot. It is a real ad script, so it waits for the
             cookie answer exactly like the Adcash auto-tag does; before that
             the slot explains itself instead of leaving a gap. */}
         <SupportBannerAd />
+
+        <span className="support-dots" aria-hidden="true" />
+
+        {/* The profitable-rate CPM unit, side by side with the banner. Same
+            rule again: the container is here, the loader waits for consent. */}
+        <SupportInlineAd />
       </div>
     </section>
   );

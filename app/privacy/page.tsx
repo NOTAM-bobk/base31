@@ -29,7 +29,7 @@ export default function PrivacyPage() {
       <Link className="privacy-back mono" href="/">← base31.org</Link>
       <p className="eyebrow mono">privacy policy</p>
       <h1>Privacy, without the noise.</h1>
-      <p className="privacy-updated">Last updated: September 29, 2026</p>
+      <p className="privacy-updated">Last updated: September 30, 2026</p>
       <section className="privacy-copy">
         <h2>What we collect</h2>
         <p>
@@ -57,9 +57,15 @@ export default function PrivacyPage() {
 
         <h2>Page views</h2>
         <p>
-          When the directory loads, it sends a page-view request to our Cloudflare Worker. The
-          Worker stores an aggregate count in Cloudflare KV. The counter is not intended to identify
-          you and does not store your name, email address, or browsing history.
+          When the directory loads, it sends a page-view request to our Cloudflare Worker, which
+          keeps aggregate counts in Cloudflare KV. Two numbers come out of it: total views, which
+          counts every load, and unique visitors, which counts a person once. To tell them apart the
+          Worker derives a one-way SHA-256 hash from the request&rsquo;s IP address and the
+          browser&rsquo;s User-Agent string, writes that hash as a mark that expires after 400 days,
+          and raises the unique total only the first time it sees it. The raw address and browser
+          string are never written to storage, and the hash cannot be turned back into either. The
+          counter is not intended to identify you and does not store your name, email address, or
+          browsing history.
         </p>
 
         <h2>Email updates, browser alerts, and bug reports</h2>
@@ -104,12 +110,13 @@ export default function PrivacyPage() {
 
         <h2>Advertising</h2>
         <p>
-          base31.org is supported by ads from two networks: Adcash, whose auto-tag runs on the
-          directory, and Adsterra, whose 160x300 banner fills the Support section as well as the same
-          slot on compmails.base31.org. Both follow one rule — no ad code, cookie, or tracking request
-          is added to the page until you confirm the cookie notice. Deny it and nothing is fetched from
-          either network. Withdrawing your choice afterwards takes the script back out along with the
-          frame it had built.
+          base31.org is supported by ads from three networks: Adcash, whose auto-tag runs on the
+          directory; Adsterra, whose 160x300 banner fills the Support section as well as the same
+          slot on compmails.base31.org; and the profitable-rate CPM network, whose unit sits beside
+          that banner. All three follow one rule — no ad code, cookie, or tracking request is added
+          to the page until you confirm the cookie notice. Deny it and nothing is fetched from any
+          of them. Withdrawing your choice afterwards takes the script back out along with the frame
+          it had built.
         </p>
         <p>
           The sponsored cards in the referral carousel and the cards in the directory are ordinary links: they request nothing from
@@ -128,6 +135,10 @@ export default function PrivacyPage() {
           and the{" "}
           <a href="https://adsterra.com/privacy-policy/" target="_blank" rel="noreferrer">
             Adsterra privacy policy
+          </a>{" "}
+          and the{" "}
+          <a href="https://www.profitableratecpmnetwork.com/" target="_blank" rel="noreferrer">
+            profitable-rate CPM network
           </a>{" "}
           for details.
         </p>

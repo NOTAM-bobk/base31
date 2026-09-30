@@ -248,9 +248,12 @@ function SiteIcon({ site }: { site: Site }) {
 const previewSources = (site: Site): string[] => {
   try {
     const url = new URL(site.url).toString();
+    // 640x300 — a shorter band than the old 16:9, and the exact ratio the
+    // `.site-preview` box uses, so the screenshot lands in it whole rather
+    // than being cropped or letterboxed.
     return [
-      `https://s0.wp.com/mshots/v1/${encodeURIComponent(url)}?w=640&h=360`,
-      `https://image.thum.io/get/width/640/crop/360/${url}`,
+      `https://s0.wp.com/mshots/v1/${encodeURIComponent(url)}?w=640&h=300`,
+      `https://image.thum.io/get/width/640/crop/300/${url}`,
     ];
   } catch {
     return [];

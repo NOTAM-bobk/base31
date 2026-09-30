@@ -1,5 +1,18 @@
 [
   {
+    "version": "1.22.0",
+    "date": "2026-09-30",
+    "title": "A grey field below the hero, and a third strip of browser apps",
+    "summary": "Below the hero's search bar the whole page now sits on a solid grey field that runs down to the footer, and a third strip — Cool apps — joins the two under the directory: 37 browser apps worth a tab, filed by category, edited through config/cool-apps.json like the other two lists.",
+    "highlights": [
+      "The page turns grey under the search bar and stays grey all the way down to the footer. The band is full-bleed: it breaks out of the centered column to touch both edges of the window, then brings its content back to the same measure, so the cards inside stay lined up with the header and the hero while the ground changes behind them. The hero itself keeps the page's own dark background, so the grey reads as a horizon line under the search.",
+      "A third strip, \"Cool apps\", sits directly under \"Cool APIs\". It holds 37 browser apps worth a tab — Excalidraw, Photopea, Squoosh, CodePen, CyberChef, Radio Garden and more — and it is built from the same shared strip as the other two: it folds away under its heading, counts what a search found, filters by category and opens every card in a new tab. The list is edited through config/cool-apps.json alone, and the validator now checks it the same way it checks the other two.",
+      "The hero's quick jumps are four keys now, with Cool apps added to the row; they lay out two-by-two on the same 480px measure as the search field, and still stack into compact rows on a phone.",
+      "The 37 apps are filed under nine categories — Draw & design, Images, Developer, Documents, Productivity, Writing, Math & science, Media & sound and Utilities — so the chip row cuts the list without typing, and the hero search reaches every one of them.",
+      "The directory's empty state now points at all three strips: when a search matches nothing in the featured list but does match a cool site, API or app, it says so and counts them together."
+    ]
+  },
+  {
     "version": "1.21.0",
     "date": "2026-09-30",
     "title": "Nine cards a section, a rail in the background, and keys that press",

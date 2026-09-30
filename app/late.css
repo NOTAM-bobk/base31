@@ -529,13 +529,48 @@ html[data-theme="light"] .cool-card {
   line-height: 1.14;
 }
 
+/* The page band ---------------------------------------------------------
+   The grey field that starts under the hero's search bar and runs down to
+   the footer. The hero itself stays on the page background, so the band is
+   the horizon line: above it the dark header and headline, below it every
+   section of the directory on a solid grey slab.
+
+   The band is full-bleed — it breaks out of `main`'s centered 720/1080px
+   column with a 100vw width and an offset margin, then pads its own content
+   back in to the same measure, so the grey reaches both edges of the window
+   while the cards inside stay aligned with the header and the hero. */
+:root { --page-band: #242424; }
+html[data-theme="light"] { --page-band: #ececec; }
+/* `main`'s bottom padding is the band's now, so the grey reaches the footer
+   without a strip of page background under it. The hero's bottom margin
+   moves into the band's top padding for the same reason. */
+.home-main { padding-bottom: 0; }
+.home-main .intro { margin-bottom: 0; }
+.page-band {
+  position: relative;
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  padding: 32px max(24px, calc((100vw - 720px) / 2)) 72px;
+  background: var(--page-band);
+}
+.page-band .quick-jumps { margin-top: 0; margin-bottom: 72px; }
+@media (max-width: 600px) {
+  .page-band { padding: 24px 12px 56px; }
+}
+@media (min-width: 1000px) {
+  .page-band {
+    padding-left: max(32px, calc((100vw - 1080px) / 2));
+    padding-right: max(32px, calc((100vw - 1080px) / 2));
+  }
+}
+
 /* Quick jumps -----------------------------------------------------------
-   Three boxes under the search field that go straight to a section, for the
-   visitor who would rather browse than type: Featured sites, Other cool sites
-   and Cool APIs. Each is an in-page anchor, so there is no routing involved —
+   Four boxes under the search field that go straight to a section, for the
+   visitor who would rather browse than type: Featured sites, Other cool sites,
+   Cool APIs and Cool apps. Each is an in-page anchor, so there is no routing —
    the browser scrolls, the section's own `scroll-margin-top` keeps it clear of
    the header, and the rail follows the move like any other scroll. They sit on
-   the same 480px measure as the search field above them, and stack into three
+   the same 480px measure as the search field above them, and stack into four
    compact rows on a phone.
 
    Each one is raised rather than outlined: a lit hairline along the top, a
@@ -545,7 +580,7 @@ html[data-theme="light"] .cool-card {
    the strip has a voice of its own instead of blending into the body text. */
 .quick-jumps {
   display: grid; gap: 10px; width: 100%; max-width: 480px; margin-top: 16px;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 .quick-jump {
   position: relative; overflow: hidden;

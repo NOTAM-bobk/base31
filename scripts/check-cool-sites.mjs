@@ -1,9 +1,9 @@
 // Plain Node ESM — run directly with `node`, no build step.
 //
-// Asks every entry in config/cool-sites.json and config/cool-apis.json for its
-// URL and reports any that fail. Both lists ship external favicons on the
-// homepage, so a dead link shows up as a broken tile before a visitor ever
-// clicks it. Exit code stays 0 on failures for now (CI shows the warnings
+// Asks every entry in config/cool-sites.json, config/cool-apis.json and
+// config/cool-apps.json for its URL and reports any that fail. All the lists
+// ship external favicons on the homepage, so a dead link shows up as a broken
+// tile before a visitor ever clicks it. Exit code stays 0 on failures for now (CI shows the warnings
 // without blocking a deploy); flip `SOFT_FAIL` to true once the lists are
 // battle-tested and a dead link should block the build.
 import fs from "node:fs";
@@ -16,6 +16,7 @@ const root = process.cwd();
 const lists = [
   { file: "cool-sites.json", label: "cool sites" },
   { file: "cool-apis.json", label: "cool APIs" },
+  { file: "cool-apps.json", label: "cool apps" },
 ];
 
 const check = async (url) => {

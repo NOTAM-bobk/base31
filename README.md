@@ -46,7 +46,8 @@ the sites themselves — all deployed together as one Vercel project.
 │   ├── donations.json     ← donation board entries
 │   ├── referrals.json     ← sponsored referral carousel
 │   ├── cool-sites.json    ← "Other cool sites" strip
-│   └── cool-apis.json     ← "Cool APIs" strip
+│   ├── cool-apis.json     ← "Cool APIs" strip
+│   └── cool-apps.json     ← "Cool apps" strip
 ├── public/
 │   ├── site-icons/        ← one favicon per directory entry
 │   └── sites/
@@ -149,7 +150,8 @@ support.
 Add entries to the array and the carousel picks them up — no code changes.
 Run `npm run validate:content` to check `sites.json`, `blogs.json`,
 `referrals.json` and `donations.json` (plus `cool-sites.json`,
-`cool-apis.json` and `changelog.json`) in one go, and do it before pushing.
+`cool-apis.json`, `cool-apps.json` and `changelog.json`) in one go, and do it
+before pushing.
 
 All the files under `config/` are imported straight into the build, so a file
 that is not valid JSON stops the deploy before a single page renders, with an
@@ -321,46 +323,63 @@ bundler. Two ways to do that by accident:
   tiles). Prefer a token; only write a
   `html[data-theme="light"]` rule when a value is hard-coded, as
   `.support-banner-ad` and the community panel's primary action are.
-- Three quick-jump keys sit under the search field — Featured sites, Other
-  cool sites and Cool APIs — each an in-page anchor to `#sites`,
-  `#cool-sites` and `#cool-apis` with the list's length as its caption. They are
+- The hero ends at the search field: the page band (`.page-band`) is a
+  full-bleed grey slab that starts just under the search bar and runs down to
+  the footer, so everything you browse — the quick jumps, the directory, the
+  three strips, the support hub and the FAQ — sits on grey while the header,
+  headline, stats and search stay on the page background. It breaks out of
+  `main`'s centered column with a `100vw` width and an offset margin, then pads
+  its content back to the same measure so the cards inside stay aligned with
+  the header; `--page-band` carries the two theme values in `app/late.css`.
+  `.home-main` drops `main`'s bottom padding and the intro its bottom margin so
+  the grey reaches the footer with no seam of page background under it.
+- Four quick-jump keys sit under the search field — Featured sites, Other
+  cool sites, Cool APIs and Cool apps — each an in-page anchor to `#sites`,
+  `#cool-sites`, `#cool-apis` and `#cool-apps` with the list's length as its
+  caption. They are
   plain anchors on purpose (no routing): the browser scrolls, `scroll-margin-top`
   on the target keeps the heading clear of the fixed header, and the rail
   follows the move like any other scroll. They share the search field's 480px
-  measure and stack into three compact rows below 600px. Each one is raised
+  measure and stack into four compact rows below 600px. Each one is raised
   rather than outlined — a lit green hairline along the top, a shallow gradient
   falling to a darker floor, an inner highlight and a shadow beneath it, and a
   glow in the corner that lights up under the pointer — so the strip reads as
-  three things you could press. Their labels are set in the headline's own
+  four things you could press. Their labels are set in the headline's own
   handwriting (`--font-hand`) at 16px, which is what gives the strip a voice of
   its own instead of blending into the body text under it.
-- The hero search reaches both strips under the directory, not only the
-directory itself: `searchCoolSites` in `lib/cool-sites.ts` and
-`searchCoolApis` in `lib/cool-apis.ts` are the matchers those places share, so a
+- The hero search reaches all three strips under the directory, not only the
+directory itself: `searchCoolSites` in `lib/cool-sites.ts`,
+`searchCoolApis` in `lib/cool-apis.ts` and `searchCoolApps` in
+`lib/cool-apps.ts` are the matchers those places share, so a
 query that matches an off-directory pick opens the strip (if it was folded
 away), filters its cards, changes its count to `n of <total>`, and is named in
 the directory's empty state instead of dead-ending there.
-- "Other cool sites" (`config/cool-sites.json`) and "Cool APIs"
-  (`config/cool-apis.json`) are the same section twice: a foldable strip of
+- "Other cool sites" (`config/cool-sites.json`), "Cool APIs"
+  (`config/cool-apis.json`) and "Cool apps" (`config/cool-apps.json`) are the
+  same section three times: a foldable strip of
   small external cards, each one a name, a host and one line of why it is worth
   the trip. Both are rendered by `components/link-strip.tsx`, which owns the
   folding heading, the count, the search and the card markup; the two files
   beside it only supply their list and their dictionary strings, so the strips
-  cannot drift apart. Entries are external URLs by design — the validator
+  cannot drift apart. "Cool apps" was added the same way — a config file, a
+  `lib/` helper and a thin wrapper over `LinkStrip`. Entries are external URLs by design — the validator
   rejects anything pointing at a base31.org subdomain, which belongs in
   `sites.json` instead.
-- Both strips carry a category chip row: each entry in `config/cool-apis.json`
-  names one of eleven broad `category` values, and each entry in
+- All three strips carry a category chip row: each entry in
+  `config/cool-apis.json` names one of eleven broad `category` values, each in
   `config/cool-sites.json` one of seven (`Toys`, `Design & code`, `Knowledge`,
-  `Games`, `Art & calm`, `Places`, `Sounds`) — coarser than the free-form
-  `tags`, which run to sixty-odd values and would be a wall of chips.
-  `coolApiCategories` in `lib/cool-apis.ts` and `coolSiteCategories` in
-  `lib/cool-sites.ts` compute their own lists busiest first, and the shared
+  `Games`, `Art & calm`, `Places`, `Sounds`) and each in `config/cool-apps.json`
+  one of nine (`Draw & design`, `Images`, `Developer`, `Documents`,
+  `Productivity`, `Writing`, `Math & science`, `Media & sound`, `Utilities`) —
+  coarser than the free-form `tags`, which run to dozens of values and would be
+  a wall of chips. `coolApiCategories` in `lib/cool-apis.ts`,
+  `coolSiteCategories` in `lib/cool-sites.ts` and `coolAppCategories` in
+  `lib/cool-apps.ts` compute their own lists busiest first, and the shared
   strip renders the row and narrows its cards to the chosen category. The chips
   combine with the hero search rather than replacing it, and the count reflects
   both. A strip only shows the row when it is handed `categories`.
 - Every long list on the page is cut at nine cards — the directory
-  (`SECTION_PREVIEW`) and both strips (the shared
+  (`SECTION_PREVIEW`) and all three strips (the shared
   `components/link-strip.tsx`) — and ends on a single `.show-all` line that
   carries the count of what is held back (`+43` while it is hidden, `-43` once
   it is showing). Nine fills the three-column grid exactly, so a section lands

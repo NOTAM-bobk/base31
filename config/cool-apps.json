@@ -1,0 +1,261 @@
+[
+  {
+    "name": "Excalidraw",
+    "category": "Draw & design",
+    "url": "https://excalidraw.com",
+    "tags": ["whiteboard", "drawing"],
+    "description": "A hand-drawn-style whiteboard in the browser for diagrams and quick sketches, with live collaboration and no sign-up."
+  },
+  {
+    "name": "tldraw",
+    "category": "Draw & design",
+    "url": "https://www.tldraw.com",
+    "tags": ["whiteboard", "diagrams"],
+    "description": "A crisp infinite canvas for sketching, diagramming and marking up images, quick enough to open for a single idea."
+  },
+  {
+    "name": "Photopea",
+    "category": "Draw & design",
+    "url": "https://www.photopea.com",
+    "tags": ["image-editor", "photoshop"],
+    "description": "A full image editor that opens PSD, XCF and Sketch files in the browser, close enough to Photoshop to work all day in."
+  },
+  {
+    "name": "Coolors",
+    "category": "Draw & design",
+    "url": "https://coolors.co",
+    "tags": ["palette", "color"],
+    "description": "Generate colour palettes with the spacebar, then check contrast and export them as CSS, SVG or a share link."
+  },
+  {
+    "name": "Google Fonts",
+    "category": "Draw & design",
+    "url": "https://fonts.google.com",
+    "tags": ["fonts", "typography"],
+    "description": "Thousands of open-source typefaces to preview, pair and download, with the CSS to drop any of them onto a page."
+  },
+  {
+    "name": "Typescale",
+    "category": "Draw & design",
+    "url": "https://typescale.com",
+    "tags": ["typography", "scale"],
+    "description": "Build a modular type scale for a project and read off the matching font sizes, line heights and CSS in one place."
+  },
+  {
+    "name": "Squoosh",
+    "category": "Images",
+    "url": "https://squoosh.app",
+    "tags": ["compress", "image"],
+    "description": "Compress and convert images in the browser with a live side-by-side preview; the file never leaves your machine."
+  },
+  {
+    "name": "TinyPNG",
+    "category": "Images",
+    "url": "https://tinypng.com",
+    "tags": ["compress", "png"],
+    "description": "Shrink PNG and JPEG files with smart lossy compression, a handful at a time, and keep the transparency intact."
+  },
+  {
+    "name": "remove.bg",
+    "category": "Images",
+    "url": "https://www.remove.bg",
+    "tags": ["background", "cutout"],
+    "description": "Erase the background from a photo automatically in a few seconds, with the option to drop in a fresh one behind it."
+  },
+  {
+    "name": "Cleanup.pictures",
+    "category": "Images",
+    "url": "https://cleanup.pictures",
+    "tags": ["retouch", "erase"],
+    "description": "Paint over anything you want gone from a photo — a stranger, a wire, a watermark — and the space is filled in."
+  },
+  {
+    "name": "Unsplash",
+    "category": "Images",
+    "url": "https://unsplash.com",
+    "tags": ["photos", "stock"],
+    "description": "A huge library of free, high-resolution photographs, licensed for commercial use with no attribution required."
+  },
+  {
+    "name": "CodePen",
+    "category": "Developer",
+    "url": "https://codepen.io",
+    "tags": ["frontend", "playground"],
+    "description": "Write HTML, CSS and JavaScript in three panes and watch the result update live — the front-end playground everyone shares."
+  },
+  {
+    "name": "StackBlitz",
+    "category": "Developer",
+    "url": "https://stackblitz.com",
+    "tags": ["ide", "fullstack"],
+    "description": "A full IDE in the tab that boots Node and npm projects in seconds, so you can try a framework without installing one."
+  },
+  {
+    "name": "RegExr",
+    "category": "Developer",
+    "url": "https://regexr.com",
+    "tags": ["regex", "tool"],
+    "description": "Build and test regular expressions against your own sample text, with every match explained token by token."
+  },
+  {
+    "name": "Carbon",
+    "category": "Developer",
+    "url": "https://carbon.now.sh",
+    "tags": ["screenshot", "code"],
+    "description": "Turn a snippet into a clean, shareable image with window chrome, padding and a theme — the standard way to post code."
+  },
+  {
+    "name": "JSON Crack",
+    "category": "Developer",
+    "url": "https://jsoncrack.com",
+    "tags": ["json", "visualise"],
+    "description": "Turn a dense JSON file into an explorable node graph, so nested objects and arrays finally make visual sense."
+  },
+  {
+    "name": "Transform",
+    "category": "Developer",
+    "url": "https://transform.tools",
+    "tags": ["convert", "codegen"],
+    "description": "Convert between JSON, TypeScript, GraphQL, YAML and a dozen other formats, turning a JSON blob into types in one paste."
+  },
+  {
+    "name": "Hoppscotch",
+    "category": "Developer",
+    "url": "https://hoppscotch.io",
+    "tags": ["api", "http"],
+    "description": "A lightweight API client in the browser for sending HTTP, WebSocket and GraphQL requests and reading the response."
+  },
+  {
+    "name": "dbdiagram.io",
+    "category": "Developer",
+    "url": "https://dbdiagram.io",
+    "tags": ["database", "schema"],
+    "description": "Sketch a database schema in a small DSL and watch it become a clean entity-relationship diagram you can export."
+  },
+  {
+    "name": "CyberChef",
+    "category": "Developer",
+    "url": "https://gchq.github.io/CyberChef/",
+    "tags": ["encoding", "security"],
+    "description": "The self-styled cyber Swiss army knife: base64, hashing, ciphers and dozens of other transforms, chained into recipes."
+  },
+  {
+    "name": "iLovePDF",
+    "category": "Documents",
+    "url": "https://www.ilovepdf.com",
+    "tags": ["pdf", "merge"],
+    "description": "Merge, split, compress, sign and convert PDFs in the browser — the everyday toolbox for any document job."
+  },
+  {
+    "name": "PDF24 Tools",
+    "category": "Documents",
+    "url": "https://tools.pdf24.org",
+    "tags": ["pdf", "tools"],
+    "description": "A sprawling set of free PDF utilities, from OCR and page numbers to cropping and converting, all run in the browser."
+  },
+  {
+    "name": "CloudConvert",
+    "category": "Documents",
+    "url": "https://cloudconvert.com",
+    "tags": ["convert", "files"],
+    "description": "Convert between more than two hundred file formats — documents, images, audio, video and archives — and hand back a link."
+  },
+  {
+    "name": "Notion",
+    "category": "Productivity",
+    "url": "https://www.notion.so",
+    "tags": ["notes", "workspace"],
+    "description": "Notes, databases and docs that nest inside each other, a flexible workspace you can shape into almost any system."
+  },
+  {
+    "name": "Trello",
+    "category": "Productivity",
+    "url": "https://trello.com",
+    "tags": ["kanban", "boards"],
+    "description": "Boards, lists and cards that make a project's state visible at a glance — the kanban tool most people start with."
+  },
+  {
+    "name": "Toggl Track",
+    "category": "Productivity",
+    "url": "https://toggl.com/track/",
+    "tags": ["time", "tracking"],
+    "description": "A one-button timer that logs where the hours went, with reports that show which projects actually earn their keep."
+  },
+  {
+    "name": "LanguageTool",
+    "category": "Writing",
+    "url": "https://languagetool.org",
+    "tags": ["grammar", "editing"],
+    "description": "A grammar and style checker for English and thirty other languages, catching the mistakes a spell checker waves through."
+  },
+  {
+    "name": "Hemingway Editor",
+    "category": "Writing",
+    "url": "https://hemingwayapp.com",
+    "tags": ["editing", "style"],
+    "description": "Paste in prose and it flags the long sentences and passive voice, grading the writing on how easy it is to read."
+  },
+  {
+    "name": "Desmos",
+    "category": "Math & science",
+    "url": "https://www.desmos.com/calculator",
+    "tags": ["graphing", "math"],
+    "description": "A graphing calculator that plots equations as you type them, with sliders to watch a curve respond in real time."
+  },
+  {
+    "name": "GeoGebra",
+    "category": "Math & science",
+    "url": "https://www.geogebra.org",
+    "tags": ["geometry", "math"],
+    "description": "Interactive geometry, algebra and calculus tools that started as classroom software and stayed free for everyone."
+  },
+  {
+    "name": "Wolfram Alpha",
+    "category": "Math & science",
+    "url": "https://www.wolframalpha.com",
+    "tags": ["answers", "compute"],
+    "description": "Ask a factual or computational question and it works out the answer from curated data instead of guessing from the web."
+  },
+  {
+    "name": "Radio Garden",
+    "category": "Media & sound",
+    "url": "https://radio.garden",
+    "tags": ["radio", "world"],
+    "description": "Spin a globe and drop into a live radio station anywhere on it — thousands of cities, playing what they play right now."
+  },
+  {
+    "name": "myNoise",
+    "category": "Media & sound",
+    "url": "https://mynoise.net",
+    "tags": ["ambient", "focus"],
+    "description": "Generative soundscapes for focus, sleep and tinnitus relief, each one adjustable in ten bands until it fits the room."
+  },
+  {
+    "name": "Loom",
+    "category": "Media & sound",
+    "url": "https://www.loom.com",
+    "tags": ["screen-recording", "video"],
+    "description": "Record a screen and camera together and get a shareable link the moment you stop — no editing, no file to send."
+  },
+  {
+    "name": "time.is",
+    "category": "Utilities",
+    "url": "https://time.is",
+    "tags": ["clock", "timezones"],
+    "description": "The exact time in any city or timezone, to the second, with the offset and daylight-saving status spelled out."
+  },
+  {
+    "name": "Speedtest",
+    "category": "Utilities",
+    "url": "https://www.speedtest.net",
+    "tags": ["network", "speed"],
+    "description": "The familiar download, upload and latency test, useful for proving to an ISP that the connection really is slow."
+  },
+  {
+    "name": "Jitsi Meet",
+    "category": "Utilities",
+    "url": "https://meet.jit.si",
+    "tags": ["video", "calls"],
+    "description": "Start a video call in a browser with no account and no download, and share the room link with as many people as you like."
+  }
+]

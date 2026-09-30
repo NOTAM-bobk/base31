@@ -13,11 +13,13 @@ import DirectoryNotifications from "@/components/directory-notifications";
 import FooterSponsor from "@/components/footer-sponsor";
 import CoolSites from "@/components/cool-sites";
 import CoolApis from "@/components/cool-apis";
+import CoolApps from "@/components/cool-apps";
 import SiteHeader from "@/components/site-header";
 import { LOCALES, LOCALE_TAGS, type Dictionary, type Locale, EN } from "@/lib/i18n";
 import { resetConsent, useConsent } from "@/lib/consent";
 import coolSites, { searchCoolSites } from "@/lib/cool-sites";
 import coolApis, { searchCoolApis } from "@/lib/cool-apis";
+import coolApps, { searchCoolApps } from "@/lib/cool-apps";
 import { tick } from "@/lib/haptics";
 import SectionRail, { type RailSection } from "@/components/section-rail";
 import HeroStats from "@/components/hero-stats";
@@ -863,17 +865,21 @@ export default function HomePage({ dict = EN, locale = "en" }: { dict?: Dictiona
     { id: "sites", label: dict.featured },
     { id: "cool-sites", label: dict.coolSites },
     { id: "cool-apis", label: dict.coolApis },
+    { id: "cool-apps", label: dict.coolApps },
     { id: "about", label: "About" },
     { id: "support", label: "Support" },
     { id: "faq-heading", label: "FAQ" },
     { id: "updates", label: "Updates" },
   ], [dict]);
 
-  // How many off-directory picks the same search found — the cool sites and
-  // the cool APIs down the page — so the directory's empty state can point at
-  // the strips instead of dead-ending.
+  // How many off-directory picks the same search found — the cool sites, the
+  // cool APIs and the cool apps down the page — so the directory's empty state
+  // can point at the strips instead of dead-ending.
   const coolMatchCount = useMemo(
-    () => (query.trim() ? searchCoolSites(query).length + searchCoolApis(query).length : 0),
+    () =>
+      query.trim()
+        ? searchCoolSites(query).length + searchCoolApis(query).length + searchCoolApps(query).length
+        : 0,
     [query],
   );
 
@@ -1053,7 +1059,7 @@ export default function HomePage({ dict = EN, locale = "en" }: { dict?: Dictiona
           between sections. */}
       <SectionRail sections={railSections} />
 
-      <main>
+      <main className="home-main">
         <section className="intro" aria-labelledby="page-title">
           <p className="eyebrow mono">the real web directory</p>
           {/* One line, three words: the title is a single phrase now, so it
@@ -1126,7 +1132,15 @@ export default function HomePage({ dict = EN, locale = "en" }: { dict?: Dictiona
             )}
             <span id="site-search-hint" className="sr-only">Press the slash key to jump here from anywhere on the page.</span>
           </div>
-          {/* Three boxes that jump straight into a section, for the visitor who
+        </section>
+
+        {/* Everything from here down to the footer sits on the page's grey
+            field: a full-bleed slab that starts just under the search bar and
+            runs to the bottom of the page, so the hero reads as a lit header
+            above a grey body. The quick jumps moved out of the hero and into
+            the slab, since they belong to the browsing half of the page. */}
+        <div className="page-band">
+          {/* Four boxes that jump straight into a section, for the visitor who
               would rather browse than type. Each one is an in-page anchor, so
               it needs no routing: the browser scrolls, the section's own
               scroll-margin keeps it clear of the header, and the rail follows
@@ -1136,6 +1150,7 @@ export default function HomePage({ dict = EN, locale = "en" }: { dict?: Dictiona
               { href: "#sites", label: dict.featured, count: `${allSites.length} sites` },
               { href: "#cool-sites", label: dict.coolSites, count: `${coolSites.length} sites` },
               { href: "#cool-apis", label: dict.coolApis, count: `${coolApis.length} APIs` },
+              { href: "#cool-apps", label: dict.coolApps, count: `${coolApps.length} apps` },
             ].map((jump) => (
               <a key={jump.href} className="quick-jump" href={jump.href} onClick={() => tick(12)}>
                 <span className="quick-jump-label">{jump.label}</span>
@@ -1146,7 +1161,6 @@ export default function HomePage({ dict = EN, locale = "en" }: { dict?: Dictiona
               </a>
             ))}
           </nav>
-        </section>
 
         <section id="sites" className={`directory-section${sitesVibrating ? " is-vibrating" : ""}`} aria-labelledby="sites-heading">
           <div className="section-heading" data-reveal>
@@ -1405,6 +1419,11 @@ export default function HomePage({ dict = EN, locale = "en" }: { dict?: Dictiona
             something rather than only browse. */}
         <CoolApis dict={dict} query={query} />
 
+        {/* A third strip in the same shape: browser apps from
+            config/cool-apps.json, for the visitor who wants a tool to use
+            rather than a site to read. */}
+        <CoolApps dict={dict} query={query} />
+
         <AboutSection />
 
         {/* The support hub: the Trustpilot reviews, the donation board, the
@@ -1431,6 +1450,7 @@ export default function HomePage({ dict = EN, locale = "en" }: { dict?: Dictiona
         {/* The bottom of the page: the decorative sparkle and the sponsorship
             invitation, directly above the footer. */}
         <FooterSponsor />
+        </div>
       </main>
 
       <footer className="site-footer">

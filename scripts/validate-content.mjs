@@ -32,14 +32,15 @@ checkUnique(posts.map((post) => String(post.slug)), "blog slug");
 checkUnique(referrals.map((referral) => String(referral.url)), "referral URL");
 checkUnique(releases.map((release) => String(release.version)), "release version");
 
-// config/cool-sites.json and config/cool-apis.json back the two strips under
-// the directory ("Other cool sites" and "Cool APIs"). Both hold external URLs
-// — deliberately not base31 subdomains — so the URL check rejects a hostname
-// that looks like the directory's own. The two lists carry the same shape, so
-// they are checked by the same loop.
+// config/cool-sites.json, config/cool-apis.json and config/cool-apps.json back
+// the three strips under the directory ("Other cool sites", "Cool APIs" and
+// "Cool apps"). All hold external URLs — deliberately not base31 subdomains —
+// so the URL check rejects a hostname that looks like the directory's own. The
+// lists carry the same shape, so they are checked by the same loop.
 const externalLists = [
   { file: "cool-sites.json", label: "Cool site", count: 0 },
   { file: "cool-apis.json", label: "Cool API", count: 0 },
+  { file: "cool-apps.json", label: "Cool app", count: 0 },
 ];
 const base31Host = /^https:\/\/[a-z0-9-]+\.base31\.org/;
 for (const list of externalLists) {
@@ -192,6 +193,6 @@ if (errors.length > 0) {
   process.exitCode = 1;
 } else {
   console.log(
-    `Content validation passed: ${sites.length} sites, ${posts.length} blog posts, ${referrals.length} referrals, ${donations.length} donations, ${releases.length} releases, ${guideBlocks.length} tool guides, ${externalLists[0].count} cool sites, ${externalLists[1].count} cool APIs.`,
+    `Content validation passed: ${sites.length} sites, ${posts.length} blog posts, ${referrals.length} referrals, ${donations.length} donations, ${releases.length} releases, ${guideBlocks.length} tool guides, ${externalLists[0].count} cool sites, ${externalLists[1].count} cool APIs, ${externalLists[2].count} cool apps.`,
   );
 }

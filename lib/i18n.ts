@@ -55,7 +55,14 @@ export const EN = {
   coolApisClosed:
     "Cool APIs are closed right now. Open the “Cool APIs” heading above to see the free APIs again.",
   coolApisNoMatch: "No cool APIs match that search — clear it to see all of them again.",
+  coolApps: "Cool apps",
+  coolAppsLede:
+    "Free web apps worth a bookmark — everything here runs in a tab, with no install and no account just to try it.",
+  coolAppsClosed:
+    "Cool apps are closed right now. Open the “Cool apps” heading above to see the browser apps again.",
+  coolAppsNoMatch: "No cool apps match that search — clear it to see all of them again.",
   links: "links",
+  apps: "apps",
   allTag: "All",
   filterByTag: "Filter by tag",
   filterByCategory: "Filter by category",
@@ -96,7 +103,14 @@ export const ES: Dictionary = {
   coolApisClosed:
     "Las APIs geniales están cerradas ahora mismo. Abre el encabezado «APIs geniales» para volver a verlas.",
   coolApisNoMatch: "Ninguna API genial coincide con esa búsqueda: bórrala para volver a verlas todas.",
+  coolApps: "Apps geniales",
+  coolAppsLede:
+    "Apps web gratuitas que vale la pena guardar: todo funciona en una pestaña, sin instalar nada ni crear cuenta solo para probarlo.",
+  coolAppsClosed:
+    "Las apps geniales están cerradas ahora mismo. Abre el encabezado «Apps geniales» para volver a ver las apps del navegador.",
+  coolAppsNoMatch: "Ninguna app genial coincide con esa búsqueda: bórrala para volver a verlas todas.",
   links: "enlaces",
+  apps: "apps",
   allTag: "Todos",
   filterByTag: "Filtrar por etiqueta",
   filterByCategory: "Filtrar por categoría",
@@ -136,7 +150,14 @@ export const FR: Dictionary = {
   coolApisClosed:
     "Les API sympas sont fermées pour le moment. Ouvrez le titre « API sympas » ci-dessus pour les revoir.",
   coolApisNoMatch: "Aucune API sympa ne correspond à cette recherche — effacez-la pour toutes les revoir.",
+  coolApps: "Applis sympas",
+  coolAppsLede:
+    "Des applis web gratuites à garder en favori : tout tourne dans un onglet, sans installation ni compte juste pour essayer.",
+  coolAppsClosed:
+    "Les applis sympas sont fermées pour le moment. Ouvrez le titre « Applis sympas » ci-dessus pour les revoir.",
+  coolAppsNoMatch: "Aucune appli sympa ne correspond à cette recherche — effacez-la pour toutes les revoir.",
   links: "liens",
+  apps: "applis",
   allTag: "Tous",
   filterByTag: "Filtrer par étiquette",
   filterByCategory: "Filtrer par catégorie",
@@ -176,7 +197,14 @@ export const PT: Dictionary = {
   coolApisClosed:
     "As APIs legais estão fechadas agora. Abra o título “APIs legais” acima para vê-las de novo.",
   coolApisNoMatch: "Nenhuma API legal corresponde a essa pesquisa — limpe-a para vê-las todas de novo.",
+  coolApps: "Apps legais",
+  coolAppsLede:
+    "Apps web gratuitos que valem um favorito: tudo roda em uma aba, sem instalar nada nem criar conta só para testar.",
+  coolAppsClosed:
+    "Os apps legais estão fechados agora. Abra o título “Apps legais” acima para ver os apps do navegador de novo.",
+  coolAppsNoMatch: "Nenhum app legal corresponde a essa pesquisa — limpe-a para vê-los todos de novo.",
   links: "links",
+  apps: "apps",
   allTag: "Todos",
   filterByTag: "Filtrar por tag",
   filterByCategory: "Filtrar por categoria",

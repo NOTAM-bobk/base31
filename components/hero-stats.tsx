@@ -9,8 +9,8 @@ const COUNT_MS = 3400;
 
 // The project's size in lines of source, across the app, the components, the
 // worker and the hand-written subdomain pages. Measured by hand on each
-// release: 1.21.0 added 191 tracked lines.
-const LINES_OF_CODE = 52512;
+// release: 1.23.0 added 67 tracked lines.
+const LINES_OF_CODE = 52579;
 
 /**
  * Counts a figure up from zero to `target` with an ease-out, in a rAF loop.

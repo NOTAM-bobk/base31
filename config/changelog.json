@@ -1,5 +1,16 @@
 [
   {
+    "version": "1.23.0",
+    "date": "2026-09-30",
+    "title": "A soft edge on the grey band, headings in the house hand, and the cards that went missing",
+    "summary": "The grey field now fades into and out of the page instead of starting on a hard line, every collapsible section heading wears the site's own handwriting, and a reveal bug that left blank gaps in the directory is fixed — cards that mounted after a sort, a \"Show all\" or the vote totals arriving no longer stay hidden.",
+    "highlights": [
+      "The grey band has no hard edges now. Its top is a gradient: it starts on the page background and eases into the grey over the band's first 88px of padding, so the hero hands off to the band instead of the page ending on a line under the search field. Its bottom eases the other way, into the tint the footer opens on, so the band meets the footer with no seam there either.",
+      "The headings that open the collapsible sections — Featured sites, Other cool sites, Cool APIs, Cool apps, Support, About and the FAQ — now wear the same face as the wordmark, the headline and the quick-jump labels that point at them: the site's own handwriting, a touch larger so it reads at heading size.",
+      "A bug that left blank gaps in the Featured sites list is fixed. The fade-in observer only re-ran when the list changed length, so a card that mounted for another reason — clicking \"Show all\", choosing a new sort, or the vote totals arriving and pulling a different card into the first screenful — kept the hidden state it shipped with and left a hole in the grid. The reveal now follows which cards are actually shown, so every card fades in when it appears."
+    ]
+  },
+  {
     "version": "1.22.0",
     "date": "2026-09-30",
     "title": "A grey field below the hero, and a third strip of browser apps",

@@ -529,6 +529,23 @@ html[data-theme="light"] .cool-card {
   line-height: 1.14;
 }
 
+/* The disclosure headings — "Featured sites", "Other cool sites", "Cool APIs",
+   "Cool apps", "Support", "About" and the FAQ — wear the same face as the
+   wordmark, the headline and the quick-jump labels that name them, so a
+   section reads the same whether its words sit on a key above or on the
+   heading it opens. A touch larger than the 17px text face was, because
+   handwriting runs smaller on the cap height than a roman does; `.sites-toggle`
+   takes the face along through its `font: inherit`. */
+.section-heading h2,
+.section-heading-main,
+.about-section h2,
+.faq-section h2 {
+  font-family: var(--font-hand), var(--font-sans);
+  font-size: 19px;
+  font-weight: 400;
+  letter-spacing: 0.005em;
+}
+
 /* The page band ---------------------------------------------------------
    The grey field that starts under the hero's search bar and runs down to
    the footer. The hero itself stays on the page background, so the band is
@@ -546,16 +563,30 @@ html[data-theme="light"] { --page-band: #ececec; }
    moves into the band's top padding for the same reason. */
 .home-main { padding-bottom: 0; }
 .home-main .intro { margin-bottom: 0; }
+/* The band has no hard edges any more. Its top is a gradient rather than a
+   cut: it begins on the page background and eases into the grey over its
+   first 88px of padding, so the hero hands off to the band instead of the
+   page ending on a line under the search field. The bottom eases the other
+   way, into the tint the footer opens on, so the band meets the footer with
+   no seam there either. The content starts after the top fade (the padding is
+   the fade's length), so the first section always sits on solid grey. */
 .page-band {
   position: relative;
   width: 100vw;
   margin-left: calc(50% - 50vw);
-  padding: 32px max(24px, calc((100vw - 720px) / 2)) 72px;
-  background: var(--page-band);
+  padding: 88px max(24px, calc((100vw - 720px) / 2)) 72px;
+  background:
+    linear-gradient(180deg, transparent calc(100% - 72px), var(--surface-hover) 100%),
+    linear-gradient(180deg, var(--background) 0, var(--page-band) 88px);
 }
 .page-band .quick-jumps { margin-top: 0; margin-bottom: 72px; }
 @media (max-width: 600px) {
-  .page-band { padding: 24px 12px 56px; }
+  .page-band {
+    padding: 64px 12px 56px;
+    background:
+      linear-gradient(180deg, transparent calc(100% - 56px), var(--surface-hover) 100%),
+      linear-gradient(180deg, var(--background) 0, var(--page-band) 64px);
+  }
 }
 @media (min-width: 1000px) {
   .page-band {

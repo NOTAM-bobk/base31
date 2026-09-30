@@ -244,6 +244,12 @@ bundler. Two ways to do that by accident:
   pinning a site adds `is-pinned` — which wiped the observer's class and left
   that card stuck at opacity 0 as a blank gap. Keep the marker off the
   `className` string.
+- That observer re-runs off the set of cards that are actually shown
+  (`shownSites` in `components/home-page.tsx`), not the list's length: a
+  "Show all", a new sort, or the vote totals arriving can mount a different
+  card while the length is unchanged, and keying on length alone left that
+  card at the hidden `opacity: 0` it shipped with — another blank gap in the
+  grid.
 - The homepage nudges visitors who move their pointer out of the top of the
   window with a "wait, don't go" dialog suggesting a site they have not seen.
   It is desktop-pointer only, waits 8 seconds, shows at most once per session,
@@ -331,6 +337,10 @@ bundler. Two ways to do that by accident:
   `main`'s centered column with a `100vw` width and an offset margin, then pads
   its content back to the same measure so the cards inside stay aligned with
   the header; `--page-band` carries the two theme values in `app/late.css`.
+  The band has no hard edges: its top is a gradient that starts on the page
+  background and eases into the grey over its first 88px of padding — the
+  content begins after the fade, so the first section still lands on solid
+  grey — and its bottom eases the other way into the tint the footer opens on.
   `.home-main` drops `main`'s bottom padding and the intro its bottom margin so
   the grey reaches the footer with no seam of page background under it.
 - Four quick-jump keys sit under the search field — Featured sites, Other
@@ -347,6 +357,13 @@ bundler. Two ways to do that by accident:
   four things you could press. Their labels are set in the headline's own
   handwriting (`--font-hand`) at 16px, which is what gives the strip a voice of
   its own instead of blending into the body text under it.
+- The headings that open the page's collapsible sections — Featured sites,
+  Other cool sites, Cool APIs, Cool apps, Support, About and the FAQ — are set
+  in the house hand (`--font-hand`) too, at 19px: the same face as the wordmark,
+  the headline and the quick-jump labels above them, so a section's name reads
+  the same whether it sits on a key or on the heading it opens. The rules live
+  with the other typefaces in `app/late.css`; `.sites-toggle` picks the face up
+  through its `font: inherit`, so the button inside the heading matches.
 - The hero search reaches all three strips under the directory, not only the
 directory itself: `searchCoolSites` in `lib/cool-sites.ts`,
 `searchCoolApis` in `lib/cool-apis.ts` and `searchCoolApps` in

@@ -839,6 +839,14 @@ export default function HomePage({ dict = EN, locale = "en" }: { dict?: Dictiona
   const shownSites = showAllSites ? list : list.slice(0, SECTION_PREVIEW);
   const foldCount = Math.max(0, list.length - SECTION_PREVIEW);
 
+  // What the reveal effect below watches. The cards it has to fade in are not
+  // only a function of `list.length`: "Show all", a new sort, or the vote
+  // totals arriving and reordering the first screenful all swap which cards
+  // are mounted while the length stays the same. A dependency on the length
+  // alone missed those, so a freshly mounted card kept the CSS `opacity: 0` it
+  // shipped with and left a blank gap in the grid until the next full reload.
+  const revealKey = shownSites.map((site) => site.subdomain).join("|");
+
   // "Surprise me" opens a random entry from whatever is currently listed, so an
   // active search narrows the pool instead of being ignored. The "Other cool
   // sites" strip is part of the same draw — those live off-directory, so they
@@ -913,7 +921,7 @@ export default function HomePage({ dict = EN, locale = "en" }: { dict?: Dictiona
       else observer.observe(target);
     }
     return () => observer.disconnect();
-  }, [list.length]);
+  }, [revealKey]);
 
   const openSubmit = useCallback(() => {
     buzz(10);

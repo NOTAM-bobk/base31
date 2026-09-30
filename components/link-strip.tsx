@@ -54,10 +54,20 @@ export type LinkStripProps = {
 // list can be cut down without typing. The chips combine with the hero search
 // rather than replacing it: both narrow the same set, and the count reflects
 // the two together.
+//
+// A strip is a long list, so it is cut short the same way the directory is:
+// nine cards and one line at the end that opens the rest. The cut is wide
+// enough to fill the three-column grid exactly, and it closes again whenever
+// the question changes — new search text or another category chip — so a fresh
+// look always starts from the top of a short list.
+const SECTION_PREVIEW = 9;
+
 export default function LinkStrip({ id, items, search, copy, query = "", categories }: LinkStripProps) {
   const [collapsed, setCollapsed] = useState(false);
   const [vibrating, setVibrating] = useState(false);
   const [category, setCategory] = useState<string | null>(null);
+  // Opens the rest of the strip. Everything past the ninth card is behind this.
+  const [showAll, setShowAll] = useState(false);
   const mounted = useRef(false);
 
   const matches = useMemo(() => search(query), [search, query]);
@@ -67,6 +77,10 @@ export default function LinkStrip({ id, items, search, copy, query = "", categor
   );
   const searching = query.trim().length > 0;
   const filtering = searching || category !== null;
+  const shown = showAll ? visible : visible.slice(0, SECTION_PREVIEW);
+  // How many cards the cut is holding back. The line reads it as "+43" while
+  // they are hidden and "-43" once they are showing.
+  const foldCount = Math.max(0, visible.length - SECTION_PREVIEW);
   const headingId = `${id}-heading`;
   const panelId = `${id}-panel`;
 
@@ -76,6 +90,13 @@ export default function LinkStrip({ id, items, search, copy, query = "", categor
   useEffect(() => {
     if (searching && matches.length > 0) setCollapsed(false);
   }, [searching, matches.length]);
+
+  // A new question starts a short list again, the way the directory's own cut
+  // does: typing something else or picking another chip folds the strip back
+  // to its first nine cards.
+  useEffect(() => {
+    setShowAll(false);
+  }, [query, category]);
 
   useEffect(() => {
     // Skip the first render: the section starts open, and that is not a toggle.
@@ -156,7 +177,7 @@ export default function LinkStrip({ id, items, search, copy, query = "", categor
           </div>
         )}
         <div className="cool-grid" role="list">
-          {visible.map((site) => (
+          {shown.map((site) => (
             <a
               key={site.url}
               href={site.url}
@@ -178,6 +199,24 @@ export default function LinkStrip({ id, items, search, copy, query = "", categor
               <span className="cool-desc">{site.description}</span>
             </a>
           ))}
+          {/* The cut: nine cards and one line that opens the rest. It shows
+              only while there is something behind it, and its count is the
+              whole point of the line — so both are kept quiet and small. */}
+          {foldCount > 0 && (
+            <button
+              type="button"
+              className="show-all"
+              aria-expanded={showAll}
+              onClick={() => { tick(8); setShowAll((value) => !value); }}
+            >
+              <span className="show-all-label">
+                {showAll ? "Show fewer" : `Show all ${visible.length} ${copy.unit}`}
+              </span>
+              <span className="show-all-count mono" aria-hidden="true">
+                {showAll ? `-${foldCount}` : `+${foldCount}`}
+              </span>
+            </button>
+          )}
         </div>
       </div>
     </section>

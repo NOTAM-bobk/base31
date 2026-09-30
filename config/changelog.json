@@ -1,5 +1,18 @@
 [
   {
+    "version": "1.21.0",
+    "date": "2026-09-30",
+    "title": "Nine cards a section, a rail in the background, and keys that press",
+    "summary": "Every long list on the page — the directory and both strips under it — now shows its first nine cards and ends on one line that opens the rest, so a section lands as a screenful you can take in. The hero's three quick jumps became raised keys set in the headline's own handwriting, the section rail lost its floating pill and now sits directly on the background, and four new posts join the blog.",
+    "highlights": [
+      "Each section stops at nine cards and ends on a single quiet line: \"Show all 63 links\", with the number being held back beside it. Nine fills the three-column grid exactly, so a cut list makes whole rows instead of leaving one card stranded; the line folds the list back down when it is pressed, and a new search or another chip starts a short list again.",
+      "The three quick jumps under the hero search are raised keys rather than outlined boxes. Each carries a lit green hairline along its top, a shallow gradient falling to a darker floor, an inner highlight and a shadow beneath it, and a glow in the corner that lights up under the pointer — so they read as something you could press, three pixels closer to you.",
+      "Their labels are set in the same handwriting as the headline now, at 16px instead of 11.5px. That face belongs to the hero and nowhere else on the page, which is what gives the strip a voice of its own instead of blending into the body text under it.",
+      "The section rail is part of the page surface instead of a panel lying on top of it. The fill, the rounded edge, the blur, the shadow and the scrollbar are all gone; the bars sit straight on the background in the gutter, and the one thing the rail still draws is the label that opens for the section you are in, which travels with a faint wash of the page colour so it stays readable wherever it reaches.",
+      "Four new posts on the blog, all of them about the same small web the directory keeps pointing at: how a one-person site actually gets found, why browser games are quietly thriving, why plain text outlives the software that made it, and how to make a site feel fast without rewriting it. Seventeen posts now, and the sitemap picks each one up as it ships."
+    ]
+  },
+  {
     "version": "1.20.0",
     "date": "2026-09-30",
     "title": "People counted per day, chips on both strips, and a quieter page",

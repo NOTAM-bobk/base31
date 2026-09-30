@@ -272,7 +272,7 @@ bundler. Two ways to do that by accident:
   counter), its unique visitors (the same readership counted once per person,
   reported by the same request as the view count), the websites it links out to
   (`allSites` plus `coolSites`) and the project's size in lines of code
-  (`51,871`). They carry no tray — the numbers sit straight on the page in the
+  (`LINES_OF_CODE` in `components/hero-stats.tsx`). They carry no tray — the numbers sit straight on the page in the
   display face (`--font-display`), with only a small caps label under each.
   `useCountUp` climbs each one from zero with an ease-out in a rAF loop and
   holds the final value; the two figures that come from the worker wait for it
@@ -321,13 +321,19 @@ bundler. Two ways to do that by accident:
   tiles). Prefer a token; only write a
   `html[data-theme="light"]` rule when a value is hard-coded, as
   `.support-banner-ad` and the community panel's primary action are.
-- Three quick-jump boxes sit under the search field — Featured sites, Other
+- Three quick-jump keys sit under the search field — Featured sites, Other
   cool sites and Cool APIs — each an in-page anchor to `#sites`,
   `#cool-sites` and `#cool-apis` with the list's length as its caption. They are
   plain anchors on purpose (no routing): the browser scrolls, `scroll-margin-top`
   on the target keeps the heading clear of the fixed header, and the rail
   follows the move like any other scroll. They share the search field's 480px
-  measure and stack into three compact rows below 600px.
+  measure and stack into three compact rows below 600px. Each one is raised
+  rather than outlined — a lit green hairline along the top, a shallow gradient
+  falling to a darker floor, an inner highlight and a shadow beneath it, and a
+  glow in the corner that lights up under the pointer — so the strip reads as
+  three things you could press. Their labels are set in the headline's own
+  handwriting (`--font-hand`) at 16px, which is what gives the strip a voice of
+  its own instead of blending into the body text under it.
 - The hero search reaches both strips under the directory, not only the
 directory itself: `searchCoolSites` in `lib/cool-sites.ts` and
 `searchCoolApis` in `lib/cool-apis.ts` are the matchers those places share, so a
@@ -353,16 +359,30 @@ the directory's empty state instead of dead-ending there.
   strip renders the row and narrows its cards to the chosen category. The chips
   combine with the hero search rather than replacing it, and the count reflects
   both. A strip only shows the row when it is handed `categories`.
+- Every long list on the page is cut at nine cards — the directory
+  (`SECTION_PREVIEW`) and both strips (the shared
+  `components/link-strip.tsx`) — and ends on a single `.show-all` line that
+  carries the count of what is held back (`+43` while it is hidden, `-43` once
+  it is showing). Nine fills the three-column grid exactly, so a section lands
+  as whole rows instead of leaving one card stranded on a line of its own.
+  Pressing the line opens the rest or folds it back down, and a new search, tag
+  or category chip starts a short list again, so the cut is never left open from
+  an earlier look at the page.
 - A slim column of small lines down the right edge
 (`components/section-rail.tsx`) is the section readout and the fast way between
-sections. Every section is rendered, so the whole page is reachable from the
-rail: `max-height` caps the pill and `overflow-y: auto` turns it into a scroll
-container, so the wheel and a drag walk the list itself, and the current line is
-scrolled back into view (`scrollTo` on the nav, not `scrollIntoView`, so the
-page never moves) whenever the page scrolls. It is always visible, from the
-first screen on at every width: a small pill with sliding labels on a wide
-monitor, shorter bars without labels below 1180px, and a slim strip of bars
-below 820px.
+sections. It is drawn as part of the page rather than as a panel lying on top of
+it: no fill, no border, no blur and no shadow, so the bars sit straight on the
+background in the gutter, and the scrollbar is hidden because there is no frame
+left for one to sit in. The only thing the rail draws over the page is the label
+that opens for the section you are in, which travels with a faint wash of the
+page colour so it stays readable wherever it reaches. Every section is rendered,
+so the whole page is reachable from the rail: `max-height` caps the column and
+`overflow-y: auto` turns it into a scroll container, so the wheel and a drag
+walk the list itself, and the current line is scrolled back into view
+(`scrollTo` on the nav, not `scrollIntoView`, so the page never moves) whenever
+the page scrolls. It is always visible, from the first screen on at every width:
+bars with sliding labels on a wide monitor, shorter bars without labels below
+1180px, and a slim strip of bars below 820px.
 The line for the section you are reading rotates flat-to-vertical and turns
 green while its label slides out; clicking a line scrolls there and the arrow
 keys walk the list one section at a time — the keys are the section ids. The

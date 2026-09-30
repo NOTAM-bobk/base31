@@ -223,6 +223,36 @@ html[data-theme="light"] .site-footer {
   .cool-card:hover { transform: none; }
 }
 
+/* The cut ---------------------------------------------------------------
+   Every long list on the page — the directory and both strips under it —
+   stops after nine cards and ends on one line that opens the rest. Nine fills
+   the widest three-column grid exactly, so a strip lands as three whole rows
+   and a card grid as a set you can take in at a glance instead of a wall you
+   have to scroll past to reach the next section. The line spans whatever
+   columns there are, shares the cards' radius and spacing, and stays quiet
+   until the pointer is on it: the count is the point, not a second button. */
+.show-all {
+  grid-column: 1 / -1;
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  width: 100%; padding: 12px 14px;
+  border: 1px dashed color-mix(in srgb, var(--line-strong) 80%, var(--line));
+  border-radius: 10px; background: transparent; color: var(--muted);
+  font: inherit; font-size: 12px; text-align: left; cursor: pointer;
+  transition: border-color 150ms ease, background 150ms ease, color 150ms ease;
+}
+.show-all:hover {
+  border-color: color-mix(in srgb, var(--live) 46%, var(--line-strong));
+  background: color-mix(in srgb, var(--surface) 70%, transparent);
+  color: var(--text-strong);
+}
+.show-all:focus-visible { outline: 2px solid var(--live); outline-offset: 2px; }
+.show-all-count {
+  flex: 0 0 auto; color: var(--subtle); font-size: 10px;
+  letter-spacing: 0.06em; text-transform: uppercase;
+  transition: color 150ms ease;
+}
+.show-all:hover .show-all-count { color: var(--live); }
+
 /* Consistency pass ------------------------------------------------------
    Shared focus ring and lede rhythm for the pieces this release added, so
    keyboard users get the same affordance everywhere and the sections under
@@ -276,47 +306,40 @@ html[data-theme="light"] .site-footer {
    label slides out beside it; clicking a line goes there and the arrow keys
    walk the list.
 
+   It is part of the page surface rather than a panel laid over it: no fill,
+   no edge, no blur and no shadow — the bars sit straight on the background in
+   the gutter beside the centered column, so the readout reads as something the
+   page itself has instead of a widget floating above it. The one thing the
+   rail still draws is the label that opens for the section you are in, and
+   that carries a faint wash of the page colour so it stays legible wherever it
+   reaches.
+
    Fixed to the right edge, so it never moves the page. It is always on, from
    the first screen and at every width — nothing to scroll past to find it. The
-   column it sits beside is a centered 720px, so the gutter is where it lives
-   and it only has to fit there: a small pill on a desktop, bars only where the
-   gutter narrows, and a slim strip of bars on a phone, where there is no hover
-   to open a label anyway. */
+   gutter is where it lives and it only has to fit there: bars and labels on a
+   desktop, bars only where the gutter narrows, and a slim strip of bars on a
+   phone, where there is no hover to open a label anyway. */
 .section-rail {
   position: fixed; top: 50%; right: 14px; z-index: 40;
-  display: flex; flex-direction: column; align-items: flex-end; gap: 5px;
+  display: flex; flex-direction: column; align-items: flex-end; gap: 6px;
   max-height: min(56vh, 152px);
   overflow-y: auto; overflow-x: hidden; overscroll-behavior: contain;
   -webkit-overflow-scrolling: touch;
-  padding: 7px 6px;
   transform: translateY(-50%);
-  border: 1px solid color-mix(in srgb, var(--line-strong) 46%, var(--line));
-  border-radius: 999px;
-  background: color-mix(in srgb, var(--surface) 80%, transparent);
-  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
-  box-shadow: 0 10px 26px -20px rgb(0 0 0 / 68%), inset 0 1px 0 rgb(255 255 255 / 5%);
-  scrollbar-width: thin;
-  scrollbar-color: color-mix(in srgb, var(--line-strong) 70%, transparent) transparent;
+  /* There is no frame left to hide a scrollbar behind, so the column scrolls
+     without drawing one. */
+  scrollbar-width: none;
 }
-.section-rail::-webkit-scrollbar { width: 4px; }
-.section-rail::-webkit-scrollbar-track { background: transparent; }
-.section-rail::-webkit-scrollbar-thumb {
-  border-radius: 999px;
-  background: color-mix(in srgb, var(--line-strong) 70%, transparent);
-}
+.section-rail::-webkit-scrollbar { display: none; }
 /* Labels need a pointer to open them, so they go first as the gutter tightens. */
 @media (max-width: 1179px) {
-  .section-rail { right: 10px; gap: 3px; padding: 6px 5px; }
+  .section-rail { right: 10px; gap: 4px; }
   .rail-bar { width: 10px; }
   .rail-item:hover .rail-bar,
   .rail-item.is-active .rail-bar { width: 12px; }
 }
 @media (max-width: 819px) {
-  .section-rail {
-    right: 6px; gap: 3px; padding: 6px 5px;
-    background: color-mix(in srgb, var(--surface) 74%, transparent);
-    box-shadow: 0 8px 20px -16px rgb(0 0 0 / 70%), inset 0 1px 0 rgb(255 255 255 / 5%);
-  }
+  .section-rail { right: 6px; gap: 4px; }
   .rail-item { min-height: 16px; padding: 0; }
   .rail-label { display: none; }
   .rail-bar { width: 9px; }
@@ -337,10 +360,15 @@ html[data-theme="light"] .site-footer {
   max-width: 0; overflow: hidden; white-space: nowrap;
   font-size: 8.5px; letter-spacing: 0.09em; text-transform: uppercase;
   opacity: 0;
+  /* The open label is the only thing the rail draws over the page now that it
+     has no container of its own, so it travels with a wash of the page colour
+     — a tooltip, not a panel. */
+  padding: 3px 7px; border-radius: 5px;
+  background: color-mix(in srgb, var(--background) 88%, transparent);
   transition: max-width 200ms ease, opacity 200ms ease;
 }
 .rail-item:hover .rail-label,
-.rail-item.is-active .rail-label { max-width: 88px; opacity: 1; }
+.rail-item.is-active .rail-label { max-width: 104px; opacity: 1; }
 
 /* The bar is the point: flat while you are elsewhere, standing on end for the
    section you are reading, so the rotation is the position readout. */
@@ -508,38 +536,101 @@ html[data-theme="light"] .cool-card {
    the browser scrolls, the section's own `scroll-margin-top` keeps it clear of
    the header, and the rail follows the move like any other scroll. They sit on
    the same 480px measure as the search field above them, and stack into three
-   compact rows on a phone. */
+   compact rows on a phone.
+
+   Each one is raised rather than outlined: a lit hairline along the top, a
+   shallow gradient falling to a darker floor, an inner highlight and a shadow
+   beneath it, so the tile reads as a physical key you could press. The label
+   is set in the hero's own handwriting — the same face the headline uses — so
+   the strip has a voice of its own instead of blending into the body text. */
 .quick-jumps {
-  display: grid; gap: 8px; width: 100%; max-width: 480px; margin-top: 14px;
+  display: grid; gap: 10px; width: 100%; max-width: 480px; margin-top: 16px;
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 .quick-jump {
-  display: flex; flex-direction: column; gap: 6px; min-height: 62px; padding: 11px 12px;
-  border: 1px solid color-mix(in srgb, var(--line-strong) 62%, var(--line));
-  border-radius: 10px;
-  background: color-mix(in srgb, var(--surface) 92%, var(--surface-hover));
+  position: relative; overflow: hidden;
+  display: flex; flex-direction: column; gap: 7px;
+  min-height: 80px; padding: 13px 13px 11px;
+  border: 1px solid color-mix(in srgb, var(--line-strong) 68%, var(--line));
+  border-radius: 12px;
+  background: linear-gradient(180deg,
+    color-mix(in srgb, var(--surface-hover) 94%, var(--line-strong)) 0%,
+    color-mix(in srgb, var(--surface) 96%, transparent) 58%,
+    color-mix(in srgb, var(--background) 92%, var(--surface)) 100%);
   color: var(--muted); text-decoration: none;
-  transition: border-color 150ms ease, background 150ms ease, transform 150ms ease, box-shadow 150ms ease;
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 7%),
+    inset 0 -1px 0 rgb(0 0 0 / 38%),
+    0 9px 16px -13px rgb(0 0 0 / 85%);
+  transition: border-color 160ms ease, transform 160ms ease, box-shadow 160ms ease;
+}
+/* The green hairline along the top edge: dim at rest and lit on hover, the only
+   colour on an otherwise neutral key. */
+.quick-jump::before {
+  content: ""; position: absolute; inset: 0 0 auto; height: 2px;
+  background: linear-gradient(90deg, transparent,
+    color-mix(in srgb, var(--live) 70%, transparent) 50%, transparent);
+  opacity: 0.5; transition: opacity 160ms ease;
+}
+/* A glow in the top corner, clipped by the radius, so the tile catches light
+   from above the way every other raised piece on the page does. */
+.quick-jump::after {
+  content: ""; position: absolute; top: -34px; right: -26px;
+  width: 96px; height: 96px; border-radius: 50%; pointer-events: none;
+  background: radial-gradient(circle,
+    color-mix(in srgb, var(--live) 24%, transparent), transparent 70%);
+  opacity: 0; transition: opacity 200ms ease;
 }
 .quick-jump:hover {
-  border-color: color-mix(in srgb, var(--live) 45%, var(--line-strong));
-  background: var(--surface-hover); transform: translateY(-2px); box-shadow: var(--shadow);
+  border-color: color-mix(in srgb, var(--live) 52%, var(--line-strong));
+  transform: translateY(-3px);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 11%),
+    inset 0 -1px 0 rgb(0 0 0 / 32%),
+    0 18px 28px -18px rgb(0 0 0 / 90%);
 }
-.quick-jump-label { color: var(--text-strong); font-size: 11.5px; line-height: 1.3; }
+.quick-jump:hover::before, .quick-jump:hover::after { opacity: 1; }
+/* Pressed: the tile settles onto its shadow instead of lifting off it. */
+.quick-jump:active { transform: translateY(-1px); }
+.quick-jump:focus-visible { outline: 2px solid var(--live); outline-offset: 3px; }
+.quick-jump-label {
+  padding-top: 1px; color: var(--text-strong);
+  font-family: var(--font-hand), var(--font-sans);
+  font-size: 16px; font-weight: 400; line-height: 1.15;
+}
 .quick-jump-meta {
   display: flex; align-items: center; justify-content: space-between;
   gap: 6px; margin-top: auto;
 }
 .quick-jump-count { color: var(--subtle); font-size: 9.5px; letter-spacing: 0.06em; text-transform: uppercase; }
-.quick-jump-arrow { color: var(--live); font-size: 12px; transition: transform 150ms ease; }
-.quick-jump:hover .quick-jump-arrow { transform: translate(2px, -2px); }
+.quick-jump-arrow { color: var(--live); font-size: 12px; transition: transform 160ms ease; }
+.quick-jump:hover .quick-jump-arrow { transform: translate(3px, -3px); }
 @media (max-width: 600px) {
-  .quick-jumps { grid-template-columns: 1fr; max-width: none; gap: 7px; }
+  .quick-jumps { grid-template-columns: 1fr; max-width: none; gap: 8px; }
   .quick-jump {
     flex-direction: row; align-items: center; justify-content: space-between;
-    min-height: 0; padding: 10px 12px;
+    gap: 10px; min-height: 0; padding: 11px 13px;
   }
+  .quick-jump::after { top: -52px; }
   .quick-jump-meta { margin-top: 0; }
+}
+/* On paper the same tile is a lighter object. The black inner lip and the deep
+   drop shadow are written for a black page, so light mode gets its own pair of
+   edges — the same treatment `.site-card` and the search field already take. */
+html[data-theme="light"] .quick-jump {
+  border-color: color-mix(in srgb, var(--line-strong) 92%, var(--line));
+  background: linear-gradient(180deg, #fff 0%, #fcfcfc 60%, #f3f3f3 100%);
+  box-shadow:
+    inset 0 1px 0 #fff,
+    inset 0 -1px 0 rgb(0 0 0 / 7%),
+    0 1px 1px rgb(0 0 0 / 5%),
+    0 3px 8px rgb(0 0 0 / 6%);
+}
+html[data-theme="light"] .quick-jump:hover {
+  box-shadow:
+    inset 0 1px 0 #fff,
+    inset 0 -1px 0 rgb(0 0 0 / 6%),
+    0 8px 18px rgb(0 0 0 / 11%);
 }
 
 /* Support, flush left ---------------------------------------------------

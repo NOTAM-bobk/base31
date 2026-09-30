@@ -58,6 +58,10 @@ type SortMode = "liked" | "newest" | "az";
 // Labels resolve through the active dictionary at render time (see dict.sortLabel).
 const SORT_OPTIONS: { value: SortMode }[] = [{ value: "liked" }, { value: "newest" }, { value: "az" }];
 const MAX_TAG_CHIPS = 11;
+// How many cards a section shows before it offers the rest. Nine fills the
+// widest grid the page has — three columns — exactly, so a cut list lands as
+// whole rows instead of leaving one card stranded on a line of its own.
+const SECTION_PREVIEW = 9;
 
 // The hero headline is laid out one span per word so it can rise into place on
 // load (the animation lives in app/late.css). One word in it also carries the
@@ -365,6 +369,9 @@ export default function HomePage({ dict = EN, locale = "en" }: { dict?: Dictiona
   const [sortMode, setSortMode] = useState<SortMode>("liked");
   // Lets a visitor fold the directory away without losing their filters.
   const [sitesCollapsed, setSitesCollapsed] = useState(false);
+  // The directory shows its first nine cards until this is set, which is what
+  // the last line of the list is for.
+  const [showAllSites, setShowAllSites] = useState(false);
   // True for the moment after the fold, so the whole section can wobble like
   // the Support section does when its panel opens or closes.
   const [sitesVibrating, setSitesVibrating] = useState(false);
@@ -816,6 +823,20 @@ export default function HomePage({ dict = EN, locale = "en" }: { dict?: Dictiona
     });
   }, [query, activeTag, sortMode, favorites, allSites, netLikes, voteTotals]);
 
+  // A new question starts a short list again: search text, a tag chip or a new
+  // sort folds the directory back to its first nine cards, so "Show all" is
+  // never left open from an earlier look at the page.
+  useEffect(() => {
+    setShowAllSites(false);
+  }, [query, activeTag, sortMode]);
+
+  // The directory's first screenful: nine cards, then the line under them that
+  // opens the rest. `foldCount` is how many cards the cut is holding back — the
+  // same number either way, read as "+13" while they are hidden and "-13" once
+  // they are showing.
+  const shownSites = showAllSites ? list : list.slice(0, SECTION_PREVIEW);
+  const foldCount = Math.max(0, list.length - SECTION_PREVIEW);
+
   // "Surprise me" opens a random entry from whatever is currently listed, so an
   // active search narrows the pool instead of being ignored. The "Other cool
   // sites" strip is part of the same draw — those live off-directory, so they
@@ -1218,7 +1239,7 @@ export default function HomePage({ dict = EN, locale = "en" }: { dict?: Dictiona
                 </button>
               </p>
             )}
-            {list.map((site, index) => {
+            {shownSites.map((site, index) => {
               const pinned = favorites.includes(site.subdomain);
               const vote = votes[site.subdomain];
               const totals = voteTotals[site.subdomain];
@@ -1331,6 +1352,25 @@ export default function HomePage({ dict = EN, locale = "en" }: { dict?: Dictiona
                 </article>
               );
             })}
+            {/* The cut. A long directory lands as a screenful you can take in,
+                with one line at the end holding the rest — the count is that
+                line's point, so it stays quiet until the pointer is on it. */}
+            {foldCount > 0 && (
+              <button
+                type="button"
+                className="show-all"
+                data-reveal
+                aria-expanded={showAllSites}
+                onClick={() => { buzz(8); setShowAllSites((value) => !value); }}
+              >
+                <span className="show-all-label">
+                  {showAllSites ? "Show fewer" : `Show all ${list.length} sites`}
+                </span>
+                <span className="show-all-count mono" aria-hidden="true">
+                  {showAllSites ? `-${foldCount}` : `+${foldCount}`}
+                </span>
+              </button>
+            )}
             {!query.trim() && (
               <button type="button" className="upload-card" data-reveal onClick={openSubmit} aria-haspopup="dialog">
                 <span className="upload-card-icon mono" aria-hidden="true">＋</span>

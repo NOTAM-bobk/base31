@@ -7,14 +7,20 @@ import { tick } from "@/lib/haptics";
 export type RailSection = { id: string; label: string };
 
 /**
- * The section rail: a slim column of small lines pinned to the right edge of
- * the homepage, one per section, in page order.
+ * The section rail: a slim column of small lines down the right edge of the
+ * homepage, one per section, in page order.
+ *
+ * It is drawn as part of the page rather than as a panel on top of it — no
+ * fill, no border, no blur, no shadow — so only the bars themselves sit in the
+ * gutter beside the column, against the background. The single exception is the
+ * label that opens for the section you are in: it carries a faint wash of the
+ * page colour so it stays readable wherever it reaches.
  *
  * Every section is rendered, so the whole page is reachable from the rail
  * itself: when the list is taller than the rail's cap the column scrolls —
  * the wheel and a drag work inside it like any other scroll container — and
  * the line for the section you are reading is kept scrolled into view as you
- * read down the page, so the readout never slides out of the pill.
+ * read down the page, so the readout never slides off the end of the column.
  *
  * The line for the current section stands on end and turns green while its
  * label slides out beside it, so the rail is both a position readout and a

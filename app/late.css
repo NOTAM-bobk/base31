@@ -7,42 +7,29 @@
    styling belongs in overrides.css or inner-pages.css, not here. */
 
 /* Hero calls to action -------------------------------------------------
-   "Why base31?" and the surprise button now share one row on a desktop and
-   stack on a phone, with the button directly under the link. The old
-   "Browse all sites" anchor is gone: the directory is the next thing down the
-   page, so it only duplicated a scroll. */
-.intro-links { align-items: center; gap: 16px; }
+   The hero has one action left, so this row is only its spacing now: the
+   numbers sit above it, and the button is centred on wide screens and flush
+   left on a phone. Both of the old anchors are gone — "Why base31?" and
+   "Browse all sites" each only duplicated a scroll the page already offers. */
+.intro-links {
+  justify-content: center;
+  align-items: center; gap: 16px;
+  margin-top: 18px;
+}
 @media (max-width: 600px) {
   .intro-links { flex-direction: column; align-items: flex-start; gap: 14px; }
 }
 
 /* The hero's one button. It used to be a quiet tinted pill beside two text
-   links; standing on its own now, it reads as a button: taller, gradient-filled,
-   with a top highlight and a soft emerald glow underneath. The hue follows
-   --live, so it stays legible in both themes. */
+   links, and it is the only thing left in the hero row, so it keeps the size
+   and weight of an action rather than a label: taller than the text it sits
+   beside, with a top highlight and a red glow underneath it. */
 .surprise-button {
   min-height: 40px; padding: 4px 17px 4px 5px;
-  border-color: color-mix(in srgb, var(--live) 55%, var(--line));
-  background: linear-gradient(
-    180deg,
-    color-mix(in srgb, var(--live) 22%, transparent),
-    color-mix(in srgb, var(--live) 10%, transparent)
-  );
   font-size: 13.5px; font-weight: 600; letter-spacing: 0.005em;
-  box-shadow:
-    inset 0 1px 0 color-mix(in srgb, var(--live) 24%, transparent),
-    0 10px 26px -16px color-mix(in srgb, var(--live) 90%, transparent);
 }
 .surprise-icon {
   width: 27px; height: 27px; font-size: 14px;
-  background: color-mix(in srgb, var(--live) 26%, transparent);
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--live) 18%, transparent);
-}
-.surprise-button:hover {
-  border-color: color-mix(in srgb, var(--live) 80%, var(--line));
-  box-shadow:
-    inset 0 1px 0 color-mix(in srgb, var(--live) 30%, transparent),
-    0 14px 32px -14px color-mix(in srgb, var(--live) 95%, transparent);
 }
 
 /* Footer sponsor block -------------------------------------------------
@@ -277,48 +264,6 @@ html[data-theme="light"] .site-footer {
   /* Pull the contact row a touch closer to the link row so the footer reads
      as one organized block instead of two unrelated strips. */
   .footer-meta { padding-bottom: 8px; }
-}
-
-/* Visitor counter -------------------------------------------------------
-   The little "views" pill in the corner. It keeps its fixed spot, but now
-   reads as a deliberate status chip: a live-green pulse dot, the label in
-   small caps, the number bright and tabular so digits do not jitter as it
-   ticks, all on a blurred glass surface with a soft green-tinted edge. */
-.view-counter {
-  display: inline-flex; align-items: center; gap: 7px;
-  padding: 8px 13px 8px 11px;
-  border: 1px solid color-mix(in srgb, var(--live) 28%, var(--line-strong));
-  background: color-mix(in srgb, var(--surface) 86%, transparent);
-  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
-  box-shadow: 0 10px 30px rgb(0 0 0 / 35%), inset 0 1px 0 rgb(255 255 255 / 6%);
-  color: var(--muted); font-size: 11px; letter-spacing: 0.02em;
-  transition: border-color 200ms ease, box-shadow 200ms ease;
-}
-.view-counter::before {
-  content: ""; width: 6px; height: 6px; flex: 0 0 auto; border-radius: 50%;
-  background: var(--live);
-  box-shadow: 0 0 8px color-mix(in srgb, var(--live) 80%, transparent);
-}
-.view-counter span { color: var(--subtle); font-size: 9px; text-transform: uppercase; letter-spacing: 0.14em; }
-.view-counter strong { color: var(--text-strong); font-size: 12.5px; font-variant-numeric: tabular-nums; }
-.view-counter:hover {
-  border-color: color-mix(in srgb, var(--live) 70%, var(--line-strong));
-  box-shadow:
-    0 12px 34px rgb(0 0 0 / 45%),
-    0 0 18px -6px color-mix(in srgb, var(--live) 70%, transparent);
-}
-
-/* The counter finally uses the bump flag the page has always set on a view
-   milestone: a short pop so the pill draws the eye to the new number. */
-.view-counter.is-bumped { animation: counter-bump 640ms cubic-bezier(0.22, 1.2, 0.36, 1); }
-@keyframes counter-bump {
-  0% { transform: scale(1); }
-  35% { transform: scale(1.12); }
-  100% { transform: scale(1); }
-}
-@media (prefers-reduced-motion: reduce) {
-  .view-counter.is-bumped { animation: none; }
-  .view-counter, .view-counter::before { transition: none; }
 }
 
 /* Section rail ---------------------------------------------------------
@@ -767,42 +712,42 @@ html[data-theme="light"] { --link: #1450c8; }
   .site-card-lower .vote-button { height: 38px; }
 }
 
-/* "Surprise me", squared off -------------------------------------------
-   The hero's one action was a green outline pill with a wash that rose inside
-   it on hover. It is a solid square now: the fill is the accent green and the
-   label sits on it in whichever ink stays legible on that green — dark ink on
-   the bright green the dark theme uses, white on the deeper light-theme one —
-   which is what `--on-live` names. With nothing left to fill, hover brightens
-   the fill and deepens the corner shadow instead, and the bolt badge inverts
-   with the label. The sheen is kept: a thin highlight across a solid button is
-   a lift, not a decoration. */
-:root { --on-live: #05170e; }
+/* "Surprise me", in red ------------------------------------------------
+   The hero's one action was a green outline pill, then a green square. It is
+   red now — the loudest thing on the page, so the action cannot be read as one
+   more accent-coloured label — and the ink on it is white in both themes, which
+   is what `--on-danger` names. With nothing left to fill, hover deepens the
+   fill and darkens the edge instead, and the bolt badge brightens with the
+   label. The sheen is kept: a thin highlight across a solid button is a lift,
+   not a decoration. */
+:root { --on-live: #05170e; --on-danger: #fff; }
 html[data-theme="light"] { --on-live: #fff; }
 .surprise-button {
   padding: 6px 14px 6px 7px;
-  border-color: var(--live);
+  border-color: color-mix(in srgb, var(--danger) 88%, #000);
   border-radius: 7px;
-  background: var(--live);
-  color: var(--on-live);
-  box-shadow: 0 6px 18px -12px color-mix(in srgb, var(--live) 90%, transparent);
+  background: var(--danger);
+  color: var(--on-danger);
+  box-shadow: 0 6px 18px -12px color-mix(in srgb, var(--danger) 90%, transparent);
 }
 /* The pill's rising wash has nothing to fill behind a solid fill. */
 .surprise-button::before { display: none; }
 .surprise-button::after {
-  background: linear-gradient(100deg, transparent, color-mix(in srgb, var(--on-live) 26%, transparent), transparent);
+  background: linear-gradient(100deg, transparent, color-mix(in srgb, var(--on-danger) 30%, transparent), transparent);
 }
 .surprise-button:hover {
-  border-color: var(--live);
-  background: color-mix(in srgb, var(--live) 84%, var(--on-live));
-  color: var(--on-live);
+  border-color: color-mix(in srgb, var(--danger) 96%, #000);
+  background: color-mix(in srgb, var(--danger) 84%, #000);
+  color: var(--on-danger);
   transform: translateY(-1px);
-  box-shadow: 0 10px 22px -12px color-mix(in srgb, var(--live) 95%, transparent);
+  box-shadow: 0 10px 22px -12px color-mix(in srgb, var(--danger) 95%, transparent);
 }
 .surprise-button .surprise-icon {
-  background: color-mix(in srgb, var(--on-live) 18%, transparent);
-  color: var(--on-live);
+  background: color-mix(in srgb, var(--on-danger) 22%, transparent);
+  color: var(--on-danger);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--on-danger) 20%, transparent);
 }
-.surprise-button:hover .surprise-icon { background: color-mix(in srgb, var(--on-live) 30%, transparent); }
+.surprise-button:hover .surprise-icon { background: color-mix(in srgb, var(--on-danger) 34%, transparent); }
 
 /* Light mode pass --------------------------------------------------------
    The light theme shipped as a token swap, and a token swap is not a pass:
@@ -828,9 +773,6 @@ html[data-theme="light"] {
 }
 /* Three surfaces still carry a shadow written for the dark theme. Each one sits
    on a screenshot or on white, so it needs a light-theme weight of its own. */
-html[data-theme="light"] .view-counter {
-  box-shadow: 0 8px 22px rgb(0 0 0 / 10%), inset 0 1px 0 #fff;
-}
 html[data-theme="light"] .support-banner-ad,
 html[data-theme="light"] .support-inline-ad,
 html[data-theme="light"] .support-ad {
@@ -885,32 +827,6 @@ html[data-theme="light"] .community-action.is-primary { color: var(--on-live); }
   .hero-stats { gap: 10px 24px; margin-top: 20px; }
   .hero-stat-value { font-size: 23px; }
   .hero-stat-label { font-size: 8.5px; letter-spacing: 0.1em; }
-}
-
-/* Next-section button --------------------------------------------------
-   A small pill in the bottom-left corner, shown only while the directory is
-   the section being read, so a long page is one tap from the next one. It is
-   narrow enough to share the corner with the donate button on the narrow
-   layouts where that drops to a fixed bar, and drawn above it. */
-.next-section {
-  position: fixed; left: 16px; bottom: 16px; z-index: 30;
-  display: inline-flex; align-items: center; gap: 8px;
-  max-width: min(60vw, 260px);
-  padding: 9px 13px; border: 1px solid var(--line-strong); border-radius: 999px;
-  background: var(--overlay); color: var(--text-strong);
-  font-size: 11px; cursor: pointer;
-  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
-  box-shadow: 0 10px 26px -20px rgb(0 0 0 / 66%);
-  animation: next-section-in 260ms ease both;
-}
-.next-section:hover { border-color: var(--live); color: var(--live); }
-.next-section-label {
-  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-}
-.next-section-arrow { flex: 0 0 auto; color: var(--live); }
-@keyframes next-section-in {
-  from { transform: translateY(8px); opacity: 0; }
-  to { transform: none; opacity: 1; }
 }
 
 /* Support-hub dividers --------------------------------------------------

@@ -10,9 +10,23 @@ export type CoolSite = {
   url: string;
   tags: string[];
   description: string;
+  /** The strip's filter chip. Coarser than `tags` on purpose: the free-form
+      tags run to dozens of values, which would be a wall of chips, so each
+      site is filed under one of the handful of categories below. */
+  category: string;
 };
 
 export const allCoolSites = coolSites as CoolSite[];
+
+/** The filter chips for the strip, busiest category first so the useful ones
+    are leftmost (then alphabetical, so the order is stable between builds). */
+export const coolSiteCategories: string[] = (() => {
+  const counts = new Map<string, number>();
+  for (const site of allCoolSites) counts.set(site.category, (counts.get(site.category) ?? 0) + 1);
+  return [...counts.entries()]
+    .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
+    .map(([category]) => category);
+})();
 
 /** Everything about a cool site that a search should look at, lowercased. */
 const index = (site: CoolSite) => `${site.name} ${site.url} ${site.tags.join(" ")} ${site.description}`.toLowerCase();

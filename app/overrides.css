@@ -1046,16 +1046,18 @@ html[data-theme="light"] .code-backdrop { opacity: 0.32; }
 .modal-close:hover { border-color: var(--line-strong); color: var(--text-strong); transform: rotate(90deg); }
 
 /* "Surprise me" button in the hero -------------------------------------
-   The only real action in the hero, so it reads as a button rather than a
-   third text link: a green pill with a bolt badge, a slow sheen that sweeps
-   the label, and a fill that rises on hover. */
+   The only action in the hero, so it reads as a button rather than a third
+   text link: a pill with a bolt badge, a slow sheen that sweeps the label, and
+   a fill that rises on hover. Its colour is deliberately not set here — the
+   late pass in app/late.css owns the red fill and the white ink, so this block
+   is the shape and the motion only. */
 .surprise-button {
   position: relative; display: inline-flex; align-items: center; gap: 8px;
   padding: 5px 13px 5px 5px; overflow: hidden;
-  border: 1px solid color-mix(in srgb, var(--live) 42%, var(--line));
+  border: 1px solid var(--line-strong);
   border-radius: 999px;
-  background: color-mix(in srgb, var(--live) 9%, transparent);
-  color: var(--live); font: inherit; font-size: 12.5px; font-weight: 500;
+  background: transparent;
+  color: var(--text-strong); font: inherit; font-size: 12.5px; font-weight: 500;
   letter-spacing: 0.01em; cursor: pointer; isolation: isolate;
   transition: border-color 200ms ease, color 200ms ease, transform 200ms ease, box-shadow 200ms ease;
 }

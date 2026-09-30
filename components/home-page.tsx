@@ -21,7 +21,6 @@ import coolApis, { searchCoolApis } from "@/lib/cool-apis";
 import { tick } from "@/lib/haptics";
 import SectionRail, { type RailSection } from "@/components/section-rail";
 import HeroStats from "@/components/hero-stats";
-import NextSectionButton from "@/components/next-section-button";
 
 type Site = { name: string; subdomain: string; url: string; tags?: string[]; description?: string; show?: boolean; community?: boolean; createdAt?: number; icon?: string; lastChecked?: string };
 
@@ -357,7 +356,9 @@ export default function HomePage({ dict = EN, locale = "en" }: { dict?: Dictiona
   const [votePops, setVotePops] = useState<Record<string, { up: number; down: number }>>({});
   const [theme, setTheme] = useState<Theme>("dark");
   const [views, setViews] = useState<number | null>(null);
-  const [bump, setBump] = useState(false);
+  // The same readership counted once per person, reported by the same request
+  // as `views`. Null until the counter answers, and null on an older worker.
+  const [unique, setUnique] = useState<number | null>(null);
   const [milestone, setMilestone] = useState<number | null>(null);
   const [exitNudge, setExitNudge] = useState<Site | null>(null);
   const [activeTag, setActiveTag] = useState<string | null>(null);
@@ -517,8 +518,7 @@ export default function HomePage({ dict = EN, locale = "en" }: { dict?: Dictiona
         if (!alive || !Number.isFinite(data?.views)) return;
         const count = Number(data.views);
         setViews(count);
-        setBump(true);
-        window.setTimeout(() => setBump(false), 700);
+        if (Number.isFinite(data?.unique)) setUnique(Number(data.unique));
         if (count > 0 && count % 10 === 0) setMilestone(count);
       })
       .catch(() => {})
@@ -1032,10 +1032,6 @@ export default function HomePage({ dict = EN, locale = "en" }: { dict?: Dictiona
           between sections. */}
       <SectionRail sections={railSections} />
 
-      {/* While the directory is the section being read, a small shortcut to
-          the strip below it appears in the bottom-left corner. */}
-      <NextSectionButton fromId="sites" toId="cool-sites" label={dict.coolSites} />
-
       <main>
         <section className="intro" aria-labelledby="page-title">
           <p className="eyebrow mono">the real web directory</p>
@@ -1062,20 +1058,21 @@ export default function HomePage({ dict = EN, locale = "en" }: { dict?: Dictiona
             </span>
           </h1>
           <p className="subtitle">{dict.subtitle}</p>
-          {/* One call to action. The "Why base31?" anchor and the old "Browse
-              all sites" link are both gone: the directory is the next thing
-              down the page, and the rail already steps to About, so each only
-              duplicated something else. */}
+          {/* Four figures, and they come before the action now: the directory's
+              readership in views, the same readership counted once per person,
+              how many sites it links out to, and the size of the project. They
+              count up on load and hold their final value. */}
+          <HeroStats visitors={views} unique={unique} sites={allSites.length + coolSites.length} />
+          {/* One call to action, directly under the numbers. The "Why base31?"
+              anchor and the old "Browse all sites" link are both gone: the
+              directory is the next thing down the page, and the rail already
+              steps to About, so each only duplicated something else. */}
           <div className="intro-links">
             <button type="button" className="surprise-button" onClick={surpriseMe} title="Open a random site from the directory or the cool sites strip">
               <span className="surprise-icon" aria-hidden="true">↯</span>
               <span className="surprise-label">{dict.surprise}</span>
             </button>
           </div>
-          {/* Three figures above the search: the directory's readership, how
-              many sites it links out to, and the size of the project. They
-              count up on load and hold their final value. */}
-          <HeroStats visitors={views} sites={allSites.length + coolSites.length} />
           {/* A search landmark with an explicit name: the wrapping label used
               to name the field "/" (its only text was the shortcut hint). */}
           <div className="search-wrap" role="search">
@@ -1264,7 +1261,6 @@ export default function HomePage({ dict = EN, locale = "en" }: { dict?: Dictiona
                       <span className="site-card-strip" aria-hidden="true" />
                       <span className="site-card-head">
                         <SiteIcon site={site} />
-                        <span className="site-url mono">{site.url.replace(/^https?:\/\//, "").replace(/\/$/, "")}</span>
                         <span className="site-open mono" aria-hidden="true">↗</span>
                         <span className="sr-only"> (opens in a new tab)</span>
                       </span>
@@ -1488,11 +1484,6 @@ export default function HomePage({ dict = EN, locale = "en" }: { dict?: Dictiona
           </nav>
         </div>
       </footer>
-
-      <div className={`view-counter mono${bump ? " is-bumped" : ""}`} aria-live="polite" aria-label="Directory page views">
-        <span>views</span>
-        <strong>{views == null ? "—" : views.toLocaleString()}</strong>
-      </div>
 
       {shareOpen && (
         <div className="modal-backdrop" onClick={(event) => event.target === event.currentTarget && setShareOpen(false)}>

@@ -2,312 +2,364 @@
   {
     "name": "Window Swap",
     "url": "https://window-swap.com",
+    "category": "Places",
     "tags": ["travel", "relax"],
     "description": "Open a window somewhere in the world — views from strangers' homes, submitted by people everywhere."
   },
   {
     "name": "The Useless Web",
     "url": "https://theuselessweb.com",
+    "category": "Toys",
     "tags": ["fun", "random"],
     "description": "A one-button router into the internet's strangest corners. The classic starting point for a pointless adventure."
   },
   {
     "name": "Neal.fun",
     "url": "https://neal.fun",
+    "category": "Toys",
     "tags": ["interactive", "toys"],
     "description": "Spend Bill Gates' money, scale the Space Elevator, dive the Deep Sea — a shelf of the web's best interactive toys."
   },
   {
     "name": "A Soft Murmur",
     "url": "https://asoftmurmur.com",
+    "category": "Sounds",
     "tags": ["ambient", "focus"],
     "description": "Mix rain, thunder, waves, fires and coffee shops into a background ambience for working or drifting off."
   },
   {
     "name": "Radio Garden",
     "url": "https://radio.garden",
+    "category": "Sounds",
     "tags": ["music", "radio"],
     "description": "Spin a glowing globe and drop in on live radio stations from almost every town on Earth."
   },
   {
     "name": "Pointer Pointer",
     "url": "https://pointerpointer.com",
+    "category": "Toys",
     "tags": ["fun", "silly"],
     "description": "Move your mouse anywhere and a photo of someone pointing at exactly that spot appears. Pointless, perfect."
   },
   {
     "name": "Zoomquilt",
     "url": "https://zoomquilt.org",
+    "category": "Art & calm",
     "tags": ["art", "animation"],
     "description": "An endlessly zooming collaborative painting — keep going deeper and the scene never stops unfolding."
   },
   {
     "name": "Music for Programming",
     "url": "https://musicforprogramming.net",
+    "category": "Sounds",
     "tags": ["music", "coding"],
     "description": "Hour-long, carefully sequenced mixes designed to sit behind long stretches of focused work."
   },
   {
     "name": "Httpster",
     "url": "https://httpster.net",
+    "category": "Design & code",
     "tags": ["design", "inspiration"],
     "description": "A curated showcase of simply beautiful websites — proof that great design is not the same as heavy design."
   },
   {
     "name": "Neal.fun",
     "url": "https://neal.fun/",
+    "category": "Toys",
     "tags": ["interactive", "games", "experiments", "design"],
     "description": "A collection of beautifully made interactive web experiments, including space visualizations, drawing challenges, and playful simulations."
   },
   {
     "name": "The Useless Web",
     "url": "https://theuselessweb.com/",
+    "category": "Toys",
     "tags": ["random", "weird", "fun", "discovery"],
     "description": "Press one button to be sent to a random, pointless, strange, and entertaining website."
   },
   {
     "name": "Cloudhiker",
     "url": "https://cloudhiker.net/",
+    "category": "Knowledge",
     "tags": ["discovery", "indie-web", "random", "creative"],
     "description": "A hand-picked collection of thousands of small independent websites, delivered randomly without feeds or rankings."
   },
   {
     "name": "Bored Button",
     "url": "https://www.boredbutton.com/",
+    "category": "Toys",
     "tags": ["games", "random", "fun", "boredom"],
     "description": "A single button that launches a new game, mini activity, visual toy, or strange internet experience."
   },
   {
     "name": "The Secret Door",
     "url": "https://www.thesecretdoor.com/",
+    "category": "Toys",
     "tags": ["random", "exploration", "images", "discovery"],
     "description": "Open a digital door and instantly discover a random image or place from somewhere on the internet."
   },
   {
     "name": "Radio Garden",
     "url": "https://radio.garden/",
+    "category": "Sounds",
     "tags": ["music", "radio", "map", "world"],
     "description": "Explore a 3D globe and tune into live radio stations from cities all around the world."
   },
   {
     "name": "Drive & Listen",
     "url": "https://driveandlisten.herokuapp.com/",
+    "category": "Places",
     "tags": ["travel", "music", "cities", "ambient"],
     "description": "Virtually drive through cities worldwide while listening to local radio stations and street sounds."
   },
   {
     "name": "Earth Nullschool",
     "url": "https://earth.nullschool.net/",
+    "category": "Places",
     "tags": ["weather", "data", "visualization", "science"],
     "description": "A mesmerizing live visualization of global wind, ocean currents, weather systems, and air conditions."
   },
   {
     "name": "Pointer Pointer",
     "url": "https://pointerpointer.com/",
+    "category": "Toys",
     "tags": ["weird", "funny", "cursor", "random"],
     "description": "Move your cursor anywhere on the screen and the site finds a photo of someone pointing directly at it."
   },
   {
     "name": "Cat Bounce",
     "url": "https://cat-bounce.com/",
+    "category": "Toys",
     "tags": ["cats", "weird", "fun", "animation"],
     "description": "A completely unnecessary but delightful page filled with endlessly bouncing cats."
   },
   {
     "name": "Patatap",
     "url": "https://patatap.com/",
+    "category": "Toys",
     "tags": ["music", "art", "interactive", "animation"],
     "description": "Press keyboard keys to create colorful animations and musical sounds in a playful audiovisual experience."
   },
   {
     "name": "Silk",
     "url": "https://weavesilk.com/",
+    "category": "Art & calm",
     "tags": ["art", "generative", "drawing", "relaxing"],
     "description": "Create glowing symmetrical digital art by moving your cursor across the screen."
   },
   {
     "name": "This Is Sand",
     "url": "https://thisissand.com/",
+    "category": "Art & calm",
     "tags": ["art", "creative", "relaxing", "simulation"],
     "description": "Pour colored digital sand onto the screen to create layered landscapes and abstract artwork."
   },
   {
     "name": "Find the Invisible Cow",
     "url": "https://findtheinvisiblecow.com/",
+    "category": "Toys",
     "tags": ["game", "audio", "weird", "funny"],
     "description": "Use increasingly loud sound cues to find an invisible cow hidden somewhere on the page."
   },
   {
     "name": "A Soft Murmur",
     "url": "https://asoftmurmur.com/",
+    "category": "Sounds",
     "tags": ["ambient", "sounds", "focus", "relaxing"],
     "description": "Mix rain, thunder, wind, waves, café noise, and other ambient sounds into a custom background soundscape."
   },
   {
     "name": "WindowSwap",
     "url": "https://www.window-swap.com/",
+    "category": "Places",
     "tags": ["travel", "video", "world", "ambient"],
     "description": "Look through video windows submitted by people around the world and experience views from their homes."
   },
   {
     "name": "Zoomquilt",
     "url": "https://zoomquilt.org/",
+    "category": "Art & calm",
     "tags": ["art", "animation", "surreal", "interactive"],
     "description": "An endlessly zooming collaborative painting — keep going deeper and the scene never stops unfolding."
   },
   {
     "name": "The Zen Zone",
     "url": "https://thezen.zone/",
+    "category": "Art & calm",
     "tags": ["relaxing", "interactive", "visual", "mindfulness"],
     "description": "A collection of calming, playful, and visually interactive experiences designed for a short mental break."
   },
   {
     "name": "The Pudding",
     "url": "https://pudding.cool/",
+    "category": "Knowledge",
     "tags": ["data", "storytelling", "visualization", "design"],
     "description": "A studio of outstanding visual stories and interactive data journalism with strong design and animation."
   },
   {
     "name": "Information Is Beautiful",
     "url": "https://informationisbeautiful.net/",
+    "category": "Knowledge",
     "tags": ["data", "visualization", "design", "learning"],
     "description": "A collection of visualizations that turn complex facts, comparisons, and datasets into engaging graphics."
   },
   {
     "name": "The True Size Of...",
     "url": "https://www.thetruesize.com/",
+    "category": "Places",
     "tags": ["maps", "geography", "education", "interactive"],
     "description": "Drag countries around the globe to see their true relative size without common map-projection distortion."
   },
   {
     "name": "OneZoom",
     "url": "https://www.onezoom.org/",
+    "category": "Knowledge",
     "tags": ["science", "nature", "visualization", "interactive"],
     "description": "Explore the entire tree of life through a smooth zoomable map of species and evolutionary relationships."
   },
   {
     "name": "Scale of the Universe 2",
     "url": "https://scaleofuniverse.com/",
+    "category": "Knowledge",
     "tags": ["space", "science", "education", "interactive"],
     "description": "Scroll from the smallest known physical scales to the largest structures in the observable universe."
   },
   {
     "name": "Library of Babel",
     "url": "https://libraryofbabel.info/",
+    "category": "Knowledge",
     "tags": ["books", "weird", "literature", "interactive"],
     "description": "A surreal digital library inspired by Borges that contains every possible combination of text."
   },
   {
     "name": "Museum of Endangered Sounds",
     "url": "https://museumofendangeredsounds.com/",
+    "category": "Sounds",
     "tags": ["nostalgia", "audio", "technology", "archive"],
     "description": "A nostalgic archive of sounds made by old technology, including dial-up modems, floppy disks, and startup chimes."
   },
   {
     "name": "FutureMe",
     "url": "https://www.futureme.org/",
+    "category": "Knowledge",
     "tags": ["writing", "future", "personal", "email"],
     "description": "Write a letter or email to your future self and schedule it to be delivered on a date you choose."
   },
   {
     "name": "Awwwards Interactive",
     "url": "https://www.awwwards.com/websites/web-interactive/",
+    "category": "Design & code",
     "tags": ["web-design", "inspiration", "animation", "ui"],
     "description": "A curated gallery of award-winning interactive websites and premium web-design inspiration."
   },
   {
     "name": "CSS Zen Garden",
     "url": "https://www.csszengarden.com/",
+    "category": "Design & code",
     "tags": ["css", "web-design", "frontend", "inspiration"],
     "description": "A classic demonstration of how dramatically different designs can be created using the same HTML and different CSS."
   },
   {
     "name": "Coolors",
     "url": "https://coolors.co/",
+    "category": "Design & code",
     "tags": ["design", "colors", "ui", "tools"],
     "description": "A fast color-palette generator for finding polished color combinations for websites, brands, and interfaces."
   },
   {
     "name": "Khroma",
     "url": "https://www.khroma.co/",
+    "category": "Design & code",
     "tags": ["design", "colors", "ai", "branding"],
     "description": "An AI-powered color tool that learns your preferences and generates personalized color palette ideas."
   },
   {
     "name": "Type Scale",
     "url": "https://typescale.com/",
+    "category": "Design & code",
     "tags": ["typography", "design", "ui", "frontend"],
     "description": "A typography tool for creating balanced font-size scales and type systems for web projects."
   },
   {
     "name": "Spline",
     "url": "https://spline.design/",
+    "category": "Design & code",
     "tags": ["3d", "design", "animation", "web-development"],
     "description": "A browser-based design tool for creating interactive 3D scenes, objects, and animations for the web."
   },
   {
     "name": "Sketchfab",
     "url": "https://sketchfab.com/",
+    "category": "Design & code",
     "tags": ["3d", "models", "art", "interactive"],
     "description": "A large online library of interactive 3D models, artwork, scenes, and creative projects."
   },
   {
     "name": "Cameron's World",
     "url": "https://www.cameronsworld.net/",
+    "category": "Art & calm",
     "tags": ["nostalgia", "web-design", "geocities", "art"],
     "description": "A colorful internet-art experience built from archived GeoCities pages and early-web design aesthetics."
   },
   {
     "name": "Little Alchemy 2",
     "url": "https://littlealchemy2.com/",
+    "category": "Games",
     "tags": ["game", "puzzle", "creative", "discovery"],
     "description": "Combine simple elements such as water, fire, earth, and air to discover hundreds of new objects and ideas."
   },
   {
     "name": "GeoGuessr",
     "url": "https://www.geoguessr.com/",
+    "category": "Games",
     "tags": ["game", "geography", "maps", "challenge"],
     "description": "A geography game where you identify locations around the world using clues from Street View."
   },
   {
     "name": "MapCrunch",
     "url": "https://www.mapcrunch.com/",
+    "category": "Places",
     "tags": ["maps", "travel", "random", "exploration"],
     "description": "Get dropped into a random Google Street View location anywhere in the world."
   },
   {
     "name": "WikiRoulette",
     "url": "https://wikiroulette.co/",
+    "category": "Knowledge",
     "tags": ["wikipedia", "random", "learning", "discovery"],
     "description": "Discover random Wikipedia articles and fall into unexpected learning rabbit holes."
   },
   {
     "name": "Quick, Draw!",
     "url": "https://quickdraw.withgoogle.com/",
+    "category": "Games",
     "tags": ["ai", "drawing", "game", "machine-learning"],
     "description": "Draw an object in a few seconds while Google's neural network tries to recognize what you are sketching."
   },
   {
     "name": "Akinator",
     "url": "https://en.akinator.com/",
+    "category": "Games",
     "tags": ["game", "trivia", "characters", "fun"],
     "description": "Think of a real or fictional character while the genie asks questions and attempts to guess who it is."
   },
   {
     "name": "Infinite Craft",
     "url": "https://neal.fun/infinite-craft/",
+    "category": "Games",
     "tags": ["game", "creative", "words", "discovery"],
     "description": "Combine words and concepts to discover increasingly unexpected creations in an endless crafting game."
   },
   {
     "name": "2048",
     "url": "https://play2048.co/",
+    "category": "Games",
     "tags": ["game", "puzzle", "numbers", "minimal"],
     "description": "A deceptively simple sliding-tile puzzle where you combine matching numbers to reach the 2048 tile."
   },
   {
     "name": "Fallen London",
     "url": "https://www.fallenlondon.com/",
+    "category": "Games",
     "tags": ["game", "story", "writing", "adventure"],
     "description": "A rich browser-based narrative game set in a dark, surreal underground Victorian world."
   }

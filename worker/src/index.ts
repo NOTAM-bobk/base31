@@ -214,27 +214,42 @@ const bumpDay = async (env: Env): Promise<void> => {
 // aim the public `?key=` endpoint at the total or at a visitor's mark.
 const UNIQUE_KEY = "@unique";
 const UNIQUE_PREFIX = "@uv:";
+// One bucket per day, holding how many *different* people were seen that day —
+// the unique half of the graph `/stats` draws. It shares the mark prefix's
+// lifetime, because a day is only as complete as the marks behind it.
+const UNIQUE_DAY_PREFIX = "@ud:";
 const UNIQUE_TTL_SECONDS = 400 * 24 * 60 * 60;
+const uniqueDayKey = (date: string) => `${UNIQUE_DAY_PREFIX}${date}`;
 
 const sha256Hex = async (value: string): Promise<string> => {
   const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(value));
   return [...new Uint8Array(digest)].map((byte) => byte.toString(16).padStart(2, "0")).join("");
 };
 
-// Counts a visitor once. Deliberately best-effort, like `bumpDay`: the view
-// counter above is the number the visitor sees, and this must never be the
-// reason that request fails.
-const bumpUnique = async (env: Env, request: Request): Promise<void> => {
+// Counts a visitor once and hands back the running total, so the caller can
+// answer with it rather than making the page ask twice. Still best-effort in
+// the same way as `bumpDay`: a KV failure returns `null` and the caller prints
+// a dash, because this number must never be the reason a view fails to count.
+//
+// A first sighting moves two counters: the all-time total, and today's bucket
+// of *people* (as opposed to `bumpDay`'s bucket of loads), which is what the
+// second graph on /stats is drawn from.
+const bumpUnique = async (env: Env, request: Request): Promise<number | null> => {
   try {
     const ip = request.headers.get("CF-Connecting-IP") || "";
     const agent = request.headers.get("User-Agent") || "";
     const mark = `${UNIQUE_PREFIX}${(await sha256Hex(`${ip}|${agent}`)).slice(0, 32)}`;
-    if (await env.VIEW_COUNTER.get(mark)) return;
+    if (await env.VIEW_COUNTER.get(mark)) return await readCount(env, UNIQUE_KEY);
     await env.VIEW_COUNTER.put(mark, "1", { expirationTtl: UNIQUE_TTL_SECONDS });
     const next = (await readCount(env, UNIQUE_KEY)) + 1;
     await env.VIEW_COUNTER.put(UNIQUE_KEY, String(next));
+    const today = uniqueDayKey(utcDate());
+    const todayNext = (await readCount(env, today)) + 1;
+    await env.VIEW_COUNTER.put(today, String(todayNext), { expirationTtl: UNIQUE_TTL_SECONDS });
+    return next;
   } catch {
     // Ignored on purpose; see above.
+    return null;
   }
 };
 
@@ -327,8 +342,12 @@ const handleStats = async (env: Env, url: URL): Promise<Response> => {
 
   try {
     const dates = Array.from({ length: days }, (_, index) => utcDate(days - 1 - index));
-    const counts = await Promise.all(dates.map((date) => readCount(env, dayKey(date))));
+    const [counts, people] = await Promise.all([
+      Promise.all(dates.map((date) => readCount(env, dayKey(date)))),
+      Promise.all(dates.map((date) => readCount(env, uniqueDayKey(date)))),
+    ]);
     const series = dates.map((date, index) => ({ date, views: counts[index] }));
+    const uniqueSeries = dates.map((date, index) => ({ date, unique: people[index] }));
 
     const [views, unique, votes, sites, subscribers, pushDevices] = await Promise.all([
       readCount(env, DIRECTORY_KEY),
@@ -354,9 +373,12 @@ const handleStats = async (env: Env, url: URL): Promise<Response> => {
         generatedAt: Date.now(),
         days,
         series,
+        uniqueSeries,
         totals: {
           views,
           unique,
+          uniqueToday: uniqueSeries[uniqueSeries.length - 1]?.unique ?? 0,
+          unique7: uniqueSeries.slice(-7).reduce((running, point) => running + point.unique, 0),
           last7: sum(series.slice(-7)),
           prev7: sum(series.slice(-14, -7)),
           sites,
@@ -937,7 +959,7 @@ export default {
       return handleStats(env, url);
     }
 
-    // GET /?key=<name> → { views } (increments the view counter).
+    // GET /?key=<name> → { views, unique } (increments the view counter).
     if (url.pathname !== "/") return notFound();
     if (request.method !== "GET") return new Response("Method not allowed", { status: 405, headers: CORS_HEADERS });
 
@@ -952,11 +974,11 @@ export default {
       return json({ error: "Counter temporarily unavailable" }, 503);
     }
 
-    // Off the critical path: the response doesn't wait on the daily bucket or
-    // on the visitor mark that decides whether this is a new unique visitor.
+    // The visitor mark is resolved before the reply now, because the reply
+    // carries the unique total; the daily bucket stays off the critical path.
+    const unique = await bumpUnique(env, request);
     context.waitUntil(bumpDay(env));
-    context.waitUntil(bumpUnique(env, request));
 
-    return json({ views });
+    return json({ views, unique });
   },
 };

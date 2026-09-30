@@ -30,9 +30,15 @@ const GRAPH_DAYS = 30;
 export const revalidate = 300;
 
 type DayPoint = { date: string; views: number };
+// The unique half of the same window: one entry per day, holding how many
+// different people were seen rather than how many loads there were.
+type UniquePoint = { date: string; unique: number };
 type StatsTotals = {
   views: number;
   unique: number;
+  /** People seen today, and over the last seven days. Counted once each. */
+  uniqueToday: number;
+  unique7: number;
   last7: number;
   prev7: number;
   sites: number;
@@ -40,7 +46,7 @@ type StatsTotals = {
   pushDevices: number;
   votes: { up: number; down: number };
 };
-type StatsPayload = { generatedAt: number; days: number; series: DayPoint[]; totals: StatsTotals; top: { key: string; up: number; down: number }[] };
+type StatsPayload = { generatedAt: number; days: number; series: DayPoint[]; uniqueSeries: UniquePoint[]; totals: StatsTotals; top: { key: string; up: number; down: number }[] };
 
 const number = new Intl.NumberFormat("en-US");
 const dayLabel = new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric", timeZone: "UTC" });
@@ -69,24 +75,31 @@ async function loadStats(): Promise<StatsPayload | null> {
 // uniformly, which keeps the bar radius and text legible at every width.
 const CHART = { width: 720, height: 240, padX: 10, padTop: 18, padBottom: 30 };
 
-function Chart({ series }: { series: DayPoint[] }) {
+// One day on either graph: the date it covers and the figure it holds, so the
+// chart does not care whether it is drawing loads or people.
+type ChartPoint = { date: string; value: number };
+
+function Chart({ points, noun, barId }: { points: ChartPoint[]; noun: string; barId: string }) {
   const plotHeight = CHART.height - CHART.padTop - CHART.padBottom;
-  const slot = (CHART.width - CHART.padX * 2) / series.length;
+  const slot = (CHART.width - CHART.padX * 2) / points.length;
   const barWidth = Math.max(4, slot * 0.62);
-  const peak = Math.max(...series.map((point) => point.views), 1);
-  const peakIndex = series.reduce((best, point, index) => (point.views > series[best].views ? index : best), 0);
+  const peak = Math.max(...points.map((point) => point.value), 1);
+  const peakIndex = points.reduce((best, point, index) => (point.value > points[best].value ? index : best), 0);
   const barX = (index: number) => CHART.padX + slot * index + (slot - barWidth) / 2;
-  const barY = (views: number) => CHART.padTop + plotHeight * (1 - views / peak);
+  const barY = (value: number) => CHART.padTop + plotHeight * (1 - value / peak);
+  const busiest = points[peakIndex];
 
   return (
     <svg
       className="stats-chart"
       viewBox={`0 0 ${CHART.width} ${CHART.height}`}
       role="img"
-      aria-label={`Daily visitors over the last ${series.length} days. Busiest day: ${shortDay(series[peakIndex].date)} with ${series[peakIndex].views} views.`}
+      aria-label={`Daily ${noun} over the last ${points.length} days. Busiest day: ${shortDay(busiest.date)} with ${busiest.value}.`}
     >
+      {/* One gradient per chart: both graphs sit on the same page, and two
+          elements cannot share an id in the same document. */}
       <defs>
-        <linearGradient id="stats-bar" x1="0" y1="0" x2="0" y2="1">
+        <linearGradient id={barId} x1="0" y1="0" x2="0" y2="1">
           <stop offset="0%" stopColor="var(--live)" stopOpacity="0.95" />
           <stop offset="100%" stopColor="var(--live)" stopOpacity="0.28" />
         </linearGradient>
@@ -106,45 +119,45 @@ function Chart({ series }: { series: DayPoint[] }) {
         />
       ))}
 
-      {series.map((point, index) => {
-        const height = Math.max(2, plotHeight * (point.views / peak));
+      {points.map((point, index) => {
+        const height = Math.max(2, plotHeight * (point.value / peak));
         return (
           <g key={point.date}>
             <rect
               x={barX(index)}
-              y={barY(point.views)}
+              y={barY(point.value)}
               width={barWidth}
               height={height}
               rx={Math.min(5, height / 2)}
-              fill="url(#stats-bar)"
-              opacity={point.views === 0 ? 0.3 : 1}
+              fill={`url(#${barId})`}
+              opacity={point.value === 0 ? 0.3 : 1}
             />
-            <title>{`${shortDay(point.date)} · ${number.format(point.views)} ${point.views === 1 ? "view" : "views"}`}</title>
+            <title>{`${shortDay(point.date)} · ${number.format(point.value)} ${noun}`}</title>
           </g>
         );
       })}
 
       {/* Mark the busiest day so the shape of the graph has an anchor. */}
-      {series[peakIndex].views > 0 && (
+      {busiest.value > 0 && (
         <text
           x={Math.min(Math.max(barX(peakIndex) + barWidth / 2, 34), CHART.width - 34)}
-          y={Math.max(barY(series[peakIndex].views) - 8, 12)}
+          y={Math.max(barY(busiest.value) - 8, 12)}
           textAnchor="middle"
           className="stats-chart-peak"
         >
-          {number.format(series[peakIndex].views)} peak
+          {number.format(busiest.value)} peak
         </text>
       )}
 
-      {[0, Math.floor(series.length / 2), series.length - 1].map((index, position) => (
+      {[0, Math.floor(points.length / 2), points.length - 1].map((index, position) => (
         <text
-          key={series[index].date}
-          x={index === 0 ? CHART.padX : index === series.length - 1 ? CHART.width - CHART.padX : barX(index) + barWidth / 2}
+          key={points[index].date}
+          x={index === 0 ? CHART.padX : index === points.length - 1 ? CHART.width - CHART.padX : barX(index) + barWidth / 2}
           y={CHART.height - 8}
           textAnchor={position === 0 ? "start" : position === 1 ? "middle" : "end"}
           className="stats-chart-label"
         >
-          {shortDay(series[index].date)}
+          {shortDay(points[index].date)}
         </text>
       ))}
     </svg>
@@ -165,9 +178,14 @@ export default async function StatsPage() {
   const stats = await loadStats();
   const totals = stats?.totals;
   const series = stats?.series ?? [];
+  // A worker older than the unique-counting release sends no `uniqueSeries`, so
+  // the second graph falls back to its empty state rather than to a broken one.
+  const uniqueSeries = stats?.uniqueSeries ?? [];
   const chartHasData = series.some((point) => point.views > 0);
+  const uniqueHasData = uniqueSeries.some((point) => point.unique > 0);
   const trend = totals && totals.prev7 > 0 ? Math.round(((totals.last7 - totals.prev7) / totals.prev7) * 100) : null;
   const graphWindow = series.reduce((running, point) => running + point.views, 0);
+  const uniqueWindow = uniqueSeries.reduce((running, point) => running + point.unique, 0);
   const top = (stats?.top ?? []).filter((entry) => entry.up > 0);
 
   return (
@@ -177,8 +195,8 @@ export default async function StatsPage() {
       <h1>What the directory is doing right now.</h1>
       <p className="privacy-updated">
         Counted by the base31 counter, with no cookies and nothing that identifies a visitor. Views count every
-        load; unique visitors are reduced to a one-way hash, so a reload does not count twice. Refreshed every five
-        minutes.
+        load; unique visitors are reduced to a one-way hash, so a reload does not count twice and the second graph
+        counts people rather than loads. Refreshed every five minutes.
       </p>
 
       {!totals ? (
@@ -194,6 +212,16 @@ export default async function StatsPage() {
               label="unique visitors"
               value={number.format(totals.unique ?? 0)}
               note="one per visitor — reloads do not count"
+            />
+            <Card
+              label="unique today"
+              value={number.format(totals.uniqueToday ?? 0)}
+              note="people seen since midnight UTC"
+            />
+            <Card
+              label="unique, last 7 days"
+              value={number.format(totals.unique7 ?? 0)}
+              note={`${number.format(uniqueWindow)} across the graph below`}
             />
             <Card
               label="last 7 days"
@@ -212,11 +240,30 @@ export default async function StatsPage() {
               <span className="mono stats-panel-metric">{number.format(graphWindow)} views</span>
             </div>
             {chartHasData ? (
-              <Chart series={series} />
+              <Chart points={series.map((point) => ({ date: point.date, value: point.views }))} noun="views" barId="stats-bar-views" />
             ) : (
               <p className="stats-notice" role="status">
                 Daily history has only just started recording, so there is nothing to draw yet. The total above is still the all-time
                 count — come back tomorrow for the first full day.
+              </p>
+            )}
+          </section>
+
+          {/* The same window counted a second way. A bar here is one person,
+              not one load, so the two graphs use the same shape and answer
+              different questions: how often the directory was opened, and how
+              many different people opened it. */}
+          <section className="stats-panel" aria-labelledby="unique-heading">
+            <div className="stats-panel-head">
+              <h2 id="unique-heading">Unique visitors, last {uniqueSeries.length} days</h2>
+              <span className="mono stats-panel-metric">{number.format(uniqueWindow)} people</span>
+            </div>
+            {uniqueHasData ? (
+              <Chart points={uniqueSeries.map((point) => ({ date: point.date, value: point.unique }))} noun="unique visitors" barId="stats-bar-unique" />
+            ) : (
+              <p className="stats-notice" role="status">
+                Every person is counted once, so this graph fills in more slowly than the one above: a day that one
+                visitor read draws a single bar. Come back after a few days of traffic for a shape.
               </p>
             )}
           </section>

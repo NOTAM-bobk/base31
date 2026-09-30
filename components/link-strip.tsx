@@ -32,7 +32,8 @@ export type LinkStripProps = {
   copy: LinkStripCopy;
   query?: string;
   /** Category names, in chip order. When present the strip grows a filter row
-      that narrows the cards to one category (the "Cool APIs" strip uses it). */
+      that narrows the cards to one category. Both strips use it: "Cool APIs"
+      files 63 links by topic, "Other cool sites" files 52 by kind. */
   categories?: string[];
 };
 
@@ -49,9 +50,10 @@ export type LinkStripProps = {
 // reads as a physical response.
 //
 // A strip given `categories` also carries a chip row — the same control the
-// directory uses for tags — so a long list can be cut down without typing.
-// The chips combine with the hero search rather than replacing it: both narrow
-// the same set, and the count reflects the two together.
+// directory uses for tags, and the same row "Cool APIs" had first — so a long
+// list can be cut down without typing. The chips combine with the hero search
+// rather than replacing it: both narrow the same set, and the count reflects
+// the two together.
 export default function LinkStrip({ id, items, search, copy, query = "", categories }: LinkStripProps) {
   const [collapsed, setCollapsed] = useState(false);
   const [vibrating, setVibrating] = useState(false);

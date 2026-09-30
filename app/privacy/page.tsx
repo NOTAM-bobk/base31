@@ -62,10 +62,13 @@ export default function PrivacyPage() {
           counts every load, and unique visitors, which counts a person once. To tell them apart the
           Worker derives a one-way SHA-256 hash from the request&rsquo;s IP address and the
           browser&rsquo;s User-Agent string, writes that hash as a mark that expires after 400 days,
-          and raises the unique total only the first time it sees it. The raw address and browser
-          string are never written to storage, and the hash cannot be turned back into either. The
-          counter is not intended to identify you and does not store your name, email address, or
-          browsing history.
+          and raises the unique total only the first time it sees it. The same hash also raises a
+          separate per-day count the first time you are seen on that day, which is what the daily
+          graph of people on our stats page is drawn from; it is another aggregate number, not a
+          per-visitor record that could be read back. The raw address and browser string are never
+          written to storage, and the hash cannot be turned back into either. The counter is not
+          intended to identify you and does not store your name, email address, or browsing
+          history.
         </p>
 
         <h2>Email updates, browser alerts, and bug reports</h2>

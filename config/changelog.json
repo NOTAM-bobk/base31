@@ -1,5 +1,18 @@
 [
   {
+    "version": "1.20.0",
+    "date": "2026-09-30",
+    "title": "People counted per day, chips on both strips, and a quieter page",
+    "summary": "The counter now keeps a unique-visitor count for each day as well as the all-time one, so /stats draws a second graph — people rather than page loads — and the hero prints its own unique figure beside the views. \"Other cool sites\" gets the same category chips \"Cool APIs\" already had, the featured cards stop printing their host, and two floating pieces are gone: the corner views pill and the bottom-left shortcut to the next section.",
+    "highlights": [
+      "The worker keeps a second daily record now: one bucket per day holding how many different people were seen, next to the existing one counting loads. The stats page draws it as a second graph with its own heading, and adds two cards — unique visitors today, and unique visitors over the last seven days — so a single visitor who reads twenty pages stops looking like twenty people.",
+      "The hero's counter request carries the unique total back with the view count, so the four figures above the hero search are views, unique visitors, websites linked and lines of code. They sit above the one button now instead of under it, and that button is red.",
+      "Both strips are filterable: the 52 links in \"Other cool sites\" are filed under seven categories — Toys, Design & code, Knowledge, Games, Art & calm, Places and Sounds — and the strip carries the same chip row, in the same material, as \"Cool APIs\". The chips narrow the cards alongside the hero search rather than replacing it.",
+      "Two floating pieces are gone. The \"views\" pill in the bottom-right corner and the bottom-left pill that jumped from the directory to the strip below it are both removed, so nothing sits over the page's own content any more; the same numbers live in the hero, where the reading starts.",
+      "Directory cards no longer print the host underneath the name. The favicon and the ↗ marker stay, and the card's name plus its screenshot already say where it goes."
+    ]
+  },
+  {
     "version": "1.19.0",
     "date": "2026-09-30",
     "title": "Unique visitors, dotted dividers, and a second ad slot",

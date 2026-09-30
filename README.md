@@ -267,16 +267,18 @@ bundler. Two ways to do that by accident:
   and the original "Browse all sites" link are both gone — the directory is the
   next thing down the page and the rail already steps to About, so each only
   duplicated something else within reach.
-- Three figures sit above the hero search (`components/hero-stats.tsx`): the
-  directory's visitors (the live view counter), the websites it links out to
+- Four figures sit above the hero search and its one button
+  (`components/hero-stats.tsx`): the directory's views (the live view
+  counter), its unique visitors (the same readership counted once per person,
+  reported by the same request as the view count), the websites it links out to
   (`allSites` plus `coolSites`) and the project's size in lines of code
   (`51,871`). They carry no tray — the numbers sit straight on the page in the
   display face (`--font-display`), with only a small caps label under each.
   `useCountUp` climbs each one from zero with an ease-out in a rAF loop and
-  holds the final value; the visitors figure waits for the worker to answer and
-  shows an em dash until it does. Under `prefers-reduced-motion` the hook jumps
-  straight to the final number, because the figure is information rather than
-  decoration.
+  holds the final value; the two figures that come from the worker wait for it
+  to answer and show an em dash until it does. Under `prefers-reduced-motion`
+  the hook jumps straight to the final number, because the figure is
+  information rather than decoration.
 - The hero headline is rendered one `<span>` per word, which is what lets it
   rise into place on load: `h1-word-in` in `app/late.css` fades each word up
   from below with a per-word delay set inline in `components/home-page.tsx`,
@@ -288,12 +290,12 @@ bundler. Two ways to do that by accident:
   one being styled. Real spaces sit between the spans, so the line still wraps
   on a phone, and `prefers-reduced-motion` shows the words in place.
 - "Surprise me" in the hero opens a random entry — from the current filter
-  results when a search is active, otherwise from the whole directory. It is a
-  solid square now: the accent green as a fill, the label in whichever ink
-  stays legible on that green (`--on-live` — dark ink on the bright dark-theme
-  green, white on the deeper light-theme one), and a bolt badge that inverts
-  with it. The base pill rule is in `app/overrides.css`; `app/late.css` squares
-  it off, and its sheen/spin is disabled under `prefers-reduced-motion`.
+  results when a search is active, otherwise from the whole directory. It sits
+  directly under the hero numbers, and it is red: `--danger` as a solid fill,
+  white ink on it in both themes (`--on-danger`), and a bolt badge that
+  brightens with it. The base pill rule is in `app/overrides.css` — shape and
+  motion only, it deliberately sets no colour — and `app/late.css` owns the red
+  fill; its sheen/spin is disabled under `prefers-reduced-motion`.
 - Directory cards are sized around a shorter preview band — a 640x300 shot
   that matches the band's own `aspect-ratio: 640 / 300`, so the screenshot is
   neither cropped nor letterboxed — with a tighter padded half and a 15px name,
@@ -314,11 +316,11 @@ bundler. Two ways to do that by accident:
   one is finished in `app/late.css`: a deeper `--live` (≈4.9:1 on the light
   surface, so 9–11px accent text clears AA), a stronger `--line` and
   `--line-strong` because card edges on paper have less to work with, a much
-  lighter `--shadow`, and light-theme weights for the three surfaces that
-  carried a shadow written for black (the view counter, the support board and
-  the favicon tiles). Prefer a token; only write a
-  `html[data-theme="light"]` rule when a value is hard-coded, as `.view-counter`
-  and the community panel's primary action are.
+  lighter `--shadow`, and light-theme weights for the surfaces that carried a
+  shadow written for black (the support board's ad slots and the favicon
+  tiles). Prefer a token; only write a
+  `html[data-theme="light"]` rule when a value is hard-coded, as
+  `.support-banner-ad` and the community panel's primary action are.
 - Three quick-jump boxes sit under the search field — Featured sites, Other
   cool sites and Cool APIs — each an in-page anchor to `#sites`,
   `#cool-sites` and `#cool-apis` with the list's length as its caption. They are
@@ -341,14 +343,16 @@ the directory's empty state instead of dead-ending there.
   cannot drift apart. Entries are external URLs by design — the validator
   rejects anything pointing at a base31.org subdomain, which belongs in
   `sites.json` instead.
-- "Cool APIs" also carries a category chip row: each entry in
-  `config/cool-apis.json` names one of eleven broad `category` values (the
-  free-form `tags` run to sixty-odd values, which would be a wall of chips),
-  `coolApiCategories` in `lib/cool-apis.ts` lists them busiest first, and the
-  shared strip renders the row and narrows its cards to the chosen category.
-  The chips combine with the hero search rather than replacing it, and the
-  count reflects both. A strip only shows the row when it is handed
-  `categories`, which is why "Other cool sites" has none.
+- Both strips carry a category chip row: each entry in `config/cool-apis.json`
+  names one of eleven broad `category` values, and each entry in
+  `config/cool-sites.json` one of seven (`Toys`, `Design & code`, `Knowledge`,
+  `Games`, `Art & calm`, `Places`, `Sounds`) — coarser than the free-form
+  `tags`, which run to sixty-odd values and would be a wall of chips.
+  `coolApiCategories` in `lib/cool-apis.ts` and `coolSiteCategories` in
+  `lib/cool-sites.ts` compute their own lists busiest first, and the shared
+  strip renders the row and narrows its cards to the chosen category. The chips
+  combine with the hero search rather than replacing it, and the count reflects
+  both. A strip only shows the row when it is handed `categories`.
 - A slim column of small lines down the right edge
 (`components/section-rail.tsx`) is the section readout and the fast way between
 sections. Every section is rendered, so the whole page is reachable from the
@@ -365,13 +369,6 @@ keys walk the list one section at a time — the keys are the section ids. The
 section list and its labels live in `components/home-page.tsx`. Every step it
 takes buzzes once through the Vibration API, and the header's nav links do the
 same on the way out.
-- While "Featured sites" is the section being read, a small pill appears in the
-  bottom-left corner (`components/next-section-button.tsx`) that jumps to the
-  strip below it — the same rule the rail uses to pick the current section, so
-  it shows on the way into the directory and hides again once "Other cool
-  sites" reaches the line. It takes the corner the donate button drops into on
-  the narrow layouts and is drawn above it (`z-index`), which is the trade the
-  corner forces.
 - The directory is filterable by tag (chips built from `config/sites.json`,
   most used first, capped at `MAX_TAG_CHIPS`) and sortable by **Most liked**,
   **Newest** or **A–Z**. Pinned sites stay on top in every mode, and a tag or
@@ -446,8 +443,9 @@ same on the way out.
   spine; `SiteIcon` is 38px (34px on phones).
 - The site name is the card's title: centred on its own line, above
   `.site-card-strip` (a green gradient band that fades out at both ends and
-  carries a soft glow) and the centred meta row holding the favicon, the host
-  and the `↗` marker underneath it. That is why `.site-card-info` centres its
+  carries a soft glow) and the centred meta row holding the favicon and the
+  `↗` marker underneath it. The host used to be printed there too; the card's
+  own name and the arrow say where it goes, so it is gone. That is why `.site-card-info` centres its
   children and the old `.site-card-ident` column is gone — the name is no
   longer part of the meta row. `SiteIcon` moved down into that row with it,
   and `.site-name` keeps `min-width: 0` so an overlong name still ellipsizes
@@ -697,8 +695,8 @@ served by a small Cloudflare Worker backed by Cloudflare KV, deployed from
 
 | Route | Purpose |
 | --- | --- |
-| `GET /?key=<name>` | Increments the view counter, returns `{ "views": n }`; also bumps that day's bucket and, for a visitor it has not seen, the unique-visitor total |
-| `GET /stats?days=<n>` | Totals plus the daily view series that `/stats` renders (cached for five minutes) |
+| `GET /?key=<name>` | Increments the view counter, returns `{ "views": n, "unique": n }`; also bumps that day's bucket and, for a visitor it has not seen, the unique total and today's bucket of people |
+| `GET /stats?days=<n>` | Totals, the daily view series and the daily unique-visitor series that `/stats` renders (cached for five minutes) |
 | `GET /votes?keys=a,b,c` | Reads totals without incrementing, returns `{ "votes": { a: { up, down }, … } }` |
 | `POST /vote` | Body `{ key, from, to }` where each of `from`/`to` is `1`, `-1` or `0`; returns the key's new `{ key, up, down }` |
 | `GET /sites` | Lists community-published sites, newest first |
@@ -740,41 +738,50 @@ votable under its slug.
 ### Stats
 
 `/stats` on the site reads `GET /stats` on the worker, which reports the
-directory's all-time views, its unique visitors, a daily series for the visitor
-graph, vote totals, published sites, subscriber counts, and the most liked
-entries. The daily buckets are written under an `@day:<YYYY-MM-DD>` key: the `@`
-is outside the characters `?key=` accepts, so a visitor can never aim the public
-counter at a day bucket. They carry a 400-day lifetime, so the namespace stays
-bounded on its own.
+directory's all-time views, its unique visitors (all-time, today, and the last
+seven days), a daily series for each of its two graphs, vote totals, published
+sites, subscriber counts, and the most liked entries. The view buckets are
+written under an `@day:<YYYY-MM-DD>` key and the person buckets under
+`@ud:<YYYY-MM-DD>`: the `@` is outside the characters `?key=` accepts, so a
+visitor can never aim the public counter at either. They carry a 400-day
+lifetime, so the namespace stays bounded on its own.
 
 ### Unique visitors
 
 Views count every load, so a reload, a second tab or a refresh all add to the
 total. The unique-visitor count is the other half: a person is counted once.
 `bumpUnique` reduces the request to a one-way SHA-256 hash of
-`CF-Connecting-IP` and `User-Agent`, writes that hash under `@uv:<hash>` as a
-mark with a 400-day lifetime, and raises `@unique` only the first time it sees
-it. The raw address and browser string are never stored, and the hash cannot be
-turned back into either. Two visitors behind one address with the same browser
-share a mark, and one visitor who clears that browser's User-Agent counts
-again — the count is an aggregate, not an identity.
+`CF-Connecting-IP` and `User-Agent` and writes that hash under `@uv:<hash>` as a
+mark with a 400-day lifetime. On the first sighting it raises `@unique`, the
+all-time total, and the current day's own bucket, `@ud:<YYYY-MM-DD>`, which is
+what the second graph on `/stats` draws; a later request that day finds the mark
+and touches neither. It returns the running total, so the page gets views and
+unique visitors from its one counter request instead of asking twice, and a
+failure to write returns `null` — the hero prints an em dash rather than a
+wrong number. The raw address and browser string are never stored, and the hash
+cannot be turned back into either. Two visitors behind one address with the same
+browser share a mark, and one visitor who clears that browser's User-Agent
+counts again — the count is an aggregate, not an identity.
 
-Both keys carry the `@` prefix, which `isValidKey` rejects, so the public
-`?key=` endpoint cannot be aimed at the unique total or at a visitor's mark.
-The bump runs in `waitUntil`, alongside the daily bucket, so it is off the
-critical path: the visitor still gets their view count if it fails.
+All three keys carry the `@` prefix, which `isValidKey` rejects, so the public
+`?key=` endpoint cannot be aimed at the unique total, at a visitor's mark or at
+a day bucket. The unique bump is the one part no longer inside `waitUntil` — the
+reply carries its result — while the daily view bucket still is; both are
+best-effort, and neither can make the view count fail.
 
 Two consequences worth knowing:
 
-- History starts the day this shipped. The graph draws `0` for earlier days and
-  says so on the page, and the all-time total is unaffected because it is a
+- History starts the day this shipped. Both graphs draw `0` for earlier days and
+  say so on the page, and the all-time total is unaffected because it is a
   separate key (`base31-directory`).
-- The feature is live only once the worker is redeployed (`npm run
-  deploy:worker`). Until then `/stats` shows its "not available yet" state and
-  nothing on the rest of the site changes.
+- A worker change is live only once it is deployed (`npm run deploy:worker`).
+  A frontend newer than the worker copes: `/stats` falls back to its empty state
+  when `uniqueSeries` is missing, and the hero prints an em dash when `unique`
+  is not in the reply.
 
 Views are stored under the key itself (so existing counts keep working),
-unique visitors under `@unique` with a `@uv:<hash>` mark per visitor, and
+unique visitors under `@unique` with a `@uv:<hash>` mark per visitor and an
+`@ud:<date>` bucket per day, and
 votes under `votes:<key>:up` / `votes:<key>:down`. Votes are per browser:
 the visitor's own choice lives in `localStorage` and the worker only keeps the
 shared totals, so the same person cannot stack votes by reloading but also

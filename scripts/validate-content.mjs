@@ -10,6 +10,7 @@ const sites = read("sites.json");
 const posts = read("blogs.json");
 const referrals = read("referrals.json");
 const donations = read("donations.json");
+const editorsPicks = read("editors-picks.json");
 const releases = read("changelog.json");
 const pkg = JSON.parse(fs.readFileSync(path.join(root, "package.json"), "utf8"));
 
@@ -62,6 +63,15 @@ for (const list of externalLists) {
   }
 }
 
+if (!Array.isArray(editorsPicks)) errors.push("editors-picks.json must be an array");
+else {
+  checkUnique(editorsPicks.map((pick) => String(pick.slug)), "editor's pick slug");
+  for (const [index, pick] of editorsPicks.entries()) {
+    if (typeof pick.slug !== "string" || !slug.test(pick.slug)) errors.push(`Editor's pick ${index + 1} needs a detail slug`);
+    if (typeof pick.note !== "string" || pick.note.trim().length < 20) errors.push(`Editor's pick ${index + 1} needs a useful editorial note`);
+  }
+}
+
 // Language codes on directory entries (BGR 47 short form; "en" is the default
 // the loader assumes). Entries without the field stay valid — the field is
 // for future translated filtering.
@@ -72,8 +82,10 @@ for (const [index, site] of sites.entries()) {
   }
   // Optional "last checked" stamp, drawn as a badge on the card. It has to be
   // an ISO day string so the client can format it without a locale parser.
-  if (site.lastChecked !== undefined && (typeof site.lastChecked !== "string" || !date.test(site.lastChecked) || Number.isNaN(Date.parse(site.lastChecked)))) {
-    errors.push(`Site ${index + 1} (${site.subdomain}) has an invalid lastChecked date`);
+  for (const field of ["addedAt", "lastChecked"]) {
+    if (site[field] !== undefined && (typeof site[field] !== "string" || !date.test(site[field]) || Number.isNaN(Date.parse(site[field])))) {
+      errors.push(`Site ${index + 1} (${site.subdomain}) has an invalid ${field} date`);
+    }
   }
 }
 

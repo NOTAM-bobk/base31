@@ -9,7 +9,11 @@ function load(relative) {
   const source = fs.readFileSync(relative, "utf8");
   const compiled = ts.transpileModule(source, { compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2017, esModuleInterop: true } }).outputText;
   const module = { exports: {} };
-  const localRequire = (id) => id.startsWith("@/") ? require(path.resolve(id.slice(2))) : require(id);
+  const localRequire = (id) => {
+    if (!id.startsWith("@/")) return require(id);
+    const relative = id.slice(2);
+    return relative.endsWith(".json") ? require(path.resolve(relative)) : load(`${relative}.ts`);
+  };
   new Function("require", "module", "exports", compiled)(localRequire, module, module.exports);
   return module.exports;
 }
@@ -39,4 +43,30 @@ for (const [file, fn] of [["cool-sites", "searchCoolSites"], ["cool-apis", "sear
   assert.ok(library[fn](sample.category).some((entry) => entry.url === sample.url));
   assert.ok(library[fn](sample.url).some((entry) => entry.url === sample.url));
 }
+const { matchesQuery } = load("lib/search.ts");
+const sample = { name: "Tag wording", url: "https://example.com/", description: "AI tools", tags: ["utility", "no-key"] };
+assert.ok(matchesQuery(sample, "#UTILITY"));
+assert.ok(matchesQuery(sample, "tag:no-key tools"));
+assert.ok(!matchesQuery(sample, "#ai"), "Tag search must not match description-only words");
+assert.ok(!matchesQuery(sample, "#util"), "Tags match exactly");
+assert.ok(!matchesQuery(sample, "#utility missing"));
+assert.ok(!matchesQuery(sample, "tag:"));
+assert.ok(directory.searchCoolAis("#openai").some((entry) => entry.name === "ChatGPT"));
+for (const [file, fn] of [["cool-sites", "searchCoolSites"], ["cool-apis", "searchCoolApis"], ["cool-apps", "searchCoolApps"]]) {
+  const library = load(`lib/${file}.ts`);
+  const sample = library[fn]("")[0];
+  assert.ok(library[fn](`#${sample.tags[0]}`).some((entry) => entry.url === sample.url));
+}
+const picks = JSON.parse(fs.readFileSync("config/editors-picks.json", "utf8"));
+assert.equal(new Set(picks.map((pick) => pick.slug)).size, picks.length);
+for (const pick of picks) {
+  assert.ok(entries.some((entry) => entry.slug === pick.slug), `Unknown editor's pick: ${pick.slug}`);
+  assert.ok(typeof pick.note === "string" && pick.note.length >= 20);
+}
+const { estimateLines } = load("lib/code-estimate.ts");
+assert.equal(estimateLines({ TypeScript: 450, HTML: 600, CSS: 350 }), 30);
+assert.equal(estimateLines({ Unknown: 90 }), 2);
+assert.equal(estimateLines({ TypeScript: -5 }), null);
+assert.equal(estimateLines({ TypeScript: "450" }), null);
+assert.equal(estimateLines({}), null);
 console.log(`Directory tests passed: ${entries.length} detail pages, four external search indexes, stable shared vote keys.`);

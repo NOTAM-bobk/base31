@@ -8,7 +8,7 @@ directory homepage (on `base31.org`) and every subdomain site (on
 ## Getting started
 
 ```bash
-npm install
+npm ci
 npm run dev
 ```
 
@@ -23,8 +23,8 @@ Useful scripts:
 | `npm run dev` | Start the Next.js dev server |
 | `npm run validate:content` | Check `config/*.json` and site folders |
 | `npm run typecheck` | Run `tsc --noEmit` |
-| `npm run lint` | Run `next lint` |
-| `npm run check` | All three of the above |
+| `npm run test:directory` | Test slugs, shared search, editor's picks, vote keys and code estimates |
+| `npm run check` | Content validation, directory tests and TypeScript |
 
 Run `npm run check` before opening a pull request.
 
@@ -49,7 +49,8 @@ Each site is a plain, build-free static site: HTML/CSS/JS that is served as-is.
    }
    ```
 
-4. Run `npm run validate:content` and fix anything it reports.
+4. Add a matching guide in `lib/tool-pages.ts` for every visible featured entry.
+5. Run `npm run check` and fix anything it reports.
 
 Rules the validator enforces (see `scripts/validate-content.mjs`):
 
@@ -57,8 +58,8 @@ Rules the validator enforces (see `scripts/validate-content.mjs`):
   match the folder name under `public/sites/` **exactly**.
 - `url` must be `https`, and there must be a favicon at
   `public/site-icons/<subdomain>.svg` unless the entry sets its own `icon`.
-- `tags` needs at least one value, `description` at least 20 characters, and
-  `show` must be a boolean.
+- `tags` needs at least one value and `description` at least 20 characters.
+- Use a boolean `show` value and keep the static folder name aligned with the subdomain; these are authoring conventions, not all enforced by the validator.
 
 ### SEO checklist for a new site
 
@@ -77,11 +78,10 @@ The best references are `public/sites/passwordgen/` and
 
 ### Ads
 
-Every static subdomain page must include the Adcash auto-tag (zone
-`iy7zk7mmw`) directly in its `<head>`, ungated, because these pages render
-outside Next.js and have no cookie banner. The loader is async, so poll briefly
-for `aclib` before calling `runAutoTag` — copy the block from an existing page
-such as `public/sites/passwordgen/index.html`.
+Do not blindly copy tracking or advertising scripts into a new tool. Static
+subdomains render outside the Next.js consent provider, and some have their
+own cookie notice. Review the privacy requirements and consent behavior first;
+keep sponsored links visibly disclosed. See README's privacy section.
 
 ### Design conventions
 
@@ -94,10 +94,10 @@ restore, CSS custom properties, a `.sr-only` utility, a skip link and a
 
 ## Changing the homepage
 
-Homepage markup lives in `app/page.tsx` and shared components in
-`components/`. Styling is split between the hand-written `app/globals.css` and
-`app/overrides.css` (which carries most of the visual design — read the
-comments there). Prefer the existing CSS custom properties and component
+Homepage markup lives in `components/home-page.tsx`; `app/page.tsx` supplies
+the route. Shared components live in `components/`. Styling uses hand-written
+CSS; `app/directory.css` owns editor's picks and the refreshed featured cards.
+Read the README's style load order before changing overrides. Prefer the existing CSS custom properties and component
 patterns over new abstractions.
 
 Two accessibility rules the homepage relies on:
@@ -109,9 +109,10 @@ Two accessibility rules the homepage relies on:
 
 ## Environment variables
 
-`env.example` lists every key the project expects, with placeholders only. Add
-new keys there (never in `.env`, which is git-ignored) and describe them in
-`README.md` if they change how something behaves.
+README documents keys and the runtime each belongs to. Configure secrets in
+hosting environment settings and Worker secrets separately. Never commit
+credential values or read existing secrets into logs. Public GitHub statistics
+require no key. In Freebuff, workspace Git authentication is managed automatically.
 
 ## Pull requests
 
@@ -119,7 +120,9 @@ new keys there (never in `.env`, which is git-ignored) and describe them in
 - Do not commit secrets, build output, or `node_modules/`.
 - Make sure `npm run check` passes, and describe the change and why it is needed.
 
-## License
+## Content and releases
 
-By contributing you agree that your work is released under the [MIT
-License](LICENSE).
+Curated lists and the editorial shortlist are edited in `config/`; README
+includes field examples and maintenance guidance. For a release, bump
+`package.json`, the root package-lock metadata, and the newest changelog entry
+together. Verify source/asset licensing before contributing third-party material.

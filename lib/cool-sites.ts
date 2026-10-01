@@ -1,4 +1,5 @@
 import coolSites from "@/config/cool-sites.json";
+import { matchesQuery } from "@/lib/search";
 
 // A hand-picked, off-directory link: a cool site that lives at its own
 // address (not a base31.org subdomain). The list is edited purely through
@@ -30,14 +31,9 @@ export const coolSiteCategories: string[] = (() => {
     .map(([category]) => category);
 })();
 
-/** Everything about a cool site that a search should look at, lowercased. */
-const index = (site: CoolSite) => `${site.name} ${site.url} ${site.category} ${site.tags.join(" ")} ${site.description}`.toLowerCase();
-
 /** The cool sites matching a hero-search query (all of them when it is empty). */
 export const searchCoolSites = (query: string): CoolSite[] => {
-  const needle = query.trim().toLowerCase();
-  if (!needle) return allCoolSites;
-  return allCoolSites.filter((site) => index(site).includes(needle));
+  return allCoolSites.filter((site) => matchesQuery(site, query));
 };
 
 export default allCoolSites;

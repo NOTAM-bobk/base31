@@ -38,7 +38,7 @@ export const EN = {
   subtitle:
     "Discover fun websites, useful online tools, and creative web projects built on base31.org and the open web.",
   surprise: "Surprise me",
-  searchPlaceholder: "Search all sites...",
+  searchPlaceholder: "Search everything… try #utility",
   searchAria: "Search all sites",
   featured: "Featured sites",
   featuredClosed:
@@ -90,7 +90,7 @@ export const ES: Dictionary = {
   subtitle:
     "Descubre sitios divertidos, herramientas útiles en línea y proyectos web creativos hechos en base31.org y en la web abierta.",
   surprise: "Sorpréndeme",
-  searchPlaceholder: "Buscar todos los sitios...",
+  searchPlaceholder: "Buscar todo… prueba #utility",
   searchAria: "Buscar todos los sitios",
   featured: "Sitios destacados",
   featuredClosed:
@@ -141,7 +141,7 @@ export const FR: Dictionary = {
   subtitle:
     "Découvrez des sites amusants, des outils en ligne utiles et des projets web créatifs construits sur base31.org et le web ouvert.",
   surprise: "Surprends-moi",
-  searchPlaceholder: "Rechercher tous les sites...",
+  searchPlaceholder: "Tout rechercher… essayez #utility",
   searchAria: "Rechercher tous les sites",
   featured: "Sites en vedette",
   featuredClosed:
@@ -192,7 +192,7 @@ export const PT: Dictionary = {
   subtitle:
     "Descubra sites divertidos, ferramentas online úteis e projetos web criativos feitos no base31.org e na web aberta.",
   surprise: "Surpreenda-me",
-  searchPlaceholder: "Pesquisar todos os sites...",
+  searchPlaceholder: "Pesquisar tudo… tente #utility",
   searchAria: "Pesquisar todos os sites",
   featured: "Sites em destaque",
   featuredClosed:

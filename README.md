@@ -1,984 +1,289 @@
+<div align="center">
+
 # base31.org
-Google Analytics verification. The tag below is Google's own snippet, served
-inline in the `<head>` from `app/layout.tsx` (the id lives in `lib/analytics.ts`)
-first thing on every page, so it is part of the HTML Google is asked to verify
-instead of being appended after the page has loaded. It runs on every visit —
-before the cookie banner is answered and whatever the answer turns out to be —
-because a tag that waits for a click is invisible to the check it exists for.
-The banner still decides whether Microsoft Clarity records a session and whether
-the ad network loads.
+### A small directory for a very big web.
 
-  add this code to the main page of base31:   
-  <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-W6J79P13FT"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
+Useful browser tools, playful websites, public APIs, creative apps, and AI picks—curated together, searchable in one place.
 
-  gtag('config', 'G-W6J79P13FT');
-</script>  
+[Visit the directory](https://base31.org) · [Explore the tools](https://base31.org/tools) · [What's new](https://base31.org/whats-new) · [Report an issue](https://github.com/NOTAM-bobk/base31/issues)
 
+![CI](https://github.com/NOTAM-bobk/base31/actions/workflows/ci.yml/badge.svg)
+![Next.js](https://img.shields.io/badge/Next.js-14-111111?logo=nextdotjs)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.6-3178C6?logo=typescript&logoColor=white)
 
-   Below is the Google tag for this account. Copy and paste it in the code of every page of your website, immediately after the <head> element. Don’t add more than one Google tag to each page.  
-     
-  
-A homepage/directory for `base31.org` that lists every subdomain site, plus
-the sites themselves — all deployed together as one Vercel project.
+</div>
 
-## How it works
+---
 
-- `middleware.ts` looks at the request's `Host` header. If it's a subdomain
-  of `base31.org` (e.g. `example.base31.org`), it rewrites the request to
-  the matching folder under `public/sites/<subdomain>/`. If it's the bare
-  domain (`base31.org` / `www.base31.org`), the request passes through
-  normally and Next.js renders the homepage.
-- The homepage (`app/page.tsx`) reads `config/sites.json` and lists every
-  entry marked `"show": true` as a directory card.
-- Each subdomain site is a **plain static site** (HTML/CSS/JS, no build
-  step) living in its own folder under `public/sites/`. This keeps adding a
-  new site as simple as dropping in a folder.
+## What is this app?
 
-```
-├── config/
-│   ├── sites.json         ← the directory's data (edit this)
-│   ├── blogs.json         ← SEO blog posts
-│   ├── donations.json     ← donation board entries
-│   ├── referrals.json     ← sponsored referral carousel
-│   ├── cool-sites.json    ← "Other cool sites" strip
-│   ├── cool-apis.json     ← "Cool APIs" strip
-│   └── cool-apps.json     ← "Cool apps" strip
-├── public/
-│   ├── site-icons/        ← one favicon per directory entry
-│   └── sites/
-│       └── example/       ← one subfolder per subdomain
-│           └── index.html
-├── middleware.ts           ← subdomain → folder routing
-└── app/                    ← the homepage itself
-```
+**base31 is both a discovery directory and a collection of independent web tools.** The Next.js app serves the directory, editorial pages, and SEO guides. Plain HTML/CSS/JavaScript tools live in this same repository and are served on their own `*.base31.org` subdomains. A separate Cloudflare Worker handles shared counters, votes, community publishing, and notification subscriptions.
 
-## Adding a new site
+### What visitors can do
 
-1. Create a new folder: `public/sites/<subdomain>/` (e.g. `public/sites/blog/`).
-2. Put a static `index.html` in it (plus any css/js/images it needs — link
-   to them with relative paths, e.g. `<link href="style.css">`).
-3. Add an entry to `config/sites.json`:
+- Search **Featured sites, Other cool sites, Cool APIs, Cool apps, and Cool AIs** by name, URL, description, category, or tags.
+- Use `#utility` or `tag:no-key` for an exact tag; combine words such as `#utility image` to narrow results. Normal browsing starts with nine cards per section; search shows every match.
+- Discover a rotating **Editor's picks** shortlist, browse categories, pin featured sites, sort them, or open a random matching pick.
+- Read detail pages at `/sites/<slug>` with related picks, recorded addition/review dates, voting, canonical metadata, and structured data. Deeper tool guides live at `/tools/<subdomain>`.
+- Vote on featured and external picks, publish a community static site, or opt into email/push updates.
+- Browse in English, Spanish, French, or Portuguese, with dark/light themes and reduced-motion support.
 
-```json
-{
-  "name": "Blog",
-  "subdomain": "blog",
-  "url": "https://blog.base31.org",
-  "tags": ["writing"],
-  "description": "Long-form posts.",
-  "show": true
-}
-```
+The homepage hero shows views, distinct linked destinations, and **estimated** source lines. Unique visitor reporting remains on `/stats`.
 
-4. Commit and push. Vercel builds and deploys automatically, and
-   `blog.base31.org` starts working immediately (no separate deploy step
-   needed) once the wildcard domain is set up — see below.
+## Quick start
 
-Set `"show": false` to keep a site live on its subdomain without listing it
-on the homepage.
-
-### A subdomain page's SEO checklist
-
-`public/sites/share/` and `public/sites/appscreenshot/` are the two worked
-examples of a full static page — copy their `<head>` when adding another. Each
-one ships:
-
-- a keyword-first `<title>`, a `<meta name="description">`, a `<link
-  rel="canonical">` on its own subdomain, plus `robots`, `color-scheme`,
-  `theme-color` and `application-name` tags.
-- `og:*` and `twitter:*` tags. The social image points at the apex
-  `https://base31.org/opengraph-image` (`app/opengraph-image.tsx`), because
-  these folders hold no PNGs of their own.
-- one `application/ld+json` `@graph` per page holding its `WebSite`, its
-  `WebApplication` and — where the page shows a FAQ — an `FAQPage` whose
-  `mainEntity` mirrors the visible `<details>` list. No node appears twice, and
-  `publisher` / `isPartOf` reference the apex `https://base31.org/#organization`
-  and `#website` ids from `components/structured-data.tsx`.
-- its own `robots.txt` and `sitemap.xml`. The apex `app/robots.ts` and
-  `app/sitemap.ts` only describe base31.org, and the middleware rewrites those
-  paths on a subdomain to `<site>/robots.txt` / `<site>/sitemap.xml`.
-
-Legal pages live on the apex, so a subdomain footer links out with absolute
-URLs (`https://base31.org/terms`, `https://base31.org/privacy`) — `/terms` on
-`example.base31.org` resolves under `public/sites/example/` and would 404.
-`appscreenshot/index.html` also carries the Adcash auto-tag (zone
-`iy7zk7mmw`, the same zone as `components/consent-aware-ads.tsx`) directly in
-its `<head>`; the loader is `async`, so the page polls for `aclib` before
-calling `runAutoTag`. Unlike the homepage it is ungated — that static page has
-no cookie banner of its own.
-
-## Referral carousel
-
-The "Referrals worth a look" carousel sits just below the launch clock and is
-labelled `ad`. It is driven by `config/referrals.json`:
-
-```json
-{
-  "name": "Cloudflare",
-  "url": "https://www.cloudflare.com/?ref=your-code",
-  "description": "The edge network and DNS that keeps base31 fast.",
-  "tag": "referral",
-  "image": "https://example.com/custom-card.png",
-  "show": true
-}
-```
-
-| Field | Required | Notes |
-| --- | --- | --- |
-| `name` | yes | Shown on the card |
-| `url` | yes | `https://` destination; put your referral/affiliate link here. Cards open in a new tab with `rel="noreferrer sponsored"` |
-| `description` | yes | One sentence, at least 20 characters |
-| `tag` | no | Small badge next to the name |
-| `image` | no | Override the card image |
-| `show` | no | `false` hides the entry |
-
-If `image` is omitted the card shows a live screenshot of the destination
-(WordPress mShots, no API key), falling back to the destination's own favicon
-and then a lettered tile, so a blocked image never leaves an empty box. These
-previews load whatever the visitor answered in the cookie banner — the card is
-unusable without its picture, they set no cookies, and the privacy page says
-so. Entries rotate
-every 7 seconds (paused on hover or focus, and never auto-rotating when the
-visitor prefers reduced motion), with arrows, dots, arrow-key and swipe
-support.
-
-Add entries to the array and the carousel picks them up — no code changes.
-Run `npm run validate:content` to check `sites.json`, `blogs.json`,
-`referrals.json` and `donations.json` (plus `cool-sites.json`,
-`cool-apis.json`, `cool-apps.json` and `changelog.json`) in one go, and do it
-before pushing.
-
-All the files under `config/` are imported straight into the build, so a file
-that is not valid JSON stops the deploy before a single page renders, with an
-unhelpful `Unexpected non-whitespace character` / `Expected ',' or ']'` from the
-bundler. Two ways to do that by accident:
-
-- An unescaped `"` inside a description or blog body string (`judging its
-  "engagement" value` needs `\"`). This already took down one deploy.
-- A new entry pasted **after** the array's closing `]` instead of before it,
-  which leaves both the orphan object and a stray trailing comma.
-
-## Sitemap, FAQ and on-page extras
-
-- `app/sitemap.ts` is generated at build time from `lib/blogs.ts` (which reads
-  `config/blogs.json` plus the editorial posts) and `config/sites.json`, so a
-  new blog post or directory entry shows up in `/sitemap.xml` on the next
-  deploy with nothing to update by hand. Sites with `"show": false` are  left out, and community uploads are not listed (they are only known at runtime).
-- `/stats` and `/whats-new` are server-rendered inner pages. Neither uses
-  `data-reveal`: the reveal observer lives in `app/page.tsx`, so a section
-  marked for it on another route would stay at opacity 0. `/stats` reads
-  `GET /stats` from the worker and caches for five minutes; `/whats-new`
-  renders `config/changelog.json`. Both carry their own `openGraph` for the
-  usual reason (see below).
-- The changelog is newest-first, and its **top entry must match the `version`
-  in `package.json`** — the footer prints that version and links it to
-  `/whats-new`, and `/whats-new` opens by naming it. `npm run validate:content`
-  fails if the two drift or if the list is out of order, so bump both in the
-  same commit.
-- Every published tool also has a guide at `/tools/<subdomain>`, generated
-  from `lib/tool-pages.ts` plus its `config/sites.json` entry, with an index at
-  `/tools`. The copy there is written fresh for search intent ("free qr code
-  generator") rather than copied from the tool's own subdomain, so the two
-  pages do not compete for the same query — each guide links out to the live
-  tool, and the subdomain keeps its own canonical. A guide publishes one
-  `@graph` with `WebPage`, `SoftwareApplication`, `BreadcrumbList` and
-  `FAQPage`; it references the layout's `#website` and `#organization` by id
-  instead of repeating them. `npm run validate:content` fails if a listed site
-  has no guide, if a guide has no matching site, or if a guide's copy is thin
-  (missing headline, an out-of-range meta description, fewer than two intro
-  paragraphs, three features or two questions).
-- There are three decorative sparkles, all Glitter Graphics GIFs with
-  transparent backgrounds, served from this origin rather than hotlinked: a
-  third-party image would be an unconsented request to someone else's CDN, and
-  the file could be swapped upstream at any time. `public/header-sparkle.gif`
-  (40×40) sits inside the wordmark link in the header; `public/footer-sparkle.gif`
-  (64×64) sits in the bottom-of-page block, beside the sponsor line; and
-  `public/about-sparkle.gif` sits at the top right of the "about the directory"
-  heading, with its own credit link under the copy. All three are decorative
-  (`alt=""`, the header one inside a link that already has a label), all three
-  are hidden under `prefers-reduced-motion`, and the credit their source asks
-  for is next to the copyright line in the footer.
-- The bottom block is `components/footer-sponsor.tsx`, rendered at the end of
-  `main` just above the footer. It exists as its own component so the bottom of
-  the page can be edited without opening `app/page.tsx`, which is long enough
-  that edits near its end are awkward.
-- `/sponsor` documents the two paid slots (a referral carousel card and the
-  support button), how to book one, and the house rules, and it doubles as the
-  page-level disclosure for the sponsored cards. It is linked from the line
-  under the referral carousel, from the bottom block, and from the footer. A
-  directory listing is deliberately *not* for sale: publishing a community site
-  is free, and that is stated on the page so nobody buys the wrong thing.
-- `app/late.css` is imported last and holds small corrections to rules that
-  already exist in `overrides.css`: same specificity, later file, so it wins.
-  It is not the place for a component's main styling — that belongs in
-  `overrides.css` or `inner-pages.css`.
-- `app/inner-pages.css` styles those two routes and is imported after
-  `overrides.css` in `app/layout.tsx`. `overrides.css` is deliberately left to
-  the homepage: it is large enough that edits to it are no longer reliable.
-- `components/faq.tsx` renders the FAQ above the footer together with its
-  matching `FAQPage` structured data. Edit the `FAQS` array there and both the
-  copy and the schema stay in sync. Every question is a native
-  `<details>`/`<summary>` disclosure, so the list starts closed, toggles with
-  no JavaScript, and keeps each answer in the served HTML — collapsing the
-  list never hides the copy from a crawler, and the schema repeats it anyway.
-- Structured data is split so no graph is emitted twice:
-  `components/structured-data.tsx` is rendered once from the root layout and
-  holds the page-agnostic `Organization` + `WebSite` nodes (the site's
-  `publisher`), while `app/page.tsx` adds the directory's `ItemList`. Any new
-  schema belongs to exactly one of those, not both.
-- Setting `openGraph` in a page's `metadata` replaces the layout's object
-  rather than merging it, so `/about`, `/privacy`, `/terms` and the blog repeat
-  `siteName`, `locale` and a page-accurate `url` — otherwise `og:url` would
-  point at the homepage while `canonical` said otherwise.
-- Sections marked `data-reveal` fade in as they scroll into view. The gate is
-  the `data-motion="enabled"` attribute that `app/layout.tsx` adds before first paint, so nothing is
-  ever hidden for visitors without JavaScript, and it is skipped entirely for
-  `prefers-reduced-motion`.
-- The "has been revealed" marker is the `data-revealed` **attribute**, not a
-  class. React rewrites `class` whenever a card's `className` prop changes —
-  pinning a site adds `is-pinned` — which wiped the observer's class and left
-  that card stuck at opacity 0 as a blank gap. Keep the marker off the
-  `className` string.
-- That observer re-runs off the set of cards that are actually shown
-  (`shownSites` in `components/home-page.tsx`), not the list's length: a
-  "Show all", a new sort, or the vote totals arriving can mount a different
-  card while the length is unchanged, and keying on length alone left that
-  card at the hidden `opacity: 0` it shipped with — another blank gap in the
-  grid.
-- The homepage nudges visitors who move their pointer out of the top of the
-  window with a "wait, don't go" dialog suggesting a site they have not seen.
-  It is desktop-pointer only, waits 8 seconds, shows at most once per session,
-  and never appears over another dialog.
-- Every directory card leads with the site's own favicon. Kept sites serve it
-  from this project at `public/site-icons/<subdomain>.svg` — same-origin, so it
-  costs no third-party request — and `SiteIcon` in `app/page.tsx` falls back to
-  a generated tile if that image is missing or blocked. A community upload has
-  no icon here, so its card asks its own origin for `/favicon.ico`. Point an
-  entry somewhere else with `"icon": "/path.svg"`. `npm run validate:content`
-  fails if a site has no favicon file, so a new entry cannot ship without one.
-  The generated tile is `SITE_GLYPHS` + a hashed HSL gradient, kept as the
-  fallback; add a shape by appending to that array.
-- Community uploads fresh within 14 days get a `new` badge.
-- The "Featured sites" heading *is* the minimize control: the label is
-  underlined and the chevron sits beside it with no box of its own, and both
-  live inside the same `.sites-toggle` button, so clicking either the text or
-  the arrow opens and closes the directory (filters, sort and every card)
-  without clearing the visitor's search or tag. The panel is
-  `<div id="sites-panel">` behind `aria-expanded`/`aria-controls`, hidden with
-  the `hidden` attribute, and the arrow rotates to `-90deg` when collapsed.
-- The hero carries one call to action: "Surprise me". The "Why base31?" anchor
-  and the original "Browse all sites" link are both gone — the directory is the
-  next thing down the page and the rail already steps to About, so each only
-  duplicated something else within reach.
-- Four figures sit above the hero search and its one button
-  (`components/hero-stats.tsx`): the directory's views (the live view
-  counter), its unique visitors (the same readership counted once per person,
-  reported by the same request as the view count), the websites it links out to
-  (`allSites` plus `coolSites`) and the project's size in lines of code
-  (`LINES_OF_CODE` in `components/hero-stats.tsx`). They carry no tray — the numbers sit straight on the page in the
-  display face (`--font-display`), with only a small caps label under each.
-  `useCountUp` climbs each one from zero with an ease-out in a rAF loop and
-  holds the final value; the two figures that come from the worker wait for it
-  to answer and show an em dash until it does. Under `prefers-reduced-motion`
-  the hook jumps straight to the final number, because the figure is
-  information rather than decoration.
-- The hero headline is rendered one `<span>` per word, which is what lets it
-  rise into place on load: `h1-word-in` in `app/late.css` fades each word up
-  from below with a per-word delay set inline in `components/home-page.tsx`,
-  and the animation fills backwards so a word is invisible until its turn.
-  The negation in the middle wears the accent — "Not" in "Totally Not Boring
-  Websites", "nada"/"pas" in the other locales, matched by `HERO_ACCENT_WORD`
-  — as a marker highlight and a green underline sized in `em`, so every
-  translation gets the same accent in the same slot instead of only the English
-  one being styled. Real spaces sit between the spans, so the line still wraps
-  on a phone, and `prefers-reduced-motion` shows the words in place.
-- "Surprise me" in the hero opens a random entry — from the current filter
-  results when a search is active, otherwise from the whole directory. It sits
-  directly under the hero numbers, and it is red: `--danger` as a solid fill,
-  white ink on it in both themes (`--on-danger`), and a bolt badge that
-  brightens with it. The base pill rule is in `app/overrides.css` — shape and
-  motion only, it deliberately sets no colour — and `app/late.css` owns the red
-  fill; its sheen/spin is disabled under `prefers-reduced-motion`.
-- Directory cards are sized around a shorter preview band — a 640x300 shot
-  that matches the band's own `aspect-ratio: 640 / 300`, so the screenshot is
-  neither cropped nor letterboxed — with a tighter padded half and a 15px name,
-  and the vote pair in the card's foot is 32px tall —
-  38px on a coarse pointer, which is the height the rest of the site's touch
-  targets already use. The sizing and the taller thumbs live at the end of
-  `app/late.css`, deliberately after the card's material, because the card's
-  own rules in `globals.css` and `app/overrides.css` are what they have to win
-  against (the coarse-pointer rule needs the extra `.site-card-lower` class for
-  the same reason).
-- The footer's links read as links: one blue token (`--link`, a light blue on
-  black and a deep blue on the light theme's grey) with a real underline that
-  thickens on hover. The pill controls that sit among them — the contact
-  details and the language switcher — take the same blue but keep their own
-  material, because an underlined pill reads as a broken chip rather than a
-  link.
-- Both themes are one token set at the top of `app/globals.css`, and the light
-  one is finished in `app/late.css`: a deeper `--live` (≈4.9:1 on the light
-  surface, so 9–11px accent text clears AA), a stronger `--line` and
-  `--line-strong` because card edges on paper have less to work with, a much
-  lighter `--shadow`, and light-theme weights for the surfaces that carried a
-  shadow written for black (the support board's ad slots and the favicon
-  tiles). Prefer a token; only write a
-  `html[data-theme="light"]` rule when a value is hard-coded, as
-  `.support-banner-ad` and the community panel's primary action are.
-- The hero ends at the search field: the page band (`.page-band`) is a
-  full-bleed grey slab that starts just under the search bar and runs down to
-  the footer, so everything you browse — the quick jumps, the directory, the
-  three strips, the support hub and the FAQ — sits on grey while the header,
-  headline, stats and search stay on the page background. It breaks out of
-  `main`'s centered column with a `100vw` width and an offset margin, then pads
-  its content back to the same measure so the cards inside stay aligned with
-  the header; `--page-band` carries the two theme values in `app/late.css`.
-  The band has no hard edges: its top is a gradient that starts on the page
-  background and eases into the grey over its first 88px of padding — the
-  content begins after the fade, so the first section still lands on solid
-  grey — and its bottom eases the other way into the tint the footer opens on.
-  `.home-main` drops `main`'s bottom padding and the intro its bottom margin so
-  the grey reaches the footer with no seam of page background under it.
-- Four quick-jump keys sit under the search field — Featured sites, Other
-  cool sites, Cool APIs and Cool apps — each an in-page anchor to `#sites`,
-  `#cool-sites`, `#cool-apis` and `#cool-apps` with the list's length as its
-  caption. They are
-  plain anchors on purpose (no routing): the browser scrolls, `scroll-margin-top`
-  on the target keeps the heading clear of the fixed header, and the rail
-  follows the move like any other scroll. They share the search field's 480px
-  measure and stack into four compact rows below 600px. Each one is raised
-  rather than outlined — a lit green hairline along the top, a shallow gradient
-  falling to a darker floor, an inner highlight and a shadow beneath it, and a
-  glow in the corner that lights up under the pointer — so the strip reads as
-  four things you could press. Their labels are set in the headline's own
-  handwriting (`--font-hand`) at 16px, which is what gives the strip a voice of
-  its own instead of blending into the body text under it.
-- The headings that open the page's collapsible sections — Featured sites,
-  Other cool sites, Cool APIs, Cool apps, Support, About and the FAQ — are set
-  in the house hand (`--font-hand`) too, at 19px: the same face as the wordmark,
-  the headline and the quick-jump labels above them, so a section's name reads
-  the same whether it sits on a key or on the heading it opens. The rules live
-  with the other typefaces in `app/late.css`; `.sites-toggle` picks the face up
-  through its `font: inherit`, so the button inside the heading matches.
-- The hero search reaches all three strips under the directory, not only the
-directory itself: `searchCoolSites` in `lib/cool-sites.ts`,
-`searchCoolApis` in `lib/cool-apis.ts` and `searchCoolApps` in
-`lib/cool-apps.ts` are the matchers those places share, so a
-query that matches an off-directory pick opens the strip (if it was folded
-away), filters its cards, changes its count to `n of <total>`, and is named in
-the directory's empty state instead of dead-ending there.
-- "Other cool sites" (`config/cool-sites.json`), "Cool APIs"
-  (`config/cool-apis.json`) and "Cool apps" (`config/cool-apps.json`) are the
-  same section three times: a foldable strip of
-  small external cards, each one a name, a host and one line of why it is worth
-  the trip. Both are rendered by `components/link-strip.tsx`, which owns the
-  folding heading, the count, the search and the card markup; the two files
-  beside it only supply their list and their dictionary strings, so the strips
-  cannot drift apart. "Cool apps" was added the same way — a config file, a
-  `lib/` helper and a thin wrapper over `LinkStrip`. Entries are external URLs by design — the validator
-  rejects anything pointing at a base31.org subdomain, which belongs in
-  `sites.json` instead.
-- All three strips carry a category chip row: each entry in
-  `config/cool-apis.json` names one of eleven broad `category` values, each in
-  `config/cool-sites.json` one of seven (`Toys`, `Design & code`, `Knowledge`,
-  `Games`, `Art & calm`, `Places`, `Sounds`) and each in `config/cool-apps.json`
-  one of nine (`Draw & design`, `Images`, `Developer`, `Documents`,
-  `Productivity`, `Writing`, `Math & science`, `Media & sound`, `Utilities`) —
-  coarser than the free-form `tags`, which run to dozens of values and would be
-  a wall of chips. `coolApiCategories` in `lib/cool-apis.ts`,
-  `coolSiteCategories` in `lib/cool-sites.ts` and `coolAppCategories` in
-  `lib/cool-apps.ts` compute their own lists busiest first, and the shared
-  strip renders the row and narrows its cards to the chosen category. The chips
-  combine with the hero search rather than replacing it, and the count reflects
-  both. A strip only shows the row when it is handed `categories`.
-- Every long list on the page is cut at nine cards — the directory
-  (`SECTION_PREVIEW`) and all three strips (the shared
-  `components/link-strip.tsx`) — and ends on a single `.show-all` line that
-  carries the count of what is held back (`+43` while it is hidden, `-43` once
-  it is showing). Nine fills the three-column grid exactly, so a section lands
-  as whole rows instead of leaving one card stranded on a line of its own.
-  Pressing the line opens the rest or folds it back down, and a new search, tag
-  or category chip starts a short list again, so the cut is never left open from
-  an earlier look at the page.
-- A slim column of small lines down the right edge
-(`components/section-rail.tsx`) is the section readout and the fast way between
-sections. It is drawn as part of the page rather than as a panel lying on top of
-it: no fill, no border, no blur and no shadow, so the bars sit straight on the
-background in the gutter, and the scrollbar is hidden because there is no frame
-left for one to sit in. The only thing the rail draws over the page is the label
-that opens for the section you are in, which travels with a faint wash of the
-page colour so it stays readable wherever it reaches. Every section is rendered,
-so the whole page is reachable from the rail: `max-height` caps the column and
-`overflow-y: auto` turns it into a scroll container, so the wheel and a drag
-walk the list itself, and the current line is scrolled back into view
-(`scrollTo` on the nav, not `scrollIntoView`, so the page never moves) whenever
-the page scrolls. It is always visible, from the first screen on at every width:
-bars with sliding labels on a wide monitor, shorter bars without labels below
-1180px, and a slim strip of bars below 820px.
-The line for the section you are reading rotates flat-to-vertical and turns
-green while its label slides out; clicking a line scrolls there and the arrow
-keys walk the list one section at a time — the keys are the section ids. The
-section list and its labels live in `components/home-page.tsx`. Every step it
-takes buzzes once through the Vibration API, and the header's nav links do the
-same on the way out.
-- The directory is filterable by tag (chips built from `config/sites.json`,
-  most used first, capped at `MAX_TAG_CHIPS`) and sortable by **Most liked**,
-  **Newest** or **A–Z**. Pinned sites stay on top in every mode, and a tag or
-  sort choice narrows what "Surprise me" picks from.
-- On a 1000px-and-wider screen the shell is 1080px and the directory is a
-  two-column grid; the donation board and prose stay capped at a readable
-  measure so the extra width goes to the cards.
-- The **support button** at the foot of `main` (`.support-ad`) is the sponsored
-  strip that pays for the page: an `ad` tag, "Want to support base31? Click this
-  button to help", and an arrow, linking out with `rel="noreferrer sponsored"`.
-  It sits directly under the referral carousel where it lived before, is a
-  plain link, and therefore needs no consent gate. Its base rule is in
-  `globals.css` (dashed frame); the solid material, hover lift and the tag/text/
-  arrow pieces are in `app/overrides.css`.
-- The hero search is one solid control (`.search-wrap` in `app/overrides.css`):
-  a raised field, the glyph in its own tile, a green ring on focus, and a
-  clear button that takes the place of the `/` hint once there is a query.
-- Two display faces are loaded through `next/font/google` in `app/layout.tsx`,
-  which self-hosts the files and exposes them as `--font-display` (Titan One,
-  used for the names on the cards) and `--font-hand` (Gochi Hand, used for the
-  header text: the wordmark and the homepage headline). Because next/font
-  downloads them at build time, no page ever requests fonts.googleapis.com, and
-  `app/late.css` holds the rules that apply them — the only place a face is
-  named.
-- `.section-divider` is the styled `<hr>` between the homepage's standalone
-  blocks (supporters, launch clock, referrals): a hairline that fades at both
-  edges with a diamond marker. It owns the gap on both sides through
-  `.section-divider + *`, so the blocks keep their own top margins only when
-  they are *not* following a divider — do not add spacing to those instead.
-- Every full-width block (donation board, launch clock, referrals and "stay in
-  the loop") shares one radius via the `--radius-card` token, so the page has a
-  single card silhouette.
-- The header is the app bar: `position: fixed` over a blurred, mostly opaque
-  background. `body:has(.site-header) { padding-top: 64px }` (58px on narrow
-  screens) gives the bar's height back to the flow, so nothing else moved when
-  it left the flow — keep those two numbers in sync if the bar's height
-  changes. The `:has()` scope matters: the blog, about, privacy and error pages
-  render no header, and must not inherit its offset. Every `[id]` carries a
-  matching `scroll-margin-top`, so in-page anchors still land below the bar.
-- The header's right-hand slot holds `components/github-stats.tsx` — the GitHub
-  mark, the repository's commit count and a small "commits" label, linking to
-  the source. It replaced the Share button; the share sheet is still reachable
-  with the `S` shortcut, which was never the button's own handler.
-  - The count comes from the public GitHub API with no key: one commit per
-    page, and the last page number in the `Link` response header is the total.
-    It is cached in `localStorage` for an hour because the unauthenticated API
-    allows only 60 requests per hour per IP. A refused request leaves the dash
-    in place — the link still works, it just shows no number.
-- The header markup lives in `components/site-header.tsx` so the homepage below
-  the fold stays editable. The language switcher is no longer in it: the four
-  locales sit in the footer on their own row, under the links and the contact
-  details, and the footer band itself carries a solid `--surface` tint instead
-  of the page background.
-- The subscribe block (`components/directory-notifications.tsx`, `#updates`)
-  is the last thing in `main`, directly above the footer and *below* the FAQ,
-  so the page ends on the call to action. Its email field and the button beside
-  it share the softer 14px rounding of the site's own input box
-  (`.search-wrap`); everything else about the block is unchanged.
-- `components/code-backdrop.tsx` is the typing-code wallpaper behind the page.
-  It is server rendered and CSS-only: no JavaScript, no timer, one stepped
-  width animation per line, staggered with negative delays so the lines never
-  restart in sync. It is `aria-hidden`, ignores pointer events, and every line
-  is measured in `ch` so it types exactly as wide as its own text.
-- A directory card is one link (`.site-card-body` — the preview band, the
-  centred title, the favicon + host row, the description and the tags). The pin
-  and the two votes both stay outside that link: the pin floats at the card's
-  top-right corner over the preview (`.favorite-button`, absolutely positioned,
-  a translucent dark pill so the white heart reads on any screenshot in either
-  theme) and the votes live in the `.site-card-foot` bar underneath. Keeping
-  the buttons outside the link is what lets the whole information block be
-  clickable without nesting interactive elements. Pinned cards get a green
-  spine; `SiteIcon` is 38px (34px on phones).
-- The site name is the card's title: centred on its own line, above
-  `.site-card-strip` (a green gradient band that fades out at both ends and
-  carries a soft glow) and the centred meta row holding the favicon and the
-  `↗` marker underneath it. The host used to be printed there too; the card's
-  own name and the arrow say where it goes, so it is gone. That is why `.site-card-info` centres its
-  children and the old `.site-card-ident` column is gone — the name is no
-  longer part of the meta row. `SiteIcon` moved down into that row with it,
-  and `.site-name` keeps `min-width: 0` so an overlong name still ellipsizes
-  instead of pushing the card wider.
-- The two thumbs are stacked in `.vote-stack` with the up vote above the down
-  vote, so the pair reads as one control; the pin stays beside the stack,
-  vertically centred by `.site-actions`. The footer bar now holds only the two
-  votes, so it keeps a shallow `3px 15px 7px` padding that lifts the thumbs a
-  little higher in the card; phones tighten it further through a
-  `.site-card .site-card-foot` override (one extra class, so it wins whatever
-  the source order).
-- Every card opens with a screenshot of its destination — the WordPress mShots
-  call the referral carousel uses, with thum.io (which the App Screenshot page
-  already depends on) as a second try, so every kept site gets a preview with
-  no image to maintain and no API key (see `SitePreview` in `app/page.tsx`).
-  Both services are asked for a 640x300 shot, the band's own ratio, so the
-  screenshot lands in it whole. A gradient fades the shot into `--surface`, which is why the
-  card's fill is a solid `--surface` and never changes on hover: a moving fill
-  would leave a seam where the fade meets the body. The band keeps the site's
-  hashed gradient underneath, so a slow or blocked screenshot still shows a
-  deliberate tile instead of a grey box.
-- Both the chips and the sort options are filled controls (solid fill, visible
-  edge, shadow, and a pressed state) rather than outlines, and the card tags
-  are filled chips in the same material. The active sort option is the raised
-  key in a recessed rail.
-- The footer's **Source code** button is the GitHub link, kept beside the plain
-  footer links (`.footer-source`).
-- Dark/light switching eases every surface at once. `switchTheme` in
-  `app/page.tsx` adds `theme-fade` to `<html>`, flushes the layout, then flips
-  the theme, and removes the class after 480ms, so the transition only covers
-  the swap; the rule is inside `@media (prefers-reduced-motion:
-  no-preference)` as well as guarded in JS. The class is removed on unmount
-  too, because `<html>` outlives client-side navigation.
-
-## Accessibility notes
-
-- Dialogs (share, milestone, publish, exit nudge) move focus in when they open,
-  keep Tab inside, and hand focus back to whatever opened them — see
-  `useDialogFocus` in `app/page.tsx`.
-- `.sr-only` is defined in `app/overrides.css`. `globals.css` is hand-written
-  CSS with no Tailwind utilities layer, so every `sr-only` label in this
-  project would otherwise print into the page.
-- The search field is inside a `role="search"` landmark and names itself with
-  `aria-label="Search all sites"`. It used to be wrapped in a `<label>` whose
-  only text was the "/" shortcut hint, so the field was announced as "/".
-- The search clear button is labelled "Clear the search" and hands focus back
-  to the field, so clearing never drops keyboard users off the input. The
-  browser's own clear glyph is suppressed in favour of it.
-- The code backdrop is decorative, so it is `aria-hidden` and skipped entirely
-  under `prefers-reduced-motion` rather than left as a column of carets. Vote
-  and pin buttons stay outside the card's link, so no control is focused twice.
-- The launch clock's ticking tiles are `aria-hidden`, with a static sentence
-  for assistive tech instead — otherwise a screen reader chases a number that
-  changes every second.
-- Vote counts are `aria-hidden` too; the button's own label already carries the
-  number, so they are not read twice.
-- The FAQ's questions are `<summary>` elements rather than headings with click
-  handlers, so Enter/Space opens them and the closed/open state is announced
-  for free; the native marker is replaced by `.faq-chevron`, which is
-  `aria-hidden` because the disclosure state already says the same thing.
-- External links (directory cards, referral cards) carry a visually hidden
-  "opens in a new tab" hint.
-- Pin and vote buttons grow from 27px to 38–40px under `(pointer: coarse)`
-  without changing their mouse appearance.
-- A "Skip to the directory" link is the first focusable element on the page.
-- `:focus-visible` gets a green ring; `globals.css` ships no focus rule at all.
-- `--subtle` is overridden to `#8f8f8f` (dark) / `#6b6b6b` (light) because the
-  original values sat just under 4.5:1 for the 9–10px labels.
-- The custom cursor keeps the native caret over inputs and textareas.
-- The Vibration API, confetti, flip clock, scroll reveals, the exit-intent
-  nudge, the FAQ chevron flip, `scroll-behavior: smooth` and carousel
-  auto-rotation are all skipped under `prefers-reduced-motion`, and the reveal
-  gate (`html[data-motion="enabled"]`) is never applied without JavaScript.
-- The blog ships an RSS feed at `/blog/feed.xml` and a JSON Feed 1.1 twin at
-  `/blog/feed.json`, both generated from `lib/blogs.ts` and advertised with
-  `<link rel="alternate">`. Posts also show a reading time and a "read next"
-  list of the other posts.
-
-## Haptics
-
-`lib/haptics.ts` exports `tick(pattern)`, the one place the Vibration API is
-called from: the section rail on every click, wheel notch and arrow key, the
-header's nav links, the support hub and the two link strips when their headings
-toggle, and the actions in the directory and the referral carousel that already
-buzzed. It returns early when the browser has no `navigator.vibrate`, when the
-visitor prefers reduced motion, and inside a `try` for the browsers that expose
-the method but refuse the call — so calling it is always safe and a component
-never needs its own guard.
-
-## Cookies, ads and analytics
-
-The Google tag and Umami both run on every visit and are deliberately not
-gated; everything else waits for the visitor's answer, and that answer is the
-switch for session recording and for ads. The tag is not gated because Google verifies the property
-from the tag it is served — anything that waits for a click fails the check it
-exists for. The other things that load either way are the destination preview
-images on every directory card and in the referral carousel and each community
-upload's own favicon — both decorative, both cookie-free:
-
-| Component | Runs when |
-| --- | --- |
-| `app/layout.tsx` | The Google tag (gtag.js) for `G-W6J79P13FT`, in `<head>` on every page, on every visit — before the answer and whatever it is |
-| `app/layout.tsx` | Umami (`data-website-id="7f63f1fe-aefd-4110-a01b-44171627ac64"`) from `cloud.umami.is`, `defer`red in `<head>` on every page. It is cookieless and stores nothing on the visitor's device, so like the Google tag there is nothing for the notice to gate |
-| `components/consent-aware-analytics.tsx` | Microsoft Clarity (`ylsxc7fokm`), only on `accepted` |
-| `components/consent-aware-ads.tsx` | Adcash auto-tag (`iy7zk7mmw`), only on `accepted` |
-| `components/support-banner-ad.tsx` | The 160x300 banner in the support hub (`d1495d5e568642fb60c4f1232a9af565`), only on `accepted` |
-| `components/support-inline-ad.tsx` | The profitable-rate CPM unit beside that banner, only on `accepted` |
-| `public/sites/appscreenshot/index.html`, `public/sites/share/index.html` | Never gated: these static subdomain pages render outside Next.js and carry no cookie banner, so the same Adcash auto-tag sits directly in their `<head>` (the async loader is polled for `aclib` before the tag runs). |
-| `public/sites/compmails/index.html` | The same 160x300 Adsterra banner as the support hub (`d1495d5e568642fb60c4f1232a9af565`), appended by `app.js` only on `accepted`. This static page ships its own cookie notice, and that notice is what gates the ad. |
-| `components/referral-carousel.tsx` | Never gated: the destination preview image loads straight from the destination (or a screenshot service) because the card is unusable without it. It sets no cookies, the sponsored links stay inert until clicked, and the privacy page says so. |
-
-The Adcash script loader (`https://acscdn.com/script/aclib.js`) is inserted only
-after the visitor accepts, then runs the supplied auto-tag for zone
-`iy7zk7mmw`. Denying or withdrawing consent prevents the loader from being
-inserted (and removes its script element if consent changes after it loads).
-
-The support hub's 160x300 banner follows the same rule. Its network is
-**Adsterra**, and its snippet is two parts — a global `atOptions` describing the
-slot (`d1495d5e568642fb60c4f1232a9af565`) and a loader at
-`https://www.highrevenueformat.com/<key>/invoke.js` that reads it — and neither
-can be pasted into a React tree or run before the answer, so
-`components/support-banner-ad.tsx` sets the global and appends the loader into
-its own slot on `accepted` only, then removes both the script and the frame the
-loader wrote when the answer changes. Before the answer the slot shows a line
-of text pointing at the privacy page instead of an empty tray.
-`public/sites/compmails/app.js` runs the same key the same way, against the
-cookie notice that static page ships. The other static subdomain pages have no
-notice of their own, which is why they carry the Adcash tag ungated instead.
-
-The second slot in the support hub is the profitable-rate CPM network's unit.
-Its snippet is also two pieces — a loader at
-`https://pl31451992.profitableratecpmnetwork.com/<id>/invoke.js` and an empty
-container it fills — so `components/support-inline-ad.tsx` renders the
-container always and appends the loader only on `accepted`, removing the script
-and clearing the container when the answer changes. Before the answer the slot
-shows the same line of text as the banner, pointing at the privacy page.
-
-Clarity is inserted into the page only on `accepted`, and its snippet appends its
-loader under `microsoft-clarity-loader` so withdrawing the choice removes what the
-page can remove. A library that already fetched stays loaded until the next page
-load, which is what the privacy page says — so never claim a withdrawal unloads a
-script that has already run. The Google tag is never removed: it is part of the
-page, it runs either way, and `lib/analytics.ts` holds the one measurement id
-that both the loader URL and the `config` call are built from.
-
-`lib/consent.ts` holds the `base31-consent` key, a `useConsent()` hook and the
-`base31-consent-change` event that keeps them in sync. `PrivacyConsent`
-(`components/privacy-consent.tsx`) re-appears whenever the choice is cleared,
-which is what the footer's **Cookie settings** button does — so a visitor can
-withdraw or change consent later without clearing site data by hand.
-
-> The `subdomain` value and the folder name under `public/sites/` must
-> match exactly.
-
-## One-time Vercel/domain setup
-
-Wildcard subdomains on Vercel require your domain to use **Vercel's
-nameservers** (this is required on every plan, including the free Hobby plan).
-The wildcard certificate is proved with a DNS-01 challenge, so Vercel has to own
-the zone to answer it. Nothing else here depends on the nameservers — only
-`*.base31.org` does.
-
-1. Push this repo to GitHub and import it as a new Vercel project.
-2. In the project's **Settings → Domains**, add `base31.org`.
-3. Since you bought the domain through Vercel, its nameservers are already
-   Vercel's — nothing to change there.
-4. Still in **Settings → Domains**, add a second domain: `*.base31.org`
-   (the wildcard). Vercel will confirm it can issue certificates for it.
-5. Push a commit — that's it. Any folder you add under `public/sites/` with
-   a matching `config/sites.json` entry is live on its subdomain right
-   away, no per-site deploy needed.
-
-Run `npm run check:domain` after any DNS change. It resolves the nameservers,
-the apex, `www`, one real directory subdomain and the mail records, and exits
-non-zero while something required is missing.
-
-### Do not move the nameservers away from Vercel
-
-Pointing the domain at another DNS host — Cloudflare, for example, to use
-**Cloudflare Email Routing** for an `@base31.org` inbox — moves the zone, and
-the web records do not come with it. The domain then resolves to nothing:
-
-- `base31.org`, `www.base31.org` and every `*.base31.org` answer NXDOMAIN, so
-  the directory is unreachable however the last deploy went.
-- Vercel lists `base31.org` and `*.base31.org` as **Invalid Configuration** and
-  cannot issue the wildcard certificate while the zone is hosted elsewhere.
-- A deployment that looks like it failed is usually this: the build is fine and
-  the domain is what is broken. Check **Settings → Domains** before rebuilding.
-- Record types do not carry over either. Resend's DKIM and `send` records, for
-  instance, live in whatever zone held them before the switch.
-
-Cloudflare Email Routing requires Cloudflare's nameservers, so it cannot be
-combined with the wildcard. Pick one:
-
-- **Keep the wildcard (recommended).** Set the nameservers back to
-  `ns1.vercel-dns.com` and `ns2.vercel-dns.com`. Vercel's zone still holds the
-  records added there — the apex, `www`, the wildcard, and the Resend ones from
-  the section below — so they start resolving again as the change propagates
-  (NS answers are cached for up to a day). Then get the `hello@base31.org`
-  inbox from a provider that works through plain MX records: a mailbox host, or
-  a forwarding service such as ImprovMX or ForwardEmail, with its MX and TXT
-  records added in Vercel's DNS.
-- **Keep Cloudflare's nameservers.** Recreate the web records in the Cloudflare
-  DNS dashboard with **Proxy off** (grey cloud) on each one:
-
-  | Type | Name | Value |
-  | --- | --- | --- |
-  | `A` | `@` | `76.76.21.21` |
-  | `CNAME` | `www` | `cname.vercel-dns.com` |
-  | `CNAME` | `*` | `cname.vercel-dns.com` |
-
-  Leave the existing apex MX/TXT alone, since Cloudflare Email Routing needs
-  them, and re-add Resend's records (`npm run check:mail` names the missing
-  ones). The catch: Vercel still cannot verify `*.base31.org` without its own
-  nameservers, so every subdomain has to be added in **Settings → Domains** by
-  hand and a new folder under `public/sites/` is no longer live on its own.
-
-## Directory additions (1.24.0)
-
-- `config/cool-ais.json` supplies 15 categorized browser AI services, including
-  ChatGPT and Gemini. The hero search reaches Featured sites and all four
-  external collections; searches open sections, clear category filters and show
-  every match rather than leaving results behind the nine-card preview.
-- `lib/directory.ts` owns stable detail slugs and namespaced URL vote keys.
-  `/sites/<slug>` pages are statically generated for every curated listing, with
-  canonical/social metadata, WebPage and breadcrumb JSON-LD, related picks,
-  voting and sitemap entries. Existing `/tools/<slug>` guides remain available.
-- `components/site-votes.tsx` reuses the Worker's `/votes` and `/vote` endpoints.
-  Bulk reads are batched, choices share `base31-votes` storage, requests lock
-  individual controls while pending, and failures show an error without saving
-  an unconfirmed vote. External controls are siblings of links, never nested.
-- `addedAt` and `lastChecked` are optional ISO dates. New AI entries have their
-  actual addition date; apps use the recorded 1.22 release date. Unknown dates
-  are not invented. Recently added covers 30 days; Fresh means reviewed within
-  30 days; reviews older than 90 days show Review due. No review date shows
-  Not yet reviewed. These are editorial labels, not live uptime checks.
-- The hero shows views, websites linked and lines of code. Unique visitors are
-  still tracked and displayed on `/stats`, but not in the homepage hero.
-- Run `npm run test:directory` for slug, search, date and vote-key checks.
-
-## Local development
+Use Node.js 20+ and **npm**. Install from the lockfile:
 
 ```bash
-npm install
+npm ci
 npm run dev
 ```
 
-Subdomains don't resolve on `localhost` by default. To test one locally,
-visit `http://example.localhost:3000` (the middleware treats `*.localhost`
-the same way it treats `*.base31.org`).
-
-Run `npm run check` before pushing: it validates the content files, typechecks,
-and lints. Dependabot (`.github/dependabot.yml`) opens one grouped pull request
-each week for minor and patch bumps and leaves major versions as their own PR,
-so a red check on a dependency PR is worth reading before merging it.
-
-## Counters and votes (Cloudflare Workers)
-
-The directory's live view counter and the shared thumbs up/down totals are
-served by a small Cloudflare Worker backed by Cloudflare KV, deployed from
-`worker/` with Wrangler.
-
-### Files
-
-- `worker/src/index.ts` — the worker (routes below)
-- `worker/wrangler.jsonc` — worker config; the KV namespace auto-provisions
-  on first deploy and wrangler writes the generated ID back into this file
-
-### Routes
-
-| Route | Purpose |
-| --- | --- |
-| `GET /?key=<name>` | Increments the view counter, returns `{ "views": n, "unique": n }`; also bumps that day's bucket and, for a visitor it has not seen, the unique total and today's bucket of people |
-| `GET /stats?days=<n>` | Totals, the daily view series and the daily unique-visitor series that `/stats` renders (cached for five minutes) |
-| `GET /votes?keys=a,b,c` | Reads totals without incrementing, returns `{ "votes": { a: { up, down }, … } }` |
-| `POST /vote` | Body `{ key, from, to }` where each of `from`/`to` is `1`, `-1` or `0`; returns the key's new `{ key, up, down }` |
-| `GET /sites` | Lists community-published sites, newest first |
-| `POST /submit` | Body `{ title, description, tags, slug, files }`; publishes a site and returns it |
-| `GET /s/<slug>/…` | Serves a published site (and its assets) from KV |
-
-### Community sites
-
-The last card in the directory is an upload form: a visitor sets a title,
-description, tags, and web address, then picks their HTML/CSS/JS files (or a
-whole folder). The homepage posts them to `POST /submit`, the worker stores
-them in the same KV namespace, and the site is live at
-`<worker>/s/<slug>/` — listed in the directory like any other entry and
-votable under its slug.
-
-- Metadata lives under `pub:<slug>`; each file body (base64) under
-  `pubfile:<slug>:<path>`. Requests arriving at `/s/<slug>` are redirected to
-  `/s/<slug>/` so relative asset links resolve correctly.
-- Limits: 40 files, 2 MB per file, 8 MB per upload, `index.html` required
-  (otherwise the first `.html` file becomes the entry point). Slugs are
-  lowercase letters, numbers, and dashes, and must be unique.
-- Cloudflare KV list is **eventually consistent**, so a freshly published site
-  can take up to ~60s to appear in `GET /sites`. The homepage inserts the
-  returned site into the list immediately so its author sees it right away.
-- Every published site is also committed to the repository under
-  `public/sites/<slug>/`, so an upload is backed by git and not only by KV. Set
-  `GITHUB_TOKEN` as a Worker secret to switch it on; `GITHUB_REPO` and
-  `GITHUB_BRANCH` override the defaults (`NOTAM-bobk/base31`, `main`). It is
-  best-effort and runs in `waitUntil`, so a missing token, a wrong scope or a
-  single failed file never becomes a failed upload. Nothing is written to
-  `config/sites.json`, so a mirrored folder does not become a second directory
-  entry and needs no tool guide.
-- Uploads are open and unmoderated. User HTML runs on the worker's own origin
-  (not `base31.org`), so it cannot reach the directory's cookies or storage,
-  but it can call the worker's own API. If this ever needs locking down, set
-  `COUNTER_SECRET` as a worker secret and/or move the publish endpoint behind
-  auth.
-
-### Stats
-
-`/stats` on the site reads `GET /stats` on the worker, which reports the
-directory's all-time views, its unique visitors (all-time, today, and the last
-seven days), a daily series for each of its two graphs, vote totals, published
-sites, subscriber counts, and the most liked entries. The view buckets are
-written under an `@day:<YYYY-MM-DD>` key and the person buckets under
-`@ud:<YYYY-MM-DD>`: the `@` is outside the characters `?key=` accepts, so a
-visitor can never aim the public counter at either. They carry a 400-day
-lifetime, so the namespace stays bounded on its own.
-
-### Unique visitors
-
-Views count every load, so a reload, a second tab or a refresh all add to the
-total. The unique-visitor count is the other half: a person is counted once.
-`bumpUnique` reduces the request to a one-way SHA-256 hash of
-`CF-Connecting-IP` and `User-Agent` and writes that hash under `@uv:<hash>` as a
-mark with a 400-day lifetime. On the first sighting it raises `@unique`, the
-all-time total, and the current day's own bucket, `@ud:<YYYY-MM-DD>`, which is
-what the second graph on `/stats` draws; a later request that day finds the mark
-and touches neither. It returns the running total, so the page gets views and
-unique visitors from its one counter request instead of asking twice, and a
-failure to write returns `null` — the hero prints an em dash rather than a
-wrong number. The raw address and browser string are never stored, and the hash
-cannot be turned back into either. Two visitors behind one address with the same
-browser share a mark, and one visitor who clears that browser's User-Agent
-counts again — the count is an aggregate, not an identity.
-
-All three keys carry the `@` prefix, which `isValidKey` rejects, so the public
-`?key=` endpoint cannot be aimed at the unique total, at a visitor's mark or at
-a day bucket. The unique bump is the one part no longer inside `waitUntil` — the
-reply carries its result — while the daily view bucket still is; both are
-best-effort, and neither can make the view count fail.
-
-Two consequences worth knowing:
-
-- History starts the day this shipped. Both graphs draw `0` for earlier days and
-  say so on the page, and the all-time total is unaffected because it is a
-  separate key (`base31-directory`).
-- A worker change is live only once it is deployed (`npm run deploy:worker`).
-  A frontend newer than the worker copes: `/stats` falls back to its empty state
-  when `uniqueSeries` is missing, and the hero prints an em dash when `unique`
-  is not in the reply.
-
-Views are stored under the key itself (so existing counts keep working),
-unique visitors under `@unique` with a `@uv:<hash>` mark per visitor and an
-`@ud:<date>` bucket per day, and
-votes under `votes:<key>:up` / `votes:<key>:down`. Votes are per browser:
-the visitor's own choice lives in `localStorage` and the worker only keeps the
-shared totals, so the same person cannot stack votes by reloading but also
-cannot be counted twice across devices. The client sends both its previous and
-its new choice, which keeps switching or clearing a vote from double-counting.
-
-### Environment variables
-
-| Key | Where | Purpose |
-| --- | --- | --- |
-| `CLOUDFLARE_API_TOKEN` | Vercel / Keys tab | Token with **Workers Scripts: Edit** + **Workers KV Storage: Edit** |
-| `CLOUDFLARE_ACCOUNT_ID` | Vercel / Keys tab | Cloudflare account ID (dashboard sidebar) |
-| `NEXT_PUBLIC_COUNTER_URL` | Vercel / Keys tab | Optional override for the deployed worker URL the homepage calls |
-| `COUNTER_SECRET` | Worker secret (`wrangler secret put`) | Optional; when set, requests must send `x-counter-secret` |
-| `RESEND_API_KEY` | Next.js hosting environment + Worker secret | Resend API credential used for bug reports, confirmations, and publication emails |
-| `RESEND_FROM_EMAIL` | Next.js hosting environment + Worker secret | Sender address used by Resend; `base31 <onboarding@resend.dev>` until a domain is verified |
-| `BUG_REPORT_TO` | Next.js hosting environment | Inbox that receives the bug and feature reports from the site form; defaults to `hello@base31.org`. Without a verified domain Resend only delivers to the account owner |
-| `VAPID_PUBLIC_KEY` | Worker secret | Public VAPID key served to browsers for opt-in push notifications |
-| `VAPID_PRIVATE_KEY` | Worker secret | Private VAPID key used to sign push notifications; never expose it to the browser |
-| `VAPID_SUBJECT` | Worker secret | VAPID contact URI, for example a `mailto:` address |
-| `GITHUB_TOKEN` | Worker secret | Optional; when set, each published community site is committed to `public/sites/<slug>/` on `GITHUB_BRANCH`. Needs **Contents: read and write** on `GITHUB_REPO` (fine-grained) or the `repo` scope |
-| `GITHUB_REPO` | Worker secret | Optional; `owner/repo` to mirror uploads into, defaults to `NOTAM-bobk/base31` |
-| `GITHUB_BRANCH` | Worker secret | Optional; branch the mirror commits to, defaults to `main` |
-
-### Deploying
+Open `http://localhost:3000`. A static tool can be tested at `http://example.localhost:3000` when your browser resolves `*.localhost`; middleware maps its host to `public/sites/example/`.
 
 ```bash
-# authenticate non-interactively via env vars (or wrangler login)
-export CLOUDFLARE_API_TOKEN=...   # token with Workers + KV edit permissions
-export CLOUDFLARE_ACCOUNT_ID=...
+npm run check             # content validation + directory tests + TypeScript
+npm run build             # production build, also run by GitHub CI
+npm start                 # serve a completed production build
+```
 
+In Freebuff, use the managed Preview controls instead of starting a second server. Installation is `npm ci`, build is `npm run build`; the managed dev command must bind to `0.0.0.0` and use its assigned port. Secrets belong in **Settings → Environment**, never in Git.
+
+> The default counter URL points at the live Worker. Override `NEXT_PUBLIC_COUNTER_URL` with a development Worker before testing writes such as votes or publishing. Missing email or push credentials do not prevent directory browsing.
+
+## Repository map
+
+```text
+app/                      Next.js routes, metadata, feeds, and styles
+  sites/[slug]/           Curated listing detail pages
+  tools/                  Tool index and search-oriented guides
+  api/bug-report/         Server-side email report endpoint
+components/               Homepage, shared strips, carousel, votes, and UI
+config/                   Editable JSON content
+lib/                      Search, directory indexing, guides, translations
+public/
+  site-icons/             Local featured-site favicons
+  sites/<subdomain>/      Static tools: index.html + relative assets
+scripts/                  Validation, regression tests, DNS/link checks
+worker/
+  src/index.ts            Cloudflare API and community-site serving
+  wrangler.jsonc          Worker name and existing KV binding
+middleware.ts             Host-based subdomain → static folder rewrite
+.github/workflows/ci.yml   Validation, tests, typecheck, production build
+```
+
+## Edit the directory without touching UI code
+
+| File | Controls |
+| --- | --- |
+| `config/sites.json` | Featured subdomain tools and profiles; `show: false` hides a listing, not its static site |
+| `config/cool-sites.json` | External websites |
+| `config/cool-apis.json` | External API resources |
+| `config/cool-apps.json` | Browser apps |
+| `config/cool-ais.json` | Web AI assistants, research tools, creative services |
+| `config/editors-picks.json` | Ordered editorial carousel selections and notes |
+| `config/blogs.json` | Config-driven blog posts; additional editorial posts are supplied by `lib/blogs.ts` |
+| `config/referrals.json` | Sponsored referral carousel, separate from editorial picks |
+| `config/donations.json` | Supporter board entries |
+| `config/changelog.json` | Newest-first release history; top version must equal `package.json` |
+
+### Add an external pick
+
+Append an object **inside** the matching JSON array:
+
+```json
+{
+  "name": "Example App",
+  "url": "https://example.com/",
+  "category": "Utilities",
+  "tags": ["utility", "no-key"],
+  "description": "One specific sentence explaining why someone should open this app.",
+  "addedAt": "2026-10-01"
+}
+```
+
+Use HTTPS, a useful description, and lowercase single-word or hyphenated tags. Match an existing category when appropriate. External collections must not contain base31 subdomains. Avoid duplicate URLs, including variants that differ only by a trailing slash.
+
+`lib/directory.ts` creates stable detail slugs and namespaced URL vote keys. Changing a listing's name can change its external detail slug; changing its URL can change its vote identity. Check links and editor's picks when either changes. Legacy slash-only duplicates share a single detail route.
+
+### Choose editor's picks
+
+Edit `config/editors-picks.json`. Selections may come from **any curated collection**; use the slug from the listing's `/sites/<slug>` URL:
+
+```json
+[
+  {
+    "slug": "apis-open-meteo",
+    "note": "Build something with real weather data—without hunting down an API key."
+  },
+  {
+    "slug": "imagecompressor",
+    "note": "Smaller images, no upload. A practical tool that respects your files."
+  }
+]
+```
+
+Array order is rotation order. Remove a selection to remove its slide; an empty array hides the carousel. Each note needs at least 20 characters. `npm run check` catches unknown or repeated slugs. These picks are **not sponsored**—paid placements belong in `referrals.json` instead.
+
+The carousel advances every seven seconds, pauses while hovered/focused, has previous/next and slide-selection controls, and offers a pause button. Reduced-motion visitors navigate manually.
+
+### Add a featured static tool
+
+1. Create `public/sites/<subdomain>/index.html` and relative CSS/JS/assets.
+2. Add `public/site-icons/<subdomain>.svg` (or set a local `icon` path).
+3. Add the featured entry to `config/sites.json`:
+
+```json
+{
+  "name": "Example",
+  "subdomain": "example",
+  "url": "https://example.base31.org",
+  "tags": ["utility"],
+  "description": "A clear explanation of the tool and what it helps visitors do.",
+  "show": true,
+  "language": "en",
+  "addedAt": "2026-10-01"
+}
+```
+
+4. Add a matching guide to `lib/tool-pages.ts` before making it visible. Validation checks guide coverage and copy requirements.
+5. Run `npm run check`, review the subdomain and detail page, then ship through your normal repository workflow.
+
+Keep folder and `subdomain` names identical. Use relative assets inside static tools. Link legal pages with absolute apex URLs (`https://base31.org/privacy`), since `/privacy` on a tool subdomain would resolve inside that tool's folder.
+
+### Record dates honestly
+
+`addedAt` and `lastChecked` are optional `YYYY-MM-DD` dates. Set an addition date when the entry is actually added, and only update review dates after an editorial check—not because an automated crawler received a response.
+
+| Badge | Meaning |
+| --- | --- |
+| Recently added | Recorded addition within 30 days |
+| Fresh | Recorded review within 30 days |
+| Previously reviewed | Recorded review between 30 and 90 days old |
+| Review due | Review more than 90 days old |
+| Not yet reviewed | No recorded review date |
+
+Dates are rendered as semantic timestamps. Review badges are **not uptime guarantees**. Unknown history should remain unknown.
+
+## Keys and environment configuration
+
+The directory and public GitHub statistics do **not** need a GitHub API key. Email delivery, optional upload mirroring, and push notifications require their own credentials.
+
+### Next.js hosting environment
+
+| Variable | Required for | Notes |
+| --- | --- | --- |
+| `NEXT_PUBLIC_COUNTER_URL` | Optional Worker override | Public base URL; defaults to the existing live Worker. Build-time variable—redeploy after changing it. Never put a secret in a `NEXT_PUBLIC_` variable. |
+| `RESEND_API_KEY` | Bug/feature report email | Server-only Resend credential |
+| `RESEND_FROM_EMAIL` | Bug/feature report email | Verified sender, e.g. `base31 <reports@example.com>` |
+| `BUG_REPORT_TO` | Optional report destination | Defaults to `hello@base31.org` |
+
+### Cloudflare Worker secrets and bindings
+
+| Name | Purpose |
+| --- | --- |
+| `VIEW_COUNTER` | Existing KV namespace binding in `worker/wrangler.jsonc`; **preserve its ID** to retain counters, votes, uploads, and subscriptions |
+| `RESEND_API_KEY`, `RESEND_FROM_EMAIL` | Double-opt-in confirmation and publication-update emails; configure separately from Next.js |
+| `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT` | Opt-in browser push; only the public key is returned to browsers |
+| `GITHUB_TOKEN` | Optional repository mirroring of community uploads; a runtime Worker credential with repository Contents read/write permission |
+| `GITHUB_REPO`, `GITHUB_BRANCH` | Optional mirror destination; defaults are `NOTAM-bobk/base31` and `main` |
+| `COUNTER_SECRET` | Optional Worker request gate requiring `x-counter-secret`; the public browser client does not send this header, so enabling it requires an architectural change such as a server-side proxy |
+
+`CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` are **deployment-tool credentials**, not browser configuration. Set them only in a trusted deployment environment. Add Worker secrets using Wrangler's secret commands from `worker/`. Do not commit any token, private VAPID key, or local environment file.
+
+Freebuff's managed GitHub App credentials authenticate workspace Git/gh operations. They are **not** the optional Worker upload-mirroring token and are not expected in your environment files.
+
+Resend's test sender has recipient restrictions. For real subscriber delivery, verify an owned sending domain, add the DNS records Resend supplies at the active DNS host, and configure a verified `RESEND_FROM_EMAIL` in **both** runtimes. `npm run check:mail` checks the mail DNS records; it does not prove message delivery.
+
+## How the services fit together
+
+### Cloudflare Worker API
+
+| Endpoint | Purpose |
+| --- | --- |
+| `GET /?key=<name>` | Increment view counter; return views and unique estimate |
+| `GET /stats?days=<n>` | Aggregates and daily series used by `/stats` |
+| `GET /votes?keys=a,b,c` | Read shared up/down totals |
+| `POST /vote` | `{ key, from, to }`, where choices are `-1`, `0`, or `1` |
+| `GET /sites` | List community-published sites |
+| `POST /submit` | Publish static files with title, description, tags, and slug |
+| `GET /s/<slug>/…` | Serve a community site's files from KV |
+
+See `worker/src/index.ts` for the subscription, confirmation, unsubscribe, and push routes and their payloads.
+
+Community uploads are served on the Worker origin, separate from the directory. Limits are 40 files, 2 MB per file, and 8 MB per upload. KV listings are eventually consistent, so new entries may take about a minute to appear elsewhere. Optional GitHub mirroring is best-effort; it does not automatically add an entry to curated `sites.json`.
+
+**Operational limitations:** votes rely on browser-local choices and client-supplied transitions, not verified identities; they are not abuse-proof or synchronized across devices. KV totals are not transactional. Community uploads are public and unmoderated. Unique visitor estimates use hashed IP/browser signals, so shared networks can undercount and changes in browser signals can overcount; hashing is not a promise that data is impossible to re-identify. Review these tradeoffs before operating at larger scale.
+
+### GitHub statistics: free, approximate, resilient
+
+- Header commits use GitHub's public REST commit endpoint and pagination headers, cached in the browser for one hour.
+- Hero source size uses `GET https://api.github.com/repos/NOTAM-bobk/base31/languages`, cached for **24 hours**.
+- GitHub returns **bytes per language, not line counts**. `lib/code-estimate.ts` divides bytes by assumed bytes/line: TypeScript and JavaScript 45, HTML 60, CSS 35; additional languages have documented factors and otherwise use 45.
+- The result is labelled `≈` and **estimated lines of code**. It covers files GitHub Linguist counts, not every repository file, dependency, binary, or generated asset.
+- Public unauthenticated requests have rate limits (normally 60/hour/IP). Failed refreshes retain a cached estimate; without a successful fetch the UI shows a dash, never a made-up fixed number.
+
+## Deployment and domains
+
+The existing setup deploys Next.js to **Vercel** on repository pushes. CI runs `npm ci`, content validation, external-link checks, directory regression tests, TypeScript, and a production build. The Worker is a **separate deployment**:
+
+```bash
 npm run deploy:worker
 ```
 
-Optional hardening:
+Only run deployment commands when intentionally changing the live service. A frontend deployment does not deploy Worker code or copy hosting secrets into Worker secrets.
 
-```bash
-cd worker && npx wrangler secret put COUNTER_SECRET
-# requests must then send: x-counter-secret: <value>
-```
+For wildcard tool routing, configure the apex and `*.base31.org` in Vercel. Vercel's wildcard certificate setup normally requires Vercel nameservers. If the DNS zone is hosted elsewhere, check current provider requirements and configure explicit subdomains/certificates as needed rather than assuming the wildcard works.
 
-The homepage reads the worker URL from `NEXT_PUBLIC_COUNTER_URL`, falling back
-to the live `*.workers.dev` deployment when it is unset. Set the variable (and
-redeploy) if you host the worker on a custom domain.
+**Before changing nameservers:** export/recreate web, mail, verification, and DKIM records at the new authoritative host. A successful application build does not prove DNS or TLS works. Run `npm run check:domain` after DNS changes and check the hosting dashboard's domain status. Do not change the KV namespace ID during redeployment.
 
-### Email and browser notifications
+## Maintenance checklist
 
-The directory already uses Resend for double-opt-in email updates and new-site
-publication notices. The `/api/bug-report` Next.js route sends the optional
-reply address, report text, and current page URL to `BUG_REPORT_TO`, which
-defaults to `hello@base31.org`. Set
-`RESEND_API_KEY`, `RESEND_FROM_EMAIL`, and `BUG_REPORT_TO` in the hosting
-Settings → Environment before bug reports can be delivered. The sender must be
-verified with Resend, and until an owned domain is verified the sender has to
-be the shared test address `onboarding@resend.dev` — Resend rejects a
-`gmail.com` (or any unowned domain) `from`, and the test sender only delivers
-to the account owner's own address, so sending to anyone else fails with a
-`403 validation_error`. The same limit applies to the Worker's double-opt-in
-confirmation and publication emails: they cannot reach outside subscribers
-until `RESEND_FROM_EMAIL` is an address on a verified domain (for example
-`base31 <reports@base31.org>`), at which point `BUG_REPORT_TO` can be any
-inbox (it ships pointed at `hello@base31.org`). `RESEND_FROM_EMAIL` accepts the `Display Name <address>` form. The
-Worker also needs `RESEND_API_KEY` and
-`RESEND_FROM_EMAIL` set as Worker secrets for subscriptions and publication
-notices. Configure push by generating a VAPID key pair and setting
-`VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, and `VAPID_SUBJECT` as Worker secrets;
-only the public key is returned to browsers. Push alerts are a separate,
-visitor-controlled opt-in and do not depend on the cookie banner.
+### Every content or UI change
 
-Do not commit credentials. Set Worker secrets with `wrangler secret put
-<KEY>` from `worker/`; add the Next.js variables in the hosting environment
-settings so they are available to the deployed app.
+1. Edit valid JSON—no trailing commas, escaped quotes inside strings, no objects after the closing `]`.
+2. Check date accuracy, URL/tag consistency, guide coverage, editor's pick references, and resulting detail slugs.
+3. Run `npm run check`. Run `node scripts/check-cool-sites.mjs` for outbound links; failures are soft warnings because some providers block automated requests.
+4. Inspect desktop/mobile, dark/light, keyboard focus, reduced motion, empty searches, category filters, and unknown detail URLs.
+5. For a release, bump `package.json` and prepend the matching version to `config/changelog.json` together.
+6. Review the diff, commit only relevant files, and confirm CI after pushing.
 
-### Verify the sending domain in Resend
+### Periodically
 
-`base31.org` is not registered with Resend yet, so `RESEND_FROM_EMAIL` has to
-stay on the shared `onboarding@resend.dev` test sender and mail only reaches
-the account owner. Verify the domain once to send from `reports@base31.org`
-(or any other local part) to any inbox:
+- Review aging picks; update `lastChecked` only after actually checking the destination.
+- Rotate the editorial shortlist and remove broken/retired services.
+- Read Dependabot PR checks before merging; major Next.js upgrades need deliberate testing.
+- Review community uploads, rate limits, Worker KV usage, email/push failures, and abuse reports.
+- Audit analytics/ads and privacy copy together; keep consent behavior consistent with what the site discloses.
 
-1. Open [resend.com/domains](https://resend.com/domains), choose **Add
-   Domain**, enter `base31.org`, and pick a region (the default is
-   `us-east-1`). The stored `RESEND_API_KEY` is send-only — Resend answers
-   `401 restricted_api_key` on `GET /domains` — so it cannot add or list
-   domains. Use the dashboard, or swap in a full-access key for this step.
-2. Resend lists the records for the domain. They are normally:
-   - `MX` on `send` → `feedback-smtp.<region>.amazonses.com`, priority `10`
-   - `TXT` on `send` → `v=spf1 include:amazonses.com ~all`
-   - `TXT` (sometimes `CNAME`) on `resend._domainkey` → the DKIM value the
-     dashboard shows
-   - optionally `TXT` on `_dmarc` → `v=DMARC1; p=none;`
+### Styling and accessibility conventions
 
-   Copy what Resend actually shows: the region changes the MX host.
-3. Add the records at whichever host actually answers for the domain — see
-   **Do not move the nameservers away from Vercel** above. While the
-   nameservers are Vercel's that is Vercel → Domains → `base31.org` → DNS
-   Records; while they are Cloudflare's it is the Cloudflare DNS dashboard. A
-   record added to a zone that does not answer for the domain never resolves.
-4. Once the records propagate, run `npm run check:mail` to confirm SPF, DKIM,
-   and MX resolve, then press **Verify DNS Records** in Resend.
-5. After verification, set `RESEND_FROM_EMAIL` to `base31 <reports@base31.org>`
-   and point `BUG_REPORT_TO` at the inbox that should receive reports
-   (`hello@base31.org` by default), both in the hosting environment and as
-   Worker secrets.
+Use the existing CSS tokens for both themes. Styles load `globals.css` → `overrides.css` → `inner-pages.css` → `late.css` → `directory.css`; the last file owns the editorial shortlist and refreshed directory cards. No Tailwind or additional React installation is needed.
 
-`npm run check:mail` takes an optional domain argument and prints the
-nameservers plus a pass/fail line per record, exiting non-zero while something
-required is still missing.
+Keep pin, vote, and detail controls **outside** outbound card links. New controls need accessible names, visible keyboard focus, and touch-friendly targets. Carousel rotation and decorative motion respect reduced motion. The page scrollbar is visually hidden where supported, but wheel/touch/keyboard scrolling remains enabled; forced-colors users retain native scrollbar chrome.
 
-> The vote routes only exist once the worker has been redeployed. Until then
-the thumbs fall back to local-only voting — the counts show `–` and the click
-still registers in `localStorage` without erroring.
+Homepage reveal state uses `data-revealed`, not a React-managed class, and the observer tracks shown card IDs rather than just list length. Don't use the homepage's reveal gate on standalone routes without an observer, or their content can remain invisible.
 
+## SEO, privacy, and third-party requests
 
-<script type="text/javascript">
-    (function(c,l,a,r,i,t,y){
-        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
-        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
-        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
-    })(window, document, "clarity", "script", "ylsxc7fokm");
-</script>
+Curated detail pages and tool guides ship canonical/social metadata and JSON-LD. `app/sitemap.ts` includes curated details and guides; community uploads aren't build-time sitemap entries. Static tools need their own title, description, canonical, social tags, `robots.txt`, and `sitemap.xml`—copy a maintained tool's structure and adapt the content. Never invent ratings, prices, or review dates.
+
+The root layout includes Google Analytics and Umami on every visit. Clarity and homepage ad scripts are consent-gated; some static tools have separate consent implementations or ungated scripts. Screenshot previews request third-party services (WordPress mShots/thum.io), and community favicon requests reach their own origins. Don't describe third-party requests as entirely local or automatically anonymous. See `app/privacy`, `lib/consent.ts`, and the consent-aware components before changing tracking behavior.
+
+Sponsored referrals must remain visibly disclosed and use sponsored link attributes. Editor's picks must remain distinct from those paid slots.
+
+## Troubleshooting
+
+| Symptom | Start here |
+| --- | --- |
+| Invalid JSON breaks a deploy | `npm run validate:content`; inspect the changed config array |
+| Unknown editor's pick disappears | `npm run test:directory`; verify the current `/sites/<slug>` |
+| Code estimate or commit count is a dash | GitHub reachability/rate limits; no API key is required |
+| Votes or uploads fail | Check the configured Worker URL and deployed routes; don't test writes against production unintentionally |
+| Report email returns unavailable | Next.js email variables; verified sender and recipient restrictions |
+| Subscriber emails fail | Worker's own email secrets and provider logs |
+| Directory works but a tool 404s | Matching static folder/subdomain, middleware, hosting domain and DNS |
+| Counters unexpectedly reset | Verify `VIEW_COUNTER` still points at the original KV namespace |
+| Build passes but the site is unreachable | Hosting domain validation, authoritative DNS, and TLS—not another build |
+
+For contribution workflow, see [CONTRIBUTING.md](CONTRIBUTING.md). For shipped release notes, see [the changelog](https://base31.org/whats-new).

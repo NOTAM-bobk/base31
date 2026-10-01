@@ -1,16 +1,16 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { estimateLines } from "@/lib/code-estimate";
 
 // How long a figure takes to climb from zero to its final value. Deliberately
 // slow: the climb is meant to be watched, not missed on the way to something
 // else.
 const COUNT_MS = 3400;
 
-// The project's size in lines of source, across the app, the components, the
-// worker and the hand-written subdomain pages. Measured by hand on each
-// release: 1.24.0 added 478 source lines.
-const LINES_OF_CODE = 53057;
+const CODE_CACHE_KEY = "base31-code-estimate-v1";
+const CODE_CACHE_MS = 24 * 60 * 60 * 1000;
+const CODE_METHOD = "Estimated from GitHub language bytes divided by approximate bytes per line (TS/JS: 45, HTML: 60, CSS: 35). Not an exact source-line count; excludes files GitHub Linguist ignores.";
 
 /**
  * Counts a figure up from zero to `target` with an ease-out, in a rAF loop.
@@ -57,24 +57,48 @@ function useCountUp(target: number | null, duration = COUNT_MS) {
  * print in English elsewhere on the page.
  */
 export default function HeroStats({ visitors, sites }: { visitors: number | null; sites: number }) {
+  const [lines, setLines] = useState<number | null>(null);
+  useEffect(() => {
+    try {
+      const saved = JSON.parse(localStorage.getItem(CODE_CACHE_KEY) || "null");
+      if (saved && Number.isFinite(saved.lines) && saved.lines >= 0 && Number.isFinite(saved.at)) {
+        setLines(saved.lines);
+        const age = Date.now() - saved.at;
+        if (age >= 0 && age < CODE_CACHE_MS) return;
+      }
+    } catch {}
+    const controller = new AbortController();
+    const timer = window.setTimeout(() => controller.abort(), 10000);
+    void fetch("https://api.github.com/repos/NOTAM-bobk/base31/languages", {
+      headers: { Accept: "application/vnd.github+json" }, signal: controller.signal,
+    }).then((response) => response.ok ? response.json() : null).then((data) => {
+      if (!data || typeof data !== "object" || Array.isArray(data) || controller.signal.aborted) return;
+      const estimate = estimateLines(data);
+      if (estimate === null) return;
+      setLines(estimate);
+      try { localStorage.setItem(CODE_CACHE_KEY, JSON.stringify({ lines: estimate, at: Date.now() })); } catch {}
+    }).catch(() => {}).finally(() => window.clearTimeout(timer));
+    return () => { controller.abort(); window.clearTimeout(timer); };
+  }, []);
   const visitorCount = useCountUp(visitors);
   const siteCount = useCountUp(sites);
-  const codeCount = useCountUp(LINES_OF_CODE);
+  const codeCount = useCountUp(lines);
 
   const stats = [
     { label: "views", text: visitors == null ? "—" : visitorCount.toLocaleString() },
     { label: "websites linked", text: siteCount.toLocaleString() },
-    { label: "lines of code", text: codeCount.toLocaleString() },
+    { label: "estimated lines of code", text: lines === null ? "—" : `≈${codeCount.toLocaleString()}` },
   ];
 
   return (
     <ul className="hero-stats" aria-label="base31 at a glance, three figures">
       {stats.map((stat) => (
-        <li key={stat.label} className="hero-stat">
+        <li key={stat.label} className="hero-stat" title={stat.label === "estimated lines of code" ? CODE_METHOD : undefined}>
           <span className="hero-stat-value">{stat.text}</span>
           <span className="hero-stat-label mono">{stat.label}</span>
         </li>
       ))}
+      <li className="sr-only">{CODE_METHOD}</li>
     </ul>
   );
 }

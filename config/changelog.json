@@ -1,5 +1,18 @@
 [
   {
+    "version": "1.25.0",
+    "date": "2026-10-01",
+    "title": "An editor's shortlist and a clearer directory",
+    "summary": "A configurable rotating shortlist sits below search, exact tag queries work across every collection, featured cards get a clearer editorial layout, and the code-size figure now estimates repository lines from GitHub's public API. Maintenance documentation has been rewritten around the actual app.",
+    "highlights": [
+      "Editor's picks references any curated detail slug in config/editors-picks.json. Rotation pauses on hover or focus, offers an explicit pause control and respects reduced motion.",
+      "Search supports #tag and tag:value queries, multiple words and cross-collection tag suggestions. Surprise me now respects matching results from all collections.",
+      "Featured cards use left-aligned titles, visible destination hosts, larger descriptions and a single footer for details and voting; pins remain separate from outbound links.",
+      "Estimated lines of code uses GitHub language byte counts with documented per-language assumptions and a 24-hour browser cache. It needs no key and keeps cached data or a dash when unavailable.",
+      "The page scrollbar is visually hidden without disabling scrolling; high-contrast users retain the browser scrollbar. README now documents setup, keys, config editing, maintenance and operational limitations."
+    ]
+  },
+  {
     "version": "1.24.0",
     "date": "2026-10-01",
     "title": "AI picks, community votes and a page for every site",

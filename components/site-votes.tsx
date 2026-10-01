@@ -7,7 +7,11 @@ const counterUrl = process.env.NEXT_PUBLIC_COUNTER_URL || "https://base31-direct
 type Choice = -1 | 0 | 1;
 type Totals = { up: number; down: number };
 const readChoices = (): Record<string, Choice> => {
-  try { return JSON.parse(localStorage.getItem("base31-votes") || "{}"); } catch { return {}; }
+  try {
+    const saved = JSON.parse(localStorage.getItem("base31-votes") || "{}");
+    if (!saved || typeof saved !== "object" || Array.isArray(saved)) return {};
+    return Object.fromEntries(Object.entries(saved).filter(([, value]) => value === -1 || value === 0 || value === 1)) as Record<string, Choice>;
+  } catch { return {}; }
 };
 export function useSiteVotes(keys: string[]) {
   const keyList = [...new Set(keys)].join(",");

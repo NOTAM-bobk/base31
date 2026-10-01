@@ -1,4 +1,5 @@
 import coolApps from "@/config/cool-apps.json";
+import { matchesQuery } from "@/lib/search";
 
 // A hand-picked browser app: something you open in a tab and use for a while.
 // The list is edited purely through config/cool-apps.json — this module adds
@@ -30,14 +31,9 @@ export const coolAppCategories: string[] = (() => {
     .map(([category]) => category);
 })();
 
-/** Everything about a cool app that a search should look at, lowercased. */
-const index = (app: CoolApp) => `${app.name} ${app.url} ${app.category} ${app.tags.join(" ")} ${app.description}`.toLowerCase();
-
 /** The cool apps matching a hero-search query (all of them when it is empty). */
 export const searchCoolApps = (query: string): CoolApp[] => {
-  const needle = query.trim().toLowerCase();
-  if (!needle) return allCoolApps;
-  return allCoolApps.filter((app) => index(app).includes(needle));
+  return allCoolApps.filter((app) => matchesQuery(app, query));
 };
 
 export default allCoolApps;

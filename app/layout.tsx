@@ -11,6 +11,7 @@ import "./inner-pages.css";
 // Small corrections that must win over overrides.css (same specificity, later
 // file). See the file header for why it exists.
 import "./late.css";
+import "./directory.css";
 import { GOOGLE_ANALYTICS_ID, googleTagSnippet } from "@/lib/analytics";
 import CodeBackdrop from "@/components/code-backdrop";
 import ConsentAwareAds from "@/components/consent-aware-ads";

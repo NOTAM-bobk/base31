@@ -25,19 +25,12 @@ import SectionRail, { type RailSection } from "@/components/section-rail";
 import HeroStats from "@/components/hero-stats";
 import CoolAis from "@/components/cool-ais";
 import Freshness from "@/components/freshness";
-import { allCoolAis, searchCoolAis, detailPath } from "@/lib/directory";
+import { allCoolAis, searchCoolAis, detailPath, directoryEntries } from "@/lib/directory";
+import { matchesQuery } from "@/lib/search";
+import EditorsPicks from "@/components/editors-picks";
 
 type Site = { name: string; subdomain: string; url: string; tags?: string[]; description?: string; show?: boolean; community?: boolean; createdAt?: number; icon?: string; lastChecked?: string; addedAt?: string };
 
-// Rendered in the "checked" badge on a card. The month names are hard-coded
-// instead of using toLocaleDateString so the server and the first client render
-// always produce the same string (no hydration mismatch).
-const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-function formatChecked(value: string) {
-  const [year, month, day] = value.split("-").map(Number);
-  if (!year || !month || !day || month < 1 || month > 12) return value;
-  return `${MONTHS[month - 1]} ${day}`;
-}
 type Theme = "dark" | "light";
 // This visitor's own choice, stored locally.
 type Vote = 1 | -1;
@@ -121,8 +114,6 @@ function useDialogFocus<T extends HTMLElement>(open: boolean, containerRef: RefO
 }
 
 const visibleSites = (sites as Site[]).filter((site) => site.show !== false);
-const searchIndex = (site: Site) =>
-  `${site.name} ${site.url} ${site.subdomain} ${(site.tags || []).join(" ")} ${site.description || ""}`.toLowerCase();
 
 const MAX_UPLOAD_FILES = 40;
 
@@ -365,9 +356,6 @@ export default function HomePage({ dict = EN, locale = "en" }: { dict?: Dictiona
   const [votePops, setVotePops] = useState<Record<string, { up: number; down: number }>>({});
   const [theme, setTheme] = useState<Theme>("dark");
   const [views, setViews] = useState<number | null>(null);
-  // The same readership counted once per person, reported by the same request
-  // as `views`. Null until the counter answers, and null on an older worker.
-  const [unique, setUnique] = useState<number | null>(null);
   const [milestone, setMilestone] = useState<number | null>(null);
   const [exitNudge, setExitNudge] = useState<Site | null>(null);
   const [activeTag, setActiveTag] = useState<string | null>(null);
@@ -533,7 +521,6 @@ export default function HomePage({ dict = EN, locale = "en" }: { dict?: Dictiona
         if (!alive || !Number.isFinite(data?.views)) return;
         const count = Number(data.views);
         setViews(count);
-        if (Number.isFinite(data?.unique)) setUnique(Number(data.unique));
         if (count > 0 && count % 10 === 0) setMilestone(count);
       })
       .catch(() => {})
@@ -801,11 +788,18 @@ export default function HomePage({ dict = EN, locale = "en" }: { dict?: Dictiona
       .map(([tag, count]) => ({ tag, count }));
   }, [allSites]);
 
+  const searchTags = useMemo(() => {
+    const counts = new Map<string, number>();
+    for (const entry of [...directoryEntries, ...userSites]) {
+      for (const tag of entry.tags ?? []) if (!/\s/.test(tag)) counts.set(tag, (counts.get(tag) ?? 0) + 1);
+    }
+    return [...counts].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])).slice(0, 6).map(([tag]) => tag);
+  }, [userSites]);
+
   const list = useMemo(() => {
-    const needle = query.trim().toLowerCase();
     const matched = allSites.filter((site) => {
       if (activeTag && !(site.tags ?? []).includes(activeTag)) return false;
-      return !needle || searchIndex(site).includes(needle);
+      return matchesQuery(site, query);
     });
     const rankValue = (key: string) => netLikes(key);
     return [...matched].sort((a, b) => {
@@ -814,9 +808,7 @@ export default function HomePage({ dict = EN, locale = "en" }: { dict?: Dictiona
       if (pinnedA !== pinnedB) return pinnedB - pinnedA;
       if (sortMode === "az") return a.name.localeCompare(b.name);
       if (sortMode === "newest") {
-        // Community uploads carry a date; the curated entries have none, so
-        // they settle underneath in alphabetical order.
-        const byDate = (b.createdAt ?? 0) - (a.createdAt ?? 0);
+        const byDate = (b.createdAt ?? (b.addedAt ? Date.parse(b.addedAt) : 0)) - (a.createdAt ?? (a.addedAt ? Date.parse(a.addedAt) : 0));
         return byDate !== 0 ? byDate : a.name.localeCompare(b.name);
       }
       // Sites with no votes yet share a neutral score of 0 and fall back to
@@ -854,20 +846,17 @@ export default function HomePage({ dict = EN, locale = "en" }: { dict?: Dictiona
   // shipped with and left a blank gap in the grid until the next full reload.
   const revealKey = shownSites.map((site) => site.subdomain).join("|");
 
-  // "Surprise me" opens a random entry from whatever is currently listed, so an
-  // active search narrows the pool instead of being ignored. The "Other cool
-  // sites" strip is part of the same draw — those live off-directory, so they
-  // are always in the pool whatever the search or filter is set to.
+  // Search applies to every collection; a featured tag chip scopes the draw.
   const surpriseMe = useCallback(() => {
-    const directoryPool = list.length > 0 ? list : allSites;
-    const pool = [...directoryPool, ...coolSites];
+    const external = directoryEntries.filter((entry) => entry.sectionId !== "sites" && matchesQuery(entry, query));
+    const pool = activeTag ? list : [...list, ...external];
     if (pool.length === 0) return;
     const pick = pool[Math.floor(Math.random() * pool.length)];
     buzz(12);
     launchConfetti(10);
     notify(`Opening ${pick.name}`);
     window.open(pick.url, "_blank", "noopener,noreferrer");
-  }, [allSites, buzz, launchConfetti, list, notify]);
+  }, [activeTag, query, buzz, launchConfetti, list, notify]);
 
   const newCutoff = Date.now() - NEW_WINDOW_MS;
 
@@ -877,6 +866,7 @@ export default function HomePage({ dict = EN, locale = "en" }: { dict?: Dictiona
   // on every locale.
   const railSections = useMemo<RailSection[]>(() => [
     { id: "page-title", label: "Top" },
+    { id: "editors-picks", label: "Editor's picks" },
     { id: "sites", label: dict.featured },
     { id: "cool-sites", label: dict.coolSites },
     { id: "cool-apis", label: dict.coolApis },
@@ -1101,17 +1091,14 @@ export default function HomePage({ dict = EN, locale = "en" }: { dict?: Dictiona
             </span>
           </h1>
           <p className="subtitle">{dict.subtitle}</p>
-          {/* Four figures, and they come before the action now: the directory's
-              readership in views, the same readership counted once per person,
-              how many sites it links out to, and the size of the project. They
-              count up on load and hold their final value. */}
-          <HeroStats visitors={views} sites={allSites.length + coolSites.length + coolApis.length + coolApps.length + allCoolAis.length} />
+          {/* Views, unique directory destinations, and estimated source lines. */}
+          <HeroStats visitors={views} sites={new Set([...directoryEntries, ...allSites].map((site) => site.url.replace(/\/$/, ""))).size} />
           {/* One call to action, directly under the numbers. The "Why base31?"
               anchor and the old "Browse all sites" link are both gone: the
               directory is the next thing down the page, and the rail already
               steps to About, so each only duplicated something else. */}
           <div className="intro-links">
-            <button type="button" className="surprise-button" onClick={surpriseMe} title="Open a random site from the directory or the cool sites strip">
+            <button type="button" className="surprise-button" onClick={surpriseMe} title="Open a random matching pick from any collection">
               <span className="surprise-icon" aria-hidden="true">↯</span>
               <span className="surprise-label">{dict.surprise}</span>
             </button>
@@ -1146,7 +1133,12 @@ export default function HomePage({ dict = EN, locale = "en" }: { dict?: Dictiona
             ) : (
               <kbd className="shortcut-hint" aria-hidden="true">/</kbd>
             )}
-            <span id="site-search-hint" className="sr-only">Press the slash key to jump here from anywhere on the page.</span>
+            <span id="site-search-hint" className="sr-only">Search names, descriptions and tags across every collection. Use #tag or tag:value for an exact tag. Combine words to narrow results. Press slash to focus this field.</span>
+          </div>
+          <div className="search-tag-suggestions" aria-label="Search tags across all collections">
+            <span className="mono">Try a tag</span>
+            {searchTags.map((tag) => <button type="button" key={tag} aria-pressed={query.toLowerCase() === `#${tag.toLowerCase()}`} onClick={() => { setQuery(`#${tag}`); searchRef.current?.focus(); }}>#{tag}</button>)}
+            <span className="search-tag-help">or type #tag</span>
           </div>
         </section>
 
@@ -1156,7 +1148,8 @@ export default function HomePage({ dict = EN, locale = "en" }: { dict?: Dictiona
             above a grey body. The quick jumps moved out of the hero and into
             the slab, since they belong to the browsing half of the page. */}
         <div className="page-band">
-          {/* Four boxes that jump straight into a section, for the visitor who
+          <EditorsPicks />
+          {/* Five boxes that jump straight into a section, for the visitor who
               would rather browse than type. Each one is an in-page anchor, so
               it needs no routing: the browser scrolls, the section's own
               scroll-margin keeps it clear of the header, and the rail follows
@@ -1297,18 +1290,14 @@ export default function HomePage({ dict = EN, locale = "en" }: { dict?: Dictiona
                   >
                     <SitePreview site={site} />
                     <span className="site-card-info">
-                      {/* The site name is the card's title: centred on its own
-                          line, above a gradient strip that fades into the
-                          meta row (favicon + host) and the description. */}
                       <span className="site-card-title">
                         <span className="site-name">{site.name}</span>
                         {site.community && <span className="site-badge mono">community</span>}
                         {isNew && <span className="site-badge is-new mono">new</span>}
-                        <Freshness item={{ ...site, description: site.description ?? "" }} />
                       </span>
-                      <span className="site-card-strip" aria-hidden="true" />
                       <span className="site-card-head">
                         <SiteIcon site={site} />
+                        <span className="site-card-host mono">{new URL(site.url).hostname.replace(/^www\./, "")}</span>
                         <span className="site-open mono" aria-hidden="true">↗</span>
                         <span className="sr-only"> (opens in a new tab)</span>
                       </span>
@@ -1323,7 +1312,9 @@ export default function HomePage({ dict = EN, locale = "en" }: { dict?: Dictiona
                   {/* The vote row sits under the link, so the thumbs stay
                       outside it and nothing interactive is ever nested. The
                       pin floats over the preview. */}
+                  <Freshness item={{ ...site, description: site.description ?? "" }} />
                   <div className="site-card-lower">
+                    {detailPath(site.url) && <a className="site-detail-link featured-detail-link" href={detailPath(site.url)!}>Details <span aria-hidden="true">→</span><span className="sr-only"> about {site.name}</span></a>}
                     <div className="site-actions">
                       {/* The two thumbs split the bar down the middle — half
                           the width each — so the card's whole foot is a
@@ -1376,7 +1367,6 @@ export default function HomePage({ dict = EN, locale = "en" }: { dict?: Dictiona
                   >
                     <HeartIcon filled={pinned} />
                   </button>
-                  {detailPath(site.url) && <a className="site-detail-link featured-detail-link" href={detailPath(site.url)!}>About {site.name} →</a>}
                 </article>
               );
             })}

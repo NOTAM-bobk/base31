@@ -1,4 +1,5 @@
 import sites from "@/config/sites.json";
+import { matchesQuery } from "@/lib/search";
 import coolSites from "@/config/cool-sites.json";
 import coolApis from "@/config/cool-apis.json";
 import coolApps from "@/config/cool-apps.json";
@@ -45,6 +46,5 @@ export const detailPath = (url: string, sectionId?: string) => {
 export const allCoolAis = coolAis;
 export const coolAiCategories = [...new Set(coolAis.map((item) => item.category))];
 export const searchCoolAis = (query: string) => {
-  const needle = query.trim().toLowerCase();
-  return coolAis.filter((item) => `${item.name} ${item.url} ${item.category} ${item.tags.join(" ")} ${item.description}`.toLowerCase().includes(needle));
+  return coolAis.filter((item) => matchesQuery(item, query));
 };

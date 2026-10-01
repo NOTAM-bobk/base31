@@ -1,0 +1,7 @@
+[
+  { "slug": "imagecompressor", "note": "Smaller images, no upload. A practical little tool that respects your files." },
+  { "slug": "apis-open-meteo", "note": "Build something with real weather data—without hunting down an API key." },
+  { "slug": "apps-excalidraw", "note": "Turn a rough idea into a hand-drawn diagram right in your browser." },
+  { "slug": "ais-notebooklm", "note": "Explore your sources with an AI research companion. Always check the citations." },
+  { "slug": "qrgenerator", "note": "From a Wi-Fi password to a useful link: make a QR code in a few clicks." }
+]

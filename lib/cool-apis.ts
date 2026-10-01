@@ -1,4 +1,5 @@
 import coolApis from "@/config/cool-apis.json";
+import { matchesQuery } from "@/lib/search";
 
 // A hand-picked, off-directory API: a free public service you can call from
 // your own project (not a base31.org subdomain). The list is edited purely
@@ -30,14 +31,9 @@ export const coolApiCategories: string[] = (() => {
     .map(([category]) => category);
 })();
 
-/** Everything about an API a search should look at, lowercased. */
-const index = (api: CoolApi) => `${api.name} ${api.url} ${api.category} ${api.tags.join(" ")} ${api.description}`.toLowerCase();
-
 /** The APIs matching a hero-search query (all of them when it is empty). */
 export const searchCoolApis = (query: string): CoolApi[] => {
-  const needle = query.trim().toLowerCase();
-  if (!needle) return allCoolApis;
-  return allCoolApis.filter((api) => index(api).includes(needle));
+  return allCoolApis.filter((api) => matchesQuery(api, query));
 };
 
 export default allCoolApis;

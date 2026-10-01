@@ -5,6 +5,7 @@ import type { CSSProperties, FormEvent, RefObject } from "react";
 import sites from "@/config/sites.json";
 import pkg from "@/package.json";
 import AboutSection from "@/components/about-section";
+import DiscussionBoard from "@/components/discussion-board";
 import SupportSection from "@/components/support-section";
 import { SITE_GLYPHS } from "@/components/site-glyphs";
 import Cursor from "@/components/cursor";
@@ -873,6 +874,7 @@ export default function HomePage({ dict = EN, locale = "en" }: { dict?: Dictiona
     { id: "cool-apps", label: dict.coolApps },
     { id: "cool-ais", label: dict.coolAis },
     { id: "about", label: "About" },
+    { id: "discussion", label: "Community" },
     { id: "support", label: "Support" },
     { id: "faq-heading", label: "FAQ" },
     { id: "updates", label: "Updates" },
@@ -1425,6 +1427,7 @@ export default function HomePage({ dict = EN, locale = "en" }: { dict?: Dictiona
         <CoolAis dict={dict} query={query} />
 
         <AboutSection />
+        <DiscussionBoard />
 
         {/* The support hub: the Trustpilot reviews, the donation board, the
             sponsored referrals and the paid support button, gathered under one

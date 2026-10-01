@@ -4,6 +4,10 @@
   "main": "src/index.ts",
   "compatibility_date": "2024-12-02",
   "workers_dev": true,
+  "durable_objects": {
+    "bindings": [{ "name": "DISCUSSION", "class_name": "DiscussionRoom" }]
+  },
+  "migrations": [{ "tag": "discussion-v1", "new_sqlite_classes": ["DiscussionRoom"] }],
   "kv_namespaces": [
     {
       // BASE31_DIRECTORY_VIEWS — pinned so deploys reuse the namespace that

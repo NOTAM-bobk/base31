@@ -1,4 +1,6 @@
 import { buildPushPayload, type PushSubscription, type VapidKeys } from "@block65/webcrypto-web-push";
+import { handleDiscussion, type DiscussionBinding } from "./discussion";
+export { DiscussionRoom } from "./discussion";
 
 // Self-contained KV binding type so the root Next.js tsconfig can typecheck
 // this file without needing @cloudflare/workers-types. Wrangler supplies the
@@ -16,6 +18,8 @@ interface KVBinding {
 
 export interface Env {
   VIEW_COUNTER: KVBinding;
+  DISCUSSION?: DiscussionBinding;
+  DISCUSSION_MODERATOR_SECRET?: string;
   COUNTER_SECRET?: string;
   RESEND_API_KEY?: string;
   RESEND_FROM_EMAIL?: string;
@@ -55,7 +59,7 @@ type PublishedSite = {
 const CORS_HEADERS: Record<string, string> = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-  "Access-Control-Allow-Headers": "Content-Type, x-counter-secret",
+  "Access-Control-Allow-Headers": "Content-Type, x-counter-secret, x-discussion-secret",
   "Access-Control-Max-Age": "86400",
 };
 
@@ -846,6 +850,8 @@ export default {
       const provided = request.headers.get("x-counter-secret");
       if (provided && provided !== env.COUNTER_SECRET) return json({ error: "Invalid secret" }, 401);
     }
+
+    if (url.pathname === "/discussion" || url.pathname.startsWith("/discussion/")) return handleDiscussion(request, env);
 
     // GET /votes?keys=a,b,c → { votes: { a: { up, down }, b: … } }
     if (url.pathname === "/votes") {

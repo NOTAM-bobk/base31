@@ -29,7 +29,7 @@ export default function PrivacyPage() {
       <Link className="privacy-back mono" href="/">← base31.org</Link>
       <p className="eyebrow mono">privacy policy</p>
       <h1>Privacy, without the noise.</h1>
-      <p className="privacy-updated">Last updated: September 30, 2026</p>
+      <p className="privacy-updated">Last updated: October 1, 2026</p>
       <section className="privacy-copy">
         <h2>What we collect</h2>
         <p>
@@ -69,6 +69,21 @@ export default function PrivacyPage() {
           written to storage, and the hash cannot be turned back into either. The counter is not
           intended to identify you and does not store your name, email address, or browsing
           history.
+        </p>
+
+        <h2>Community discussion</h2>
+        <p>
+          Discussion messages, display names, reply relationships and posting times are public and stored
+          in Cloudflare Durable Objects until removed by the operator. Do not post private information.
+          Names are chosen by visitors, not verified accounts. Your browser saves your display name locally;
+          drafts are kept only in the current page and are lost when it closes or reloads.
+        </p>
+        <p>
+          To limit spam, the Worker derives a daily SHA-256 hash from the connecting IP address and date.
+          It stores this rate-limit signal with posting counts and times, not the raw IP. These signals
+          are cleaned up after 24 hours on a subsequent post; hashing is not a guarantee of anonymity.
+          Shared networks may share posting limits. Contact <a href="mailto:hello@base31.org">hello@base31.org</a>
+          {" "}with the message details to request removal or report abuse. Messages are not automatically moderated.
         </p>
 
         <h2>Email updates, browser alerts, and bug reports</h2>

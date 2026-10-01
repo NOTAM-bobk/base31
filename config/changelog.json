@@ -1,5 +1,16 @@
 [
   {
+    "version": "1.28.0",
+    "date": "2026-10-01",
+    "title": "A community corner for the curious web",
+    "summary": "A public discussion board sits directly below About the directory, with display names, shared conversations and threaded replies. The existing Cloudflare Worker gains consistent SQLite-backed discussion storage, deployed separately from the frontend.",
+    "highlights": [
+      "Visitors can start conversations and reply to any message without an account. The board refreshes every 15 seconds while the tab is visible and offers older/newer conversation pages.",
+      "Plain-text messages, bounded request sizes, name and message limits, atomic network rate limits and secret-protected moderator removal provide a safer foundation for public discussion.",
+      "The community corner follows both themes and mobile layouts, keeps drafts on failed sends, and documents public-message privacy and the separate Worker deployment requirement."
+    ]
+  },
+  {
     "version": "1.27.0",
     "date": "2026-10-01",
     "title": "Color on the cards, a clearer next step",

@@ -26,13 +26,14 @@ Useful browser tools, playful websites, public APIs, creative apps, and AI picks
 - Discover a rotating **Editor's picks** shortlist, browse categories, pin featured sites, sort them, or open a random matching pick.
 - Read detail pages at `/sites/<slug>` with related picks, recorded addition/review dates, voting, canonical metadata, and structured data. Deeper tool guides live at `/tools/<subdomain>`.
 - Vote on featured and external picks, publish a community static site, or opt into email/push updates.
+- Join the public community discussion below About: start a conversation or reply to another visitor without creating an account.
 - Browse in English, Spanish, French, or Portuguese, with dark/light themes and reduced-motion support.
 
 The homepage hero shows views, distinct linked destinations, and **estimated** source lines. Unique visitor reporting remains on `/stats`.
 
 ## Quick start
 
-Use Node.js 20+ and **npm**. Install from the lockfile:
+Use Node.js 22.13+ and **npm** (discussion regression tests use built-in SQLite). Install from the lockfile:
 
 ```bash
 npm ci
@@ -42,7 +43,7 @@ npm run dev
 Open `http://localhost:3000`. A static tool can be tested at `http://example.localhost:3000` when your browser resolves `*.localhost`; middleware maps its host to `public/sites/example/`.
 
 ```bash
-npm run check             # content validation + directory tests + TypeScript
+npm run check             # content validation + directory/discussion tests + TypeScript
 npm run build             # production build, also run by GitHub CI
 npm start                 # serve a completed production build
 ```
@@ -210,12 +211,29 @@ Resend's test sender has recipient restrictions. For real subscriber delivery, v
 | `GET /sites` | List community-published sites |
 | `POST /submit` | Publish static files with title, description, tags, and slug |
 | `GET /s/<slug>/…` | Serve a community site's files from KV |
+| `GET /discussion?before=<id>` | Newest 20 threads and up to 100 replies each; `nextCursor` for older pages |
+| `POST /discussion` | `{ name, body, replyTo? }`; returns the stored message |
+| `POST /discussion/moderate` | `{ id }` plus `x-discussion-secret`; replace a message with a removal notice |
 
 See `worker/src/index.ts` for the subscription, confirmation, unsubscribe, and push routes and their payloads.
 
 Community uploads are served on the Worker origin, separate from the directory. Limits are 40 files, 2 MB per file, and 8 MB per upload. KV listings are eventually consistent, so new entries may take about a minute to appear elsewhere. Optional GitHub mirroring is best-effort; it does not automatically add an entry to curated `sites.json`.
 
 **Operational limitations:** votes rely on browser-local choices and client-supplied transitions, not verified identities; they are not abuse-proof or synchronized across devices. KV totals are not transactional. Community uploads are public and unmoderated. Unique visitor estimates use hashed IP/browser signals, so shared networks can undercount and changes in browser signals can overcount; hashing is not a promise that data is impossible to re-identify. Review these tradeoffs before operating at larger scale.
+
+### Community discussion
+
+The board is directly below About and shares one `DiscussionRoom` Durable Object in the **existing Worker**. SQLite storage keeps writes and rate-limit checks atomic, without changing the counter KV namespace or requiring a manually created D1 database. `worker/wrangler.jsonc` declares the `DISCUSSION` binding and its `discussion-v1` SQLite migration. Preserve that migration and the object name to retain messages.
+
+**Activation:** deploy the Worker separately with `npm run deploy:worker` from a trusted environment authenticated to Cloudflare. Deployment credentials are `CLOUDFLARE_API_TOKEN` (Workers/Durable Objects deployment permissions) and `CLOUDFLARE_ACCOUNT_ID`, not browser keys. The binding is provisioned by the migration. Pushing to Vercel alone does not activate chat routes; before deployment the UI shows an honest unavailable state. No additional public URL is needed unless overriding `NEXT_PUBLIC_COUNTER_URL`.
+
+Posting uses a display name (1–32 characters), plain-text body (1–2,000 characters), and optional numeric parent message ID. Replies to replies stay in their original thread with an explicit parent label. A thread holds at most 100 replies; start another once full. Request bodies are bounded at 12 KB. HTML is rendered as text, not markup or clickable links. Network-based limits allow one message every 15 seconds and 50 per UTC day. The Worker replaces client-supplied visitor signals with a daily hash of Cloudflare's connecting IP; raw IPs are not stored in discussion tables. Old rate-limit records are cleaned on subsequent posts.
+
+The board polls every 15 seconds only while the tab is visible; it is not WebSocket realtime. Drafts survive failed submissions but not page reloads. Only the display name is saved locally. Messages/names are public and names are **not verified identities**. Rate limits are basic protection, not a substitute for active moderation, CAPTCHA or authentication at higher traffic.
+
+To moderate, configure `DISCUSSION_MODERATOR_SECRET` as a Worker secret and send an authenticated `POST /discussion/moderate` with `{ "id": 123 }` and the matching `x-discussion-secret` header from trusted tooling. Never expose this key in frontend configuration. Removal clears the author's name/body and leaves a tombstone so replies stay understandable; removing a root closes its thread to further replies. Visitors can report messages to `hello@base31.org`. There is no automatic moderation or self-service delete identity. Review reports and usage regularly.
+
+`npm run test:discussion` exercises the actual SQL against in-memory SQLite: messages, nested replies, concurrent rate limits, pagination, validation and moderation. It does not contact or write to the live Worker. Local tests and frontend CI do not prove the Worker has been deployed.
 
 ### GitHub statistics: free, approximate, resilient
 

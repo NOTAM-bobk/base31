@@ -41,6 +41,7 @@ const externalLists = [
   { file: "cool-sites.json", label: "Cool site", count: 0 },
   { file: "cool-apis.json", label: "Cool API", count: 0 },
   { file: "cool-apps.json", label: "Cool app", count: 0 },
+  { file: "cool-ais.json", label: "Cool AI", count: 0 },
 ];
 const base31Host = /^https:\/\/[a-z0-9-]+\.base31\.org/;
 for (const list of externalLists) {
@@ -50,6 +51,9 @@ for (const list of externalLists) {
   checkUnique(entries.map((entry) => String(entry.url)), `${list.label} URL`);
   for (const [index, entry] of entries.entries()) {
     const at = `${list.label} ${index + 1}`;
+    for (const field of ["addedAt", "lastChecked"]) {
+      if (entry[field] !== undefined && (typeof entry[field] !== "string" || !date.test(entry[field]) || Number.isNaN(Date.parse(entry[field])))) errors.push(`${at} has an invalid ${field} date`);
+    }
     if (typeof entry.name !== "string" || !entry.name.trim()) errors.push(`${at} needs a name`);
     if (typeof entry.url !== "string" || !https.test(entry.url)) errors.push(`${at} needs an HTTPS URL`);
     else if (base31Host.test(entry.url)) errors.push(`${at} points at a base31.org subdomain — directory entries belong in sites.json, not here`);
@@ -193,6 +197,6 @@ if (errors.length > 0) {
   process.exitCode = 1;
 } else {
   console.log(
-    `Content validation passed: ${sites.length} sites, ${posts.length} blog posts, ${referrals.length} referrals, ${donations.length} donations, ${releases.length} releases, ${guideBlocks.length} tool guides, ${externalLists[0].count} cool sites, ${externalLists[1].count} cool APIs, ${externalLists[2].count} cool apps.`,
+    `Content validation passed: ${sites.length} sites, ${posts.length} blog posts, ${referrals.length} referrals, ${donations.length} donations, ${releases.length} releases, ${guideBlocks.length} tool guides, ${externalLists[0].count} cool sites, ${externalLists[1].count} cool APIs, ${externalLists[2].count} cool apps, ${externalLists[3].count} cool AIs.`,
   );
 }

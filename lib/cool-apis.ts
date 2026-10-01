@@ -14,6 +14,8 @@ export type CoolApi = {
       tags run to sixty-odd values, which would be a wall of chips, so each API
       is filed under one of the handful of categories below. */
   category: string;
+  addedAt?: string;
+  lastChecked?: string;
 };
 
 export const allCoolApis = coolApis as CoolApi[];
@@ -29,7 +31,7 @@ export const coolApiCategories: string[] = (() => {
 })();
 
 /** Everything about an API a search should look at, lowercased. */
-const index = (api: CoolApi) => `${api.name} ${api.url} ${api.tags.join(" ")} ${api.description}`.toLowerCase();
+const index = (api: CoolApi) => `${api.name} ${api.url} ${api.category} ${api.tags.join(" ")} ${api.description}`.toLowerCase();
 
 /** The APIs matching a hero-search query (all of them when it is empty). */
 export const searchCoolApis = (query: string): CoolApi[] => {

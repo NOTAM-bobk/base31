@@ -2,8 +2,12 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { tick } from "@/lib/haptics";
+import Link from "next/link";
+import { detailPath, externalVoteKey } from "@/lib/directory";
+import Freshness from "@/components/freshness";
+import SiteVotes, { useSiteVotes } from "@/components/site-votes";
 
-export type LinkStripItem = { name: string; url: string; tags: string[]; description: string; category?: string };
+export type LinkStripItem = { name: string; url: string; tags: string[]; description: string; category?: string; addedAt?: string; lastChecked?: string };
 
 /** The dictionary strings one strip needs, so a translated homepage folds and
     searches its strips in its own words. */
@@ -77,7 +81,8 @@ export default function LinkStrip({ id, items, search, copy, query = "", categor
   );
   const searching = query.trim().length > 0;
   const filtering = searching || category !== null;
-  const shown = showAll ? visible : visible.slice(0, SECTION_PREVIEW);
+  const shown = showAll || searching ? visible : visible.slice(0, SECTION_PREVIEW);
+  const voteState = useSiteVotes(shown.map((item) => externalVoteKey(item.url)));
   // How many cards the cut is holding back. The line reads it as "+43" while
   // they are hidden and "-43" once they are showing.
   const foldCount = Math.max(0, visible.length - SECTION_PREVIEW);
@@ -88,8 +93,8 @@ export default function LinkStrip({ id, items, search, copy, query = "", categor
   // instead of folded away. Setting `false` when it is already open does not
   // re-render, so this never fights the visitor's own toggle.
   useEffect(() => {
-    if (searching && matches.length > 0) setCollapsed(false);
-  }, [searching, matches.length]);
+    if (searching) { setCollapsed(false); setCategory(null); }
+  }, [query, searching]);
 
   // A new question starts a short list again, the way the directory's own cut
   // does: typing something else or picking another chip folds the strip back
@@ -178,11 +183,10 @@ export default function LinkStrip({ id, items, search, copy, query = "", categor
         )}
         <div className="cool-grid" role="list">
           {shown.map((site) => (
+            <article key={site.url} className="cool-card" role="listitem">
             <a
-              key={site.url}
               href={site.url}
-              className="cool-card"
-              role="listitem"
+              className="cool-card-link"
               target="_blank"
               rel="noopener noreferrer"
             >
@@ -198,11 +202,17 @@ export default function LinkStrip({ id, items, search, copy, query = "", categor
               <span className="cool-host mono">{new URL(site.url).hostname.replace(/^www\./, "")}</span>
               <span className="cool-desc">{site.description}</span>
             </a>
+            <Freshness item={site} />
+            <div className="cool-card-footer">
+              {detailPath(site.url, id) && <Link className="site-detail-link" href={detailPath(site.url, id)!}>Details →</Link>}
+              <SiteVotes voteKey={externalVoteKey(site.url)} name={site.name} state={voteState} />
+            </div>
+            </article>
           ))}
           {/* The cut: nine cards and one line that opens the rest. It shows
               only while there is something behind it, and its count is the
               whole point of the line — so both are kept quiet and small. */}
-          {foldCount > 0 && (
+          {foldCount > 0 && !searching && (
             <button
               type="button"
               className="show-all"

@@ -1,12 +1,13 @@
 {
   "name": "base31-directory",
-  "version": "1.23.0",
+  "version": "1.24.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "typecheck": "tsc --noEmit",
+    "test:directory": "node scripts/test-directory.mjs",
     "lint": "next lint",
     "validate:content": "node scripts/validate-content.mjs",
     "check:mail": "node scripts/check-mail-dns.mjs",

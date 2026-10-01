@@ -17,6 +17,7 @@ const lists = [
   { file: "cool-sites.json", label: "cool sites" },
   { file: "cool-apis.json", label: "cool APIs" },
   { file: "cool-apps.json", label: "cool apps" },
+  { file: "cool-ais.json", label: "cool AIs" },
 ];
 
 const check = async (url) => {

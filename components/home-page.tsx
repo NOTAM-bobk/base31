@@ -23,8 +23,11 @@ import coolApps, { searchCoolApps } from "@/lib/cool-apps";
 import { tick } from "@/lib/haptics";
 import SectionRail, { type RailSection } from "@/components/section-rail";
 import HeroStats from "@/components/hero-stats";
+import CoolAis from "@/components/cool-ais";
+import Freshness from "@/components/freshness";
+import { allCoolAis, searchCoolAis, detailPath } from "@/lib/directory";
 
-type Site = { name: string; subdomain: string; url: string; tags?: string[]; description?: string; show?: boolean; community?: boolean; createdAt?: number; icon?: string; lastChecked?: string };
+type Site = { name: string; subdomain: string; url: string; tags?: string[]; description?: string; show?: boolean; community?: boolean; createdAt?: number; icon?: string; lastChecked?: string; addedAt?: string };
 
 // Rendered in the "checked" badge on a card. The month names are hard-coded
 // instead of using toLocaleDateString so the server and the first client render
@@ -119,7 +122,7 @@ function useDialogFocus<T extends HTMLElement>(open: boolean, containerRef: RefO
 
 const visibleSites = (sites as Site[]).filter((site) => site.show !== false);
 const searchIndex = (site: Site) =>
-  `${site.name} ${site.subdomain} ${(site.tags || []).join(" ")} ${site.description || ""}`.toLowerCase();
+  `${site.name} ${site.url} ${site.subdomain} ${(site.tags || []).join(" ")} ${site.description || ""}`.toLowerCase();
 
 const MAX_UPLOAD_FILES = 40;
 
@@ -460,7 +463,10 @@ export default function HomePage({ dict = EN, locale = "en" }: { dict?: Dictiona
   useEffect(() => {
     if (!hydrated) return;
     try {
-      localStorage.setItem("base31-votes", JSON.stringify(votes));
+      const saved = JSON.parse(localStorage.getItem("base31-votes") || "{}");
+      const external = Object.fromEntries(Object.entries(saved).filter(([key]) => key.startsWith("external:")));
+      const featured = Object.fromEntries(Object.entries(votes).filter(([key]) => !key.startsWith("external:")));
+      localStorage.setItem("base31-votes", JSON.stringify({ ...external, ...featured }));
     } catch {}
   }, [votes, hydrated]);
 
@@ -836,7 +842,8 @@ export default function HomePage({ dict = EN, locale = "en" }: { dict?: Dictiona
   // opens the rest. `foldCount` is how many cards the cut is holding back — the
   // same number either way, read as "+13" while they are hidden and "-13" once
   // they are showing.
-  const shownSites = showAllSites ? list : list.slice(0, SECTION_PREVIEW);
+  const shownSites = showAllSites || query.trim() ? list : list.slice(0, SECTION_PREVIEW);
+  useEffect(() => { if (query.trim()) { setSitesCollapsed(false); setActiveTag(null); } }, [query]);
   const foldCount = Math.max(0, list.length - SECTION_PREVIEW);
 
   // What the reveal effect below watches. The cards it has to fade in are not
@@ -874,6 +881,7 @@ export default function HomePage({ dict = EN, locale = "en" }: { dict?: Dictiona
     { id: "cool-sites", label: dict.coolSites },
     { id: "cool-apis", label: dict.coolApis },
     { id: "cool-apps", label: dict.coolApps },
+    { id: "cool-ais", label: dict.coolAis },
     { id: "about", label: "About" },
     { id: "support", label: "Support" },
     { id: "faq-heading", label: "FAQ" },
@@ -886,7 +894,7 @@ export default function HomePage({ dict = EN, locale = "en" }: { dict?: Dictiona
   const coolMatchCount = useMemo(
     () =>
       query.trim()
-        ? searchCoolSites(query).length + searchCoolApis(query).length + searchCoolApps(query).length
+        ? searchCoolSites(query).length + searchCoolApis(query).length + searchCoolApps(query).length + searchCoolAis(query).length
         : 0,
     [query],
   );
@@ -913,7 +921,7 @@ export default function HomePage({ dict = EN, locale = "en" }: { dict?: Dictiona
           observer.unobserve(entry.target);
         }
       },
-      { rootMargin: "0px 0px -10% 0px", threshold: 0.06 },
+      { rootMargin: "0px 0px -10% 0px", threshold: 0 },
     );
     for (const target of targets) {
       // Whatever is already on screen shows straight away.
@@ -1097,7 +1105,7 @@ export default function HomePage({ dict = EN, locale = "en" }: { dict?: Dictiona
               readership in views, the same readership counted once per person,
               how many sites it links out to, and the size of the project. They
               count up on load and hold their final value. */}
-          <HeroStats visitors={views} unique={unique} sites={allSites.length + coolSites.length} />
+          <HeroStats visitors={views} sites={allSites.length + coolSites.length + coolApis.length + coolApps.length + allCoolAis.length} />
           {/* One call to action, directly under the numbers. The "Why base31?"
               anchor and the old "Browse all sites" link are both gone: the
               directory is the next thing down the page, and the rail already
@@ -1159,6 +1167,7 @@ export default function HomePage({ dict = EN, locale = "en" }: { dict?: Dictiona
               { href: "#cool-sites", label: dict.coolSites, count: `${coolSites.length} sites` },
               { href: "#cool-apis", label: dict.coolApis, count: `${coolApis.length} APIs` },
               { href: "#cool-apps", label: dict.coolApps, count: `${coolApps.length} apps` },
+              { href: "#cool-ais", label: dict.coolAis, count: `${allCoolAis.length} AIs` },
             ].map((jump) => (
               <a key={jump.href} className="quick-jump" href={jump.href} onClick={() => tick(12)}>
                 <span className="quick-jump-label">{jump.label}</span>
@@ -1295,11 +1304,7 @@ export default function HomePage({ dict = EN, locale = "en" }: { dict?: Dictiona
                         <span className="site-name">{site.name}</span>
                         {site.community && <span className="site-badge mono">community</span>}
                         {isNew && <span className="site-badge is-new mono">new</span>}
-                        {site.lastChecked && (
-                          <span className="site-badge is-checked mono" title={`Last checked on ${site.lastChecked}`}>
-                            checked {formatChecked(site.lastChecked)}
-                          </span>
-                        )}
+                        <Freshness item={{ ...site, description: site.description ?? "" }} />
                       </span>
                       <span className="site-card-strip" aria-hidden="true" />
                       <span className="site-card-head">
@@ -1371,13 +1376,14 @@ export default function HomePage({ dict = EN, locale = "en" }: { dict?: Dictiona
                   >
                     <HeartIcon filled={pinned} />
                   </button>
+                  {detailPath(site.url) && <a className="site-detail-link featured-detail-link" href={detailPath(site.url)!}>About {site.name} →</a>}
                 </article>
               );
             })}
             {/* The cut. A long directory lands as a screenful you can take in,
                 with one line at the end holding the rest — the count is that
                 line's point, so it stays quiet until the pointer is on it. */}
-            {foldCount > 0 && (
+            {foldCount > 0 && !query.trim() && (
               <button
                 type="button"
                 className="show-all"
@@ -1431,6 +1437,7 @@ export default function HomePage({ dict = EN, locale = "en" }: { dict?: Dictiona
             config/cool-apps.json, for the visitor who wants a tool to use
             rather than a site to read. */}
         <CoolApps dict={dict} query={query} />
+        <CoolAis dict={dict} query={query} />
 
         <AboutSection />
 

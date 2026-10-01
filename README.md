@@ -719,6 +719,29 @@ combined with the wildcard. Pick one:
   nameservers, so every subdomain has to be added in **Settings → Domains** by
   hand and a new folder under `public/sites/` is no longer live on its own.
 
+## Directory additions (1.24.0)
+
+- `config/cool-ais.json` supplies 15 categorized browser AI services, including
+  ChatGPT and Gemini. The hero search reaches Featured sites and all four
+  external collections; searches open sections, clear category filters and show
+  every match rather than leaving results behind the nine-card preview.
+- `lib/directory.ts` owns stable detail slugs and namespaced URL vote keys.
+  `/sites/<slug>` pages are statically generated for every curated listing, with
+  canonical/social metadata, WebPage and breadcrumb JSON-LD, related picks,
+  voting and sitemap entries. Existing `/tools/<slug>` guides remain available.
+- `components/site-votes.tsx` reuses the Worker's `/votes` and `/vote` endpoints.
+  Bulk reads are batched, choices share `base31-votes` storage, requests lock
+  individual controls while pending, and failures show an error without saving
+  an unconfirmed vote. External controls are siblings of links, never nested.
+- `addedAt` and `lastChecked` are optional ISO dates. New AI entries have their
+  actual addition date; apps use the recorded 1.22 release date. Unknown dates
+  are not invented. Recently added covers 30 days; Fresh means reviewed within
+  30 days; reviews older than 90 days show Review due. No review date shows
+  Not yet reviewed. These are editorial labels, not live uptime checks.
+- The hero shows views, websites linked and lines of code. Unique visitors are
+  still tracked and displayed on `/stats`, but not in the homepage hero.
+- Run `npm run test:directory` for slug, search, date and vote-key checks.
+
 ## Local development
 
 ```bash

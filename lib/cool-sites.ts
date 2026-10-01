@@ -14,6 +14,8 @@ export type CoolSite = {
       tags run to dozens of values, which would be a wall of chips, so each
       site is filed under one of the handful of categories below. */
   category: string;
+  addedAt?: string;
+  lastChecked?: string;
 };
 
 export const allCoolSites = coolSites as CoolSite[];
@@ -29,7 +31,7 @@ export const coolSiteCategories: string[] = (() => {
 })();
 
 /** Everything about a cool site that a search should look at, lowercased. */
-const index = (site: CoolSite) => `${site.name} ${site.url} ${site.tags.join(" ")} ${site.description}`.toLowerCase();
+const index = (site: CoolSite) => `${site.name} ${site.url} ${site.category} ${site.tags.join(" ")} ${site.description}`.toLowerCase();
 
 /** The cool sites matching a hero-search query (all of them when it is empty). */
 export const searchCoolSites = (query: string): CoolSite[] => {

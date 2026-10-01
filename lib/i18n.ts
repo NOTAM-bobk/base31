@@ -55,6 +55,10 @@ export const EN = {
   coolApisClosed:
     "Cool APIs are closed right now. Open the “Cool APIs” heading above to see the free APIs again.",
   coolApisNoMatch: "No cool APIs match that search — clear it to see all of them again.",
+  coolAis: "Cool AIs",
+  coolAisLede: "Browser AI assistants, research tools and creative services. Plans vary; verify important answers and avoid sharing sensitive information.",
+  coolAisClosed: "The AI picks are folded away — open the heading to explore them.",
+  coolAisNoMatch: "No AI tools match that search — clear it to see them all.",
   coolApps: "Cool apps",
   coolAppsLede:
     "Free web apps worth a bookmark — everything here runs in a tab, with no install and no account just to try it.",
@@ -103,6 +107,10 @@ export const ES: Dictionary = {
   coolApisClosed:
     "Las APIs geniales están cerradas ahora mismo. Abre el encabezado «APIs geniales» para volver a verlas.",
   coolApisNoMatch: "Ninguna API genial coincide con esa búsqueda: bórrala para volver a verlas todas.",
+  coolAis: "IAs geniales",
+  coolAisLede: "Asistentes de IA y herramientas de investigación y creación. Los planes varían; verifica las respuestas y evita compartir datos sensibles.",
+  coolAisClosed: "Las IAs están plegadas: abre el título para explorarlas.",
+  coolAisNoMatch: "Ninguna IA coincide: borra la búsqueda para verlas todas.",
   coolApps: "Apps geniales",
   coolAppsLede:
     "Apps web gratuitas que vale la pena guardar: todo funciona en una pestaña, sin instalar nada ni crear cuenta solo para probarlo.",
@@ -150,6 +158,10 @@ export const FR: Dictionary = {
   coolApisClosed:
     "Les API sympas sont fermées pour le moment. Ouvrez le titre « API sympas » ci-dessus pour les revoir.",
   coolApisNoMatch: "Aucune API sympa ne correspond à cette recherche — effacez-la pour toutes les revoir.",
+  coolAis: "IAs sympas",
+  coolAisLede: "Assistants IA et outils de recherche et de création. Les offres varient ; vérifiez les réponses et évitez les données sensibles.",
+  coolAisClosed: "Les IAs sont repliées — ouvrez le titre pour les explorer.",
+  coolAisNoMatch: "Aucune IA ne correspond — effacez la recherche pour toutes les voir.",
   coolApps: "Applis sympas",
   coolAppsLede:
     "Des applis web gratuites à garder en favori : tout tourne dans un onglet, sans installation ni compte juste pour essayer.",
@@ -197,6 +209,10 @@ export const PT: Dictionary = {
   coolApisClosed:
     "As APIs legais estão fechadas agora. Abra o título “APIs legais” acima para vê-las de novo.",
   coolApisNoMatch: "Nenhuma API legal corresponde a essa pesquisa — limpe-a para vê-las todas de novo.",
+  coolAis: "IAs legais",
+  coolAisLede: "Assistentes de IA e ferramentas de pesquisa e criação. Os planos variam; confira as respostas e evite compartilhar dados sensíveis.",
+  coolAisClosed: "As IAs estão recolhidas — abra o título para explorá-las.",
+  coolAisNoMatch: "Nenhuma IA corresponde — limpe a pesquisa para ver todas.",
   coolApps: "Apps legais",
   coolAppsLede:
     "Apps web gratuitos que valem um favorito: tudo roda em uma aba, sem instalar nada nem criar conta só para testar.",

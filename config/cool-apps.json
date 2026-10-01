@@ -1,5 +1,6 @@
 [
   {
+    "addedAt": "2026-09-30",
     "name": "Excalidraw",
     "category": "Draw & design",
     "url": "https://excalidraw.com",
@@ -7,6 +8,7 @@
     "description": "A hand-drawn-style whiteboard in the browser for diagrams and quick sketches, with live collaboration and no sign-up."
   },
   {
+    "addedAt": "2026-09-30",
     "name": "tldraw",
     "category": "Draw & design",
     "url": "https://www.tldraw.com",
@@ -14,6 +16,7 @@
     "description": "A crisp infinite canvas for sketching, diagramming and marking up images, quick enough to open for a single idea."
   },
   {
+    "addedAt": "2026-09-30",
     "name": "Photopea",
     "category": "Draw & design",
     "url": "https://www.photopea.com",
@@ -21,6 +24,7 @@
     "description": "A full image editor that opens PSD, XCF and Sketch files in the browser, close enough to Photoshop to work all day in."
   },
   {
+    "addedAt": "2026-09-30",
     "name": "Coolors",
     "category": "Draw & design",
     "url": "https://coolors.co",
@@ -28,6 +32,7 @@
     "description": "Generate colour palettes with the spacebar, then check contrast and export them as CSS, SVG or a share link."
   },
   {
+    "addedAt": "2026-09-30",
     "name": "Google Fonts",
     "category": "Draw & design",
     "url": "https://fonts.google.com",
@@ -35,6 +40,7 @@
     "description": "Thousands of open-source typefaces to preview, pair and download, with the CSS to drop any of them onto a page."
   },
   {
+    "addedAt": "2026-09-30",
     "name": "Typescale",
     "category": "Draw & design",
     "url": "https://typescale.com",
@@ -42,6 +48,7 @@
     "description": "Build a modular type scale for a project and read off the matching font sizes, line heights and CSS in one place."
   },
   {
+    "addedAt": "2026-09-30",
     "name": "Squoosh",
     "category": "Images",
     "url": "https://squoosh.app",
@@ -49,6 +56,7 @@
     "description": "Compress and convert images in the browser with a live side-by-side preview; the file never leaves your machine."
   },
   {
+    "addedAt": "2026-09-30",
     "name": "TinyPNG",
     "category": "Images",
     "url": "https://tinypng.com",
@@ -56,6 +64,7 @@
     "description": "Shrink PNG and JPEG files with smart lossy compression, a handful at a time, and keep the transparency intact."
   },
   {
+    "addedAt": "2026-09-30",
     "name": "remove.bg",
     "category": "Images",
     "url": "https://www.remove.bg",
@@ -63,6 +72,7 @@
     "description": "Erase the background from a photo automatically in a few seconds, with the option to drop in a fresh one behind it."
   },
   {
+    "addedAt": "2026-09-30",
     "name": "Cleanup.pictures",
     "category": "Images",
     "url": "https://cleanup.pictures",
@@ -70,6 +80,7 @@
     "description": "Paint over anything you want gone from a photo — a stranger, a wire, a watermark — and the space is filled in."
   },
   {
+    "addedAt": "2026-09-30",
     "name": "Unsplash",
     "category": "Images",
     "url": "https://unsplash.com",
@@ -77,6 +88,7 @@
     "description": "A huge library of free, high-resolution photographs, licensed for commercial use with no attribution required."
   },
   {
+    "addedAt": "2026-09-30",
     "name": "CodePen",
     "category": "Developer",
     "url": "https://codepen.io",
@@ -84,6 +96,7 @@
     "description": "Write HTML, CSS and JavaScript in three panes and watch the result update live — the front-end playground everyone shares."
   },
   {
+    "addedAt": "2026-09-30",
     "name": "StackBlitz",
     "category": "Developer",
     "url": "https://stackblitz.com",
@@ -91,6 +104,7 @@
     "description": "A full IDE in the tab that boots Node and npm projects in seconds, so you can try a framework without installing one."
   },
   {
+    "addedAt": "2026-09-30",
     "name": "RegExr",
     "category": "Developer",
     "url": "https://regexr.com",
@@ -98,6 +112,7 @@
     "description": "Build and test regular expressions against your own sample text, with every match explained token by token."
   },
   {
+    "addedAt": "2026-09-30",
     "name": "Carbon",
     "category": "Developer",
     "url": "https://carbon.now.sh",
@@ -105,6 +120,7 @@
     "description": "Turn a snippet into a clean, shareable image with window chrome, padding and a theme — the standard way to post code."
   },
   {
+    "addedAt": "2026-09-30",
     "name": "JSON Crack",
     "category": "Developer",
     "url": "https://jsoncrack.com",
@@ -112,6 +128,7 @@
     "description": "Turn a dense JSON file into an explorable node graph, so nested objects and arrays finally make visual sense."
   },
   {
+    "addedAt": "2026-09-30",
     "name": "Transform",
     "category": "Developer",
     "url": "https://transform.tools",
@@ -119,6 +136,7 @@
     "description": "Convert between JSON, TypeScript, GraphQL, YAML and a dozen other formats, turning a JSON blob into types in one paste."
   },
   {
+    "addedAt": "2026-09-30",
     "name": "Hoppscotch",
     "category": "Developer",
     "url": "https://hoppscotch.io",
@@ -126,6 +144,7 @@
     "description": "A lightweight API client in the browser for sending HTTP, WebSocket and GraphQL requests and reading the response."
   },
   {
+    "addedAt": "2026-09-30",
     "name": "dbdiagram.io",
     "category": "Developer",
     "url": "https://dbdiagram.io",
@@ -133,6 +152,7 @@
     "description": "Sketch a database schema in a small DSL and watch it become a clean entity-relationship diagram you can export."
   },
   {
+    "addedAt": "2026-09-30",
     "name": "CyberChef",
     "category": "Developer",
     "url": "https://gchq.github.io/CyberChef/",
@@ -140,6 +160,7 @@
     "description": "The self-styled cyber Swiss army knife: base64, hashing, ciphers and dozens of other transforms, chained into recipes."
   },
   {
+    "addedAt": "2026-09-30",
     "name": "iLovePDF",
     "category": "Documents",
     "url": "https://www.ilovepdf.com",
@@ -147,6 +168,7 @@
     "description": "Merge, split, compress, sign and convert PDFs in the browser — the everyday toolbox for any document job."
   },
   {
+    "addedAt": "2026-09-30",
     "name": "PDF24 Tools",
     "category": "Documents",
     "url": "https://tools.pdf24.org",
@@ -154,6 +176,7 @@
     "description": "A sprawling set of free PDF utilities, from OCR and page numbers to cropping and converting, all run in the browser."
   },
   {
+    "addedAt": "2026-09-30",
     "name": "CloudConvert",
     "category": "Documents",
     "url": "https://cloudconvert.com",
@@ -161,6 +184,7 @@
     "description": "Convert between more than two hundred file formats — documents, images, audio, video and archives — and hand back a link."
   },
   {
+    "addedAt": "2026-09-30",
     "name": "Notion",
     "category": "Productivity",
     "url": "https://www.notion.so",
@@ -168,6 +192,7 @@
     "description": "Notes, databases and docs that nest inside each other, a flexible workspace you can shape into almost any system."
   },
   {
+    "addedAt": "2026-09-30",
     "name": "Trello",
     "category": "Productivity",
     "url": "https://trello.com",
@@ -175,6 +200,7 @@
     "description": "Boards, lists and cards that make a project's state visible at a glance — the kanban tool most people start with."
   },
   {
+    "addedAt": "2026-09-30",
     "name": "Toggl Track",
     "category": "Productivity",
     "url": "https://toggl.com/track/",
@@ -182,6 +208,7 @@
     "description": "A one-button timer that logs where the hours went, with reports that show which projects actually earn their keep."
   },
   {
+    "addedAt": "2026-09-30",
     "name": "LanguageTool",
     "category": "Writing",
     "url": "https://languagetool.org",
@@ -189,6 +216,7 @@
     "description": "A grammar and style checker for English and thirty other languages, catching the mistakes a spell checker waves through."
   },
   {
+    "addedAt": "2026-09-30",
     "name": "Hemingway Editor",
     "category": "Writing",
     "url": "https://hemingwayapp.com",
@@ -196,6 +224,7 @@
     "description": "Paste in prose and it flags the long sentences and passive voice, grading the writing on how easy it is to read."
   },
   {
+    "addedAt": "2026-09-30",
     "name": "Desmos",
     "category": "Math & science",
     "url": "https://www.desmos.com/calculator",
@@ -203,6 +232,7 @@
     "description": "A graphing calculator that plots equations as you type them, with sliders to watch a curve respond in real time."
   },
   {
+    "addedAt": "2026-09-30",
     "name": "GeoGebra",
     "category": "Math & science",
     "url": "https://www.geogebra.org",
@@ -210,6 +240,7 @@
     "description": "Interactive geometry, algebra and calculus tools that started as classroom software and stayed free for everyone."
   },
   {
+    "addedAt": "2026-09-30",
     "name": "Wolfram Alpha",
     "category": "Math & science",
     "url": "https://www.wolframalpha.com",
@@ -217,6 +248,7 @@
     "description": "Ask a factual or computational question and it works out the answer from curated data instead of guessing from the web."
   },
   {
+    "addedAt": "2026-09-30",
     "name": "Radio Garden",
     "category": "Media & sound",
     "url": "https://radio.garden",
@@ -224,6 +256,7 @@
     "description": "Spin a globe and drop into a live radio station anywhere on it — thousands of cities, playing what they play right now."
   },
   {
+    "addedAt": "2026-09-30",
     "name": "myNoise",
     "category": "Media & sound",
     "url": "https://mynoise.net",
@@ -231,6 +264,7 @@
     "description": "Generative soundscapes for focus, sleep and tinnitus relief, each one adjustable in ten bands until it fits the room."
   },
   {
+    "addedAt": "2026-09-30",
     "name": "Loom",
     "category": "Media & sound",
     "url": "https://www.loom.com",
@@ -238,6 +272,7 @@
     "description": "Record a screen and camera together and get a shareable link the moment you stop — no editing, no file to send."
   },
   {
+    "addedAt": "2026-09-30",
     "name": "time.is",
     "category": "Utilities",
     "url": "https://time.is",
@@ -245,6 +280,7 @@
     "description": "The exact time in any city or timezone, to the second, with the offset and daylight-saving status spelled out."
   },
   {
+    "addedAt": "2026-09-30",
     "name": "Speedtest",
     "category": "Utilities",
     "url": "https://www.speedtest.net",
@@ -252,6 +288,7 @@
     "description": "The familiar download, upload and latency test, useful for proving to an ISP that the connection really is slow."
   },
   {
+    "addedAt": "2026-09-30",
     "name": "Jitsi Meet",
     "category": "Utilities",
     "url": "https://meet.jit.si",

@@ -35,6 +35,9 @@ jobs:
       - name: Check external cool-sites links
         run: node scripts/check-cool-sites.mjs
 
+      - name: Directory regression tests
+        run: npm run test:directory
+
       - name: Typecheck
         run: npm run typecheck
 

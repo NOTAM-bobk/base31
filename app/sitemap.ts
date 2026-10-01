@@ -1,4 +1,5 @@
 import type { MetadataRoute } from "next";
+import { directoryEntries } from "@/lib/directory";
 import { blogPosts } from "@/lib/blogs";
 import { publishedToolSlugs } from "@/lib/tool-pages";
 import changelog from "@/config/changelog.json";
@@ -87,6 +88,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${siteUrl}/es`, changeFrequency: "weekly" as const, priority: 0.8 },
     { url: `${siteUrl}/fr`, changeFrequency: "weekly" as const, priority: 0.8 },
     { url: `${siteUrl}/pt`, changeFrequency: "weekly" as const, priority: 0.8 },
+    ...directoryEntries.map((entry) => ({
+      url: `${siteUrl}/sites/${entry.slug}`,
+      ...(entry.lastChecked || entry.addedAt ? { lastModified: new Date(entry.lastChecked ?? entry.addedAt!) } : {}),
+      changeFrequency: "monthly" as const,
+      priority: 0.6,
+    })),
     // One URL per listed subdomain site.
     ...listedSites.map((site) => ({
       url: site.url,

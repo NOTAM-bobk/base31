@@ -1,5 +1,19 @@
 [
   {
+    "version": "1.24.0",
+    "date": "2026-10-01",
+    "title": "AI picks, community votes and a page for every site",
+    "summary": "Cool AIs joins the directory with 15 browser AI tools. Search reaches all five collections, external picks gain shared voting and freshness labels, and every curated entry has an SEO-ready detail page. The homepage hero keeps three figures; unique visitors remain in the stats experience.",
+    "highlights": [
+      "Cool AIs includes ChatGPT, Gemini, Claude, Copilot, Perplexity and other assistant, research and creative tools. The section supports the same search, categories and disclosure controls as the other strips, in all four homepage languages.",
+      "Search now clears conflicting category filters, opens sections and shows all matching cards rather than hiding results behind the nine-card preview. Category names and web addresses are searchable too.",
+      "All external strips share the existing Worker's voting service. Stable URL keys keep votes consistent between cards and detail pages; failed submissions show a retry message instead of claiming success.",
+      "Added dates and review timestamps power Recently added, Fresh and Review due badges. Entries without recorded review dates explicitly say Not yet reviewed. AI entries carry their real addition date; browser apps use their recorded release date.",
+      "Every curated listing has a static /sites/<slug> detail page with canonical metadata, social previews, breadcrumbs, structured data, related picks, review dates and voting. The sitemap includes them and existing tool guides remain linked.",
+      "The homepage hero no longer displays unique visitors. Unique visitor tracking and the stats page are unchanged."
+    ]
+  },
+  {
     "version": "1.23.0",
     "date": "2026-09-30",
     "title": "A soft edge on the grey band, headings in the house hand, and the cards that went missing",

@@ -9,8 +9,8 @@ const COUNT_MS = 3400;
 
 // The project's size in lines of source, across the app, the components, the
 // worker and the hand-written subdomain pages. Measured by hand on each
-// release: 1.23.0 added 67 tracked lines.
-const LINES_OF_CODE = 52579;
+// release: 1.24.0 added 478 source lines.
+const LINES_OF_CODE = 53057;
 
 /**
  * Counts a figure up from zero to `target` with an ease-out, in a rAF loop.
@@ -47,9 +47,8 @@ function useCountUp(target: number | null, duration = COUNT_MS) {
 }
 
 /**
- * The four figures the hero prints directly above the search and the one
- * action: how many times the directory has been read, how many of those loads
- * were a person rather than a reload, how many sites it links out to (the
+ * The three figures the hero prints directly above the search and the one
+ * action: how many times the directory has been read, how many sites it links out to (the
  * built-in entries plus the off-directory picks), and how much code the project
  * is.
  *
@@ -57,21 +56,19 @@ function useCountUp(target: number | null, duration = COUNT_MS) {
  * labels — they name the same numbers the counters and the source already
  * print in English elsewhere on the page.
  */
-export default function HeroStats({ visitors, unique, sites }: { visitors: number | null; unique: number | null; sites: number }) {
+export default function HeroStats({ visitors, sites }: { visitors: number | null; sites: number }) {
   const visitorCount = useCountUp(visitors);
-  const uniqueCount = useCountUp(unique);
   const siteCount = useCountUp(sites);
   const codeCount = useCountUp(LINES_OF_CODE);
 
   const stats = [
     { label: "views", text: visitors == null ? "—" : visitorCount.toLocaleString() },
-    { label: "unique visitors", text: unique == null ? "—" : uniqueCount.toLocaleString() },
     { label: "websites linked", text: siteCount.toLocaleString() },
     { label: "lines of code", text: codeCount.toLocaleString() },
   ];
 
   return (
-    <ul className="hero-stats" aria-label="base31 at a glance, four figures">
+    <ul className="hero-stats" aria-label="base31 at a glance, three figures">
       {stats.map((stat) => (
         <li key={stat.label} className="hero-stat">
           <span className="hero-stat-value">{stat.text}</span>

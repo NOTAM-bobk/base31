@@ -14,6 +14,8 @@ export type CoolApp = {
       tags run to dozens of values, which would be a wall of chips, so each app
       is filed under one of the handful of categories below. */
   category: string;
+  addedAt?: string;
+  lastChecked?: string;
 };
 
 export const allCoolApps = coolApps as CoolApp[];
@@ -29,7 +31,7 @@ export const coolAppCategories: string[] = (() => {
 })();
 
 /** Everything about a cool app that a search should look at, lowercased. */
-const index = (app: CoolApp) => `${app.name} ${app.url} ${app.tags.join(" ")} ${app.description}`.toLowerCase();
+const index = (app: CoolApp) => `${app.name} ${app.url} ${app.category} ${app.tags.join(" ")} ${app.description}`.toLowerCase();
 
 /** The cool apps matching a hero-search query (all of them when it is empty). */
 export const searchCoolApps = (query: string): CoolApp[] => {

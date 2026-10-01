@@ -5,8 +5,8 @@
   "start_url": "https://donation.base31.org/",
   "scope": "https://donation.base31.org/",
   "display": "standalone",
-  "background_color": "#f6f4ef",
-  "theme_color": "#f6f4ef",
+  "background_color": "#fafafa",
+  "theme_color": "#fafafa",
   "icons": [
     { "src": "https://donation.base31.org/donation-icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" },
     { "src": "https://base31.org/icons/base31-icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },

@@ -1,5 +1,17 @@
 [
   {
+    "version": "1.26.0",
+    "date": "2026-10-01",
+    "title": "A quieter shortlist and a fresh way to support",
+    "summary": "Search keeps four example tags without the extra hint. Editor's picks loses its label and button clutter, fits phones more comfortably, and the donation page becomes a clean, playful space with direct FundRazr support links.",
+    "highlights": [
+      "Two example tag chips and the or type #tag hint have been removed; exact tag search continues to work across all collections.",
+      "Editor's picks no longer shows the shortlist label, pause button, arrows or clickable slide dots. Rotation pauses on hover and stops after interaction; arrow-key and swipe browsing remain available with reduced-motion support.",
+      "Mobile picks use stacked copy and a full-width exploration link, without the oversized decorative number.",
+      "The donation page uses fine borders, generous spacing, monochrome surfaces and small playful accents in both system themes. Support links lead to the FundRazr campaign, replacing email payment links and placeholder crypto wallets."
+    ]
+  },
+  {
     "version": "1.25.0",
     "date": "2026-10-01",
     "title": "An editor's shortlist and a clearer directory",

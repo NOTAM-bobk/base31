@@ -793,7 +793,7 @@ export default function HomePage({ dict = EN, locale = "en" }: { dict?: Dictiona
     for (const entry of [...directoryEntries, ...userSites]) {
       for (const tag of entry.tags ?? []) if (!/\s/.test(tag)) counts.set(tag, (counts.get(tag) ?? 0) + 1);
     }
-    return [...counts].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])).slice(0, 6).map(([tag]) => tag);
+    return [...counts].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])).slice(0, 4).map(([tag]) => tag);
   }, [userSites]);
 
   const list = useMemo(() => {
@@ -1138,7 +1138,6 @@ export default function HomePage({ dict = EN, locale = "en" }: { dict?: Dictiona
           <div className="search-tag-suggestions" aria-label="Search tags across all collections">
             <span className="mono">Try a tag</span>
             {searchTags.map((tag) => <button type="button" key={tag} aria-pressed={query.toLowerCase() === `#${tag.toLowerCase()}`} onClick={() => { setQuery(`#${tag}`); searchRef.current?.focus(); }}>#{tag}</button>)}
-            <span className="search-tag-help">or type #tag</span>
           </div>
         </section>
 

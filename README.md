@@ -125,7 +125,9 @@ Edit `config/editors-picks.json`. Selections may come from **any curated collect
 
 Array order is rotation order. Remove a selection to remove its slide; an empty array hides the carousel. Each note needs at least 20 characters. `npm run check` catches unknown or repeated slugs. These picks are **not sponsored**—paid placements belong in `referrals.json` instead.
 
-The carousel advances every seven seconds, pauses while hovered/focused, has previous/next and slide-selection controls, and offers a pause button. Reduced-motion visitors navigate manually.
+The carousel advances every seven seconds with quiet, non-interactive progress marks. It pauses on hover and stops automatic rotation after focus, touch, or manual browsing. There are no visible pause or slide-switch buttons; use arrow keys while focused or swipe on mobile to browse. Reduced-motion visitors navigate manually. On phones the card stacks its copy and full-width link without the large decorative number.
+
+The donation page lives in `public/sites/donation/index.html`. Its support links and DonateAction schema point to `https://fundrazr.com/62nDBa`; payment options and campaign terms are handled there. Keep that destination in sync when changing campaigns. The page uses local CSS, native FAQ disclosures, and system light/dark preferences, without payment forms or third-party script dependencies.
 
 ### Add a featured static tool
 

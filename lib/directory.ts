@@ -10,6 +10,18 @@ export type DirectoryItem = {
   category?: string; addedAt?: string; lastChecked?: string; createdAt?: number;
 };
 export type DirectoryEntry = DirectoryItem & { slug: string; section: string; sectionId: string; voteKey: string };
+// Semantic families plus a stable fallback keep each tag's color consistent.
+export function tagTone(tag: string): "mint" | "sky" | "amber" | "coral" {
+  const value = tag.trim().toLowerCase();
+  if (/^(utility|tools?|free|no-key|productivity|base31)$/.test(value)) return "mint";
+  if (/^(dev|developer|code|github|ai|data|network|domains?|status|iframe)$/.test(value)) return "sky";
+  if (/^(game|games|fun|entertainment|word|puzzle|learning|education|vocabulary)$/.test(value)) return "amber";
+  if (/^(privacy|security|password|email|image|audio|music|design|portfolio)$/.test(value)) return "coral";
+  let hash = 0;
+  for (const character of value) hash = (Math.imul(hash, 31) + character.charCodeAt(0)) >>> 0;
+  return (["mint", "sky", "amber", "coral"] as const)[hash % 4];
+}
+
 const slugify = (value: string) => value.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 
 // Namespaced URL keys keep the same site's vote totals consistent across strips.

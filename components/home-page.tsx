@@ -25,7 +25,7 @@ import SectionRail, { type RailSection } from "@/components/section-rail";
 import HeroStats from "@/components/hero-stats";
 import CoolAis from "@/components/cool-ais";
 import Freshness from "@/components/freshness";
-import { allCoolAis, searchCoolAis, detailPath, directoryEntries } from "@/lib/directory";
+import { allCoolAis, searchCoolAis, detailPath, directoryEntries, tagTone } from "@/lib/directory";
 import { matchesQuery } from "@/lib/search";
 import EditorsPicks from "@/components/editors-picks";
 
@@ -1276,10 +1276,8 @@ export default function HomePage({ dict = EN, locale = "en" }: { dict?: Dictiona
                   role="listitem"
                   style={{ "--i": index } as CSSProperties}
                 >
-                  {/* The link covers the preview, icon, name and host; the
-                      description + vote row and the tags sit outside it, and
-                      the pin floats over the preview, so no control is ever
-                      nested in the link. */}
+                  {/* Preview tags and copy belong to the outbound link;
+                      votes, details and the pin remain separate controls. */}
                   <a
                     href={site.url}
                     className="site-link site-card-main"
@@ -1287,7 +1285,12 @@ export default function HomePage({ dict = EN, locale = "en" }: { dict?: Dictiona
                     rel="noreferrer"
                     aria-label={`${site.name} — open site${site.description ? `: ${site.description}` : ""}`}
                   >
-                    <SitePreview site={site} />
+                    <span className="site-preview-shell">
+                      <SitePreview site={site} />
+                      {!!site.tags?.length && <span className="tags preview-tags" aria-label="Tags">
+                        {site.tags.map((tag) => <span key={tag} className={`tag mono tone-${tagTone(tag)}`}>{tag}</span>)}
+                      </span>}
+                    </span>
                     <span className="site-card-info">
                       <span className="site-card-title">
                         <span className="site-name">{site.name}</span>
@@ -1300,11 +1303,6 @@ export default function HomePage({ dict = EN, locale = "en" }: { dict?: Dictiona
                         <span className="site-open mono" aria-hidden="true">↗</span>
                         <span className="sr-only"> (opens in a new tab)</span>
                       </span>
-                      {site.tags && site.tags.length > 0 && (
-                        <span className="tags" aria-label="Tags">
-                          {site.tags.map((tag) => <span key={tag} className="tag mono">{tag}</span>)}
-                        </span>
-                      )}
                       {site.description && <span className="site-description">{site.description}</span>}
                     </span>
                   </a>
@@ -1313,11 +1311,8 @@ export default function HomePage({ dict = EN, locale = "en" }: { dict?: Dictiona
                       pin floats over the preview. */}
                   <Freshness item={{ ...site, description: site.description ?? "" }} />
                   <div className="site-card-lower">
-                    {detailPath(site.url) && <a className="site-detail-link featured-detail-link" href={detailPath(site.url)!}>Details <span aria-hidden="true">→</span><span className="sr-only"> about {site.name}</span></a>}
                     <div className="site-actions">
-                      {/* The two thumbs split the bar down the middle — half
-                          the width each — so the card's whole foot is a
-                          target and there is no dead space between them. */}
+                      {/* Rate first; the detail link follows on its own row. */}
                       <span className="vote-stack">
                         <button
                           type="button"
@@ -1353,6 +1348,7 @@ export default function HomePage({ dict = EN, locale = "en" }: { dict?: Dictiona
                         </button>
                       </span>
                     </div>
+                    {detailPath(site.url) && <a className="site-detail-link featured-detail-link" href={detailPath(site.url)!}>Details <span aria-hidden="true">→</span><span className="sr-only"> about {site.name}</span></a>}
                   </div>
                   {/* The pin floats at the card's top-right corner, over the
                       preview, but stays outside the link so the two controls

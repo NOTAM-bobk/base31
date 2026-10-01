@@ -1,5 +1,16 @@
 [
   {
+    "version": "1.27.0",
+    "date": "2026-10-01",
+    "title": "Color on the cards, a clearer next step",
+    "summary": "Featured tags now sit along the bottom of each preview in consistent mint, sky, amber and coral colors. Details follows the rating buttons, and coordinated accents bring a little more color to the homepage in both themes.",
+    "highlights": [
+      "Featured cards put rating controls first and the Details link on a separate row below, with interactive controls kept outside the outbound link.",
+      "Tags overlay the bottom of the preview image, wrapping on small screens. Semantic tag families share colors and other tags use a stable fallback; labels remain readable without relying on color alone.",
+      "Sky, amber and coral join emerald in the hero figures, editor's picks, search suggestions and quick-jump accents, with separate light and dark theme values."
+    ]
+  },
+  {
     "version": "1.26.0",
     "date": "2026-10-01",
     "title": "A quieter shortlist and a fresh way to support",

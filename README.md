@@ -262,6 +262,8 @@ For wildcard tool routing, configure the apex and `*.base31.org` in Vercel. Verc
 
 Use the existing CSS tokens for both themes. Styles load `globals.css` → `overrides.css` → `inner-pages.css` → `late.css` → `directory.css`; the last file owns the editorial shortlist and refreshed directory cards. No Tailwind or additional React installation is needed.
 
+Featured cards place color-coded tags along the bottom of the preview image. `tagTone` in `lib/directory.ts` maps semantic tag families to mint, sky, amber, or coral, with a stable fallback for custom tags. Text labels remain visible, so meaning never depends on color alone. Ratings sit above the Details link in the card footer. The homepage uses coordinated sky, amber and coral accents alongside emerald, with theme-specific contrast values.
+
 Keep pin, vote, and detail controls **outside** outbound card links. New controls need accessible names, visible keyboard focus, and touch-friendly targets. Carousel rotation and decorative motion respect reduced motion. The page scrollbar is visually hidden where supported, but wheel/touch/keyboard scrolling remains enabled; forced-colors users retain native scrollbar chrome.
 
 Homepage reveal state uses `data-revealed`, not a React-managed class, and the observer tracks shown card IDs rather than just list length. Don't use the homepage's reveal gate on standalone routes without an observer, or their content can remain invisible.

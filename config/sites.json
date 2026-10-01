@@ -303,5 +303,21 @@
     "show": true,
     "language": "en",
     "lastChecked": "2026-09-29"
+  },
+  {
+    "name": "Background Remover",
+    "subdomain": "backgroundremover",
+    "url": "https://backgroundremover.base31.org",
+    "tags": [
+      "image",
+      "background",
+      "remove",
+      "utility",
+      "tool"
+    ],
+    "description": "Remove the background from a photo in your browser, swap in a colour or gradient, and download a transparent PNG with no upload.",
+    "show": true,
+    "language": "en",
+    "addedAt": "2026-10-01"
   }
 ]

@@ -494,6 +494,35 @@ export const toolPages: Record<string, ToolPage> = {
       { question: "Is the source code available?", answer: "The portfolio describes the work itself. If you want to talk about a specific project, the contact details at the end of the page are the way in." },
     ],
   },
+
+  backgroundremover: {
+    headline: "Remove an image background in your browser, free",
+    metaDescription:
+      "Remove the background from a photo in your browser, replace it with a colour or gradient, and download a transparent PNG — free, private, no sign-up.",
+    summary: "Clear a photo's backdrop on your own device, then restyle it and save a transparent PNG.",
+    intro: [
+      "Background Remover takes the backdrop out of a picture without sending it anywhere. Drop in a photo, clear the background in one click, then place the subject on a new colour, a gradient, or nothing at all — a fully transparent PNG.",
+      "The work happens in your browser rather than on a server, so your files stay on your device: there is no copy to expire, log or leak. A tolerance slider and a click-to-erase brush clean up stubborn edges, and padding, a drop shadow and a trim control finish the job.",
+    ],
+    features: [
+      { title: "One-click removal", body: "The tool samples the colours along the image edges and clears the connected backdrop, which is fastest against a plain wall or a solid colour." },
+      { title: "Replace the backdrop", body: "Keep it transparent, or drop the subject onto any colour, a two-colour gradient, or a soft drop shadow." },
+      { title: "Click to erase", body: "Any leftover patch can be removed by hand: turn on Erase by hand and click it away, with Undo always a step behind." },
+      { title: "Nothing is uploaded", body: "Redrawing and re-encoding the image on your device means the file never leaves the browser, so there is no server copy to leak." },
+    ],
+    steps: [
+      "Drop an image onto the page, paste it, or choose a file from your device.",
+      "Press Remove background, then adjust the tolerance or click to erase anything left over.",
+      "Choose a background, add a shadow or padding if you want them, and download a transparent PNG.",
+    ],
+    faqs: [
+      { question: "Are my images uploaded to a server?", answer: "No. Your browser reads, edits and saves the picture locally, so the file never leaves your device. You can unplug your connection after the page loads and it still works." },
+      { question: "How does the removal work?", answer: "It samples the colours along the edges and clears the connected pixels that match that backdrop, which is most reliable on plain or lightly textured backgrounds. The tolerance slider controls how much is cleared, and clicking any remaining patch erases it by hand." },
+      { question: "Which format should I download?", answer: "PNG keeps a fully transparent background and suits most uses. WebP is smaller and also supports transparency. JPEG cannot store transparency, so the cleared area is filled with your chosen colour or white." },
+      { question: "Does it work on a phone?", answer: "Yes, the layout stacks on small screens. Very large images are limited by your device's memory rather than by the tool, so process one at a time on a phone." },
+    ],
+    related: ["imagecompressor", "appscreenshot", "qrgenerator"],
+  },
 };
 
 const tagsBySlug = new Map(

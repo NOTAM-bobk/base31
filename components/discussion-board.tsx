@@ -87,7 +87,7 @@ export default function DiscussionBoard() {
 
   return <section id="discussion" className="discussion-board" aria-labelledby="discussion-heading">
     <div className="discussion-heading">
-      <div><p className="eyebrow mono">the community corner</p><h2 id="discussion-heading">Good links. Better conversations.</h2><p>Share a discovery, ask a question, or say hello to the people exploring with you.</p></div>
+      <div><h2 id="discussion-heading">Good links. Better conversations.</h2><p>Share a discovery, ask a question, or say hello to the people exploring with you.</p></div>
       <span className="discussion-badge mono">Open to everyone</span>
     </div>
     <div className="discussion-layout">
@@ -108,7 +108,7 @@ export default function DiscussionBoard() {
         <div className="discussion-feed-heading"><h3>{cursor ? "Earlier conversations" : "Latest conversations"}</h3><button type="button" className="discussion-text-button" onClick={refreshPage} disabled={loading}>Refresh ↻</button></div>
         <p className="discussion-poll-note mono">Refreshes every 15 seconds while this tab is visible</p>
         {loadError && <p className="discussion-error" role="status">{loadError} Your draft is safe; use Refresh to retry.</p>}
-        {loading && !available && <p className="discussion-empty" role="status">Opening the community corner…</p>}
+        {loading && !available && <p className="discussion-empty" role="status">Opening the conversation…</p>}
         {!loading && !loadError && page.threads.length === 0 && <div className="discussion-empty"><span aria-hidden="true">✳</span><h3>A little quiet in here.</h3><p>Be the first to start a conversation. What’s your favorite find in the directory?</p></div>}
         {page.threads.map(thread => <div className="discussion-thread" key={thread.id}>{renderMessage(thread, thread)}{thread.replies.length > 0 && <div className="discussion-replies" aria-label={`Replies to ${thread.name}`}>{thread.replies.map(message => renderMessage(message, thread))}</div>}</div>)}
         <nav className="discussion-pagination" aria-label="Conversation pages">

@@ -1,0 +1,281 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+
+<!-- SEO --------------------------------------------------------------- -->
+<title>Free Online Background Remover — Remove Image Backgrounds | backgroundremover.base31.org</title>
+<meta name="description" content="Remove the background from any photo for free, right in your browser. Drop an image, clear the backdrop, swap it for a colour or gradient, and download a transparent PNG — no upload, no sign-up." />
+<link rel="canonical" href="https://backgroundremover.base31.org/" />
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />
+<meta name="color-scheme" content="light dark" />
+<meta name="theme-color" content="#fafafa" media="(prefers-color-scheme: light)" />
+<meta name="theme-color" content="#050506" media="(prefers-color-scheme: dark)" />
+<meta name="application-name" content="Background Remover" />
+<meta name="apple-mobile-web-app-title" content="Background Remover" />
+<meta name="author" content="base31.org" />
+
+<!-- Social preview ---------------------------------------------------- -->
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="Background Remover" />
+<meta property="og:locale" content="en_US" />
+<meta property="og:title" content="Free Online Background Remover — No Upload" />
+<meta property="og:description" content="Clear the background from a photo in your browser, replace it with a colour or gradient, and download a transparent PNG. Nothing is uploaded." />
+<meta property="og:url" content="https://backgroundremover.base31.org/" />
+<meta property="og:image" content="https://base31.org/opengraph-image" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:image:alt" content="Background Remover — clear a photo's background in the browser" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Free Online Background Remover — No Upload" />
+<meta name="twitter:description" content="Remove a photo background in your browser, swap in a new colour, and download a transparent PNG. Free, no sign-up, nothing uploaded." />
+<meta name="twitter:image" content="https://base31.org/opengraph-image" />
+<meta name="twitter:image:alt" content="Background Remover — clear a photo's background in the browser" />
+
+<link id="favicon" rel="icon" href="./favicon.svg" type="image/svg+xml" />
+<link rel="apple-touch-icon" href="https://base31.org/icons/apple-touch-icon.png" />
+
+<!-- Structured data: the site, the tool it hosts and its FAQ. --------- -->
+<script type="application/ld+json">
+{"@context":"https://schema.org","@graph":[{"@type":"WebSite","@id":"https://backgroundremover.base31.org/#website","url":"https://backgroundremover.base31.org/","name":"Free Online Background Remover","alternateName":"Background Remover by base31.org","description":"Remove the background from an image in the browser, replace it, and download a transparent PNG — no upload and no account.","inLanguage":"en","publisher":{"@id":"https://base31.org/#organization"}},{"@type":"WebApplication","@id":"https://backgroundremover.base31.org/#app","name":"Free Online Background Remover","url":"https://backgroundremover.base31.org/","description":"Remove the background from a photo entirely in the browser: clear the backdrop automatically, refine it with a click, then replace it with a colour, gradient or keep it transparent, add a shadow and padding, and download the result as PNG, WebP or JPEG. Files are never uploaded to a server.","applicationCategory":"MultimediaApplication","operatingSystem":"Any","browserRequirements":"Requires JavaScript","isAccessibleForFree":true,"inLanguage":"en","image":"https://base31.org/opengraph-image","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"featureList":["Remove an image background in the browser","Automatic edge-based background detection","Click to erase any remaining patch","Replace the background with a colour, gradient or transparency","Add a drop shadow and padding","Trim the empty borders around the subject","Download as PNG, WebP or JPEG at a chosen quality","Copy the finished image straight to the clipboard"],"isPartOf":{"@id":"https://base31.org/#website"}},{"@type":"FAQPage","@id":"https://backgroundremover.base31.org/#faq","mainEntity":[{"@type":"Question","name":"Is this background remover really free?","acceptedAnswer":{"@type":"Answer","text":"Yes. There is no account, no watermark and no export limit. The tool runs entirely in your browser, so it costs nothing to operate and nothing is charged to use it."}},{"@type":"Question","name":"Are my images uploaded to a server?","acceptedAnswer":{"@type":"Answer","text":"No. The picture is read, edited and re-encoded on your own device with the canvas API. Nothing is uploaded, so there is no copy to store, log or leak. You can confirm this by going offline after the page loads — the tool keeps working."}},{"@type":"Question","name":"How does the automatic removal work?","acceptedAnswer":{"@type":"Answer","text":"It samples the colours along the edges of your image, then clears the connected pixels that match that backdrop. It works best when the subject sits against a reasonably even background, such as a plain wall, a studio sweep or a solid colour. Use the tolerance slider to clear more or less, and click any leftover patch to erase it by hand."}},{"@type":"Question","name":"What kind of photos work best?","acceptedAnswer":{"@type":"Answer","text":"Product shots, headshots, logos and anything photographed against a plain or lightly textured backdrop give the cleanest result. Busy scenes, hair and fur need a little manual cleanup with the click-to-erase tool, which is why the tolerance and soft-edge controls exist."}},{"@type":"Question","name":"Which file formats can I download?","acceptedAnswer":{"@type":"Answer","text":"PNG keeps a fully transparent background and is the best choice for most uses. WebP is smaller and also supports transparency. JPEG cannot store transparency, so if you pick JPEG the transparent area is filled with your chosen background colour, or white."}},{"@type":"Question","name":"Does it work on a phone?","acceptedAnswer":{"@type":"Answer","text":"Yes. The layout stacks on small screens and the controls stay reachable, though very large images are limited by your device's memory rather than by the tool. Process one image at a time on a phone for the smoothest result."}}]}]}
+</script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+<link rel="stylesheet" href="./style.css" />
+
+<!-- Ads: Adcash auto-tag (zone iy7zk7mmw). This static subdomain page has no
+     cookie banner of its own, so the tag loads ungated here, exactly like the
+     other base31 tools. The loader is async, so the call polls briefly for
+     `aclib` instead of assuming it is ready. -->
+<script id="aclib" type="text/javascript" src="https://acscdn.com/script/aclib.js" async></script>
+<script>
+  (function () {
+    var attempts = 0;
+    (function runAutoTag() {
+      if (window.aclib && typeof window.aclib.runAutoTag === 'function') {
+        window.aclib.runAutoTag({ zoneId: 'iy7zk7mmw' });
+      } else if (attempts++ < 60) {
+        window.setTimeout(runAutoTag, 250);
+      }
+    })();
+  })();
+</script>
+
+<script>
+  // Apply the saved theme before first paint to avoid a flash.
+  (function () {
+    var t = null;
+    try { t = localStorage.getItem('bgremover:theme'); } catch (e) {}
+    if (!t) t = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    document.documentElement.setAttribute('data-theme', t);
+  })();
+</script>
+
+<script src="./app.js" defer></script>
+</head>
+
+<body>
+<a href="#main" class="skip">Skip to the tool</a>
+
+<header class="topbar">
+  <div class="wrap topbar-inner">
+    <a href="https://base31.org/" class="brand" aria-label="Background Remover, a base31.org tool">
+      <span class="brand-mark" aria-hidden="true">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M4 17 9 12l4 4 3-3 4 4"/><rect x="3" y="4" width="18" height="16" rx="2.5"/><circle cx="8.5" cy="8.5" r="1.3"/></svg>
+      </span>
+      <span>Background Remover</span>
+    </a>
+    <div class="topbar-actions">
+      <button id="themeBtn" class="icon-btn" type="button" aria-label="Toggle dark mode"></button>
+    </div>
+  </div>
+</header>
+
+<main id="main">
+  <div class="wrap">
+    <!-- Hero -->
+    <section class="hero">
+      <span class="pill"><span class="dot" aria-hidden="true"></span>Nothing is uploaded — it all runs in your browser</span>
+      <h1>Remove the <span class="grad">background</span> from any photo, free</h1>
+      <p>Drop in an image, clear the backdrop in one click, then drop in a new colour, a gradient or keep it transparent. Add a shadow, trim the edges and download the result — no account, no watermark and no server in the middle.</p>
+      <div class="hero-features">
+        <span class="chip">One-click removal</span>
+        <span class="chip">Transparent PNG</span>
+        <span class="chip">Colour &amp; gradient backdrops</span>
+        <span class="chip">Shadow &amp; padding</span>
+        <span class="chip">Click-to-erase</span>
+      </div>
+    </section>
+
+    <!-- The tool -->
+    <section class="card" aria-labelledby="toolHeading">
+      <div class="card-head">
+        <div>
+          <h2 id="toolHeading">Your image</h2>
+          <p>Drop a file, paste from the clipboard, or pick one from your device.</p>
+        </div>
+        <span class="badge mono" id="sizeBadge" hidden></span>
+      </div>
+      <div class="card-body">
+        <!-- Step 1: the drop zone -->
+        <div class="dz" id="dz" role="button" tabindex="0" aria-label="Choose an image to remove its background">
+          <span class="dz-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V7"/><path d="m8 11 4-4 4 4"/><path d="M4 16v2.5A1.5 1.5 0 0 0 5.5 20h13a1.5 1.5 0 0 0 1.5-1.5V16"/></svg>
+          </span>
+          <p class="dz-title">Drop an image here</p>
+          <p class="dz-hint">PNG, JPEG or WebP — processed on your device</p>
+          <div class="dz-actions">
+            <button type="button" class="btn btn-primary" id="pickBtn">Choose an image</button>
+          </div>
+        </div>
+        <input type="file" id="fileInput" accept="image/*" hidden />
+
+        <!-- Step 2: the studio -->
+        <div class="studio" id="studio">
+          <div class="studio-grid">
+            <div class="stage">
+              <div class="board-shell" id="boardShell">
+                <div class="board-wrap" id="boardWrap">
+                  <canvas id="board" class="board" aria-label="Image preview"></canvas>
+                </div>
+              </div>
+              <div class="stage-bar">
+                <button type="button" class="btn btn-primary" id="removeBtn">Remove background</button>
+                <button type="button" class="btn" id="magicBtn" aria-pressed="false">Erase by hand</button>
+                <button type="button" class="btn" id="undoBtn" disabled>Undo</button>
+                <span class="spacer"></span>
+                <button type="button" class="btn btn-ghost" id="resetBtn">Start over</button>
+              </div>
+              <p class="status" id="status" role="status">Loading…</p>
+            </div>
+
+            <!-- Controls -->
+            <div class="controls">
+              <div class="panel">
+                <div class="panel-head">
+                  <h3>Removal</h3>
+                  <p>How aggressively the backdrop is cleared.</p>
+                </div>
+                <div class="panel-body">
+                  <div class="field">
+                    <div class="field-row"><label for="tolerance">Colour tolerance</label><span class="value" id="toleranceOut">32</span></div>
+                    <input type="range" id="tolerance" min="6" max="100" value="32" />
+                    <small>Higher clears more shades near the backdrop.</small>
+                  </div>
+                  <div class="field">
+                    <div class="field-row"><label for="softness">Edge softness</label><span class="value" id="softnessOut">1 px</span></div>
+                    <input type="range" id="softness" min="0" max="4" value="1" />
+                    <small>Blurs the cut edge so it blends instead of looking jagged.</small>
+                  </div>
+                  <button type="button" class="btn btn-sm" id="softenBtn">Soften edges now</button>
+                </div>
+              </div>
+
+              <div class="panel">
+                <div class="panel-head">
+                  <h3>Background</h3>
+                  <p>What shows behind the subject.</p>
+                </div>
+                <div class="panel-body">
+                  <div class="seg" role="group" aria-label="Background type">
+                    <button type="button" data-bg="transparent" aria-pressed="true">Transparent</button>
+                    <button type="button" data-bg="color" aria-pressed="false">Colour</button>
+                    <button type="button" data-bg="gradient" aria-pressed="false">Gradient</button>
+                  </div>
+                  <div class="field" id="colorFields" hidden>
+                    <div class="swatches" id="swatches">
+                      <button type="button" class="swatch" data-color="#ffffff" style="background:#ffffff" aria-label="White" aria-pressed="false"></button>
+                      <button type="button" class="swatch" data-color="#0a0a0a" style="background:#0a0a0a" aria-label="Black" aria-pressed="false"></button>
+                      <button type="button" class="swatch" data-color="#4f8cff" style="background:#4f8cff" aria-label="Blue" aria-pressed="false"></button>
+                      <button type="button" class="swatch" data-color="#10b981" style="background:#10b981" aria-label="Green" aria-pressed="false"></button>
+                      <button type="button" class="swatch" data-color="#f59e0b" style="background:#f59e0b" aria-label="Amber" aria-pressed="false"></button>
+                      <button type="button" class="swatch" data-color="#ec4899" style="background:#ec4899" aria-label="Pink" aria-pressed="false"></button>
+                    </div>
+                    <div class="color-input">
+                      <label for="bg1" class="label" id="bg1Label">Colour</label>
+                      <input type="color" id="bg1" value="#eef4ff" />
+                      <input type="color" id="bg2" value="#22d3ee" hidden />
+                    </div>
+                  </div>
+                  <label class="toggle"><input type="checkbox" id="shadow" /> Add a drop shadow</label>
+                  <div class="field">
+                    <div class="field-row"><label for="padding">Padding</label><span class="value" id="paddingOut">0%</span></div>
+                    <input type="range" id="padding" min="0" max="20" value="0" />
+                  </div>
+                  <button type="button" class="btn btn-sm" id="trimBtn">Trim empty edges</button>
+                </div>
+              </div>
+
+              <div class="panel">
+                <div class="panel-head">
+                  <h3>Download</h3>
+                  <p>Choose a format and grab the result.</p>
+                </div>
+                <div class="panel-body">
+                  <div class="field">
+                    <label for="format">Format</label>
+                    <select id="format">
+                      <option value="image/png">PNG — keeps transparency (recommended)</option>
+                      <option value="image/webp">WebP — smaller, keeps transparency</option>
+                      <option value="image/jpeg">JPEG — flattens onto the background</option>
+                    </select>
+                  </div>
+                  <div class="field">
+                    <div class="field-row"><label for="quality">Quality</label><span class="value" id="qualityOut">92</span></div>
+                    <input type="range" id="quality" min="40" max="100" value="92" />
+                  </div>
+                  <button type="button" class="btn btn-primary" id="downloadBtn">Download image</button>
+                  <button type="button" class="btn btn-sm" id="copyBtn">Copy to clipboard</button>
+                  <p class="hint">PNG and WebP keep the transparent area. JPEG has no transparency, so it is filled with your background colour, or white.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- How it works -->
+    <section class="section" aria-labelledby="howHeading">
+      <h2 id="howHeading">How to remove a background</h2>
+      <p>Three steps, no account, and nothing leaves your device along the way.</p>
+      <ol class="steps">
+        <li class="step"><span class="step-num">1</span><h3>Add your image</h3><p>Drop a file onto the page, paste it from the clipboard, or choose it from your device. It is read locally — there is no upload.</p></li>
+        <li class="step"><span class="step-num">2</span><h3>Clear the backdrop</h3><p>Press Remove background. Nudge the tolerance if any of the subject fades, then click Erase by hand to clean up the leftovers.</p></li>
+        <li class="step"><span class="step-num">3</span><h3>Restyle and download</h3><p>Set a colour or gradient, add a shadow and padding, then download a transparent PNG or copy it straight to the clipboard.</p></li>
+      </ol>
+    </section>
+
+    <!-- FAQ -->
+    <section class="section" aria-labelledby="faqHeading">
+      <h2 id="faqHeading">Frequently asked questions</h2>
+      <p>What people usually want to know before they trust a photo to a web tool.</p>
+      <div class="faq-list">
+        <details class="faq"><summary>Is this background remover really free?</summary><p>Yes. There is no account, no watermark and no export limit. The tool runs entirely in your browser, so there is nothing to meter and nothing to pay for.</p></details>
+        <details class="faq"><summary>Are my images uploaded to a server?</summary><p>No. The picture is read, edited and saved on your own device with the canvas API. Nothing is uploaded, so there is no copy to store, log or leak. You can go offline after the page loads and it still works.</p></details>
+        <details class="faq"><summary>How does the automatic removal work?</summary><p>It samples the colours along the edges of your image, then clears the connected pixels that match that backdrop. It is most reliable against a plain wall, a studio sweep or a solid colour. The tolerance slider controls how much is cleared, and clicking any remaining patch erases it by hand.</p></details>
+        <details class="faq"><summary>What kind of photos work best?</summary><p>Product shots, headshots, logos and anything shot against a plain or lightly textured backdrop give the cleanest result. Busy scenes and fine hair may need a little manual cleanup with the click-to-erase tool.</p></details>
+        <details class="faq"><summary>Which file formats can I download?</summary><p>PNG keeps a fully transparent background and suits most uses. WebP is smaller and also supports transparency. JPEG cannot store transparency, so the cleared area is filled with your background colour, or white.</p></details>
+        <details class="faq"><summary>Does it work on a phone?</summary><p>Yes. The layout stacks on small screens and the controls stay reachable. Very large images are limited by your device's memory rather than by the tool, so process one at a time on a phone.</p></details>
+      </div>
+    </section>
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <span>© 2026 base31.org · Background Remover runs entirely in your browser</span>
+    <nav class="foot-links" aria-label="Footer">
+      <a href="https://base31.org/">base31.org</a>
+      <a href="https://base31.org/tools">All tools</a>
+      <a href="https://base31.org/privacy">Privacy</a>
+      <a href="https://base31.org/terms">Terms</a>
+    </nav>
+  </div>
+</footer>
+</body>
+</html>

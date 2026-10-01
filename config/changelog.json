@@ -1,5 +1,17 @@
 [
   {
+    "version": "1.29.0",
+    "date": "2026-10-01",
+    "title": "A background remover, and a tidier homepage",
+    "summary": "A new browser-only tool clears the background from a photo, swaps in a colour or gradient and exports a transparent PNG. The homepage search centres on desktop, the editor's picks get a smoother slide, and the community board fits phones properly.",
+    "highlights": [
+      "Background Remover is a new base31 tool: drop in an image, clear the backdrop in one click, refine it with a tolerance slider and click-to-erase, then download a transparent PNG, WebP or JPEG — nothing is uploaded.",
+      "The hero search now centres on desktop instead of hugging the left of the column, matching the stats and tag chips around it.",
+      "Editor's picks slides animate in from the direction you moved, with a progress mark that fills as a rotating slide waits, and a warmer lit panel in both themes.",
+      "The community discussion board gains tighter phone spacing, full-width post and pagination buttons, and inputs sized so mobile browsers do not zoom when a field is focused. The 'community corner' label is gone."
+    ]
+  },
+  {
     "version": "1.28.0",
     "date": "2026-10-01",
     "title": "A community corner for the curious web",

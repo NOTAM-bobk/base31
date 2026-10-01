@@ -8,6 +8,15 @@ html::-webkit-scrollbar, body::-webkit-scrollbar { display: none; width: 0; heig
   html { scrollbar-width: auto; }
   html::-webkit-scrollbar, body::-webkit-scrollbar { display: initial; width: auto; height: auto; }
 }
+/* Hero search placement -------------------------------------------------
+   The field used to hug the left edge of the 1080px column while the stats,
+   the surprise button and the tag chips above and below it were centered, so
+   the hero read as misaligned. On anything wider than a phone the search now
+   centers on the same measure as the chips beneath it. Phones already span the
+   full width, so they are left untouched. */
+@media (min-width: 601px) {
+  .search-wrap { margin-left: auto; margin-right: auto; }
+}
 .search-tag-suggestions { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 7px; max-width: 560px; margin: 14px auto 0; color: var(--subtle); font-size: 11px; }
 .search-tag-suggestions button { border: 1px solid var(--line-strong); border-radius: 6px; background: var(--surface); color: var(--muted); padding: 5px 8px; cursor: pointer; }
 .search-tag-suggestions button:hover, .search-tag-suggestions button[aria-pressed="true"] { color: var(--live); border-color: var(--live); }
@@ -145,4 +154,111 @@ html::-webkit-scrollbar, body::-webkit-scrollbar { display: none; width: 0; heig
   .discussion-heading { flex-direction: column; gap: 10px; }
   .discussion-layout { grid-template-columns: 1fr; gap: 24px; }
   .discussion-replies { margin-left: 8px; padding-left: 12px; }
+}
+/* Phones: the board gets a tighter frame and every control a full-width,
+   thumb-sized target. The 16px inputs also stop mobile Safari from zooming
+   the page when a field is focused. */
+@media (max-width: 600px) {
+  .discussion-board { margin: 36px 0; padding: 18px 14px; border-radius: 16px; }
+  .discussion-heading { margin-bottom: 18px; }
+  .discussion-heading h2 { font-size: clamp(24px, 7.5vw, 30px); margin: 0 0 6px; }
+  .discussion-badge { align-self: flex-start; }
+  .discussion-layout { gap: 20px; }
+  .discussion-composer { padding: 16px 14px; }
+  .discussion-composer input, .discussion-composer textarea { font-size: 16px; padding: 11px; }
+  .discussion-composer textarea { min-height: 120px; }
+  .discussion-composer-footer { flex-wrap: wrap; gap: 8px; }
+  .discussion-composer-footer > span { order: 2; }
+  .discussion-post { flex: 1 1 100%; min-height: 48px; font-size: 13px !important; }
+  .discussion-message { gap: 10px; }
+  .discussion-avatar { width: 28px; height: 28px; border-radius: 9px; }
+  .discussion-replies { margin-left: 4px; padding-left: 12px; gap: 16px; }
+  .discussion-empty { padding: 30px 16px; }
+  .discussion-pagination { gap: 8px; }
+  .discussion-pagination button { flex: 1 1 auto; min-height: 48px; }
+  .discussion-feed-heading { flex-wrap: wrap; }
+}
+
+/* Editor's picks, refreshed ---------------------------------------------
+   The editorial shortlist reads as a small lit panel now: a soft amber-to-sky
+   wash, a hairline of colour along the top edge and a lifted shadow, with the
+   slide copy animating in from the side it travelled from. Layout-changing
+   rules are re-stated for phones at the bottom so the earlier mobile block is
+   not undone. */
+.editors-picks {
+  position: relative; overflow: hidden;
+  padding: 26px 30px 16px;
+  border-radius: 22px;
+  border-color: color-mix(in srgb, var(--accent-amber) 34%, var(--line));
+  background:
+    radial-gradient(120% 150% at 100% 0%, color-mix(in srgb, var(--accent-sky) 13%, transparent), transparent 56%),
+    linear-gradient(118deg, color-mix(in srgb, var(--accent-amber) 9%, var(--surface)), var(--surface) 52%, color-mix(in srgb, var(--accent-sky) 7%, var(--surface)));
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, var(--text-strong) 8%, transparent),
+    0 18px 40px -26px rgb(0 0 0 / 70%);
+}
+.editors-picks::before {
+  position: absolute; inset: 0 0 auto; height: 1px; content: "";
+  background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--accent-amber) 72%, transparent) 22%, color-mix(in srgb, var(--accent-sky) 72%, transparent) 78%, transparent);
+}
+.editors-heading { align-items: baseline; }
+.editors-position { font-variant-numeric: tabular-nums; letter-spacing: 0.08em; }
+.editors-position-sep { opacity: .5; }
+
+.editors-slide { gap: 24px; min-height: 176px; padding: 20px 4px 14px; }
+.editors-number {
+  font-size: 84px;
+  color: color-mix(in srgb, var(--accent-amber) 42%, var(--surface));
+  text-shadow: 0 12px 34px color-mix(in srgb, var(--accent-amber) 26%, transparent);
+}
+.editors-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; }
+.editors-tags { display: inline-flex; flex-wrap: wrap; gap: 6px; }
+.editors-tag {
+  padding: 3px 8px; border: 1px solid var(--line); border-radius: 999px;
+  background: color-mix(in srgb, var(--surface) 70%, transparent);
+  color: var(--muted); font-size: 10px; line-height: 1.4;
+}
+.editors-tag.tone-mint { color: var(--live); border-color: color-mix(in srgb, var(--live) 40%, var(--line)); }
+.editors-tag.tone-sky { color: var(--accent-sky); border-color: color-mix(in srgb, var(--accent-sky) 40%, var(--line)); }
+.editors-tag.tone-amber { color: var(--accent-amber); border-color: color-mix(in srgb, var(--accent-amber) 40%, var(--line)); }
+.editors-tag.tone-coral { color: var(--accent-coral); border-color: color-mix(in srgb, var(--accent-coral) 40%, var(--line)); }
+.editors-cta { gap: 14px; transition: border-color 160ms ease, color 160ms ease, background 160ms ease, transform 160ms ease; }
+.editors-cta-arrow { display: inline-block; transition: transform 220ms cubic-bezier(.22,.72,.24,1); }
+
+.editors-progress { gap: 7px; padding: 16px 0 2px; }
+.editors-progress span {
+  position: relative; overflow: hidden;
+  width: 26px; height: 4px; border-radius: 999px;
+  background: color-mix(in srgb, var(--line-strong) 80%, transparent);
+  transition: background 200ms ease;
+}
+.editors-progress span.is-active { background: color-mix(in srgb, var(--accent-amber) 42%, var(--line-strong)); }
+
+@media (prefers-reduced-motion: no-preference) {
+  .editors-slide[data-direction="1"] { animation: editors-in-right 520ms cubic-bezier(.22,.72,.24,1) both; }
+  .editors-slide[data-direction="-1"] { animation: editors-in-left 520ms cubic-bezier(.22,.72,.24,1) both; }
+  .editors-slide > * { animation: editors-rise 640ms cubic-bezier(.22,.72,.24,1) both; }
+  .editors-slide > *:nth-child(2) { animation-delay: 70ms; }
+  .editors-slide > *:nth-child(3) { animation-delay: 140ms; }
+  .editors-cta:hover { transform: translateY(-1px); }
+  .editors-cta:hover .editors-cta-arrow { transform: translate(2px, -2px); }
+  /* A rotating slide fills its progress mark over the seven seconds it is on
+     screen; the fill restarts because the row is re-keyed per slide. */
+  .editors-picks.is-rotating .editors-progress span.is-active::after {
+    position: absolute; inset: 0; content: ""; transform-origin: left center;
+    background: linear-gradient(90deg, var(--accent-amber), var(--accent-sky));
+    animation: editors-progress 7000ms linear forwards;
+  }
+}
+@keyframes editors-in-right { from { opacity: 0; transform: translateX(28px); } to { opacity: 1; transform: none; } }
+@keyframes editors-in-left { from { opacity: 0; transform: translateX(-28px); } to { opacity: 1; transform: none; } }
+@keyframes editors-rise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+@keyframes editors-progress { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+
+@media (max-width: 600px) {
+  .editors-picks { padding: 18px 16px 14px; border-radius: 18px; }
+  .editors-slide { display: grid; grid-template-columns: 1fr; gap: 14px; min-height: 0; padding: 18px 0 8px; }
+  .editors-number { display: none; }
+  .editors-copy h3 { font-size: 22px; line-height: 1.25; }
+  .editors-cta { width: 100%; min-height: 46px; justify-content: space-between; }
 }

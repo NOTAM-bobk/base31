@@ -20,13 +20,13 @@
     "@block65/webcrypto-web-push": "^1.0.2",
     "@vercel/analytics": "^2.0.1",
     "next": "14.2.35",
-    "react": "18.3.1",
+    "react": "19.3.0",
     "react-dom": "18.3.1",
     "resend": "^6.28.1"
   },
   "devDependencies": {
     "@types/node": "20.16.11",
-    "@types/react": "18.3.11",
+    "@types/react": "19.3.0",
     "eslint": "8.57.1",
     "eslint-config-next": "14.2.35",
     "typescript": "5.6.3"

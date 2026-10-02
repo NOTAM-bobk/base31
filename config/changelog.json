@@ -1,5 +1,17 @@
 [
   {
+    "version": "1.31.0",
+    "date": "2026-10-02",
+    "title": "Safer community publishing and healthier previews",
+    "summary": "Community uploads now have a per-visitor submission limit, protected removal tools, automatic health checks, and a moderation panel. Screenshot previews also use responsive image optimization and legacy typo-prone subdomains have safe aliases.",
+    "highlights": [
+      "Community submissions are limited to three per hour per privacy-preserving visitor fingerprint, with a Retry-After response when the limit is reached.",
+      "The protected /admin/community-sites panel lists community uploads, their health state and failed checks, and can remove their hosted KV files using COUNTER_SECRET.",
+      "The Worker checks published uploads every 15 minutes and hides a site after two failed checks while retaining it for moderation.",
+      "Homepage and detail-page screenshot previews use next/image with fixed remote hosts, and corrected dailywordle, jokegenerator and voicetranscribe subdomains redirect to the existing live destinations."
+    ]
+  },
+  {
     "version": "1.30.0",
     "date": "2026-10-02",
     "title": "Focus guide and patched framework dependencies",

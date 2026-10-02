@@ -3,6 +3,11 @@ import { NextRequest, NextResponse } from "next/server";
 // The apex domain this whole project is deployed on.
 // Change this if you ever move to a different root domain.
 const ROOT_DOMAIN = "base31.org";
+const SUBDOMAIN_ALIASES: Record<string, string> = {
+  dailywordle: "dailywordel",
+  jokegenerator: "jokegenrator",
+  voicetranscribe: "voicetransrib",
+};
 
 function getSubdomain(host: string): string | null {
   const hostname = host.split(":")[0]; // strip port, e.g. for localhost:3000
@@ -37,6 +42,13 @@ export function middleware(request: NextRequest) {
   // No subdomain (or "www") -> this is the root directory site, serve normally.
   if (!subdomain) {
     return NextResponse.next();
+  }
+
+  const legacyTarget = SUBDOMAIN_ALIASES[subdomain];
+  if (legacyTarget) {
+    const destination = request.nextUrl.clone();
+    destination.hostname = `${legacyTarget}.${ROOT_DOMAIN}`;
+    return NextResponse.redirect(destination, 308);
   }
 
   const url = request.nextUrl.clone();

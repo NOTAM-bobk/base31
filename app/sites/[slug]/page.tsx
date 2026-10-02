@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { directoryEntries } from "@/lib/directory";
@@ -65,8 +66,7 @@ export default function SiteDetailPage({ params }: Props) {
       <p className="tool-summary">{entry.description}</p>
       <Freshness item={entry} />
       <div className="site-detail-preview">
-        {/* eslint-disable-next-line @next/next/no-img-element -- third-party preview, fixed dimensions and graceful fallback */}
-        <img src={`https://image.thum.io/get/width/960/crop/480/noanimate/${entry.url}`} alt={`Preview of ${entry.name}`} width={960} height={480} loading="lazy" />
+        <Image src={`https://image.thum.io/get/width/960/crop/480/noanimate/${entry.url}`} alt={`Preview of ${entry.name}`} width={960} height={480} sizes="(max-width: 780px) 100vw, 780px" />
       </div>
       <a className="tool-cta" href={entry.url} target="_blank" rel="noopener noreferrer">
         <span className="tool-cta-label">Visit {entry.name}</span>

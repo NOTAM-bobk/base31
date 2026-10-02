@@ -2,6 +2,7 @@
 
 import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { CSSProperties, FormEvent, RefObject } from "react";
+import Image from "next/image";
 import sites from "@/config/sites.json";
 import pkg from "@/package.json";
 import AboutSection from "@/components/about-section";
@@ -284,11 +285,11 @@ function SitePreview({ site }: { site: Site }) {
       style={{ backgroundImage: `linear-gradient(140deg, hsl(${hue} 62% 40%), hsl(${(hue + 38) % 360} 58% 24%))` }}
     >
       {src && (
-        <img
+        <Image
           src={src}
           alt=""
-          loading="lazy"
-          decoding="async"
+          fill
+          sizes="(max-width: 700px) 100vw, (max-width: 1100px) 50vw, 33vw"
           referrerPolicy="no-referrer"
           onError={() => setIndex((current) => current + 1)}
         />

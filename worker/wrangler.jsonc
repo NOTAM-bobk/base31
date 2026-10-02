@@ -3,7 +3,9 @@
   "name": "base31-directory-counter",
   "main": "src/index.ts",
   "compatibility_date": "2024-12-02",
+  "compatibility_flags": ["nodejs_compat"],
   "workers_dev": true,
+  "triggers": { "crons": ["*/15 * * * *"] },
   "durable_objects": {
     "bindings": [{ "name": "DISCUSSION", "class_name": "DiscussionRoom" }]
   },

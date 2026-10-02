@@ -16,7 +16,7 @@ import CoolSites from "@/components/cool-sites";
 import CoolApis from "@/components/cool-apis";
 import CoolApps from "@/components/cool-apps";
 import SiteHeader from "@/components/site-header";
-import { LOCALES, LOCALE_TAGS, type Dictionary, type Locale, EN } from "@/lib/i18n";
+import { LOCALES, type Dictionary, type Locale, EN } from "@/lib/i18n";
 import { resetConsent, useConsent } from "@/lib/consent";
 import coolSites, { searchCoolSites } from "@/lib/cool-sites";
 import coolApis, { searchCoolApis } from "@/lib/cool-apis";
@@ -412,7 +412,7 @@ export default function HomePage({ dict = EN, locale = "en" }: { dict?: Dictiona
       return;
     }
     setSitesVibrating(true);
-    buzz(6);
+    tick(6);
     const timer = window.setTimeout(() => setSitesVibrating(false), 460);
     return () => window.clearTimeout(timer);
   }, [sitesCollapsed]);

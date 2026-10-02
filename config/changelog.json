@@ -1,5 +1,16 @@
 [
   {
+    "version": "1.30.0",
+    "date": "2026-10-02",
+    "title": "Focus guide and patched framework dependencies",
+    "summary": "The new Focus listing now has its own favicon and directory guide, while Next.js and its ESLint integration move to the latest patched 14.2 releases.",
+    "highlights": [
+      "Focus now passes content validation with a local favicon and a full /tools/focus guide.",
+      "Next.js and eslint-config-next are upgraded from 14.2.15 to 14.2.35 to address published security advisories without taking a major-version migration.",
+      "The project's CI checks now cover the newly published entry instead of failing on the first push after it was added."
+    ]
+  },
+  {
     "version": "1.29.0",
     "date": "2026-10-01",
     "title": "A background remover, and a tidier homepage",

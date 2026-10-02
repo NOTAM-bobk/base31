@@ -78,7 +78,7 @@ export default function SiteDetailPage({ params }: Props) {
         <p>{entry.name} is listed in our {entry.section.toLowerCase()} collection{entry.category ? ` under ${entry.category.toLowerCase()}` : ""}. {entry.description}</p>
         {!!entry.tags?.length && <ul className="detail-tags mono" aria-label="Topics">{entry.tags.map((tag) => <li key={tag}>{tag}</li>)}</ul>}
         <p className="stats-foot">Review dates describe our recorded editorial checks, not a live uptime guarantee. Features, pricing and account requirements can change; confirm them on the linked website.</p>
-        {entry.sectionId === "cool-ais" && <p className="ai-notice">AI answers can be inaccurate. Verify sources and do not upload confidential or sensitive personal information without reviewing the provider's privacy terms.</p>}
+        {entry.sectionId === "cool-ais" && <p className="ai-notice">AI answers can be inaccurate. Verify sources and do not upload confidential or sensitive personal information without reviewing the provider&apos;s privacy terms.</p>}
         {guide && <Link className="site-detail-link" href={`/tools/${entry.slug}`}>Read the full guide: {guide.headline} →</Link>}
       </section>
       <section className="tool-block" aria-labelledby="site-votes-heading">

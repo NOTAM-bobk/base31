@@ -523,6 +523,33 @@ export const toolPages: Record<string, ToolPage> = {
     ],
     related: ["imagecompressor", "appscreenshot", "qrgenerator"],
   },
+  focus: {
+    headline: "Stay focused with a simple timer for deep work",
+    metaDescription:
+      "A simple focus timer for deep work, study sessions and daily routines. Set a session, remove distractions and keep your attention on one task.",
+    summary: "A quiet focus timer for work, study and any task that deserves your full attention.",
+    intro: [
+      "Focus is a deliberately small tool for the moment when you want to do one thing and not be pulled into five others. Set a session, start the clock and keep the page out of your way while you work.",
+      "It is useful for a study block, a writing sprint, a workout of concentrated coding or a daily routine you are trying to make automatic. There is no account to create and no complicated system to learn before you begin.",
+    ],
+    features: [
+      { title: "One task at a time", body: "A focused surface keeps the session about the work in front of you instead of turning planning into another distraction." },
+      { title: "Flexible sessions", body: "Choose a duration that fits the task, whether you need a short reset or a longer block of uninterrupted work." },
+      { title: "Useful on any device", body: "The tool runs in your browser and adapts to a phone, tablet or desktop without an app to install." },
+      { title: "No account required", body: "Start a session immediately without creating a profile, handing over an email address or signing up for a subscription." },
+    ],
+    steps: [
+      "Open Focus and choose how long you want to work.",
+      "Start the session, then keep the page open while you give the task your attention.",
+      "When the timer ends, take a short break or begin another focused block.",
+    ],
+    faqs: [
+      { question: "What is Focus for?", answer: "It is a simple browser timer for deep work, studying, writing, coding and other tasks that are easier when you protect a block of uninterrupted attention." },
+      { question: "Do I need an account?", answer: "No. Focus is available without an account, password or subscription." },
+      { question: "Can I use it on my phone?", answer: "Yes. It runs in a mobile browser as well as on a desktop, so you can use the same kind of session wherever you work." },
+    ],
+    related: ["dailywordel", "backgroundremover", "appscreenshot"],
+  },
 };
 
 const tagsBySlug = new Map(

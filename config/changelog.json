@@ -1,5 +1,17 @@
 [
   {
+    "version": "1.33.0",
+    "date": "2026-10-03",
+    "title": "Websites of the Week and better blog discovery",
+    "summary": "The blog now has more useful search-focused guides and a weekly editorial page for sharing one interesting website with its story.",
+    "highlights": [
+      "Added three substantial articles about personal websites, the Indie Web, and building sites people bookmark.",
+      "Added /websites-of-the-week, powered by config/websites-of-the-week.json so new picks can be added without changing the page code.",
+      "Added the first weekly pick, Low-tech Magazine, with an editorial explanation of why it is worth visiting.",
+      "Added a prominent Websites of the Week button near the top of the blog and included the new page in the sitemap and structured data."
+    ]
+  },
+  {
     "version": "1.32.0",
     "date": "2026-10-03",
     "title": "A private inbox for community suggestions",

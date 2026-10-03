@@ -37,6 +37,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.8,
     },
     {
+      url: `${siteUrl}/websites-of-the-week`,
+      lastModified: newestPost,
+      changeFrequency: "weekly",
+      priority: 0.8,
+    },
+    {
       // The hub for the tool guides. Each guide is listed below, and they all
       // interlink through their "More tools" blocks.
       url: `${siteUrl}/tools`,

@@ -55,6 +55,10 @@ export default function BlogIndexPage() {
       <p className="blog-subscribe-note">
         New articles cover independent websites, useful tools, static publishing, and the people making the web more personal.
       </p>
+      <Link className="blog-feature-link" href="/websites-of-the-week">
+        <span><strong>Websites of the Week</strong><small>One interesting site, and the story behind why it matters.</small></span>
+        <span aria-hidden="true">→</span>
+      </Link>
       <p className="blog-subscribe mono">
         <span>Follow along</span>
         <a href="/blog/feed.xml">RSS</a>

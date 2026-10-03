@@ -127,7 +127,11 @@ html::-webkit-scrollbar, body::-webkit-scrollbar { display: none; width: 0; heig
 .discussion-rules a { color: var(--accent-sky); text-underline-offset: 3px; }
 .discussion-reply-context { padding: 12px; margin-top: 16px; border-left: 2px solid var(--accent-sky); background: var(--surface-hover); font-size: 12px; line-height: 1.6; color: var(--muted); overflow-wrap: anywhere; }
 .discussion-reply-context button { display: block; border: 0; padding: 10px 0 0; color: var(--accent-sky); background: none; }
-.discussion-feed { min-width: 0; }
+.discussion-feed { min-width: 0; padding: 20px; border: 1px solid var(--line); border-radius: 18px; background: color-mix(in srgb, var(--accent-sky) 3%, var(--background)); }
+.discussion-composer input:focus, .discussion-composer textarea:focus { border-color: var(--accent-sky); }
+.discussion-composer > h3 { padding-bottom: 12px; border-bottom: 1px solid var(--line); }
+.discussion-thread .discussion-message-copy > .discussion-text-button { padding: 6px 12px; margin-top: 10px; min-height: 36px; border-radius: 8px; background: var(--surface-hover); }
+@media (min-width: 900px) { .discussion-composer { position: sticky; top: 96px; } }
 .discussion-feed-heading { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
 .discussion-text-button { border: 0; background: none; color: var(--accent-sky); padding: 10px 0; min-height: 44px; font-size: 11px !important; }
 .discussion-poll-note { color: var(--subtle); font-size: 10px; line-height: 1.6; margin: 0 0 18px; }
@@ -179,6 +183,15 @@ html::-webkit-scrollbar, body::-webkit-scrollbar { display: none; width: 0; heig
   .discussion-feed-heading { flex-wrap: wrap; }
 }
 
+/* About and support paths stay visible without competing with the directory. */
+.about-page-links { display: flex; flex-wrap: wrap; gap: 12px; margin: 24px 0; }
+.about-page-links a { display: inline-flex; align-items: center; justify-content: space-between; gap: 28px; min-height: 46px; padding: 12px 18px; border: 1px solid var(--line-strong); border-radius: 12px; background: var(--surface); color: var(--text-strong); font-size: 13px; text-decoration: none; }
+.about-page-links a:hover { border-color: var(--live); background: var(--surface-hover); }
+.donation-alternative { display: block; margin-top: 14px; padding: 10px 0; color: var(--muted); font-size: 12px; text-align: center; text-underline-offset: 4px; }
+.newsletter-status { padding: 14px 16px; border: 1px solid var(--line); border-radius: 10px; }
+.newsletter-status.is-success { color: var(--live); border-color: color-mix(in srgb, var(--live) 30%, var(--line)); background: color-mix(in srgb, var(--live) 6%, var(--surface)); }
+.newsletter-status.is-error { color: var(--danger); }
+
 /* Discoveries, conversations, and the wider base31 journal. */
 .intro-links { gap: 12px; align-items: center; }
 .submit-url-link { display: inline-flex; align-items: center; gap: 18px; min-height: 44px; padding: 10px 18px; border: 1px solid var(--line-strong); border-radius: 999px; background: var(--surface); color: var(--text-strong); font-size: 12px; text-decoration: none; transition: border-color .2s, background .2s; }
@@ -189,7 +202,9 @@ html::-webkit-scrollbar, body::-webkit-scrollbar { display: none; width: 0; heig
 .url-submission h2 { margin: 0; color: var(--text-strong); font-size: clamp(28px, 4vw, 38px); letter-spacing: -.045em; line-height: 1.12; }
 .url-submission-copy > p:not(.eyebrow) { color: var(--muted); font-size: 13px; line-height: 1.8; margin: 20px 0; }
 .url-submission-note { color: var(--accent-amber); font-size: 10px; line-height: 1.7; }
-.url-submission-form { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.url-submission-form { display: flex; flex-direction: column; gap: 10px; min-width: 0; padding: 22px; border: 1px solid var(--line); border-radius: 18px; background: var(--surface); }
+.url-submission-copy { padding: 8px 0; }
+.url-submission-form:focus-within { border-color: color-mix(in srgb, var(--accent-amber) 50%, var(--line)); }
 .url-submission-form label { color: var(--text-strong); font-size: 12px; margin-top: 6px; }
 .url-submission-form label span { color: var(--muted); }
 .url-submission-form input, .url-submission-form textarea { width: 100%; border: 1px solid var(--line-strong); border-radius: 10px; padding: 12px 14px; background: var(--input-bg); color: var(--text-strong); font: inherit; font-size: 14px; line-height: 1.6; }
@@ -235,6 +250,9 @@ html::-webkit-scrollbar, body::-webkit-scrollbar { display: none; width: 0; heig
 }
 @media (max-width: 600px) {
   .url-submission { padding: 22px 16px; border-radius: 18px; }
+  .url-submission-form { padding: 16px 12px; }
+  .discussion-feed { padding: 16px 12px; }
+  .about-page-links a { flex: 1 1 auto; }
   .url-submission-form input, .url-submission-form textarea { font-size: 16px; }
   .discussion-thread { padding: 14px 12px; border-radius: 12px; }
   .discussion-avatar { width: 28px; height: 28px; border-radius: 9px; }

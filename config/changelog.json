@@ -1,5 +1,18 @@
 [
   {
+    "version": "1.35.0",
+    "date": "2026-10-03",
+    "title": "Our story, clearer numbers, more ways to help",
+    "summary": "About Us and Our Story get direct internal links, the stats page regains its missing styles, and SupportKori joins the referral and donation options. The submission desk and discussion board get a more defined layout.",
+    "highlights": [
+      "Added /our-story with links from About and the homepage, alongside clearly labeled About Us navigation.",
+      "Restored stats cards, responsive charts, rankings and empty states after the route-specific stylesheet rules had been lost.",
+      "The URL suggestion form stays directly below the final directory collection and gains a framed writing area. Conversations have a distinct feed and a sticky desktop composer.",
+      "Newsletter success has a clear confirmation state after the Worker acknowledges storage; active emails remain visible in the existing private admin inbox.",
+      "Added the supplied SupportKori referral link and a second donation option on the homepage and donation site, preserving FundRazr."
+    ]
+  },
+  {
     "version": "1.34.0",
     "date": "2026-10-03",
     "title": "Pass on a good find",

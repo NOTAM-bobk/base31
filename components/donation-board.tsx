@@ -45,6 +45,9 @@ export default function DonationBoard() {
       <a className="donation-cta" href={donationUrl} target="_blank" rel="noreferrer">
         Support base31 <span aria-hidden="true">↗</span>
       </a>
+      <a className="donation-alternative" href="https://www.supportkori.com/base31" target="_blank" rel="noopener noreferrer">
+        Or support on SupportKori <span aria-hidden="true">↗</span>
+      </a>
     </aside>
   );
 }

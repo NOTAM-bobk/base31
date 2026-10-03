@@ -76,6 +76,26 @@ const schemas = [...donation.matchAll(/<script type="application\/ld\+json">([\s
 assert.equal(schemas[0]["@graph"][0].potentialAction.target, campaign);
 assert.ok(!donation.includes("cdn.tailwindcss.com") && !donation.includes("0x71C") && !donation.includes("bc1q..."));
 assert.ok(donation.includes('href="https://base31.org/privacy"'));
+const kori = "https://www.supportkori.com/base31";
+assert.equal((donation.match(/href="https:\/\/www\.supportkori\.com\/base31"/g) ?? []).length, 2, "SupportKori is available in both donation CTA areas");
+assert.ok(fs.readFileSync("components/donation-board.tsx", "utf8").includes(kori));
+const referrals = JSON.parse(fs.readFileSync("config/referrals.json", "utf8"));
+assert.ok(referrals.some(item => item.url === "https://supportkori.com/aff/EQvZmCrx" && item.show === true));
+const home = fs.readFileSync("components/home-page.tsx", "utf8");
+for (const href of ["/about", "/our-story"]) {
+  assert.ok(home.includes(`href="${href}"`));
+  assert.ok(fs.readFileSync("components/about-section.tsx", "utf8").includes(`href="${href}"`));
+}
+assert.ok(fs.readFileSync("app/our-story/page.tsx", "utf8").includes('canonical: "/our-story"'));
+assert.ok(fs.readFileSync("app/sitemap.ts", "utf8").includes("/our-story"));
+const statsPage = fs.readFileSync("app/stats/page.tsx", "utf8");
+const styles = fs.readFileSync("app/inner-pages.css", "utf8");
+for (const [, classList] of statsPage.matchAll(/className="([^"]+)"/g)) {
+  for (const className of classList.split(" ").filter(name => name.startsWith("stats-"))) {
+    assert.ok(styles.includes(`.${className}`), `Missing stats style: ${className}`);
+  }
+}
+assert.match(styles, /\.stats-chart\s*\{[^}]*width: 100%;[^}]*height: auto;/);
 const carousel = fs.readFileSync("components/editors-picks.tsx", "utf8");
 assert.ok(!carousel.includes("<button") && !carousel.includes("THE SHORTLIST"));
 assert.ok(carousel.includes("onTouchEnd") && carousel.includes("prefers-reduced-motion"));

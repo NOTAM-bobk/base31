@@ -71,4 +71,8 @@ assert.match(homepage, /<CoolAis[^\n]+\/>\s*<UrlRequest \/>/);
 assert.equal((homepage.match(/<UrlRequest \/>/g) || []).length, 1);
 assert.match(homepage, /href="#request-url"/);
 for (const url of ["https://dev.to/base31", "https://medium.com/@base31dotorg"]) assert.ok(homepage.includes(url));
+const notifications = fs.readFileSync("components/directory-notifications.tsx", "utf8");
+assert.ok(notifications.includes("result?.success !== true"), "Signup success requires the Worker storage acknowledgement");
+assert.ok(notifications.includes("newsletter-status") && notifications.includes("No confirmation needed."));
+assert.ok(fs.readFileSync("components/admin-community-sites.tsx", "utf8").includes('subscriber.verified ? "active" : "pending"'));
 console.log("Subscription tests passed: immediate storage, deduplication, existing admin authorization and listing, unsubscribe, failures and private URL request queue.");

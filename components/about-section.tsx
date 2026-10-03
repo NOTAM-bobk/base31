@@ -18,6 +18,10 @@ export default function AboutSection() {
       </div>
       <p>base31.org is an independent collection of personal sites, experiments, tools, and other projects worth exploring. It is a hand-built alternative to noisy app lists: every link leads to a real project with something to see or use.</p>
       <p>Looking for Base44? base31 is a separate, independent project and is not affiliated with Base44. Start here for a different kind of website directory: slower, stranger, and made for curious people.</p>
+      <nav className="about-page-links" aria-label="Meet base31">
+        <a href="/about">About Us <span aria-hidden="true">→</span></a>
+        <a href="/our-story">Our Story <span aria-hidden="true">→</span></a>
+      </nav>
       <div className="topic-links">
         <a href="#sites">Cool sites</a>
         <a href="#sites">Fun websites</a>

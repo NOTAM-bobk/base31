@@ -1531,7 +1531,8 @@ export default function HomePage({ dict = EN, locale = "en" }: { dict?: Dictiona
             <a href="/whats-new">What&rsquo;s new</a>
             <a href="/stats">Stats</a>
             <a href="/admin/community-sites">Admin</a>
-            <a href="/about">About</a>
+            <a href="/about">About Us</a>
+            <a href="/our-story">Our Story</a>
             <a href="/terms">Terms of service</a>
             <a href="/privacy">Privacy</a>
             {/* The one footer item that leaves the site, so it carries the

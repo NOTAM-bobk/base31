@@ -14,6 +14,7 @@ export default function DirectoryNotifications() {
   const [email, setEmail] = useState("");
   const [emailStatus, setEmailStatus] = useState("");
   const [emailBusy, setEmailBusy] = useState(false);
+  const [emailSuccess, setEmailSuccess] = useState(false);
   const [pushSupported, setPushSupported] = useState(false);
   const [pushEnabled, setPushEnabled] = useState(false);
   const [pushBusy, setPushBusy] = useState(false);
@@ -36,14 +37,17 @@ export default function DirectoryNotifications() {
     if (emailBusy) return;
     setEmailBusy(true);
     setEmailStatus("");
+    setEmailSuccess(false);
     try {
       const response = await fetch(`${counterUrl}/subscribe`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),
+        signal: AbortSignal.timeout(12000),
       });
       const result = await response.json().catch(() => null);
-      if (!response.ok) throw new Error(result?.error || "Could not subscribe right now.");
+      if (!response.ok || result?.success !== true) throw new Error(result?.error || "Could not subscribe right now.");
+      setEmailSuccess(true);
       setEmailStatus(result?.alreadySubscribed ? "Success — that address is already on the list." : "Success — you’re on the list! No confirmation needed.");
       setEmail("");
     } catch (error) {
@@ -147,7 +151,7 @@ export default function DirectoryNotifications() {
         <button className="community-action is-primary" type="submit" disabled={emailBusy}>{emailBusy ? "Sending…" : "Get site updates"}</button>
       </form>
       <p className="community-privacy-note">Signing up adds your email to our updates list immediately. No cookie tracking, and every update email includes an unsubscribe link.</p>
-      {emailStatus && <p className="community-status" role="status">{emailStatus}</p>}
+      {emailStatus && <p className={`community-status newsletter-status${emailSuccess ? " is-success" : " is-error"}`} role={emailSuccess ? "status" : "alert"}>{emailSuccess && <span aria-hidden="true">✓ </span>}{emailStatus}</p>}
 
       <div className="push-opt-in">
         <div>

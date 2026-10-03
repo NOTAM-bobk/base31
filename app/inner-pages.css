@@ -1,4 +1,42 @@
 
+/* Stats: restore the route-specific rules lost when the admin styles were added. */
+.stats-page { width: min(100% - 48px, 980px); min-height: 100vh; margin: 0 auto; padding: 72px 0 120px; }
+.stats-page h1 { max-width: 740px; margin: 16px 0; font-size: clamp(32px, 5vw, 48px); line-height: 1.12; letter-spacing: -.045em; }
+.stats-page .privacy-updated { max-width: 700px; color: var(--muted); font-size: 14px; line-height: 1.8; }
+.stats-page > .eyebrow { margin-top: 36px; }
+.stats-cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin-top: 40px; }
+.stats-card { display: flex; flex-direction: column; gap: 12px; min-width: 0; padding: 22px; border: 1px solid var(--line); border-radius: 16px; background: linear-gradient(135deg, color-mix(in srgb, var(--live) 5%, var(--surface)), var(--surface)); }
+.stats-card-label { color: var(--muted); font-size: 10px; letter-spacing: .08em; text-transform: uppercase; }
+.stats-card-value { color: var(--text-strong); font-size: clamp(28px, 4vw, 38px); letter-spacing: -.04em; line-height: 1.15; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.stats-card-note { color: var(--muted); font-size: 12px; line-height: 1.6; }
+.stats-panel { margin-top: 24px; padding: 24px; border: 1px solid var(--line); border-radius: 18px; background: var(--surface); }
+.stats-panel-head { display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+.stats-panel-head h2 { margin: 0; color: var(--text-strong); font-size: 17px; font-weight: 500; }
+.stats-panel-metric { color: var(--live); font-size: 11px; }
+.stats-chart { display: block; width: 100%; height: auto; margin-top: 24px; overflow: visible; }
+.stats-chart-peak { fill: var(--live); font: 11px ui-monospace, monospace; }
+.stats-chart-label { fill: var(--muted); font: 11px ui-monospace, monospace; }
+.stats-notice { margin-top: 24px; padding: 20px; border: 1px dashed var(--line-strong); border-radius: 12px; color: var(--muted); font-size: 13px; line-height: 1.8; }
+.stats-ranking { margin: 18px 0 0; padding: 0; list-style: none; }
+.stats-rank-row { display: flex; align-items: center; gap: 14px; padding: 16px 0; border-bottom: 1px solid var(--line); }
+.stats-rank-row:last-child { border: 0; }
+.stats-rank { flex: 0 0 24px; color: var(--subtle); font-size: 11px; }
+.stats-rank-name { flex: 1; min-width: 0; color: var(--text-strong); font-size: 14px; overflow-wrap: anywhere; }
+.stats-rank-votes { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 10px; font-size: 11px; }
+.stats-rank-up { color: var(--live); }
+.stats-rank-down { color: var(--danger); }
+.stats-foot { margin-top: 40px; color: var(--muted); font-size: 13px; line-height: 1.8; }
+.stats-foot a, .stats-notice a { color: var(--live); text-underline-offset: 4px; }
+@media (max-width: 720px) { .stats-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 480px) {
+  .stats-page { width: calc(100% - 32px); padding: 48px 0 96px; }
+  .stats-cards { gap: 10px; }
+  .stats-card { padding: 16px 12px; }
+  .stats-card-value { font-size: 27px; }
+  .stats-panel { padding: 18px 14px; }
+  .stats-rank-row { gap: 8px; }
+}
+
 /* Community moderation panel ------------------------------------------- */
 .admin-shell { width: min(100% - 48px, 900px); min-height: 100vh; margin: 0 auto; padding: 72px 0 120px; }
 .admin-shell h1 { margin: 12px 0 0; color: var(--text-strong); font-size: clamp(30px, 5vw, 46px); letter-spacing: -0.03em; }

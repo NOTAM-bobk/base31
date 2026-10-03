@@ -12,6 +12,7 @@ import { SITE_GLYPHS } from "@/components/site-glyphs";
 import Cursor from "@/components/cursor";
 import Faq from "@/components/faq";
 import DirectoryNotifications from "@/components/directory-notifications";
+import UrlRequest from "@/components/url-request";
 import FooterSponsor from "@/components/footer-sponsor";
 import CoolSites from "@/components/cool-sites";
 import CoolApis from "@/components/cool-apis";
@@ -1450,6 +1451,7 @@ export default function HomePage({ dict = EN, locale = "en" }: { dict?: Dictiona
         {/* The subscribe block sits below the FAQ as the final thing before
             the footer, so the page ends on the call to action. */}
         <DirectoryNotifications />
+        <UrlRequest />
 
         {/* The bottom of the page: the decorative sparkle and the sponsorship
             invitation, directly above the footer. */}
@@ -1522,6 +1524,7 @@ export default function HomePage({ dict = EN, locale = "en" }: { dict?: Dictiona
             <a href="#updates">Updates</a>
             <a href="/whats-new">What&rsquo;s new</a>
             <a href="/stats">Stats</a>
+            <a href="/admin/community-sites">Admin</a>
             <a href="/about">About</a>
             <a href="/terms">Terms of service</a>
             <a href="/privacy">Privacy</a>

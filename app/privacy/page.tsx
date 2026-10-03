@@ -96,6 +96,11 @@ export default function PrivacyPage() {
           optional and are separate from the cookie/analytics choice.
         </p>
         <p>
+          If you request a URL for the directory, we store the URL, your description, and any optional email
+          address you provide so the site operator can review the suggestion. Suggestions are not published
+          automatically.
+        </p>
+        <p>
           Bug reports are sent to the site operator through Resend. The report includes the message, the
           page URL, and an email address only if you choose to provide one. Reports are retained in the
           email provider’s systems; an optional reply address is used only to respond to the report.

@@ -1,5 +1,17 @@
 [
   {
+    "version": "1.32.0",
+    "date": "2026-10-03",
+    "title": "A private inbox for community suggestions",
+    "summary": "Visitors can now request URLs for the directory, while the protected admin inbox shows those requests, newsletter addresses, and published community sites in one place.",
+    "highlights": [
+      "Added a bottom-of-page URL request form; suggestions wait for manual review and are never published automatically.",
+      "Added newsletter subscriber visibility to the moderation panel, including confirmation state.",
+      "Added a Vercel server-side password gate so the admin password is not exposed directly to the Worker from the browser.",
+      "Added an Admin link to the footer."
+    ]
+  },
+  {
     "version": "1.31.0",
     "date": "2026-10-02",
     "title": "Safer community publishing and healthier previews",

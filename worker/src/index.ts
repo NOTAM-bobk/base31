@@ -60,6 +60,15 @@ type PublishedSite = {
   healthFailures?: number;
 };
 
+type UrlRequest = {
+  id: string;
+  url: string;
+  title: string;
+  note: string;
+  email?: string;
+  createdAt: number;
+};
+
 const CORS_HEADERS: Record<string, string> = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "GET, POST, DELETE, OPTIONS",
@@ -79,6 +88,7 @@ const MAX_LISTED_SITES = 500;
 const SUBMIT_LIMIT = 3;
 const SUBMIT_WINDOW_SECONDS = 60 * 60;
 const RATE_PREFIX = "@rate:submit:";
+const REQUEST_PREFIX = "request:url:";
 const HEALTH_FAILURE_THRESHOLD = 2;
 const SUBSCRIBER_PREFIX = "subscriber:";
 const CONFIRM_PREFIX = "confirm:";
@@ -94,6 +104,7 @@ const FILE_PREFIX = "pubfile:";
 const siteKey = (slug: string) => `${SITE_PREFIX}${slug}`;
 const fileKey = (slug: string, path: string) => `${FILE_PREFIX}${slug}:${path}`;
 const rateKey = (identity: string) => `${RATE_PREFIX}${identity}`;
+const requestKey = (id: string) => `${REQUEST_PREFIX}${id}`;
 
 const json = (body: unknown, status = 200): Response =>
   new Response(JSON.stringify(body), {
@@ -128,6 +139,32 @@ const takeSubmitSlot = async (request: Request, env: Env): Promise<number | null
   if (state.count >= SUBMIT_LIMIT) return Math.max(1, state.resetAt - now);
   await env.VIEW_COUNTER.put(key, JSON.stringify({ count: state.count + 1, resetAt: state.resetAt }), { expirationTtl: Math.max(1, state.resetAt - now) });
   return null;
+};
+
+const validHttpUrl = (value: unknown): value is string => {
+  if (typeof value !== "string" || value.length > 2048) return false;
+  try {
+    const parsed = new URL(value);
+    return parsed.protocol === "https:" || parsed.protocol === "http:";
+  } catch {
+    return false;
+  }
+};
+
+const listPrefixRecords = async <T>(env: Env, prefix: string): Promise<T[]> => {
+  const records: T[] = [];
+  let cursor: string | undefined;
+  for (;;) {
+    const page = await env.VIEW_COUNTER.list({ prefix, limit: 100, cursor });
+    const raws = await Promise.all(page.keys.map((entry) => env.VIEW_COUNTER.get(entry.name)));
+    for (const raw of raws) {
+      if (!raw) continue;
+      try { records.push(JSON.parse(raw) as T); } catch {}
+    }
+    if (page.list_complete || !page.cursor) break;
+    cursor = page.cursor;
+  }
+  return records;
 };
 
 const isValidKey = (key: unknown): key is string =>
@@ -693,6 +730,33 @@ const handleSubmit = async (request: Request, env: Env, origin: string, context:
   }
 };
 
+const handleUrlRequest = async (request: Request, env: Env): Promise<Response> => {
+  const retryAfter = await takeSubmitSlot(request, env);
+  if (retryAfter !== null) {
+    return new Response(JSON.stringify({ error: "Too many requests. Please try again later." }), {
+      status: 429,
+      headers: { "Content-Type": "application/json; charset=utf-8", "Retry-After": String(retryAfter), ...CORS_HEADERS },
+    });
+  }
+  let payload: Record<string, unknown>;
+  try { payload = await request.json() as Record<string, unknown>; } catch { return json({ error: "Invalid JSON body" }, 400); }
+  const url = typeof payload.url === "string" ? payload.url.trim() : "";
+  if (!validHttpUrl(url)) return json({ error: "Enter a valid website URL." }, 400);
+  const title = typeof payload.title === "string" ? payload.title.trim().slice(0, 100) : "";
+  if (!title) return json({ error: "Tell us the site's name." }, 400);
+  const note = typeof payload.note === "string" ? payload.note.trim().slice(0, 500) : "";
+  const email = payload.email == null || payload.email === "" ? undefined : payload.email;
+  if (email !== undefined && !validEmail(email)) return json({ error: "Enter a valid email address." }, 400);
+  const id = `${Date.now().toString(36)}-${randomToken().slice(0, 12)}`;
+  const record: UrlRequest = { id, url, title, note, ...(email ? { email } : {}), createdAt: Date.now() };
+  try {
+    await env.VIEW_COUNTER.put(requestKey(id), JSON.stringify(record));
+    return json({ success: true }, 201);
+  } catch {
+    return json({ error: "Could not save that request right now." }, 503);
+  }
+};
+
 // GET /s/<slug>/<path> — serves a published site's files from KV.
 const handleServe = async (url: URL, env: Env): Promise<Response> => {
   const rest = url.pathname.slice("/s/".length);
@@ -984,8 +1048,32 @@ export default {
       }
     }
 
-    if (url.pathname === "/admin/sites" || url.pathname.startsWith("/admin/sites/")) {
+    if (url.pathname === "/admin/data" || url.pathname === "/admin/sites" || url.pathname.startsWith("/admin/sites/") || url.pathname.startsWith("/admin/requests/")) {
       if (!adminAuthorized(request, env)) return json({ error: "Admin authentication required." }, 401);
+      if (url.pathname === "/admin/data") {
+        if (request.method !== "GET") return json({ error: "Method not allowed" }, 405);
+        try {
+          const [sites, requests, subscribers] = await Promise.all([
+            listSites(env, true),
+            listPrefixRecords<UrlRequest>(env, REQUEST_PREFIX),
+            listPrefixRecords<{ email: string; verified: boolean }>(env, SUBSCRIBER_PREFIX),
+          ]);
+          return json({
+            sites: sites.map((site) => ({ ...publicSite(site, url.origin), lastCheckedAt: site.lastCheckedAt ?? null, healthFailures: site.healthFailures ?? 0 })),
+            requests: requests.sort((a, b) => b.createdAt - a.createdAt),
+            subscribers: subscribers.filter((subscriber) => validEmail(subscriber.email)).map(({ email, verified }) => ({ email, verified })),
+          });
+        } catch {
+          return json({ error: "Admin data temporarily unavailable" }, 503);
+        }
+      }
+      if (url.pathname.startsWith("/admin/requests/")) {
+        if (request.method !== "DELETE") return json({ error: "Method not allowed" }, 405);
+        const id = url.pathname.slice("/admin/requests/".length);
+        if (!/^[A-Za-z0-9_-]{8,80}$/.test(id)) return json({ error: "Invalid request id" }, 400);
+        await env.VIEW_COUNTER.delete(requestKey(id));
+        return json({ success: true });
+      }
       if (url.pathname === "/admin/sites") {
         if (request.method !== "GET") return json({ error: "Method not allowed" }, 405);
         try {
@@ -1003,6 +1091,11 @@ export default {
       } catch {
         return json({ error: "Could not remove that site" }, 503);
       }
+    }
+
+    if (url.pathname === "/request-url") {
+      if (request.method !== "POST") return json({ error: "Method not allowed" }, 405);
+      return handleUrlRequest(request, env);
     }
 
     if (url.pathname === "/subscribe") {

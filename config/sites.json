@@ -109,6 +109,20 @@
     "language": "en"
   },
   {
+    "name": "Focus",
+    "subdomain": "focus",
+    "url": "https://focus.base31.org",
+    "tags": [
+      "productivity",
+      "focus",
+      "utility"
+    ],
+    "description": "Stay on task with a simple, distraction-free focus tool for deep work sessions and daily routines.",
+    "show": true,
+    "language": "en",
+    "addedAt": "2026-10-02"
+  },
+  {
     "name": "Is It Down",
     "subdomain": "isitdown",
     "url": "https://isitdown.base31.org",

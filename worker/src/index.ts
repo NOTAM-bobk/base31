@@ -21,7 +21,6 @@ export interface Env {
   DISCUSSION?: DiscussionBinding;
   DISCUSSION_MODERATOR_SECRET?: string;
   COUNTER_SECRET?: string;
-  SUBSCRIBER_ADMIN_SECRET?: string;
   RESEND_API_KEY?: string;
   RESEND_FROM_EMAIL?: string;
   VAPID_PUBLIC_KEY?: string;
@@ -32,6 +31,7 @@ export interface Env {
   GITHUB_TOKEN?: string;
   GITHUB_REPO?: string;
   GITHUB_BRANCH?: string;
+  PUBLIC_WORKER_URL?: string;
 }
 
 interface WorkerContext {
@@ -55,12 +55,24 @@ type PublishedSite = {
   indexPath: string;
   files: PublishedFile[];
   createdAt: number;
+  active?: boolean;
+  lastCheckedAt?: number;
+  healthFailures?: number;
+};
+
+type UrlRequest = {
+  id: string;
+  url: string;
+  title: string;
+  note: string;
+  email?: string;
+  createdAt: number;
 };
 
 const CORS_HEADERS: Record<string, string> = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-  "Access-Control-Allow-Headers": "Content-Type, x-counter-secret, x-discussion-secret, Authorization",
+  "Access-Control-Allow-Methods": "GET, POST, DELETE, OPTIONS",
+  "Access-Control-Allow-Headers": "Content-Type, Authorization, x-counter-secret, x-discussion-secret",
   "Access-Control-Max-Age": "86400",
 };
 
@@ -73,6 +85,11 @@ const MAX_FILES = 40;
 const MAX_FILE_BYTES = 2 * 1024 * 1024;
 const MAX_TOTAL_BYTES = 8 * 1024 * 1024;
 const MAX_LISTED_SITES = 500;
+const SUBMIT_LIMIT = 3;
+const SUBMIT_WINDOW_SECONDS = 60 * 60;
+const RATE_PREFIX = "@rate:submit:";
+const REQUEST_PREFIX = "request:url:";
+const HEALTH_FAILURE_THRESHOLD = 2;
 const SUBSCRIBER_PREFIX = "subscriber:";
 const CONFIRM_PREFIX = "confirm:";
 const UNSUBSCRIBE_PREFIX = "unsubscribe:";
@@ -86,6 +103,8 @@ const SITE_PREFIX = "pub:";
 const FILE_PREFIX = "pubfile:";
 const siteKey = (slug: string) => `${SITE_PREFIX}${slug}`;
 const fileKey = (slug: string, path: string) => `${FILE_PREFIX}${slug}:${path}`;
+const rateKey = (identity: string) => `${RATE_PREFIX}${identity}`;
+const requestKey = (id: string) => `${REQUEST_PREFIX}${id}`;
 
 const json = (body: unknown, status = 200): Response =>
   new Response(JSON.stringify(body), {
@@ -94,6 +113,59 @@ const json = (body: unknown, status = 200): Response =>
   });
 
 const notFound = () => new Response("Not found", { status: 404, headers: CORS_HEADERS });
+
+const adminAuthorized = (request: Request, env: Env): boolean => {
+  const secret = env.COUNTER_SECRET?.trim();
+  if (!secret) return false;
+  const header = request.headers.get("Authorization") || "";
+  return header.startsWith("Bearer ") && header.slice(7) === secret;
+};
+
+const requestIdentity = async (request: Request): Promise<string> => {
+  const ip = request.headers.get("CF-Connecting-IP") || request.headers.get("X-Forwarded-For") || "unknown";
+  const agent = request.headers.get("User-Agent") || "unknown";
+  return (await sha256Hex(`${ip}|${agent}`)).slice(0, 32);
+};
+
+const takeSubmitSlot = async (request: Request, env: Env): Promise<number | null> => {
+  const key = rateKey(await requestIdentity(request));
+  const raw = await env.VIEW_COUNTER.get(key);
+  const now = Math.floor(Date.now() / 1000);
+  let state: { count: number; resetAt: number } = { count: 0, resetAt: now + SUBMIT_WINDOW_SECONDS };
+  if (raw) {
+    try { state = JSON.parse(raw) as typeof state; } catch {}
+    if (!Number.isFinite(state.resetAt) || state.resetAt <= now) state = { count: 0, resetAt: now + SUBMIT_WINDOW_SECONDS };
+  }
+  if (state.count >= SUBMIT_LIMIT) return Math.max(1, state.resetAt - now);
+  await env.VIEW_COUNTER.put(key, JSON.stringify({ count: state.count + 1, resetAt: state.resetAt }), { expirationTtl: Math.max(1, state.resetAt - now) });
+  return null;
+};
+
+const validHttpUrl = (value: unknown): value is string => {
+  if (typeof value !== "string" || value.length > 2048) return false;
+  try {
+    const parsed = new URL(value);
+    return parsed.protocol === "https:" || parsed.protocol === "http:";
+  } catch {
+    return false;
+  }
+};
+
+const listPrefixRecords = async <T>(env: Env, prefix: string): Promise<T[]> => {
+  const records: T[] = [];
+  let cursor: string | undefined;
+  for (;;) {
+    const page = await env.VIEW_COUNTER.list({ prefix, limit: 100, cursor });
+    const raws = await Promise.all(page.keys.map((entry) => env.VIEW_COUNTER.get(entry.name)));
+    for (const raw of raws) {
+      if (!raw) continue;
+      try { records.push(JSON.parse(raw) as T); } catch {}
+    }
+    if (page.list_complete || !page.cursor) break;
+    cursor = page.cursor;
+  }
+  return records;
+};
 
 const isValidKey = (key: unknown): key is string =>
   typeof key === "string" && key.length > 0 && key.length <= MAX_KEY_LENGTH && /^[A-Za-z0-9._:-]+$/.test(key);
@@ -463,9 +535,10 @@ const publicSite = (site: PublishedSite, origin: string) => ({
   tags: site.tags,
   url: `${origin}/s/${site.slug}/`,
   createdAt: site.createdAt,
+  active: site.active !== false,
 });
 
-const listSites = async (env: Env): Promise<PublishedSite[]> => {
+const listSites = async (env: Env, includeInactive = false): Promise<PublishedSite[]> => {
   const sites: PublishedSite[] = [];
   let cursor: string | undefined;
   for (;;) {
@@ -474,7 +547,8 @@ const listSites = async (env: Env): Promise<PublishedSite[]> => {
     for (const raw of raws) {
       if (!raw) continue;
       try {
-        sites.push(JSON.parse(raw) as PublishedSite);
+        const site = JSON.parse(raw) as PublishedSite;
+        if (includeInactive || site.active !== false) sites.push(site);
       } catch {
         // Skip anything that was not written by this worker.
       }
@@ -484,6 +558,37 @@ const listSites = async (env: Env): Promise<PublishedSite[]> => {
     if (sites.length >= MAX_LISTED_SITES) break;
   }
   return sites.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0)).slice(0, MAX_LISTED_SITES);
+};
+
+const deleteSite = async (env: Env, slug: string): Promise<boolean> => {
+  const raw = await env.VIEW_COUNTER.get(siteKey(slug));
+  if (!raw) return false;
+  const site = JSON.parse(raw) as PublishedSite;
+  await Promise.all([
+    env.VIEW_COUNTER.delete(siteKey(slug)),
+    ...site.files.map((file) => env.VIEW_COUNTER.delete(fileKey(slug, file.path))),
+  ]);
+  return true;
+};
+
+const checkSiteHealth = async (env: Env, site: PublishedSite): Promise<void> => {
+  const raw = await env.VIEW_COUNTER.get(fileKey(site.slug, site.indexPath));
+  const healthy = !!raw && raw.length > 0;
+  const failures = healthy ? 0 : (site.healthFailures ?? 0) + 1;
+  const updated: PublishedSite = {
+    ...site,
+    active: healthy || failures < HEALTH_FAILURE_THRESHOLD,
+    healthFailures: failures,
+    lastCheckedAt: Date.now(),
+  };
+  await env.VIEW_COUNTER.put(siteKey(site.slug), JSON.stringify(updated));
+};
+
+const runHealthChecks = async (env: Env): Promise<void> => {
+  const sites = await listSites(env, true);
+  for (const site of sites) {
+    try { await checkSiteHealth(env, site); } catch {}
+  }
 };
 
 // Community uploads are mirrored into the repository, in the same
@@ -539,6 +644,13 @@ const mirrorSiteToRepo = async (env: Env, site: PublishedSite, bodies: { key: st
 
 // POST /submit — validates and stores a community-published site.
 const handleSubmit = async (request: Request, env: Env, origin: string, context: WorkerContext): Promise<Response> => {
+  const retryAfter = await takeSubmitSlot(request, env);
+  if (retryAfter !== null) {
+    return new Response(JSON.stringify({ error: "Too many site submissions. Please try again later." }), {
+      status: 429,
+      headers: { "Content-Type": "application/json; charset=utf-8", "Retry-After": String(retryAfter), ...CORS_HEADERS },
+    });
+  }
   let payload: Record<string, unknown>;
   try {
     payload = (await request.json()) as Record<string, unknown>;
@@ -606,7 +718,7 @@ const handleSubmit = async (request: Request, env: Env, origin: string, context:
       return json({ error: `The address /s/${slug}/ is already taken — pick another.` }, 409);
     }
 
-    const site: PublishedSite = { slug, title, description, tags, indexPath, files, createdAt: Date.now() };
+    const site: PublishedSite = { slug, title, description, tags, indexPath, files, createdAt: Date.now(), active: true, healthFailures: 0 };
     await env.VIEW_COUNTER.put(siteKey(slug), JSON.stringify(site));
     for (const body of bodies) await env.VIEW_COUNTER.put(body.key, body.data);
     const published = publicSite(site, origin);
@@ -615,6 +727,33 @@ const handleSubmit = async (request: Request, env: Env, origin: string, context:
     return json({ site: published }, 201);
   } catch {
     return json({ error: "Couldn't publish that right now — try again." }, 503);
+  }
+};
+
+const handleUrlRequest = async (request: Request, env: Env): Promise<Response> => {
+  const retryAfter = await takeSubmitSlot(request, env);
+  if (retryAfter !== null) {
+    return new Response(JSON.stringify({ error: "Too many requests. Please try again later." }), {
+      status: 429,
+      headers: { "Content-Type": "application/json; charset=utf-8", "Retry-After": String(retryAfter), ...CORS_HEADERS },
+    });
+  }
+  let payload: Record<string, unknown>;
+  try { payload = await request.json() as Record<string, unknown>; } catch { return json({ error: "Invalid JSON body" }, 400); }
+  const url = typeof payload.url === "string" ? payload.url.trim() : "";
+  if (!validHttpUrl(url)) return json({ error: "Enter a valid website URL." }, 400);
+  const title = typeof payload.title === "string" ? payload.title.trim().slice(0, 100) : "";
+  if (!title) return json({ error: "Tell us the site's name." }, 400);
+  const note = typeof payload.note === "string" ? payload.note.trim().slice(0, 500) : "";
+  const email = payload.email == null || payload.email === "" ? undefined : payload.email;
+  if (email !== undefined && !validEmail(email)) return json({ error: "Enter a valid email address." }, 400);
+  const id = `${Date.now().toString(36)}-${randomToken().slice(0, 12)}`;
+  const record: UrlRequest = { id, url, title, note, ...(email ? { email } : {}), createdAt: Date.now() };
+  try {
+    await env.VIEW_COUNTER.put(requestKey(id), JSON.stringify(record));
+    return json({ success: true }, 201);
+  } catch {
+    return json({ error: "Could not save that request right now." }, 503);
   }
 };
 
@@ -637,6 +776,7 @@ const handleServe = async (url: URL, env: Env): Promise<Response> => {
   } catch {
     return notFound();
   }
+  if (site.active === false) return notFound();
 
   const rawPath = slash === -1 ? "" : rest.slice(slash + 1);
   let requested: string;
@@ -695,23 +835,6 @@ const handleEmailSubscribe = async (request: Request, env: Env): Promise<Respons
   } catch {
     return json({ error: "Could not save your subscription right now." }, 503);
   }
-};
-
-const handleSubscriberAdmin = async (request: Request, env: Env, url: URL): Promise<Response> => {
-  if (!env.SUBSCRIBER_ADMIN_SECRET || request.headers.get("Authorization") !== `Bearer ${env.SUBSCRIBER_ADMIN_SECRET}`) return json({ error: "Administrator access required." }, 401);
-  if (request.method !== "GET") return json({ error: "Method not allowed" }, 405);
-  const cursor = url.searchParams.get("cursor") || undefined;
-  if (cursor && cursor.length > 2048) return json({ error: "Invalid cursor." }, 400);
-  try {
-    const page = await env.VIEW_COUNTER.list({ prefix: SUBSCRIBER_PREFIX, limit: 100, cursor });
-    const subscribers = await Promise.all(page.keys.map(async ({ name }) => {
-      const raw = await env.VIEW_COUNTER.get(name);
-      if (!raw) return null;
-      const saved = JSON.parse(raw) as { email: string; verified?: boolean; subscribedAt?: number };
-      return { email: saved.email, active: !!saved.verified, subscribedAt: saved.subscribedAt ?? null };
-    }));
-    return json({ subscribers: subscribers.filter(Boolean), nextCursor: page.list_complete ? null : page.cursor ?? null });
-  } catch { return json({ error: "Could not load subscribers." }, 503); }
 };
 
 const handleConfirmSubscription = async (url: URL, env: Env): Promise<Response> => {
@@ -916,7 +1039,55 @@ export default {
       }
     }
 
-    if (url.pathname === "/admin/subscribers") return handleSubscriberAdmin(request, env, url);
+    if (url.pathname === "/admin/data" || url.pathname === "/admin/sites" || url.pathname.startsWith("/admin/sites/") || url.pathname.startsWith("/admin/requests/")) {
+      if (!adminAuthorized(request, env)) return json({ error: "Admin authentication required." }, 401);
+      if (url.pathname === "/admin/data") {
+        if (request.method !== "GET") return json({ error: "Method not allowed" }, 405);
+        try {
+          const [sites, requests, subscribers] = await Promise.all([
+            listSites(env, true),
+            listPrefixRecords<UrlRequest>(env, REQUEST_PREFIX),
+            listPrefixRecords<{ email: string; verified: boolean }>(env, SUBSCRIBER_PREFIX),
+          ]);
+          return json({
+            sites: sites.map((site) => ({ ...publicSite(site, url.origin), lastCheckedAt: site.lastCheckedAt ?? null, healthFailures: site.healthFailures ?? 0 })),
+            requests: requests.sort((a, b) => b.createdAt - a.createdAt),
+            subscribers: subscribers.filter((subscriber) => validEmail(subscriber.email)).map(({ email, verified }) => ({ email, verified })),
+          });
+        } catch {
+          return json({ error: "Admin data temporarily unavailable" }, 503);
+        }
+      }
+      if (url.pathname.startsWith("/admin/requests/")) {
+        if (request.method !== "DELETE") return json({ error: "Method not allowed" }, 405);
+        const id = url.pathname.slice("/admin/requests/".length);
+        if (!/^[A-Za-z0-9_-]{8,80}$/.test(id)) return json({ error: "Invalid request id" }, 400);
+        await env.VIEW_COUNTER.delete(requestKey(id));
+        return json({ success: true });
+      }
+      if (url.pathname === "/admin/sites") {
+        if (request.method !== "GET") return json({ error: "Method not allowed" }, 405);
+        try {
+          const sites = await listSites(env, true);
+          return json({ sites: sites.map((site) => ({ ...publicSite(site, url.origin), lastCheckedAt: site.lastCheckedAt ?? null, healthFailures: site.healthFailures ?? 0 })) });
+        } catch {
+          return json({ error: "Directory temporarily unavailable" }, 503);
+        }
+      }
+      if (request.method !== "DELETE") return json({ error: "Method not allowed" }, 405);
+      const slug = url.pathname.slice("/admin/sites/".length);
+      if (!isValidSlug(slug)) return json({ error: "Invalid site slug" }, 400);
+      try {
+        return (await deleteSite(env, slug)) ? json({ success: true }) : json({ error: "Site not found" }, 404);
+      } catch {
+        return json({ error: "Could not remove that site" }, 503);
+      }
+    }
+
+    if (url.pathname === "/request-url") {
+      if (request.method !== "POST") return json({ error: "Method not allowed" }, 405);
+      return handleUrlRequest(request, env);
+    }
 
     if (url.pathname === "/subscribe") {
       if (request.method !== "POST") return json({ error: "Method not allowed" }, 405);
@@ -997,5 +1168,8 @@ export default {
     context.waitUntil(bumpDay(env));
 
     return json({ views, unique });
+  },
+  async scheduled(_event: unknown, env: Env, context: WorkerContext) {
+    context.waitUntil(runHealthChecks(env));
   },
 };

@@ -2,22 +2,23 @@
 
 import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { CSSProperties, FormEvent, RefObject } from "react";
+import Image from "next/image";
 import sites from "@/config/sites.json";
 import pkg from "@/package.json";
 import AboutSection from "@/components/about-section";
 import DiscussionBoard from "@/components/discussion-board";
-import UrlSubmission from "@/components/url-submission";
 import SupportSection from "@/components/support-section";
 import { SITE_GLYPHS } from "@/components/site-glyphs";
 import Cursor from "@/components/cursor";
 import Faq from "@/components/faq";
 import DirectoryNotifications from "@/components/directory-notifications";
+import UrlRequest from "@/components/url-request";
 import FooterSponsor from "@/components/footer-sponsor";
 import CoolSites from "@/components/cool-sites";
 import CoolApis from "@/components/cool-apis";
 import CoolApps from "@/components/cool-apps";
 import SiteHeader from "@/components/site-header";
-import { LOCALES, LOCALE_TAGS, type Dictionary, type Locale, EN } from "@/lib/i18n";
+import { LOCALES, type Dictionary, type Locale, EN } from "@/lib/i18n";
 import { resetConsent, useConsent } from "@/lib/consent";
 import coolSites, { searchCoolSites } from "@/lib/cool-sites";
 import coolApis, { searchCoolApis } from "@/lib/cool-apis";
@@ -285,11 +286,11 @@ function SitePreview({ site }: { site: Site }) {
       style={{ backgroundImage: `linear-gradient(140deg, hsl(${hue} 62% 40%), hsl(${(hue + 38) % 360} 58% 24%))` }}
     >
       {src && (
-        <img
+        <Image
           src={src}
           alt=""
-          loading="lazy"
-          decoding="async"
+          fill
+          sizes="(max-width: 700px) 100vw, (max-width: 1100px) 50vw, 33vw"
           referrerPolicy="no-referrer"
           onError={() => setIndex((current) => current + 1)}
         />
@@ -413,7 +414,7 @@ export default function HomePage({ dict = EN, locale = "en" }: { dict?: Dictiona
       return;
     }
     setSitesVibrating(true);
-    buzz(6);
+    tick(6);
     const timer = window.setTimeout(() => setSitesVibrating(false), 460);
     return () => window.clearTimeout(timer);
   }, [sitesCollapsed]);
@@ -1105,7 +1106,7 @@ export default function HomePage({ dict = EN, locale = "en" }: { dict?: Dictiona
               <span className="surprise-icon" aria-hidden="true">↯</span>
               <span className="surprise-label">{dict.surprise}</span>
             </button>
-            <a className="submit-url-link" href="#submit-url">Submit a URL <span aria-hidden="true">↗</span></a>
+            <a className="submit-url-link" href="#request-url">Submit a URL <span aria-hidden="true">↗</span></a>
           </div>
           {/* A search landmark with an explicit name: the wrapping label used
               to name the field "/" (its only text was the shortcut hint). */}
@@ -1427,7 +1428,7 @@ export default function HomePage({ dict = EN, locale = "en" }: { dict?: Dictiona
             rather than a site to read. */}
         <CoolApps dict={dict} query={query} />
         <CoolAis dict={dict} query={query} />
-        <UrlSubmission />
+        <UrlRequest />
 
         <AboutSection />
         <DiscussionBoard />
@@ -1529,6 +1530,7 @@ export default function HomePage({ dict = EN, locale = "en" }: { dict?: Dictiona
             <a href="#updates">Updates</a>
             <a href="/whats-new">What&rsquo;s new</a>
             <a href="/stats">Stats</a>
+            <a href="/admin/community-sites">Admin</a>
             <a href="/about">About</a>
             <a href="/terms">Terms of service</a>
             <a href="/privacy">Privacy</a>

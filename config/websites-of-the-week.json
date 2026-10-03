@@ -1,0 +1,10 @@
+[
+  {
+    "weekOf": "2026-10-03",
+    "name": "Low-tech Magazine",
+    "url": "https://solar.lowtechmagazine.com/",
+    "tagline": "A solar-powered magazine about sustainable technology.",
+    "story": "Low-tech Magazine is a great example of a website whose design follows its subject. Its solar-powered server can go offline when the battery is low, turning energy use into part of the reading experience instead of hiding it behind a dashboard. The site is thoughtful, unusual, and useful: it makes research about technology feel tangible, and its constraints give the publication a character that a polished media template could never provide.",
+    "tags": ["sustainable web", "technology", "independent publishing"]
+  }
+]

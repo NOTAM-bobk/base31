@@ -1,6 +1,6 @@
 [
   {
-    "version": "1.30.0",
+    "version": "1.34.0",
     "date": "2026-10-03",
     "title": "Pass on a good find",
     "summary": "SpriteFrame joins the apps collection, URL suggestions get a dedicated place below the directory, and conversations get a cleaner shared space. Email signup now saves immediately, with a private subscriber panel for the operator.",
@@ -9,7 +9,54 @@
       "A styled URL suggestion form follows the last directory collection, with a Submit a URL shortcut beside Surprise me. Suggestions go to the operator for review.",
       "Community conversations gain framed message cards, clearer reply threads and a refined composer in both themes and on phones.",
       "Footer buttons link directly to base31 posts on dev.to and Medium.",
-      "Email signups report success after storage without confirmation. A secret-protected /admin panel lists subscriber emails, status and signup time. The Worker must be deployed separately and its admin secret configured."
+      "Email signups report success after storage without confirmation. The existing private community inbox lists subscriber emails as active immediately. The Worker must be deployed separately; existing admin credentials are unchanged."
+    ]
+  },
+  {
+    "version": "1.33.0",
+    "date": "2026-10-03",
+    "title": "Websites of the Week and better blog discovery",
+    "summary": "The blog now has more useful search-focused guides and a weekly editorial page for sharing one interesting website with its story.",
+    "highlights": [
+      "Added three substantial articles about personal websites, the Indie Web, and building sites people bookmark.",
+      "Added /websites-of-the-week, powered by config/websites-of-the-week.json so new picks can be added without changing the page code.",
+      "Added the first weekly pick, Low-tech Magazine, with an editorial explanation of why it is worth visiting.",
+      "Added a prominent Websites of the Week button near the top of the blog and included the new page in the sitemap and structured data."
+    ]
+  },
+  {
+    "version": "1.32.0",
+    "date": "2026-10-03",
+    "title": "A private inbox for community suggestions",
+    "summary": "Visitors can now request URLs for the directory, while the protected admin inbox shows those requests, newsletter addresses, and published community sites in one place.",
+    "highlights": [
+      "Added a bottom-of-page URL request form; suggestions wait for manual review and are never published automatically.",
+      "Added newsletter subscriber visibility to the moderation panel, including confirmation state.",
+      "Added a Vercel server-side password gate so the admin password is not exposed directly to the Worker from the browser.",
+      "Added an Admin link to the footer."
+    ]
+  },
+  {
+    "version": "1.31.0",
+    "date": "2026-10-02",
+    "title": "Safer community publishing and healthier previews",
+    "summary": "Community uploads now have a per-visitor submission limit, protected removal tools, automatic health checks, and a moderation panel. Screenshot previews also use responsive image optimization and legacy typo-prone subdomains have safe aliases.",
+    "highlights": [
+      "Community submissions are limited to three per hour per privacy-preserving visitor fingerprint, with a Retry-After response when the limit is reached.",
+      "The protected /admin/community-sites panel lists community uploads, their health state and failed checks, and can remove their hosted KV files using COUNTER_SECRET.",
+      "The Worker checks published uploads every 15 minutes and hides a site after two failed checks while retaining it for moderation.",
+      "Homepage and detail-page screenshot previews use next/image with fixed remote hosts, and corrected dailywordle, jokegenerator and voicetranscribe subdomains redirect to the existing live destinations."
+    ]
+  },
+  {
+    "version": "1.30.0",
+    "date": "2026-10-02",
+    "title": "Focus guide and patched framework dependencies",
+    "summary": "The new Focus listing now has its own favicon and directory guide, while Next.js and its ESLint integration move to the latest patched 14.2 releases.",
+    "highlights": [
+      "Focus now passes content validation with a local favicon and a full /tools/focus guide.",
+      "Next.js and eslint-config-next are upgraded from 14.2.15 to 14.2.35 to address published security advisories without taking a major-version migration.",
+      "The project's CI checks now cover the newly published entry instead of failing on the first push after it was added."
     ]
   },
   {

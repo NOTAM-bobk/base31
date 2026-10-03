@@ -90,16 +90,19 @@ export default function PrivacyPage() {
         <p>
           If you subscribe to community-site updates, your email address is stored by our Cloudflare Worker
           until you unsubscribe. Signing up adds you to the active list immediately, without a confirmation
-          email. Your email and signup time are visible only to the operator through a protected admin panel.
+          email. Your email is visible only to the operator through the protected community inbox.
           Publication notices include an unsubscribe link. If you enable browser alerts,
           this browser’s push subscription is stored so we can send an alert when a community site is
           published. You can turn alerts off from the same control in the directory. These features are
           optional and are separate from the cookie/analytics choice.
         </p>
         <p>
-          Bug reports and URL suggestions are sent to the site operator through Resend. URL suggestions
-          include the submitted website address for review; they are not automatically published.
-          The report includes the message, the
+          If you request a URL for the directory, we store the URL, your description, and any optional email
+          address you provide so the site operator can review the suggestion. Suggestions are not published
+          automatically.
+        </p>
+        <p>
+          Bug reports are sent to the site operator through Resend. The report includes the message, the
           page URL, and an email address only if you choose to provide one. Reports are retained in the
           email provider’s systems; an optional reply address is used only to respond to the report.
         </p>

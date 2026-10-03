@@ -8,6 +8,7 @@ const read = (file) => JSON.parse(fs.readFileSync(path.join(root, "config", file
 
 const sites = read("sites.json");
 const posts = read("blogs.json");
+const weeklySites = read("websites-of-the-week.json");
 const referrals = read("referrals.json");
 const donations = read("donations.json");
 const editorsPicks = read("editors-picks.json");
@@ -30,6 +31,8 @@ const checkUnique = (values, label) => {
 
 checkUnique(sites.map((site) => String(site.subdomain)), "site subdomain");
 checkUnique(posts.map((post) => String(post.slug)), "blog slug");
+checkUnique(weeklySites.map((entry) => String(entry.weekOf)), "website-of-the-week date");
+checkUnique(weeklySites.map((entry) => String(entry.url)), "website-of-the-week URL");
 checkUnique(referrals.map((referral) => String(referral.url)), "referral URL");
 checkUnique(releases.map((release) => String(release.version)), "release version");
 
@@ -113,6 +116,18 @@ for (const [index, post] of posts.entries()) {
   if (typeof post.description !== "string" || post.description.trim().length < 40) errors.push(`Blog post ${index + 1} needs a useful description`);
   if (typeof post.date !== "string" || !date.test(post.date) || Number.isNaN(Date.parse(post.date))) errors.push(`Blog post ${index + 1} has an invalid date`);
   if (!Array.isArray(post.body) || post.body.length < 3) errors.push(`Blog post ${index + 1} needs more content`);
+}
+
+if (!Array.isArray(weeklySites) || weeklySites.length === 0) errors.push("websites-of-the-week.json needs at least one entry");
+for (const [index, entry] of weeklySites.entries()) {
+  const at = `Website of the Week ${index + 1}`;
+  if (typeof entry.weekOf !== "string" || !date.test(entry.weekOf) || Number.isNaN(Date.parse(entry.weekOf))) errors.push(`${at} has an invalid weekOf date`);
+  if (typeof entry.name !== "string" || !entry.name.trim()) errors.push(`${at} needs a name`);
+  if (typeof entry.url !== "string" || !https.test(entry.url)) errors.push(`${at} needs an HTTPS URL`);
+  if (typeof entry.tagline !== "string" || entry.tagline.trim().length < 20) errors.push(`${at} needs a useful tagline`);
+  if (typeof entry.story !== "string" || entry.story.trim().length < 80) errors.push(`${at} needs a useful story`);
+  if (!Array.isArray(entry.tags) || entry.tags.length === 0) errors.push(`${at} needs at least one tag`);
+  if (index > 0 && weeklySites[index - 1].weekOf < entry.weekOf) errors.push(`${at} is newer than the entry above it; keep websites-of-the-week.json newest-first`);
 }
 
 for (const [index, referral] of referrals.entries()) {

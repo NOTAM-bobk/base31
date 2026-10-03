@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { directoryEntries } from "@/lib/directory";
@@ -65,8 +66,7 @@ export default function SiteDetailPage({ params }: Props) {
       <p className="tool-summary">{entry.description}</p>
       <Freshness item={entry} />
       <div className="site-detail-preview">
-        {/* eslint-disable-next-line @next/next/no-img-element -- third-party preview, fixed dimensions and graceful fallback */}
-        <img src={`https://image.thum.io/get/width/960/crop/480/noanimate/${entry.url}`} alt={`Preview of ${entry.name}`} width={960} height={480} loading="lazy" />
+        <Image src={`https://image.thum.io/get/width/960/crop/480/noanimate/${entry.url}`} alt={`Preview of ${entry.name}`} width={960} height={480} sizes="(max-width: 780px) 100vw, 780px" />
       </div>
       <a className="tool-cta" href={entry.url} target="_blank" rel="noopener noreferrer">
         <span className="tool-cta-label">Visit {entry.name}</span>
@@ -78,7 +78,7 @@ export default function SiteDetailPage({ params }: Props) {
         <p>{entry.name} is listed in our {entry.section.toLowerCase()} collection{entry.category ? ` under ${entry.category.toLowerCase()}` : ""}. {entry.description}</p>
         {!!entry.tags?.length && <ul className="detail-tags mono" aria-label="Topics">{entry.tags.map((tag) => <li key={tag}>{tag}</li>)}</ul>}
         <p className="stats-foot">Review dates describe our recorded editorial checks, not a live uptime guarantee. Features, pricing and account requirements can change; confirm them on the linked website.</p>
-        {entry.sectionId === "cool-ais" && <p className="ai-notice">AI answers can be inaccurate. Verify sources and do not upload confidential or sensitive personal information without reviewing the provider's privacy terms.</p>}
+        {entry.sectionId === "cool-ais" && <p className="ai-notice">AI answers can be inaccurate. Verify sources and do not upload confidential or sensitive personal information without reviewing the provider&apos;s privacy terms.</p>}
         {guide && <Link className="site-detail-link" href={`/tools/${entry.slug}`}>Read the full guide: {guide.headline} →</Link>}
       </section>
       <section className="tool-block" aria-labelledby="site-votes-heading">

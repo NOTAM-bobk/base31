@@ -73,16 +73,6 @@ export async function POST(request: Request) {
     return json({ success: true }, 202);
   }
 
-  const isUrlSuggestion = payload.kind === "url";
-  let suggestedUrl = "";
-  if (isUrlSuggestion) {
-    try {
-      if (typeof payload.url !== "string" || payload.url.length > 2048) throw new Error("Invalid URL");
-      const url = new URL(payload.url);
-      if (!["http:", "https:"].includes(url.protocol) || url.username || url.password) throw new Error("Invalid URL");
-      suggestedUrl = url.href;
-    } catch { return json({ error: "Enter a valid http or https URL." }, 400); }
-  }
   const message = typeof payload.message === "string" ? payload.message.trim() : "";
   const email = payload.email == null || payload.email === "" ? "" : payload.email;
   if (message.length < 10 || message.length > 4000) {
@@ -115,14 +105,13 @@ export async function POST(request: Request) {
   const safeEmail = email ? escapeHtml(email) : "Not provided";
   const safePage = escapeHtml(page);
   const text = [
-    isUrlSuggestion ? "New base31.org URL suggestion" : "New base31.org bug or feature report",
-    ...(suggestedUrl ? [`Suggested URL: ${suggestedUrl}`] : []),
+    "New base31.org bug or feature report",
     `From: ${email || "Not provided"}`,
     `Page: ${page}`,
     "",
     message,
   ].join("\n");
-  const html = `<h2>${isUrlSuggestion ? "New base31.org URL suggestion" : "New base31.org bug or feature report"}</h2>${suggestedUrl ? `<p><strong>Suggested URL:</strong> ${escapeHtml(suggestedUrl)}</p>` : ""}<p><strong>Reply-to:</strong> ${safeEmail}</p><p><strong>Page:</strong> ${safePage}</p><hr><p>${safeMessage.replace(/\n/g, "<br>")}</p>`;
+  const html = `<h2>New base31.org bug or feature report</h2><p><strong>Reply-to:</strong> ${safeEmail}</p><p><strong>Page:</strong> ${safePage}</p><hr><p>${safeMessage.replace(/\n/g, "<br>")}</p>`;
 
   try {
     const response = await fetch("https://api.resend.com/emails", {
@@ -134,7 +123,7 @@ export async function POST(request: Request) {
       body: JSON.stringify({
         from,
         to,
-        subject: isUrlSuggestion ? "New base31.org URL suggestion" : "New base31.org bug or feature report",
+        subject: "New base31.org bug or feature report",
         text,
         html,
         ...(email ? { reply_to: email } : {}),

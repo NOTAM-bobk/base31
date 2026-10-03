@@ -1048,3 +1048,20 @@ html[data-theme="light"] .freshness-badge.is-stale { color: #80541a; }
 }
 .support-inline-ad.is-waiting .support-inline-ad-slot { min-height: 0; }
 
+
+/* Visitor URL suggestions ----------------------------------------------- */
+.url-request-panel { margin-top: 56px; padding: 22px; border: 1px solid var(--line); border-radius: var(--radius-card); background: var(--surface); }
+.url-request-panel h2 { margin: 0; color: var(--text-strong); font-size: 19px; font-weight: 500; letter-spacing: -0.02em; }
+.url-request-lede { max-width: 590px; margin: 10px 0 0; color: var(--muted); font-size: 13px; line-height: 1.65; }
+.url-request-form { max-width: 620px; }
+
+/* Admin inbox sections --------------------------------------------------- */
+.admin-section { margin-top: 42px; }
+.admin-section-head { display: flex; align-items: baseline; justify-content: space-between; gap: 14px; margin-bottom: 12px; }
+.admin-section-head h2 { margin: 0; color: var(--text-strong); font-size: 19px; font-weight: 500; }
+.admin-site h3 { margin: 0; color: var(--text-strong); font-size: 16px; font-weight: 500; }
+.admin-site a { color: var(--live); overflow-wrap: anywhere; }
+.admin-subscriber-list { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.admin-subscriber-list li { display: flex; justify-content: space-between; gap: 14px; padding: 12px 14px; border: 1px solid var(--line); border-radius: 10px; color: var(--muted); font-size: 13px; }
+.admin-subscriber-list li .mono { color: var(--subtle); font-size: 10px; }
+@media (max-width: 600px) { .url-request-panel { padding: 16px; } .admin-section { margin-top: 34px; } }

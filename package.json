@@ -1,6 +1,6 @@
 {
   "name": "base31-directory",
-  "version": "1.35.0",
+  "version": "1.36.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -10,11 +10,12 @@
     "test:directory": "node scripts/test-directory.mjs",
     "test:discussion": "node scripts/test-discussion.mjs",
     "test:subscriptions": "node scripts/test-subscriptions.mjs",
+    "test:wordoftheday": "node scripts/test-wordoftheday.mjs",
     "lint": "next lint",
     "validate:content": "node scripts/validate-content.mjs",
     "check:mail": "node scripts/check-mail-dns.mjs",
     "check:domain": "node scripts/check-domain.mjs",
-    "check": "npm run validate:content && npm run test:directory && npm run test:discussion && npm run test:subscriptions && npm run typecheck",
+    "check": "npm run validate:content && npm run test:directory && npm run test:discussion && npm run test:subscriptions && npm run test:wordoftheday && npm run typecheck",
     "deploy:worker": "cd worker && npx wrangler deploy"
   },
   "dependencies": {

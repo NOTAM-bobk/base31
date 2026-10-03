@@ -1,5 +1,6 @@
 import { buildPushPayload, type PushSubscription, type VapidKeys } from "@block65/webcrypto-web-push";
 import { handleDiscussion, type DiscussionBinding } from "./discussion";
+import { compareVotes } from "../../lib/vote-ranking";
 export { DiscussionRoom } from "./discussion";
 
 // Self-contained KV binding type so the root Next.js tsconfig can typecheck
@@ -442,7 +443,7 @@ const handleStats = async (env: Env, url: URL): Promise<Response> => {
     );
     const top = Object.entries(votes)
       .map(([key, totals]) => ({ key, ...totals }))
-      .sort((a, b) => b.up - a.up || a.down - b.down || a.key.localeCompare(b.key))
+      .sort((a, b) => compareVotes(a, b) || a.key.localeCompare(b.key))
       .slice(0, 12);
 
     return new Response(

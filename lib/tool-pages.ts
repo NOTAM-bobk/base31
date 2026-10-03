@@ -398,7 +398,8 @@ export const toolPages: Record<string, ToolPage> = {
     features: [
       { title: "One word a day", body: "A small, finishable dose of vocabulary instead of an overwhelming list you will not return to." },
       { title: "Definition and example", body: "The example sentence is what makes a new word stick, because it shows where the word belongs." },
-      { title: "A daily habit", body: "The same word for everyone, refreshed each day." },
+      { title: "Reliable daily words", body: "A bundled 30-word collection rotates at midnight UTC, with the same entry for everyone. Words and definitions need no network request." },
+      { title: "A personal notebook", body: "Browse previous days, save words in this browser, download a word card, and practice with a restartable five-question quiz." },
       { title: "Nothing to sign up for", body: "Open the page and read it. No account, no email address, no streak to maintain." },
     ],
     steps: [
@@ -407,7 +408,7 @@ export const toolPages: Record<string, ToolPage> = {
       "Try using the word once today — that is what makes it stay.",
     ],
     faqs: [
-      { question: "Is there a new word every day?", answer: "Yes. The word refreshes daily, and it is the same one for everybody." },
+      { question: "Is there a new word every day?", answer: "The daily entry changes at midnight UTC and is the same for everyone. The curated collection contains 30 words and repeats after 30 days; this is not an unlimited dictionary feed." },
       { question: "Do I need an account?", answer: "No. The page is public and free." },
       { question: "Is this a dictionary?", answer: "No. It is a daily habit, not a lookup service: one word at a time is what makes it stick. Use a dictionary when you need full coverage." },
     ],

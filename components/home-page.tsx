@@ -31,6 +31,7 @@ import Freshness from "@/components/freshness";
 import { allCoolAis, searchCoolAis, detailPath, directoryEntries, tagTone } from "@/lib/directory";
 import { matchesQuery } from "@/lib/search";
 import EditorsPicks from "@/components/editors-picks";
+import { compareVotes } from "@/lib/vote-ranking";
 
 type Site = { name: string; subdomain: string; url: string; tags?: string[]; description?: string; show?: boolean; community?: boolean; createdAt?: number; icon?: string; lastChecked?: string; addedAt?: string };
 
@@ -768,17 +769,6 @@ export default function HomePage({ dict = EN, locale = "en" }: { dict?: Dictiona
     })),
   ], [userSites]);
 
-  // Ranking: hearted (pinned) sites stay on top, then everything sorts by how
-  // liked it is — net thumbs (up minus down), then raw upvotes, then name.
-  const netLikes = useCallback(
-    (key: string) => {
-      const totals = voteTotals[key];
-      if (!totals) return null;
-      return totals.up - totals.down;
-    },
-    [voteTotals],
-  );
-
   // Every tag in the directory, most used first, for the filter chips.
   const allTags = useMemo(() => {
     const counts = new Map<string, number>();
@@ -804,27 +794,19 @@ export default function HomePage({ dict = EN, locale = "en" }: { dict?: Dictiona
       if (activeTag && !(site.tags ?? []).includes(activeTag)) return false;
       return matchesQuery(site, query);
     });
-    const rankValue = (key: string) => netLikes(key);
     return [...matched].sort((a, b) => {
       const pinnedA = favorites.includes(a.subdomain) ? 1 : 0;
       const pinnedB = favorites.includes(b.subdomain) ? 1 : 0;
-      if (pinnedA !== pinnedB) return pinnedB - pinnedA;
+      if (sortMode !== "liked" && pinnedA !== pinnedB) return pinnedB - pinnedA;
       if (sortMode === "az") return a.name.localeCompare(b.name);
       if (sortMode === "newest") {
         const byDate = (b.createdAt ?? (b.addedAt ? Date.parse(b.addedAt) : 0)) - (a.createdAt ?? (a.addedAt ? Date.parse(a.addedAt) : 0));
         return byDate !== 0 ? byDate : a.name.localeCompare(b.name);
       }
-      // Sites with no votes yet share a neutral score of 0 and fall back to
-      // alphabetical order beneath the ranked ones.
-      const scoreA = rankValue(a.subdomain) ?? 0;
-      const scoreB = rankValue(b.subdomain) ?? 0;
-      if (scoreA !== scoreB) return scoreB - scoreA;
-      const upA = voteTotals[a.subdomain]?.up ?? 0;
-      const upB = voteTotals[b.subdomain]?.up ?? 0;
-      if (upA !== upB) return upB - upA;
-      return a.name.localeCompare(b.name);
+      // Vote ranking is strict: pins do not move a lower-voted site ahead.
+      return compareVotes(voteTotals[a.subdomain], voteTotals[b.subdomain]) || a.name.localeCompare(b.name);
     });
-  }, [query, activeTag, sortMode, favorites, allSites, netLikes, voteTotals]);
+  }, [query, activeTag, sortMode, favorites, allSites, voteTotals]);
 
   // A new question starts a short list again: search text, a tag chip or a new
   // sort folds the directory back to its first nine cards, so "Show all" is
@@ -1106,7 +1088,7 @@ export default function HomePage({ dict = EN, locale = "en" }: { dict?: Dictiona
               <span className="surprise-icon" aria-hidden="true">↯</span>
               <span className="surprise-label">{dict.surprise}</span>
             </button>
-            <a className="submit-url-link" href="#request-url">Submit a URL <span aria-hidden="true">↗</span></a>
+            <a className="submit-url-link" href="#request-url"><span className="submit-url-icon" aria-hidden="true">＋</span><span>Submit a URL</span><span className="submit-url-arrow" aria-hidden="true">↗</span></a>
           </div>
           {/* A search landmark with an explicit name: the wrapping label used
               to name the field "/" (its only text was the shortcut hint). */}
@@ -1152,13 +1134,13 @@ export default function HomePage({ dict = EN, locale = "en" }: { dict?: Dictiona
             above a grey body. The quick jumps moved out of the hero and into
             the slab, since they belong to the browsing half of the page. */}
         <div className="page-band">
-          <EditorsPicks />
+          {!query.trim() && <EditorsPicks />}
           {/* Five boxes that jump straight into a section, for the visitor who
               would rather browse than type. Each one is an in-page anchor, so
               it needs no routing: the browser scrolls, the section's own
               scroll-margin keeps it clear of the header, and the rail follows
               the move like any other scroll. */}
-          <nav className="quick-jumps" aria-label="Jump to a section">
+          {!query.trim() && <nav className="quick-jumps" aria-label="Jump to a section">
             {[
               { href: "#sites", label: dict.featured, count: `${allSites.length} sites` },
               { href: "#cool-sites", label: dict.coolSites, count: `${coolSites.length} sites` },
@@ -1174,7 +1156,7 @@ export default function HomePage({ dict = EN, locale = "en" }: { dict?: Dictiona
                 </span>
               </a>
             ))}
-          </nav>
+          </nav>}
 
         <section id="sites" className={`directory-section${sitesVibrating ? " is-vibrating" : ""}`} aria-labelledby="sites-heading">
           <div className="section-heading" data-reveal>

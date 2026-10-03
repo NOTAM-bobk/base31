@@ -5,6 +5,7 @@ import { tick } from "@/lib/haptics";
 import Link from "next/link";
 import { detailPath, externalVoteKey } from "@/lib/directory";
 import Freshness from "@/components/freshness";
+import { compareVotes } from "@/lib/vote-ranking";
 import SiteVotes, { useSiteVotes } from "@/components/site-votes";
 
 export type LinkStripItem = { name: string; url: string; tags: string[]; description: string; category?: string; addedAt?: string; lastChecked?: string };
@@ -81,8 +82,11 @@ export default function LinkStrip({ id, items, search, copy, query = "", categor
   );
   const searching = query.trim().length > 0;
   const filtering = searching || category !== null;
-  const shown = showAll || searching ? visible : visible.slice(0, SECTION_PREVIEW);
-  const voteState = useSiteVotes(shown.map((item) => externalVoteKey(item.url)));
+  // Fetch the complete collection before cutting it: a popular hidden card
+  // must still be able to rise into the first nine results.
+  const voteState = useSiteVotes(items.map((item) => externalVoteKey(item.url)));
+  const ranked = useMemo(() => [...visible].sort((a, b) => compareVotes(voteState.totals[externalVoteKey(a.url)], voteState.totals[externalVoteKey(b.url)]) || a.name.localeCompare(b.name)), [visible, voteState.totals]);
+  const shown = showAll || searching ? ranked : ranked.slice(0, SECTION_PREVIEW);
   // How many cards the cut is holding back. The line reads it as "+43" while
   // they are hidden and "-43" once they are showing.
   const foldCount = Math.max(0, visible.length - SECTION_PREVIEW);

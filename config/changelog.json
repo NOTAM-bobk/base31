@@ -1,5 +1,18 @@
 [
   {
+    "version": "1.36.0",
+    "date": "2026-10-03",
+    "title": "More votes, fewer distractions, a reliable daily word",
+    "summary": "SpriteFrame moves to Other Cool Sites, every collection ranks by total votes, and search clears away the editorial browsing blocks. Word of the Day becomes a reliable, self-contained vocabulary notebook.",
+    "highlights": [
+      "SpriteFrame is now in Other Cool Sites instead of Cool Apps, retaining its URL-based vote identity.",
+      "Default rankings use total votes from most to least, counting upvotes and downvotes; ties use upvotes and then name. Stats follows the same rule, and pins do not override vote ranking.",
+      "Editor’s Picks and section quick links disappear while searching and return when the query is cleared. Submit a URL gets a distinct plus badge and refined hover styling.",
+      "Word of the Day immediately displays a curated entry selected by UTC date, without waiting for third-party APIs or styling services. Its 30-word collection rotates daily and repeats monthly.",
+      "The word notebook includes past-day browsing, random discovery, local saved words, pronunciation where supported, PNG card downloads, and a restartable five-question quiz."
+    ]
+  },
+  {
     "version": "1.35.0",
     "date": "2026-10-03",
     "title": "Our story, clearer numbers, more ways to help",

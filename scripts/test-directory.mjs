@@ -17,8 +17,20 @@ function load(relative) {
   new Function("require", "module", "exports", compiled)(localRequire, module, module.exports);
   return module.exports;
 }
+const { compareVotes, totalVotes } = load("lib/vote-ranking.ts");
+assert.equal(totalVotes({ up: 2, down: 10 }), 12);
+assert.ok(compareVotes({ up: 2, down: 10 }, { up: 9, down: 0 }) < 0);
+assert.ok(compareVotes(undefined, { up: 0, down: 1 }) > 0);
+assert.ok(compareVotes({ up: 5, down: 5 }, { up: 6, down: 4 }) > 0);
 const directory = load("lib/directory.ts");
 const entries = directory.directoryEntries;
+const sprite = entries.find(item => item.url === "https://spriteframe.com/png-to-sprite-sheet");
+assert.equal(sprite.sectionId, "cool-sites");
+assert.equal(entries.filter(item => item.url === sprite.url).length, 1);
+const homeSource = fs.readFileSync("components/home-page.tsx", "utf8");
+assert.ok(homeSource.includes('!query.trim() && <EditorsPicks'));
+assert.ok(homeSource.includes('!query.trim() && <nav className="quick-jumps"'));
+assert.ok(fs.readFileSync("components/link-strip.tsx", "utf8").includes('useSiteVotes(items.map('), "Ranking includes votes for cards beyond the preview");
 assert.equal(new Set(entries.map((entry) => entry.slug)).size, entries.length, "Detail slugs must be unique");
 for (const entry of entries) {
   assert.match(entry.slug, /^[a-z0-9]+(?:-[a-z0-9]+)*$/);

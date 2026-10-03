@@ -1,10 +1,12 @@
 import Link from "next/link";
 import sitesConfig from "@/config/sites.json";
+import { compareVotes, totalVotes } from "@/lib/vote-ranking";
+import { directoryEntries } from "@/lib/directory";
 
 export const metadata = {
   title: "Stats — Visitor Numbers for base31.org",
   description:
-    "Live numbers for base31.org: total visitors, a daily visitor graph, the most liked tools in the directory, and how many people follow along.",
+    "Live numbers for base31.org: total visitors, a daily visitor graph, the most voted sites in the directory, and how many people follow along.",
   alternates: { canonical: "/stats" },
   // Without this the page would inherit the layout's openGraph and og:url would
   // point at the homepage while the canonical says /stats.
@@ -14,12 +16,12 @@ export const metadata = {
     siteName: "base31.org",
     locale: "en_US",
     title: "Stats — Visitor Numbers for base31.org",
-    description: "Total visitors, a daily visitor graph, and the most liked tools in the base31.org directory.",
+    description: "Total visitors, a daily visitor graph, and the most voted sites in the base31.org directory.",
   },
   twitter: {
     card: "summary_large_image",
     title: "Stats — base31.org",
-    description: "Total visitors, a daily visitor graph, and the most liked tools in the directory.",
+    description: "Total visitors, a daily visitor graph, and the most voted sites in the directory.",
   },
 };
 
@@ -55,6 +57,7 @@ const shortDay = (date: string) => dayLabel.format(new Date(`${date}T00:00:00Z`)
 // Names for the vote keys: curated entries come from config/sites.json, and a
 // community upload is keyed by its own slug, which is readable as-is.
 const siteNames = new Map((sitesConfig as { subdomain: string; name: string }[]).map((site) => [site.subdomain, site.name]));
+for (const entry of directoryEntries) siteNames.set(entry.voteKey, entry.name);
 const displayName = (key: string) => siteNames.get(key) ?? key;
 
 async function loadStats(): Promise<StatsPayload | null> {
@@ -186,7 +189,7 @@ export default async function StatsPage() {
   const trend = totals && totals.prev7 > 0 ? Math.round(((totals.last7 - totals.prev7) / totals.prev7) * 100) : null;
   const graphWindow = series.reduce((running, point) => running + point.views, 0);
   const uniqueWindow = uniqueSeries.reduce((running, point) => running + point.unique, 0);
-  const top = (stats?.top ?? []).filter((entry) => entry.up > 0);
+  const top = (stats?.top ?? []).filter((entry) => totalVotes(entry) > 0).sort((a, b) => compareVotes(a, b) || a.key.localeCompare(b.key));
 
   return (
     <main className="stats-page">
@@ -270,12 +273,12 @@ export default async function StatsPage() {
 
           <section className="stats-panel" aria-labelledby="liked-heading">
             <div className="stats-panel-head">
-              <h2 id="liked-heading">Most liked tools</h2>
+              <h2 id="liked-heading">Most voted sites</h2>
               <span className="mono stats-panel-metric">{top.length === 0 ? "no votes yet" : `${number.format(top.length)} ranked`}</span>
             </div>
             {top.length === 0 ? (
               <p className="stats-notice" role="status">
-                Nobody has voted yet. Open any site in the <Link href="/#sites">directory</Link> and use the thumbs up to start the list.
+                Nobody has voted yet. Open any site in the <Link href="/#sites">directory</Link> and cast a vote to start the list.
               </p>
             ) : (
               <ol className="stats-ranking">
@@ -284,6 +287,7 @@ export default async function StatsPage() {
                     <span className="stats-rank mono">{String(index + 1).padStart(2, "0")}</span>
                     <span className="stats-rank-name">{displayName(entry.key)}</span>
                     <span className="stats-rank-votes mono">
+                      <span>{number.format(totalVotes(entry))} votes</span>
                       <span className="stats-rank-up">▲ {number.format(entry.up)}</span>
                       {entry.down > 0 ? <span className="stats-rank-down">▼ {number.format(entry.down)}</span> : null}
                     </span>

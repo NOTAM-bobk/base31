@@ -44,6 +44,9 @@ jobs:
       - name: Subscription regression tests
         run: npm run test:subscriptions
 
+      - name: Daily vocabulary regression tests
+        run: npm run test:wordoftheday
+
       - name: Typecheck
         run: npm run typecheck
 

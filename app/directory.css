@@ -194,8 +194,11 @@ html::-webkit-scrollbar, body::-webkit-scrollbar { display: none; width: 0; heig
 
 /* Discoveries, conversations, and the wider base31 journal. */
 .intro-links { gap: 12px; align-items: center; }
-.submit-url-link { display: inline-flex; align-items: center; gap: 18px; min-height: 44px; padding: 10px 18px; border: 1px solid var(--line-strong); border-radius: 999px; background: var(--surface); color: var(--text-strong); font-size: 12px; text-decoration: none; transition: border-color .2s, background .2s; }
-.submit-url-link:hover { border-color: var(--accent-sky); background: var(--surface-hover); }
+.submit-url-link { display: inline-flex; align-items: center; gap: 12px; min-height: 48px; padding: 7px 18px 7px 8px; border: 1px solid color-mix(in srgb, var(--accent-sky) 42%, var(--line)); border-radius: 999px; background: linear-gradient(120deg, color-mix(in srgb, var(--accent-sky) 10%, var(--surface)), var(--surface)); color: var(--text-strong); font-size: 12px; font-weight: 600; text-decoration: none; box-shadow: 0 8px 20px -16px var(--accent-sky); transition: border-color .2s, transform .2s, box-shadow .2s; }
+.submit-url-icon { display: grid; place-items: center; width: 32px; height: 32px; border-radius: 50%; background: color-mix(in srgb, var(--accent-sky) 14%, var(--surface)); color: var(--accent-sky); font-size: 21px; font-weight: 400; }
+.submit-url-arrow { margin-left: 8px; color: var(--accent-sky); transition: transform .2s; }
+.submit-url-link:hover { border-color: var(--accent-sky); transform: translateY(-2px); box-shadow: 0 10px 24px -16px var(--accent-sky); }
+.submit-url-link:hover .submit-url-arrow { transform: translate(2px, -2px); }
 .url-submission { scroll-margin-top: 100px; margin: 48px 0 0; padding: 32px; display: grid; grid-template-columns: 1fr 1.25fr; gap: 36px; border: 1px solid color-mix(in srgb, var(--accent-amber) 32%, var(--line)); border-radius: 24px; background: radial-gradient(ellipse at top left, color-mix(in srgb, var(--accent-amber) 10%, transparent), transparent 65%), var(--surface); box-shadow: 0 20px 50px -40px rgb(0 0 0 / 60%); }
 .url-submission-mark { display: grid; place-items: center; width: 48px; height: 48px; margin-bottom: 26px; border: 1px solid color-mix(in srgb, var(--accent-amber) 35%, var(--line)); border-radius: 14px; color: var(--accent-amber); font-size: 26px; }
 .url-submission .eyebrow { font-size: 10px; line-height: 1.6; margin-bottom: 12px; }

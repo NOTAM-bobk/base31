@@ -6,6 +6,12 @@ const compiled = ts.transpileModule(fs.readFileSync("worker/src/index.ts", "utf8
 const module = { exports: {} };
 new Function("module", "exports", "require", compiled)(module, module.exports, name => {
   if (name === "./discussion" || name === "@block65/webcrypto-web-push") return {};
+  if (name === "../../lib/vote-ranking") {
+    const ranking = { exports: {} };
+    const code = ts.transpileModule(fs.readFileSync("lib/vote-ranking.ts", "utf8"), { compilerOptions: { module: ts.ModuleKind.CommonJS } }).outputText;
+    new Function("module", "exports", code)(ranking, ranking.exports);
+    return ranking.exports;
+  }
   throw new Error(`Unexpected import: ${name}`);
 });
 const worker = module.exports.default;
@@ -66,6 +72,11 @@ assert.equal((await suggest({ url: "https://spriteframe.com/png-to-sprite-sheet"
 page = await (await call("/admin/data", auth)).json();
 assert.equal(page.requests[0].title, "SpriteFrame");
 assert.equal(page.requests[0].url, "https://spriteframe.com/png-to-sprite-sheet");
+await env.VIEW_COUNTER.put("votes:popular:up", "2");
+await env.VIEW_COUNTER.put("votes:popular:down", "10");
+await env.VIEW_COUNTER.put("votes:liked:up", "9");
+const stats = await (await call("/stats")).json();
+assert.equal(stats.top[0].key, "popular", "Stats ranks by all votes, not net likes or upvotes alone");
 const homepage = fs.readFileSync("components/home-page.tsx", "utf8");
 assert.match(homepage, /<CoolAis[^\n]+\/>\s*<UrlRequest \/>/);
 assert.equal((homepage.match(/<UrlRequest \/>/g) || []).length, 1);

@@ -1,5 +1,13 @@
 [
   {
+    "addedAt": "2026-10-03",
+    "name": "SpriteFrame PNG to Sprite Sheet",
+    "category": "Images",
+    "url": "https://spriteframe.com/png-to-sprite-sheet",
+    "tags": ["png", "sprites", "animation", "game-dev"],
+    "description": "Arrange PNG frames, preview the animation, and export a sprite sheet or separate frames with JSON timing data. Basic editing runs in your browser, free without an account."
+  },
+  {
     "addedAt": "2026-09-30",
     "name": "Excalidraw",
     "category": "Draw & design",

@@ -186,7 +186,8 @@ The directory and public GitHub statistics do **not** need a GitHub API key. Ema
 | Name | Purpose |
 | --- | --- |
 | `VIEW_COUNTER` | Existing KV namespace binding in `worker/wrangler.jsonc`; **preserve its ID** to retain counters, votes, uploads, and subscriptions |
-| `RESEND_API_KEY`, `RESEND_FROM_EMAIL` | Double-opt-in confirmation and publication-update emails; configure separately from Next.js |
+| `RESEND_API_KEY`, `RESEND_FROM_EMAIL` | Publication-update emails; signup saves immediately without sending a confirmation email. Configure delivery separately from Next.js |
+| `SUBSCRIBER_ADMIN_SECRET` | Required to unlock `/admin`; a long random Worker secret, never public frontend configuration |
 | `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT` | Opt-in browser push; only the public key is returned to browsers |
 | `GITHUB_TOKEN` | Optional repository mirroring of community uploads; a runtime Worker credential with repository Contents read/write permission |
 | `GITHUB_REPO`, `GITHUB_BRANCH` | Optional mirror destination; defaults are `NOTAM-bobk/base31` and `main` |
@@ -215,7 +216,9 @@ Resend's test sender has recipient restrictions. For real subscriber delivery, v
 | `POST /discussion` | `{ name, body, replyTo? }`; returns the stored message |
 | `POST /discussion/moderate` | `{ id }` plus `x-discussion-secret`; replace a message with a removal notice |
 
-See `worker/src/index.ts` for the subscription, confirmation, unsubscribe, and push routes and their payloads.
+`POST /subscribe` saves an active email immediately; success is returned only after storage succeeds, with no confirmation email or Resend requirement. Existing confirmation links still work for older pending records. `GET /admin/subscribers` requires `Authorization: Bearer <SUBSCRIBER_ADMIN_SECRET>` and returns up to 100 emails with active status, signup time (when recorded), and a pagination cursor—never unsubscribe tokens. The `/admin` page holds the entered secret in memory only. Configure this separate secret in the Worker before using the panel; access fails closed if it is unset. KV lists are eventually consistent, so new emails may take about a minute to appear. Older pending signups are not automatically activated.
+
+URL suggestions below the last directory collection use the existing `/api/bug-report` operator inbox with a distinct subject. They are reviewed, not automatically published. The Next.js Resend configuration is required for that form. See `worker/src/index.ts` for legacy confirmation, unsubscribe, and push routes. Single-step signup records form consent but does not verify email ownership; operators should monitor for abusive or unwanted subscriptions.
 
 Community uploads are served on the Worker origin, separate from the directory. Limits are 40 files, 2 MB per file, and 8 MB per upload. KV listings are eventually consistent, so new entries may take about a minute to appear elsewhere. Optional GitHub mirroring is best-effort; it does not automatically add an entry to curated `sites.json`.
 

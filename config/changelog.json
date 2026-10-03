@@ -1,5 +1,18 @@
 [
   {
+    "version": "1.30.0",
+    "date": "2026-10-03",
+    "title": "Pass on a good find",
+    "summary": "SpriteFrame joins the apps collection, URL suggestions get a dedicated place below the directory, and conversations get a cleaner shared space. Email signup now saves immediately, with a private subscriber panel for the operator.",
+    "highlights": [
+      "SpriteFrame combines PNG frames into sprite sheets with animation previews and JSON timing exports.",
+      "A styled URL suggestion form follows the last directory collection, with a Submit a URL shortcut beside Surprise me. Suggestions go to the operator for review.",
+      "Community conversations gain framed message cards, clearer reply threads and a refined composer in both themes and on phones.",
+      "Footer buttons link directly to base31 posts on dev.to and Medium.",
+      "Email signups report success after storage without confirmation. A secret-protected /admin panel lists subscriber emails, status and signup time. The Worker must be deployed separately and its admin secret configured."
+    ]
+  },
+  {
     "version": "1.29.0",
     "date": "2026-10-01",
     "title": "A background remover, and a tidier homepage",

@@ -113,13 +113,13 @@ html::-webkit-scrollbar, body::-webkit-scrollbar { display: none; width: 0; heig
 .discussion-board h3 { font-size: 16px; color: var(--text-strong); margin: 0; }
 .discussion-composer > p { color: var(--muted); font-size: 12px; line-height: 1.65; }
 .discussion-composer label { display: block; font-size: 12px; color: var(--text-strong); margin: 20px 0 8px; }
-.discussion-composer input, .discussion-composer textarea { width: 100%; box-sizing: border-box; border: 1px solid var(--line-strong); border-radius: 8px; padding: 12px; background: var(--bg); color: var(--text-strong); font: inherit; font-size: 14px; line-height: 1.6; }
+.discussion-composer input, .discussion-composer textarea { width: 100%; box-sizing: border-box; border: 1px solid var(--line-strong); border-radius: 8px; padding: 12px; background: var(--input-bg); color: var(--text-strong); font: inherit; font-size: 14px; line-height: 1.6; }
 .discussion-composer textarea { resize: vertical; min-height: 140px; }
 .discussion-composer input::placeholder, .discussion-composer textarea::placeholder { color: var(--subtle); }
 .discussion-composer-footer { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 12px; }
 .discussion-composer-footer > span { color: var(--subtle); font-size: 10px; }
 .discussion-board button { font: inherit; cursor: pointer; }
-.discussion-post { padding: 12px 16px; min-height: 44px; border: 1px solid var(--live); border-radius: 8px; background: var(--live); color: var(--bg); font-size: 12px !important; font-weight: 600 !important; }
+.discussion-post { padding: 12px 16px; min-height: 44px; border: 1px solid var(--live); border-radius: 8px; background: var(--live); color: var(--background); font-size: 12px !important; font-weight: 600 !important; }
 .discussion-post:hover { filter: brightness(1.1); }
 .discussion-board button:disabled { opacity: .5; cursor: not-allowed; }
 .discussion-board :focus-visible { outline: 2px solid var(--accent-sky); outline-offset: 4px; }
@@ -177,6 +177,70 @@ html::-webkit-scrollbar, body::-webkit-scrollbar { display: none; width: 0; heig
   .discussion-pagination { gap: 8px; }
   .discussion-pagination button { flex: 1 1 auto; min-height: 48px; }
   .discussion-feed-heading { flex-wrap: wrap; }
+}
+
+/* Discoveries, conversations, and the wider base31 journal. */
+.intro-links { gap: 12px; align-items: center; }
+.submit-url-link { display: inline-flex; align-items: center; gap: 18px; min-height: 44px; padding: 10px 18px; border: 1px solid var(--line-strong); border-radius: 999px; background: var(--surface); color: var(--text-strong); font-size: 12px; text-decoration: none; transition: border-color .2s, background .2s; }
+.submit-url-link:hover { border-color: var(--accent-sky); background: var(--surface-hover); }
+.url-submission { scroll-margin-top: 100px; margin: 48px 0 0; padding: 32px; display: grid; grid-template-columns: 1fr 1.25fr; gap: 36px; border: 1px solid color-mix(in srgb, var(--accent-amber) 32%, var(--line)); border-radius: 24px; background: radial-gradient(ellipse at top left, color-mix(in srgb, var(--accent-amber) 10%, transparent), transparent 65%), var(--surface); box-shadow: 0 20px 50px -40px rgb(0 0 0 / 60%); }
+.url-submission-mark { display: grid; place-items: center; width: 48px; height: 48px; margin-bottom: 26px; border: 1px solid color-mix(in srgb, var(--accent-amber) 35%, var(--line)); border-radius: 14px; color: var(--accent-amber); font-size: 26px; }
+.url-submission .eyebrow { font-size: 10px; line-height: 1.6; margin-bottom: 12px; }
+.url-submission h2 { margin: 0; color: var(--text-strong); font-size: clamp(28px, 4vw, 38px); letter-spacing: -.045em; line-height: 1.12; }
+.url-submission-copy > p:not(.eyebrow) { color: var(--muted); font-size: 13px; line-height: 1.8; margin: 20px 0; }
+.url-submission-note { color: var(--accent-amber); font-size: 10px; line-height: 1.7; }
+.url-submission-form { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.url-submission-form label { color: var(--text-strong); font-size: 12px; margin-top: 6px; }
+.url-submission-form label span { color: var(--muted); }
+.url-submission-form input, .url-submission-form textarea { width: 100%; border: 1px solid var(--line-strong); border-radius: 10px; padding: 12px 14px; background: var(--input-bg); color: var(--text-strong); font: inherit; font-size: 14px; line-height: 1.6; }
+.url-submission-form textarea { resize: vertical; min-height: 100px; }
+.url-submission-form input::placeholder, .url-submission-form textarea::placeholder { color: var(--subtle); }
+.url-submit-button { min-height: 46px; margin-top: 8px; padding: 12px 18px; border: 1px solid var(--invert-bg); border-radius: 10px; background: var(--invert-bg); color: var(--invert-fg); font: inherit; font-size: 13px; font-weight: 600; cursor: pointer; }
+.url-submit-button:hover { opacity: .85; }
+.url-submit-button:disabled { opacity: .5; cursor: wait; }
+.url-submission-privacy { margin: 2px 0 0; color: var(--muted); font-size: 10px; line-height: 1.7; }
+.url-submission :focus-visible, .submit-url-link:focus-visible, .footer-publications a:focus-visible, .admin-panel :focus-visible { outline: 2px solid var(--accent-sky); outline-offset: 4px; }
+.discussion-board { position: relative; border-color: color-mix(in srgb, var(--accent-sky) 30%, var(--line)); background: radial-gradient(ellipse at top right, color-mix(in srgb, var(--accent-sky) 11%, transparent), transparent 60%), var(--surface); box-shadow: 0 20px 50px -40px rgb(0 0 0 / 60%); }
+.discussion-heading { padding-bottom: 24px; border-bottom: 1px solid var(--line); }
+.discussion-badge { display: inline-flex; align-items: center; gap: 7px; background: color-mix(in srgb, var(--live) 7%, var(--surface)); color: var(--live); border-color: color-mix(in srgb, var(--live) 25%, var(--line)); }
+.discussion-badge::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+.discussion-composer { background: color-mix(in srgb, var(--accent-sky) 3%, var(--surface)); border-radius: 16px; box-shadow: inset 0 1px 0 color-mix(in srgb, var(--text-strong) 5%, transparent); }
+.discussion-thread { margin: 14px 0; padding: 18px; border: 1px solid var(--line); border-radius: 16px; background: var(--surface); transition: border-color .2s; }
+.discussion-thread:hover { border-color: var(--line-strong); }
+.discussion-avatar { width: 36px; height: 36px; border-radius: 12px; border: 1px solid color-mix(in srgb, var(--accent-sky) 20%, var(--line)); font-weight: 600; }
+.discussion-message p { color: var(--text); }
+.discussion-replies { margin-top: 16px; padding-top: 8px; border-left-color: color-mix(in srgb, var(--accent-amber) 38%, var(--line)); }
+.discussion-feed-heading { padding: 0 0 4px; }
+.discussion-feed-heading .discussion-text-button { padding: 8px 12px; border: 1px solid var(--line); border-radius: 999px; }
+.footer-publications { width: min(100% - 48px, 960px); margin: 0 auto; padding: 32px 0; display: flex; align-items: center; flex-wrap: wrap; gap: 12px; }
+.footer-publications > span { margin-right: auto; color: var(--subtle); font-size: 10px; text-transform: uppercase; letter-spacing: .08em; }
+.site-footer .footer-publications a { display: inline-flex; align-items: center; gap: 12px; min-height: 48px; padding: 10px 16px; border: 1px solid var(--line-strong); border-radius: 12px; color: var(--text-strong); background: var(--surface); transition: border-color .2s, transform .2s; }
+.footer-publications a:hover { border-color: var(--accent-sky); transform: translateY(-2px); }
+.footer-publications strong { color: var(--text-strong); font-size: 14px; letter-spacing: -.04em; }
+.subscriber-admin > .eyebrow { margin-top: 44px; }
+.admin-panel { margin-top: 32px; padding: 24px; border: 1px solid var(--line); border-radius: 18px; background: var(--surface); }
+.admin-toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+.admin-toolbar strong { margin-right: auto; }
+.admin-toolbar button { min-height: 44px; padding: 8px 14px; border: 1px solid var(--line-strong); border-radius: 8px; background: var(--surface); color: var(--text); cursor: pointer; }
+.admin-table-wrap { overflow-x: auto; }
+.admin-panel table { width: 100%; border-collapse: collapse; text-align: left; font-size: 12px; }
+.admin-panel th, .admin-panel td { padding: 14px 10px; border-bottom: 1px solid var(--line); }
+.admin-panel td:first-child { overflow-wrap: anywhere; }
+@media (max-width: 720px) {
+  .url-submission { grid-template-columns: 1fr; gap: 24px; padding: 24px; }
+  .url-submission-mark { margin-bottom: 18px; }
+  .url-submission h2 br { display: none; }
+  .url-submission h2 br::after { content: " "; }
+  .footer-publications > span { flex-basis: 100%; margin-bottom: 8px; }
+}
+@media (max-width: 600px) {
+  .url-submission { padding: 22px 16px; border-radius: 18px; }
+  .url-submission-form input, .url-submission-form textarea { font-size: 16px; }
+  .discussion-thread { padding: 14px 12px; border-radius: 12px; }
+  .discussion-avatar { width: 28px; height: 28px; border-radius: 9px; }
+  .discussion-heading { padding-bottom: 18px; }
+  .footer-publications { width: calc(100% - 32px); }
+  .site-footer .footer-publications a { flex: 1 1 100%; justify-content: space-between; }
 }
 
 /* Editor's picks, refreshed ---------------------------------------------

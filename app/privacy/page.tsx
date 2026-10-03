@@ -89,14 +89,17 @@ export default function PrivacyPage() {
         <h2>Email updates, browser alerts, and bug reports</h2>
         <p>
           If you subscribe to community-site updates, your email address is stored by our Cloudflare Worker
-          until you unsubscribe. We send a confirmation message first; only confirmed subscribers receive
-          publication notices, and each notice includes an unsubscribe link. If you enable browser alerts,
+          until you unsubscribe. Signing up adds you to the active list immediately, without a confirmation
+          email. Your email and signup time are visible only to the operator through a protected admin panel.
+          Publication notices include an unsubscribe link. If you enable browser alerts,
           this browser’s push subscription is stored so we can send an alert when a community site is
           published. You can turn alerts off from the same control in the directory. These features are
           optional and are separate from the cookie/analytics choice.
         </p>
         <p>
-          Bug reports are sent to the site operator through Resend. The report includes the message, the
+          Bug reports and URL suggestions are sent to the site operator through Resend. URL suggestions
+          include the submitted website address for review; they are not automatically published.
+          The report includes the message, the
           page URL, and an email address only if you choose to provide one. Reports are retained in the
           email provider’s systems; an optional reply address is used only to respond to the report.
         </p>

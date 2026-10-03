@@ -21,6 +21,7 @@ export interface Env {
   DISCUSSION?: DiscussionBinding;
   DISCUSSION_MODERATOR_SECRET?: string;
   COUNTER_SECRET?: string;
+  SUBSCRIBER_ADMIN_SECRET?: string;
   RESEND_API_KEY?: string;
   RESEND_FROM_EMAIL?: string;
   VAPID_PUBLIC_KEY?: string;
@@ -59,7 +60,7 @@ type PublishedSite = {
 const CORS_HEADERS: Record<string, string> = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-  "Access-Control-Allow-Headers": "Content-Type, x-counter-secret, x-discussion-secret",
+  "Access-Control-Allow-Headers": "Content-Type, x-counter-secret, x-discussion-secret, Authorization",
   "Access-Control-Max-Age": "86400",
 };
 
@@ -407,7 +408,7 @@ const handleStats = async (env: Env, url: URL): Promise<Response> => {
 };
 
 const validEmail = (value: unknown): value is string => {
-  if (typeof value !== "string" || value.length > 254) return false;
+  if (typeof value !== "string" || value.length > 254 || /[\s<>(),;:\\[\]]/.test(value)) return false;
   const at = value.lastIndexOf("@");
   const domain = value.slice(at + 1);
   return at > 0 && value.indexOf("@") === at && at < 65 && domain.includes(".") && !domain.startsWith(".") && !domain.endsWith(".");
@@ -666,11 +667,14 @@ const handleServe = async (url: URL, env: Env): Promise<Response> => {
   }
 };
 
-const handleEmailSubscribe = async (request: Request, env: Env, origin: string): Promise<Response> => {
-  if (!env.RESEND_API_KEY || !env.RESEND_FROM_EMAIL) return json({ error: "Email updates are not configured yet." }, 503);
+const handleEmailSubscribe = async (request: Request, env: Env): Promise<Response> => {
   let payload: { email?: unknown };
-  try { payload = await request.json() as typeof payload; } catch { return json({ error: "Invalid JSON body" }, 400); }
-  if (!validEmail(payload.email)) return json({ error: "Enter a valid email address." }, 400);
+  try {
+    const raw = await request.text();
+    if (raw.length > 2048) return json({ error: "Request too large." }, 413);
+    payload = JSON.parse(raw) as typeof payload;
+  } catch { return json({ error: "Invalid JSON body" }, 400); }
+  if (!payload || !validEmail(payload.email)) return json({ error: "Enter a valid email address." }, 400);
   const email = payload.email.trim().toLowerCase();
   const hash = await digest(email);
   const key = emailKey(hash);
@@ -681,28 +685,33 @@ const handleEmailSubscribe = async (request: Request, env: Env, origin: string):
       if (saved.verified) return json({ success: true, alreadySubscribed: true });
       if (saved.unsubscribeHash) await env.VIEW_COUNTER.delete(`${UNSUBSCRIBE_PREFIX}${saved.unsubscribeHash}`);
     }
-    const token = randomToken();
     const unsubscribeToken = randomToken();
     const unsubscribeHash = await digest(unsubscribeToken);
-    const confirmationUrl = `${origin}/subscribe/confirm?token=${encodeURIComponent(token)}`;
-    const unsubscribeUrl = `${origin}/subscribe/unsubscribe?token=${encodeURIComponent(unsubscribeToken)}`;
-    await env.VIEW_COUNTER.put(key, JSON.stringify({ email, verified: false, unsubscribeHash, unsubscribeToken }));
-    await env.VIEW_COUNTER.put(`${CONFIRM_PREFIX}${token}`, hash, { expirationTtl: 86400 });
     await env.VIEW_COUNTER.put(`${UNSUBSCRIBE_PREFIX}${unsubscribeHash}`, hash);
-    const sent = await sendResend(env, {
-      to: email,
-      subject: "Confirm your base31 site updates",
-      text: `Confirm your email to get a note when community sites are published: ${confirmationUrl}\n\nIf you didn't request this, ignore this message.`,
-      html: `<p>Confirm your email to get a note when community sites are published.</p><p><a href="${escapeHtml(confirmationUrl)}">Confirm my subscription</a></p><p>If you didn’t request this, ignore this message.</p>`,
-    });
-    if (!sent) {
-      await Promise.all([env.VIEW_COUNTER.delete(key), env.VIEW_COUNTER.delete(`${CONFIRM_PREFIX}${token}`), env.VIEW_COUNTER.delete(`${UNSUBSCRIBE_PREFIX}${unsubscribeHash}`)]);
-      return json({ error: "Could not send a confirmation email right now." }, 502);
-    }
-    return json({ success: true }, 202);
+    // Keep the legacy field for publication delivery; it now means active,
+    // not that ownership of the email address was verified by confirmation.
+    await env.VIEW_COUNTER.put(key, JSON.stringify({ email, verified: true, subscribedAt: Date.now(), consent: "signup-form", unsubscribeHash, unsubscribeToken }));
+    return json({ success: true }, 201);
   } catch {
     return json({ error: "Could not save your subscription right now." }, 503);
   }
+};
+
+const handleSubscriberAdmin = async (request: Request, env: Env, url: URL): Promise<Response> => {
+  if (!env.SUBSCRIBER_ADMIN_SECRET || request.headers.get("Authorization") !== `Bearer ${env.SUBSCRIBER_ADMIN_SECRET}`) return json({ error: "Administrator access required." }, 401);
+  if (request.method !== "GET") return json({ error: "Method not allowed" }, 405);
+  const cursor = url.searchParams.get("cursor") || undefined;
+  if (cursor && cursor.length > 2048) return json({ error: "Invalid cursor." }, 400);
+  try {
+    const page = await env.VIEW_COUNTER.list({ prefix: SUBSCRIBER_PREFIX, limit: 100, cursor });
+    const subscribers = await Promise.all(page.keys.map(async ({ name }) => {
+      const raw = await env.VIEW_COUNTER.get(name);
+      if (!raw) return null;
+      const saved = JSON.parse(raw) as { email: string; verified?: boolean; subscribedAt?: number };
+      return { email: saved.email, active: !!saved.verified, subscribedAt: saved.subscribedAt ?? null };
+    }));
+    return json({ subscribers: subscribers.filter(Boolean), nextCursor: page.list_complete ? null : page.cursor ?? null });
+  } catch { return json({ error: "Could not load subscribers." }, 503); }
 };
 
 const handleConfirmSubscription = async (url: URL, env: Env): Promise<Response> => {
@@ -907,9 +916,11 @@ export default {
       }
     }
 
+    if (url.pathname === "/admin/subscribers") return handleSubscriberAdmin(request, env, url);
+
     if (url.pathname === "/subscribe") {
       if (request.method !== "POST") return json({ error: "Method not allowed" }, 405);
-      return handleEmailSubscribe(request, env, url.origin);
+      return handleEmailSubscribe(request, env);
     }
 
     if (url.pathname === "/subscribe/confirm") {

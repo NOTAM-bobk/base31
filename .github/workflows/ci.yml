@@ -41,6 +41,9 @@ jobs:
       - name: Discussion regression tests
         run: npm run test:discussion
 
+      - name: Subscription regression tests
+        run: npm run test:subscriptions
+
       - name: Typecheck
         run: npm run typecheck
 

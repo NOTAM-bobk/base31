@@ -33,6 +33,7 @@ export default function DirectoryNotifications() {
 
   const subscribeEmail = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    if (emailBusy) return;
     setEmailBusy(true);
     setEmailStatus("");
     try {
@@ -43,7 +44,8 @@ export default function DirectoryNotifications() {
       });
       const result = await response.json().catch(() => null);
       if (!response.ok) throw new Error(result?.error || "Could not subscribe right now.");
-      setEmailStatus(result?.alreadySubscribed ? "That address is already on the list." : "Check your inbox to confirm your subscription.");
+      setEmailStatus(result?.alreadySubscribed ? "Success — that address is already on the list." : "Success — you’re on the list! No confirmation needed.");
+      setEmail("");
     } catch (error) {
       setEmailStatus(error instanceof Error ? error.message : "Could not subscribe right now.");
     } finally {
@@ -144,7 +146,7 @@ export default function DirectoryNotifications() {
         <input id="updates-email" type="email" autoComplete="email" maxLength={254} required value={email} onChange={(event) => setEmail(event.target.value)} placeholder="you@example.com" />
         <button className="community-action is-primary" type="submit" disabled={emailBusy}>{emailBusy ? "Sending…" : "Get site updates"}</button>
       </form>
-      <p className="community-privacy-note">We’ll send a confirmation link first. No cookie tracking, and every update email includes an unsubscribe link.</p>
+      <p className="community-privacy-note">Signing up adds your email to our updates list immediately. No cookie tracking, and every update email includes an unsubscribe link.</p>
       {emailStatus && <p className="community-status" role="status">{emailStatus}</p>}
 
       <div className="push-opt-in">

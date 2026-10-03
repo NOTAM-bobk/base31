@@ -6,6 +6,7 @@ import sites from "@/config/sites.json";
 import pkg from "@/package.json";
 import AboutSection from "@/components/about-section";
 import DiscussionBoard from "@/components/discussion-board";
+import UrlSubmission from "@/components/url-submission";
 import SupportSection from "@/components/support-section";
 import { SITE_GLYPHS } from "@/components/site-glyphs";
 import Cursor from "@/components/cursor";
@@ -1104,6 +1105,7 @@ export default function HomePage({ dict = EN, locale = "en" }: { dict?: Dictiona
               <span className="surprise-icon" aria-hidden="true">↯</span>
               <span className="surprise-label">{dict.surprise}</span>
             </button>
+            <a className="submit-url-link" href="#submit-url">Submit a URL <span aria-hidden="true">↗</span></a>
           </div>
           {/* A search landmark with an explicit name: the wrapping label used
               to name the field "/" (its only text was the shortcut hint). */}
@@ -1425,6 +1427,7 @@ export default function HomePage({ dict = EN, locale = "en" }: { dict?: Dictiona
             rather than a site to read. */}
         <CoolApps dict={dict} query={query} />
         <CoolAis dict={dict} query={query} />
+        <UrlSubmission />
 
         <AboutSection />
         <DiscussionBoard />
@@ -1457,6 +1460,11 @@ export default function HomePage({ dict = EN, locale = "en" }: { dict?: Dictiona
       </main>
 
       <footer className="site-footer">
+        <nav className="footer-publications" aria-label="Read our posts elsewhere">
+          <span className="mono">Beyond the directory</span>
+          <a href="https://dev.to/base31" target="_blank" rel="noopener noreferrer"><strong>DEV</strong> Read our posts on dev.to <span aria-hidden="true">↗</span></a>
+          <a href="https://medium.com/@base31dotorg" target="_blank" rel="noopener noreferrer"><strong>M</strong> Read our posts on Medium <span aria-hidden="true">↗</span></a>
+        </nav>
         {/* Contact details and the deployed build version. They sit at the very
             bottom of the page, for visitors and search crawlers alike. The
             version comes from package.json, so it tracks the release. */}

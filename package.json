@@ -21,7 +21,7 @@
   "dependencies": {
     "@block65/webcrypto-web-push": "^1.0.2",
     "@vercel/analytics": "^2.0.1",
-    "next": "14.2.35",
+    "next": "16.3.8",
     "react": "18.3.1",
     "react-dom": "18.3.1",
     "resend": "^6.28.1"

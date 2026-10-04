@@ -1528,6 +1528,7 @@ export default function HomePage({ dict = EN, locale = "en" }: { dict?: Dictiona
             <a href="/our-story">Our Story</a>
             <a href="/terms">Terms of service</a>
             <a href="/privacy">Privacy</a>
+            <a href="/security">Security</a>
             {/* The one footer item that leaves the site, so it carries the
                 GitHub mark and reads as a small button rather than a link. */}
             <a className="footer-source" href="https://github.com/NOTAM-bobk/base31" target="_blank" rel="noreferrer">

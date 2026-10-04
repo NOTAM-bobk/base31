@@ -19,8 +19,26 @@ export default function AboutSection() {
       <p>base31.org is an independent collection of personal sites, experiments, tools, and other projects worth exploring. It is a hand-built alternative to noisy app lists: every link leads to a real project with something to see or use.</p>
       <p>Looking for Base44? base31 is a separate, independent project and is not affiliated with Base44. Start here for a different kind of website directory: slower, stranger, and made for curious people.</p>
       <nav className="about-page-links" aria-label="Meet base31">
-        <a href="/about">About Us <span aria-hidden="true">→</span></a>
-        <a href="/our-story">Our Story <span aria-hidden="true">→</span></a>
+        <a href="/about" className="about-page-card">
+          <span className="about-page-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="8" r="3.5" /><path d="M4.5 20a7.5 7.5 0 0 1 15 0" /></svg>
+          </span>
+          <span className="about-page-text">
+            <span className="about-page-label">About Us</span>
+            <span className="about-page-sub">Who runs base31 and why</span>
+          </span>
+          <span className="about-page-arrow" aria-hidden="true">→</span>
+        </a>
+        <a href="/our-story" className="about-page-card is-story">
+          <span className="about-page-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5z" /><path d="M4 20.5A2.5 2.5 0 0 0 6.5 23H20v-5" /></svg>
+          </span>
+          <span className="about-page-text">
+            <span className="about-page-label">Our Story</span>
+            <span className="about-page-sub">How the directory began</span>
+          </span>
+          <span className="about-page-arrow" aria-hidden="true">→</span>
+        </a>
       </nav>
       <div className="topic-links">
         <a href="#sites">Cool sites</a>

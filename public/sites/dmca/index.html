@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>DMCA Takedown Request — base31.org</title>
+    <meta name="description" content="Submit a DMCA copyright takedown request for content listed or hosted on base31.org. Every request is reviewed by a person." />
+    <meta name="robots" content="index, follow" />
+    <link rel="canonical" href="https://dmca.base31.org/" />
+    <meta property="og:title" content="DMCA Takedown Request — base31.org" />
+    <meta property="og:description" content="Report copyrighted material listed or hosted on base31.org." />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary" />
+    <style>
+      :root { --bg:#000; --surface:#0a0a0a; --line:#262626; --line-strong:#3a3a3a; --text:#ededed; --muted:#b0b0b0; --subtle:#777; --strong:#fff; --live:#46e891; --danger:#ff3b5c; --sky:#8cc8ff; }
+      @media (prefers-color-scheme: light) { :root { --bg:#fafafa; --surface:#fff; --line:#e7e7e7; --line-strong:#cbcbcb; --text:#1b1b1b; --muted:#555; --subtle:#8a8a8a; --strong:#050505; --live:#0f9d58; --danger:#e0244a; --sky:#225f9d; } }
+      * { box-sizing: border-box; }
+      body { margin: 0; min-height: 100vh; background: var(--bg); color: var(--text); font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; -webkit-font-smoothing: antialiased; }
+      .mono { font-family: "SFMono-Regular", Consolas, Menlo, monospace; }
+      main { width: min(100% - 40px, 640px); margin: 0 auto; padding: 64px 0 96px; }
+      .back { color: var(--muted); font-size: 12px; text-decoration: none; }
+      .eyebrow { margin: 36px 0 14px; color: var(--subtle); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; }
+      h1 { margin: 0; color: var(--strong); font-size: clamp(32px, 6vw, 48px); font-weight: 600; letter-spacing: -.05em; line-height: 1.05; }
+      .lede { margin: 16px 0 32px; color: var(--muted); font-size: 15px; line-height: 1.65; }
+      form { display: grid; gap: 18px; padding: 24px; border: 1px solid var(--line); border-radius: 16px; background: var(--surface); }
+      .row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+      label { display: grid; gap: 7px; color: var(--strong); font-size: 13px; font-weight: 500; }
+      label small { color: var(--subtle); font-weight: 400; }
+      input[type=text], input[type=email], input[type=url], textarea { width: 100%; padding: 11px 12px; border: 1px solid var(--line-strong); border-radius: 9px; background: var(--bg); color: var(--strong); font: inherit; font-size: 14px; }
+      textarea { min-height: 96px; resize: vertical; }
+      input:focus, textarea:focus { outline: 2px solid color-mix(in srgb, var(--sky) 60%, transparent); outline-offset: 1px; }
+      .check { display: flex; align-items: flex-start; gap: 10px; color: var(--muted); font-size: 12.5px; font-weight: 400; line-height: 1.5; }
+      .check input { margin-top: 3px; accent-color: var(--live); }
+      button { justify-self: start; padding: 12px 20px; border: 0; border-radius: 999px; background: var(--strong); color: var(--bg); font: inherit; font-size: 13px; font-weight: 600; cursor: pointer; }
+      button:disabled { opacity: .6; cursor: progress; }
+      .status { margin: 0; padding: 12px 14px; border: 1px solid var(--line); border-radius: 10px; font-size: 13px; }
+      .status.ok { color: var(--live); border-color: color-mix(in srgb, var(--live) 35%, var(--line)); }
+      .status.err { color: var(--danger); }
+      .note { margin-top: 28px; color: var(--subtle); font-size: 12px; line-height: 1.6; }
+      .hp { position: absolute; left: -9999px; }
+      @media (max-width: 560px) { .row { grid-template-columns: 1fr; } form { padding: 18px; } input, textarea { font-size: 16px !important; } }
+    </style>
+  </head>
+  <body>
+    <main>
+      <a class="back mono" href="https://base31.org">← base31.org</a>
+      <p class="eyebrow mono">copyright</p>
+      <h1>DMCA takedown request</h1>
+      <p class="lede">If something listed or hosted on base31.org uses your copyrighted work without permission, tell us here. Every request is reviewed by a person, usually within a few days.</p>
+
+      <form id="dmca-form" novalidate>
+        <div class="row">
+          <label>Full name<input type="text" name="name" required maxlength="120" autocomplete="name" /></label>
+          <label>Email<input type="email" name="email" required maxlength="254" autocomplete="email" /></label>
+        </div>
+        <label>Company or organization <small>(optional)</small><input type="text" name="organization" maxlength="160" autocomplete="organization" /></label>
+        <label>URL of the material to remove<input type="url" name="infringingUrl" required maxlength="2000" placeholder="https://base31.org/…" /></label>
+        <label>Your original copyrighted work<textarea name="originalWork" required maxlength="1000" placeholder="Describe the work, or link to where it is published."></textarea></label>
+        <label>Additional details <small>(optional)</small><textarea name="details" maxlength="2000"></textarea></label>
+        <input class="hp" type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" />
+        <label class="check"><input type="checkbox" name="goodFaith" required /> I have a good-faith belief that use of the material described above is not authorized by the copyright owner, its agent, or the law.</label>
+        <label class="check"><input type="checkbox" name="accurate" required /> The information in this notice is accurate, and under penalty of perjury, I am the owner, or authorized to act on behalf of the owner, of the copyright that is allegedly infringed.</label>
+        <label>Electronic signature <small>(type your full name)</small><input type="text" name="signature" required maxlength="120" /></label>
+        <p id="status" class="status" role="status" hidden></p>
+        <button type="submit" id="submit">Send takedown request</button>
+      </form>
+
+      <p class="note">Knowingly false claims may carry legal liability under 17 U.S.C. § 512(f). For anything else, email <a href="mailto:hello@base31.org">hello@base31.org</a>.</p>
+    </main>
+
+    <script>
+      (function () {
+        var WORKER = "https://base31-directory-counter.sawyerbobk563.workers.dev";
+        var ADMIN = "https://base31.org/admin/community-sites#dmca";
+        var form = document.getElementById("dmca-form");
+        var status = document.getElementById("status");
+        var button = document.getElementById("submit");
+        function show(msg, ok) { status.hidden = false; status.textContent = msg; status.className = "status " + (ok ? "ok" : "err"); }
+        form.addEventListener("submit", function (event) {
+          event.preventDefault();
+          var f = form.elements;
+          if (f.website.value) return; // honeypot
+          if (!form.checkValidity()) { show("Please fill in every required field and confirm both statements.", false); form.reportValidity(); return; }
+          button.disabled = true; button.textContent = "Sending…";
+          fetch(WORKER + "/dmca", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              name: f.name.value, email: f.email.value, organization: f.organization.value,
+              infringingUrl: f.infringingUrl.value, originalWork: f.originalWork.value, details: f.details.value,
+              goodFaith: f.goodFaith.checked, accurate: f.accurate.checked, signature: f.signature.value
+            })
+          }).then(function (res) {
+            return res.json().catch(function () { return {}; }).then(function (data) {
+              if (!res.ok) throw new Error(data.error || "Could not send that request. Please try again.");
+              form.reset();
+              show("Request received and sent to the moderation inbox. Taking you to the admin panel…", true);
+              setTimeout(function () { window.location.href = ADMIN; }, 1800);
+            });
+          }).catch(function (err) {
+            show(err.message || "Could not send that request.", false);
+          }).finally(function () { button.disabled = false; button.textContent = "Send takedown request"; });
+        });
+      })();
+    </script>
+  </body>
+</html>

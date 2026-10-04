@@ -90,6 +90,7 @@ const SUBMIT_LIMIT = 3;
 const SUBMIT_WINDOW_SECONDS = 60 * 60;
 const RATE_PREFIX = "@rate:submit:";
 const REQUEST_PREFIX = "request:url:";
+const DMCA_PREFIX = "request:dmca:";
 const HEALTH_FAILURE_THRESHOLD = 2;
 const SUBSCRIBER_PREFIX = "subscriber:";
 const CONFIRM_PREFIX = "confirm:";
@@ -106,6 +107,21 @@ const siteKey = (slug: string) => `${SITE_PREFIX}${slug}`;
 const fileKey = (slug: string, path: string) => `${FILE_PREFIX}${slug}:${path}`;
 const rateKey = (identity: string) => `${RATE_PREFIX}${identity}`;
 const requestKey = (id: string) => `${REQUEST_PREFIX}${id}`;
+const dmcaKey = (id: string) => `${DMCA_PREFIX}${id}`;
+
+// A copyright takedown request filed from dmca.base31.org. Stored in the same
+// KV namespace as URL requests and surfaced in the admin inbox for review.
+type DmcaRequest = {
+  id: string;
+  name: string;
+  email: string;
+  organization?: string;
+  infringingUrl: string;
+  originalWork: string;
+  details: string;
+  signature: string;
+  createdAt: number;
+};
 
 const json = (body: unknown, status = 200): Response =>
   new Response(JSON.stringify(body), {
@@ -807,6 +823,42 @@ const handleUrlRequest = async (request: Request, env: Env): Promise<Response> =
   }
 };
 
+// POST /dmca — a copyright takedown request from dmca.base31.org. Rate limited
+// like URL requests; saved to KV so it appears in the admin inbox.
+const handleDmcaRequest = async (request: Request, env: Env): Promise<Response> => {
+  const retryAfter = await takeSubmitSlot(request, env);
+  if (retryAfter !== null) {
+    return new Response(JSON.stringify({ error: "Too many requests. Please try again later." }), {
+      status: 429,
+      headers: { "Content-Type": "application/json; charset=utf-8", "Retry-After": String(retryAfter), ...CORS_HEADERS },
+    });
+  }
+  let payload: Record<string, unknown>;
+  try { payload = await request.json() as Record<string, unknown>; } catch { return json({ error: "Invalid JSON body" }, 400); }
+  const text = (key: string, max: number) => typeof payload[key] === "string" ? (payload[key] as string).trim().slice(0, max) : "";
+  const name = text("name", 120);
+  const email = text("email", 254);
+  const organization = text("organization", 160);
+  const infringingUrl = text("infringingUrl", 2000);
+  const originalWork = text("originalWork", 1000);
+  const details = text("details", 2000);
+  const signature = text("signature", 120);
+  if (!name) return json({ error: "Enter your full name." }, 400);
+  if (!validEmail(email)) return json({ error: "Enter a valid email address." }, 400);
+  if (!validHttpUrl(infringingUrl)) return json({ error: "Enter the full URL of the material to remove." }, 400);
+  if (!originalWork) return json({ error: "Describe the original copyrighted work." }, 400);
+  if (payload.goodFaith !== true || payload.accurate !== true) return json({ error: "Please confirm both statements." }, 400);
+  if (!signature) return json({ error: "Type your full name as a signature." }, 400);
+  const id = `${Date.now().toString(36)}-${randomToken().slice(0, 12)}`;
+  const record: DmcaRequest = { id, name, email, ...(organization ? { organization } : {}), infringingUrl, originalWork, details, signature, createdAt: Date.now() };
+  try {
+    await env.VIEW_COUNTER.put(dmcaKey(id), JSON.stringify(record));
+    return json({ success: true, id }, 201);
+  } catch {
+    return json({ error: "Could not save that request right now." }, 503);
+  }
+};
+
 // GET /s/<slug>/<path> — serves a published site's files from KV.
 const handleServe = async (url: URL, env: Env): Promise<Response> => {
   const rest = url.pathname.slice("/s/".length);
@@ -1095,24 +1147,33 @@ export default {
       return handleQuality(env, url);
     }
 
-    if (url.pathname === "/admin/data" || url.pathname === "/admin/sites" || url.pathname.startsWith("/admin/sites/") || url.pathname.startsWith("/admin/requests/")) {
+    if (url.pathname === "/admin/data" || url.pathname === "/admin/sites" || url.pathname.startsWith("/admin/sites/") || url.pathname.startsWith("/admin/requests/") || url.pathname.startsWith("/admin/dmca/")) {
       if (!adminAuthorized(request, env)) return json({ error: "Admin authentication required." }, 401);
       if (url.pathname === "/admin/data") {
         if (request.method !== "GET") return json({ error: "Method not allowed" }, 405);
         try {
-          const [sites, requests, subscribers] = await Promise.all([
+          const [sites, requests, subscribers, dmca] = await Promise.all([
             listSites(env, true),
             listPrefixRecords<UrlRequest>(env, REQUEST_PREFIX),
             listPrefixRecords<{ email: string; verified: boolean }>(env, SUBSCRIBER_PREFIX),
+            listPrefixRecords<DmcaRequest>(env, DMCA_PREFIX),
           ]);
           return json({
             sites: sites.map((site) => ({ ...publicSite(site, url.origin), lastCheckedAt: site.lastCheckedAt ?? null, healthFailures: site.healthFailures ?? 0 })),
             requests: requests.sort((a, b) => b.createdAt - a.createdAt),
+            dmca: dmca.sort((a, b) => b.createdAt - a.createdAt),
             subscribers: subscribers.filter((subscriber) => validEmail(subscriber.email)).map(({ email, verified }) => ({ email, verified })),
           });
         } catch {
           return json({ error: "Admin data temporarily unavailable" }, 503);
         }
+      }
+      if (url.pathname.startsWith("/admin/dmca/")) {
+        if (request.method !== "DELETE") return json({ error: "Method not allowed" }, 405);
+        const id = url.pathname.slice("/admin/dmca/".length);
+        if (!/^[A-Za-z0-9_-]{8,80}$/.test(id)) return json({ error: "Invalid request id" }, 400);
+        await env.VIEW_COUNTER.delete(dmcaKey(id));
+        return json({ success: true });
       }
       if (url.pathname.startsWith("/admin/requests/")) {
         if (request.method !== "DELETE") return json({ error: "Method not allowed" }, 405);
@@ -1138,6 +1199,11 @@ export default {
       } catch {
         return json({ error: "Could not remove that site" }, 503);
       }
+    }
+
+    if (url.pathname === "/dmca") {
+      if (request.method !== "POST") return json({ error: "Method not allowed" }, 405);
+      return handleDmcaRequest(request, env);
     }
 
     if (url.pathname === "/request-url") {

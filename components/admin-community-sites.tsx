@@ -4,12 +4,14 @@ import { useCallback, useState } from "react";
 
 type AdminSite = { slug: string; title: string; description: string; url: string; active: boolean; lastCheckedAt: number | null; healthFailures: number };
 type UrlRequest = { id: string; url: string; title: string; note: string; email?: string; createdAt: number };
+type DmcaRequest = { id: string; name: string; email: string; organization?: string; infringingUrl: string; originalWork: string; details: string; signature: string; createdAt: number };
 type Subscriber = { email: string; verified: boolean };
 
 export default function AdminCommunitySites() {
   const [password, setPassword] = useState("");
   const [sites, setSites] = useState<AdminSite[]>([]);
   const [requests, setRequests] = useState<UrlRequest[]>([]);
+  const [dmca, setDmca] = useState<DmcaRequest[]>([]);
   const [subscribers, setSubscribers] = useState<Subscriber[]>([]);
   const [status, setStatus] = useState("");
   const [busy, setBusy] = useState(false);
@@ -24,6 +26,7 @@ export default function AdminCommunitySites() {
       if (!response.ok) throw new Error(data?.error || "Could not load admin data.");
       setSites(Array.isArray(data?.sites) ? data.sites : []);
       setRequests(Array.isArray(data?.requests) ? data.requests : []);
+      setDmca(Array.isArray(data?.dmca) ? data.dmca : []);
       setSubscribers(Array.isArray(data?.subscribers) ? data.subscribers : []);
       setStatus("Admin data loaded.");
     } catch (error) { setStatus(error instanceof Error ? error.message : "Could not load admin data."); }
@@ -52,18 +55,35 @@ export default function AdminCommunitySites() {
     finally { setBusy(false); }
   };
 
+  const resolveDmca = async (item: DmcaRequest) => {
+    if (!window.confirm(`Mark the takedown request from ${item.name} as resolved? It will be removed from the inbox.`)) return;
+    setBusy(true);
+    try {
+      const response = await fetch("/api/admin", { method: "DELETE", headers: authHeaders(), body: JSON.stringify({ kind: "dmca", id: item.id }) });
+      if (!response.ok) throw new Error("Could not resolve that takedown request.");
+      setDmca((current) => current.filter((entry) => entry.id !== item.id)); setStatus("Takedown request resolved.");
+    } catch (error) { setStatus(error instanceof Error ? error.message : "Could not resolve that takedown request."); }
+    finally { setBusy(false); }
+  };
+
   return (
     <main className="admin-shell">
       <a className="privacy-back mono" href="/">← base31.org</a>
       <p className="eyebrow mono">moderation</p>
       <h1>Community inbox</h1>
-      <p className="admin-lede">Review URL suggestions, published community sites, and newsletter signups. Nothing submitted here is published automatically.</p>
+      <p className="admin-lede">Review DMCA takedown requests, URL suggestions, published community sites, and newsletter signups. Nothing submitted here is published automatically.</p>
       <form className="admin-form" onSubmit={(event) => { event.preventDefault(); void loadData(); }}>
         <label htmlFor="admin-password">Admin password</label>
         <input id="admin-password" type="password" value={password} onChange={(event) => setPassword(event.target.value)} autoComplete="current-password" placeholder="Your private password" />
         <button type="submit" disabled={busy}>{busy ? "Loading…" : "Open inbox"}</button>
       </form>
       {status && <p className="admin-status" role="status">{status}</p>}
+
+      <section className="admin-section" id="dmca"><div className="admin-section-head"><h2>DMCA takedown requests</h2><span className="mono">{dmca.length}</span></div>
+        {dmca.length === 0 ? <p className="admin-empty">No takedown requests.</p> : dmca.map((item) => (
+          <article className="admin-site" key={item.id}><div><h3>{item.name}{item.organization ? ` · ${item.organization}` : ""}</h3><p><strong>Remove:</strong> <a href={item.infringingUrl} target="_blank" rel="noreferrer">{item.infringingUrl}</a></p><p><strong>Original work:</strong> {item.originalWork}</p>{item.details && <p>{item.details}</p>}<p className="mono"><a href={`mailto:${item.email}`}>{item.email}</a> · signed &ldquo;{item.signature}&rdquo; · {new Date(item.createdAt).toLocaleString()}</p></div><button type="button" className="admin-remove" disabled={busy} onClick={() => void resolveDmca(item)}>Resolve</button></article>
+        ))}
+      </section>
 
       <section className="admin-section"><div className="admin-section-head"><h2>URL requests</h2><span className="mono">{requests.length}</span></div>
         {requests.length === 0 ? <p className="admin-empty">No pending suggestions.</p> : requests.map((item) => (

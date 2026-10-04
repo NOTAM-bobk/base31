@@ -4,6 +4,7 @@ import { blogPosts } from "@/lib/blogs";
 import { publishedToolSlugs } from "@/lib/tool-pages";
 import changelog from "@/config/changelog.json";
 import sites from "@/config/sites.json";
+import { allTags } from "@/lib/tags";
 
 const siteUrl = "https://base31.org";
 
@@ -75,6 +76,30 @@ export default function sitemap(): MetadataRoute.Sitemap {
       url: `${siteUrl}/stats`,
       lastModified: newestPost,
       changeFrequency: "daily",
+      priority: 0.5,
+    },
+    {
+      // The tag index and one page per tag, all derived from the config files.
+      url: `${siteUrl}/tags`,
+      changeFrequency: "weekly",
+      priority: 0.7,
+    },
+    ...allTags.map((info) => ({
+      url: `${siteUrl}/tags/${info.slug}`,
+      changeFrequency: "weekly" as const,
+      priority: 0.5,
+    })),
+    {
+      // Newest-first additions, straight from the addedAt metadata.
+      url: `${siteUrl}/recently-added`,
+      lastModified: newestPost,
+      changeFrequency: "daily",
+      priority: 0.7,
+    },
+    {
+      // Editorial review dates plus the automated health-check report.
+      url: `${siteUrl}/quality-report`,
+      changeFrequency: "weekly",
       priority: 0.5,
     },
     {

@@ -1,5 +1,18 @@
 [
   {
+    "version": "1.37.0",
+    "date": "2026-10-03",
+    "title": "Tags, recently added, and an honest quality report",
+    "summary": "Every tag becomes its own page on tags.base31.org, the newest picks get a derived recently-added index, and each site gains related picks and a share strip. A new quality report publishes the editorial review dates beside the automated health checks.",
+    "highlights": [
+      "Detail pages link their tags into /tags/<tag>, list six related picks ranked by shared tags, and carry a share strip with X, Facebook, LinkedIn, Reddit, email and a copy-link button.",
+      "A new /recently-added page groups every dated entry by month, newest first, straight from the addedAt and createdAt metadata, and lists community uploads read live from the Worker.",
+      "The tag index at /tags gathers all 230 tags in letter groups with per-tag counts; tags.base31.org serves the same routes on a subdomain, so a tag has a short shareable address.",
+      "A new /quality-report page publishes each curated pick's added and last-reviewed dates with fresh, due and overdue states, plus a live table of automated health checks behind a new public Worker /quality endpoint.",
+      "Quick jumps and the footer link the three new indexes, and every tag page joins the sitemap."
+    ]
+  },
+  {
     "version": "1.36.0",
     "date": "2026-10-03",
     "title": "More votes, fewer distractions, a reliable daily word",

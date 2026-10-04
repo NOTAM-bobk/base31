@@ -57,6 +57,33 @@ await signup("second@example.com");
 page = await (await call("/admin/data", auth)).json();
 assert.equal(page.subscribers.length, 2, "Existing admin loads paginated KV records");
 assert.equal((await call("/admin/data", { ...auth, method: "POST" })).status, 405);
+// GET /quality backs /quality-report: the public health-check report. It has to
+// stay read-only, report the same fields the admin panel shows, and count what
+// the page prints without the page recounting.
+const now = Date.now();
+const putSite = (slug, record) => values.set(`pub:${slug}`, JSON.stringify({ slug, title: slug, description: "d", tags: [], indexPath: "index.html", files: [], createdAt: now, active: true, ...record }));
+putSite("fresh-one", { lastCheckedAt: now - 60_000, healthFailures: 0 });
+putSite("never-checked", {});
+putSite("failing", { lastCheckedAt: now - 3_600_000, healthFailures: 3 });
+putSite("hidden", { active: false, lastCheckedAt: now - 10 * 86_400_000, healthFailures: 2 });
+assert.equal((await call("/quality", { method: "POST" })).status, 405);
+const qualityResponse = await call("/quality");
+assert.equal(qualityResponse.status, 200);
+assert.equal(qualityResponse.headers.get("Cache-Control"), "public, max-age=300");
+const quality = await qualityResponse.json();
+assert.equal(quality.summary.sites, 4);
+assert.equal(quality.summary.checked, 3);
+assert.equal(quality.summary.neverChecked, 1);
+assert.equal(quality.summary.failing, 2, "A failure count or a hidden site both count as failing");
+assert.equal(quality.summary.hidden, 1);
+assert.equal(quality.summary.stale, 1, "Only the site with no check in a week is overdue");
+assert.equal(quality.summary.staleAfterDays, 7);
+assert.ok(quality.summary.lastCheckedAt > 0);
+assert.equal(quality.checks.length, 4);
+assert.deepEqual(quality.checks.map((site) => site.slug), ["never-checked", "hidden", "failing", "fresh-one"], "Oldest check first, never-checked at the top");
+assert.ok(quality.checks.every((site) => site.title && site.url.startsWith("https://worker.test/s/") && typeof site.active === "boolean"));
+assert.ok(!JSON.stringify(quality).includes("indexPath"), "The public report must not leak stored file paths");
+
 const unavailable = { VIEW_COUNTER: { ...env.VIEW_COUNTER, async put() { throw new Error("storage down"); } } };
 assert.equal((await call("/subscribe", { method: "POST", body: JSON.stringify({ email: "fail@example.com" }) }, unavailable)).status, 503);
 assert.equal((await call(`/subscribe/unsubscribe?token=${saved.unsubscribeToken}`)).status, 200);

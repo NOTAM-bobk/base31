@@ -3,6 +3,14 @@ import { NextRequest, NextResponse } from "next/server";
 // The apex domain this whole project is deployed on.
 // Change this if you ever move to a different root domain.
 const ROOT_DOMAIN = "base31.org";
+
+// The one subdomain that is not a static folder: tags.base31.org serves the
+// tag index and one page per tag, both of which are Next.js routes derived from
+// the directory itself. It is a subdomain rather than only an internal route so
+// a tag has a short, memorable address (tags.base31.org/fun) that can be shared
+// on its own, while /tags keeps working on the apex.
+const TAG_SUBDOMAIN = "tags";
+
 const SUBDOMAIN_ALIASES: Record<string, string> = {
   dailywordle: "dailywordel",
   jokegenerator: "jokegenrator",
@@ -53,6 +61,14 @@ export function middleware(request: NextRequest) {
 
   const url = request.nextUrl.clone();
   let pathname = url.pathname;
+
+  // tags.base31.org/<tag> → /tags/<tag>, and the bare host → /tags. A trailing
+  // slash is dropped so both spellings reach the same route.
+  if (subdomain === TAG_SUBDOMAIN) {
+    const tag = pathname.replace(/^\/+|\/+$/g, "");
+    url.pathname = tag ? `/tags/${tag}` : "/tags";
+    return NextResponse.rewrite(url);
+  }
 
   // Map "/" to that site's index.html since these are plain static files,
   // not Next.js routes.

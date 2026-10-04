@@ -69,6 +69,82 @@ for (const [file, fn] of [["cool-sites", "searchCoolSites"], ["cool-apis", "sear
   const sample = library[fn]("")[0];
   assert.ok(library[fn](`#${sample.tags[0]}`).some((entry) => entry.url === sample.url));
 }
+// Tags are an index of their own now: every tag in the directory gets a page,
+// and the slug on that page has to be unique and URL-safe.
+const tags = load("lib/tags.ts");
+assert.ok(tags.allTags.length > 0, "The tag index must not be empty");
+assert.equal(new Set(tags.allTags.map((info) => info.slug)).size, tags.allTags.length, "Tag slugs must be unique");
+assert.ok(tags.allTags.every((info) => /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(info.slug)), "Tag slugs must be URL-safe");
+assert.ok(tags.allTags.every((info) => info.count > 0), "A tag with no entries should not be listed");
+for (const info of tags.allTags) {
+  assert.equal(tags.tagBySlug(info.slug).tag, info.tag);
+  const carrying = tags.entriesForTag(info.tag);
+  assert.equal(carrying.length, info.count, `Tag ${info.tag} count must match its entries`);
+  assert.ok(carrying.every((entry) => (entry.tags ?? []).includes(info.tag)));
+}
+assert.equal(tags.tagBySlug("no-such-tag-123"), undefined);
+assert.equal(tags.tagSlug("No Key!"), "no-key");
+assert.equal(tags.tagGroups.reduce((total, group) => total + group.tags.length, 0), tags.allTags.length, "Every tag belongs to exactly one letter group");
+
+// Recently added is derived from addedAt/createdAt, never hand-listed.
+const recent = load("lib/recently-added.ts");
+assert.ok(recent.recentlyAdded.length > 0, "Some entries must carry an added date");
+assert.ok(recent.recentlyAdded.every((entry) => recent.addedTime(entry) !== undefined));
+const recentTimes = recent.recentlyAdded.map((entry) => recent.addedTime(entry));
+assert.deepEqual(recentTimes, [...recentTimes].sort((a, b) => b - a), "Recently added must be newest-first");
+const dated = entries.filter((entry) => entry.addedAt || entry.createdAt).length;
+assert.equal(recent.recentlyAdded.length, dated, "Every dated entry belongs on the page");
+assert.equal(recent.monthLabel("2026-10-03"), "October 2026");
+assert.ok(recent.recentlyAddedTop(3).length <= 3);
+assert.ok(recent.addedWithinDays(0).length <= recent.recentlyAdded.length);
+
+// The detail page has to carry both the related block and the share strip, and
+// the tag chips have to link into the tag pages rather than being plain text.
+const detailSource = fs.readFileSync("app/sites/[slug]/page.tsx", "utf8");
+assert.ok(detailSource.includes("<ShareLink url={url}"), "A detail page must offer a share link");
+assert.ok(detailSource.includes("ShareLink compact"), "Each related pick gets its own share row");
+assert.ok(detailSource.includes('href={`/tags/${tagSlug(tag)}`}'), "Detail tags must link to their tag pages");
+assert.ok(detailSource.includes("Related picks"), "The related block must be titled");
+const shareSource = fs.readFileSync("components/share-link.tsx", "utf8");
+for (const host of ["twitter.com/intent/tweet", "facebook.com/sharer", "linkedin.com/sharing", "reddit.com/submit", "mailto:"]) {
+  assert.ok(shareSource.includes(host), `Share link missing ${host}`);
+}
+assert.ok(shareSource.includes("navigator.clipboard.writeText"), "Share link must offer a copy button");
+assert.ok(shareSource.includes('"use client"'), "The copy button needs the client");
+
+// The new routes exist, are canonical, and are listed in the sitemap.
+const sitemap = fs.readFileSync("app/sitemap.ts", "utf8");
+for (const [route, file] of [["/tags", "app/tags/page.tsx"], ["/recently-added", "app/recently-added/page.tsx"], ["/quality-report", "app/quality-report/page.tsx"]]) {
+  assert.ok(fs.readFileSync(file, "utf8").includes(`canonical: "${route}"`), `${route} must set its canonical`);
+  assert.ok(sitemap.includes(route), `${route} must be in the sitemap`);
+}
+assert.ok(fs.readFileSync("app/tags/[tag]/page.tsx", "utf8").includes("generateStaticParams"), "Tag pages are built at build time");
+assert.ok(sitemap.includes("/tags/${info.slug}"), "Every tag page must be in the sitemap");
+
+// tags.base31.org is the tag index, not a static folder.
+const middlewareSource = fs.readFileSync("middleware.ts", "utf8");
+assert.ok(middlewareSource.includes('const TAG_SUBDOMAIN = "tags"'));
+assert.ok(middlewareSource.includes("url.pathname = tag ? `/tags/${tag}` : \"/tags\""), "The tags subdomain rewrites to the tag routes");
+
+// The quality report reads the Worker's health checks through a proxy.
+const qualityRoute = fs.readFileSync("app/api/quality-report/route.ts", "utf8");
+assert.ok(qualityRoute.includes("/quality"), "The proxy must call the Worker's /quality endpoint");
+const workerSource = fs.readFileSync("worker/src/index.ts", "utf8");
+assert.ok(workerSource.includes('url.pathname === "/quality"'), "The Worker must route /quality");
+assert.ok(workerSource.includes("const handleQuality"), "The Worker must implement /quality");
+assert.ok(workerSource.includes("lastCheckedAt"), "The quality report needs the last check time");
+assert.ok(workerSource.includes("healthFailures"), "The quality report needs the failure count");
+assert.ok(fs.readFileSync("components/quality-checks.tsx", "utf8").includes("/api/quality-report"), "The live block reads the proxy");
+
+// The homepage points at the three new indexes, from the quick jumps and the
+// footer. Read here rather than relying on the `home` binding declared further
+// down, which is not in scope yet.
+const homeWithIndexes = fs.readFileSync("components/home-page.tsx", "utf8");
+for (const href of ["/recently-added", "/tags", "/quality-report"]) {
+  assert.ok(homeWithIndexes.includes(`href: "${href}"`), `The homepage quick jumps must include ${href}`);
+  assert.ok(homeWithIndexes.includes(`href="${href}"`), `The footer must link ${href}`);
+}
+
 const picks = JSON.parse(fs.readFileSync("config/editors-picks.json", "utf8"));
 assert.equal(new Set(picks.map((pick) => pick.slug)).size, picks.length);
 for (const pick of picks) {

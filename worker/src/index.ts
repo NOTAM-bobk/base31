@@ -72,7 +72,7 @@ type UrlRequest = {
 
 const CORS_HEADERS: Record<string, string> = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Methods": "GET, POST, DELETE, OPTIONS",
+  "Access-Control-Allow-Methods": "GET, POST, DELETE, PATCH, OPTIONS",
   "Access-Control-Allow-Headers": "Content-Type, Authorization, x-counter-secret, x-discussion-secret",
   "Access-Control-Max-Age": "86400",
 };
@@ -538,6 +538,55 @@ const publicSite = (site: PublishedSite, origin: string) => ({
   createdAt: site.createdAt,
   active: site.active !== false,
 });
+
+// A check older than this reads as "overdue" on the quality report. The
+// scheduled handler runs daily, so anything past a week has been missed.
+const QUALITY_STALE_DAYS = 7;
+
+// GET /quality → the health-check report behind /quality-report on the site.
+// Public and read-only: the same fields the admin panel shows for community
+// sites — when each was last checked, and how many checks have failed since it
+// last answered — plus a summary so the page does not have to count.
+const handleQuality = async (env: Env, url: URL): Promise<Response> => {
+  try {
+    const sites = await listSites(env, true);
+    const now = Date.now();
+    const checks = sites
+      .map((site) => ({
+        ...publicSite(site, url.origin),
+        lastCheckedAt: site.lastCheckedAt ?? null,
+        healthFailures: site.healthFailures ?? 0,
+      }))
+      .sort((a, b) => (a.lastCheckedAt ?? 0) - (b.lastCheckedAt ?? 0) || a.title.localeCompare(b.title));
+    const checked = checks.filter((site) => site.lastCheckedAt !== null);
+    return new Response(
+      JSON.stringify({
+        generatedAt: now,
+        summary: {
+          sites: checks.length,
+          checked: checked.length,
+          neverChecked: checks.length - checked.length,
+          failing: checks.filter((site) => !site.active || site.healthFailures > 0).length,
+          hidden: checks.filter((site) => !site.active).length,
+          stale: checked.filter((site) => now - (site.lastCheckedAt as number) > QUALITY_STALE_DAYS * 86400000).length,
+          lastCheckedAt: checked.reduce((latest, site) => Math.max(latest, site.lastCheckedAt as number), 0) || null,
+          staleAfterDays: QUALITY_STALE_DAYS,
+        },
+        checks,
+      }),
+      {
+        headers: {
+          "Content-Type": "application/json; charset=utf-8",
+          ...CORS_HEADERS,
+          // The page refreshes on its own window; this matches it.
+          "Cache-Control": "public, max-age=300",
+        },
+      },
+    );
+  } catch {
+    return json({ error: "Quality report temporarily unavailable" }, 503);
+  }
+};
 
 const listSites = async (env: Env, includeInactive = false): Promise<PublishedSite[]> => {
   const sites: PublishedSite[] = [];
@@ -1038,6 +1087,12 @@ export default {
       } catch {
         return json({ error: "Directory temporarily unavailable" }, 503);
       }
+    }
+
+    // GET /quality → the health-check report behind /quality-report.
+    if (url.pathname === "/quality") {
+      if (request.method !== "GET") return json({ error: "Method not allowed" }, 405);
+      return handleQuality(env, url);
     }
 
     if (url.pathname === "/admin/data" || url.pathname === "/admin/sites" || url.pathname.startsWith("/admin/sites/") || url.pathname.startsWith("/admin/requests/")) {

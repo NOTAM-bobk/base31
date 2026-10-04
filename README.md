@@ -154,6 +154,20 @@ The donation page lives in `public/sites/donation/index.html`. Its support links
 
 Keep folder and `subdomain` names identical. Use relative assets inside static tools. Link legal pages with absolute apex URLs (`https://base31.org/privacy`), since `/privacy` on a tool subdomain would resolve inside that tool's folder.
 
+### Derived indexes
+
+Three routes are generated from the config files rather than hand-maintained:
+
+| Route | Built from |
+| --- | --- |
+| `/recently-added` (and `tags.base31.org` siblings) | Every entry's `addedAt` or a community upload's `createdAt` |
+| `/tags` and `/tags/<tag>` | Every tag on every entry, aggregated in `lib/tags.ts` |
+| `/quality-report` | `lastChecked` dates plus the Worker's `/quality` health checks |
+
+Add an `addedAt` date and the entry appears on `/recently-added`; add a tag and it gets a `/tags/<slug>` page. Nothing needs to be registered anywhere else. An entry with neither `addedAt` nor `createdAt` is deliberately absent from `/recently-added` rather than guessed at.
+
+`middleware.ts` maps `tags.base31.org` to the `/tags` routes instead of a static folder; the bare host is the tag index and `tags.base31.org/<tag>` is that tag's page. `tags` is therefore reserved and must not be used as a tool subdomain.
+
 ### Record dates honestly
 
 `addedAt` and `lastChecked` are optional `YYYY-MM-DD` dates. Set an addition date when the entry is actually added, and only update review dates after an editorial check—not because an automated crawler received a response.
@@ -209,6 +223,7 @@ Resend's test sender has recipient restrictions. For real subscriber delivery, v
 | `GET /votes?keys=a,b,c` | Read shared up/down totals |
 | `POST /vote` | `{ key, from, to }`, where choices are `-1`, `0`, or `1` |
 | `GET /sites` | List community-published sites |
+| `GET /quality` | Public health-check report: last check time and failure count per community site, behind `/quality-report` |
 | `POST /submit` | Publish static files with title, description, tags, and slug |
 | `GET /s/<slug>/…` | Serve a community site's files from KV |
 | `GET /discussion?before=<id>` | Newest 20 threads and up to 100 replies each; `nextCursor` for older pages |

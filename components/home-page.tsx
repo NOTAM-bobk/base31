@@ -29,6 +29,8 @@ import HeroStats from "@/components/hero-stats";
 import CoolAis from "@/components/cool-ais";
 import Freshness from "@/components/freshness";
 import { allCoolAis, searchCoolAis, detailPath, directoryEntries, tagTone } from "@/lib/directory";
+import { tagCount } from "@/lib/tags";
+import { recentlyAdded } from "@/lib/recently-added";
 import { matchesQuery } from "@/lib/search";
 import EditorsPicks from "@/components/editors-picks";
 import { compareVotes } from "@/lib/vote-ranking";
@@ -1147,6 +1149,12 @@ export default function HomePage({ dict = EN, locale = "en" }: { dict?: Dictiona
               { href: "#cool-apis", label: dict.coolApis, count: `${coolApis.length} APIs` },
               { href: "#cool-apps", label: dict.coolApps, count: `${coolApps.length} apps` },
               { href: "#cool-ais", label: dict.coolAis, count: `${allCoolAis.length} AIs` },
+              // The two in-page jumps above are anchors; these three leave the
+              // page for the derived indexes. They are grouped last so the row
+              // still reads as "browse this page, then browse the whole thing".
+              { href: "/recently-added", label: "Recently added", count: `${recentlyAdded.length} dated` },
+              { href: "/tags", label: "Tags", count: `${tagCount} tags` },
+              { href: "/quality-report", label: "Quality report", count: "reviews" },
             ].map((jump) => (
               <a key={jump.href} className="quick-jump" href={jump.href} onClick={() => tick(12)}>
                 <span className="quick-jump-label">{jump.label}</span>
@@ -1511,6 +1519,9 @@ export default function HomePage({ dict = EN, locale = "en" }: { dict?: Dictiona
             <a href="/tools">Tools</a>
             <a href="#updates">Updates</a>
             <a href="/whats-new">What&rsquo;s new</a>
+            <a href="/recently-added">Recently added</a>
+            <a href="/tags">Tags</a>
+            <a href="/quality-report">Quality report</a>
             <a href="/stats">Stats</a>
             <a href="/admin/community-sites">Admin</a>
             <a href="/about">About Us</a>

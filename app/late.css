@@ -959,6 +959,30 @@ html[data-theme="light"] .code-backdrop { opacity: 0.38; }
    light-theme green it would be dark-on-dark, so it follows `--on-live`. */
 html[data-theme="light"] .community-action.is-primary { color: var(--on-live); }
 
+/* Loading preview ---------------------------------------------------------
+   The route loader mirrors the directory's card rhythm, so navigation feels
+   like a soft continuation instead of a blank interstitial. */
+.loading-preview { width: min(100% - 32px, 960px); margin: 32px auto 0; }
+.loading-preview-bar { width: 42%; height: 10px; border-radius: 999px; background: var(--line-strong); animation: skeleton-shimmer 1.6s ease-in-out infinite; }
+.loading-preview-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-top: 18px; }
+.loading-card { overflow: hidden; border: 1px solid var(--line); border-radius: 14px; background: var(--surface); }
+.loading-card-image { aspect-ratio: 2.7 / 1; background: var(--surface-hover); animation: skeleton-shimmer 1.6s ease-in-out infinite; }
+.loading-card-copy { display: flex; flex-direction: column; gap: 9px; padding: 16px; }
+.loading-card-copy span { display: block; border-radius: 999px; background: var(--line-strong); animation: skeleton-shimmer 1.6s ease-in-out infinite; }
+.loading-card-title { width: 58%; height: 14px; }
+.loading-card-line { width: 88%; height: 9px; }
+.loading-card-line-short { width: 64%; }
+.loading-card-tags { display: flex; gap: 6px; margin-top: 4px; }
+.loading-card-tags span { width: 38px; height: 18px; border-radius: 5px; }
+@keyframes skeleton-shimmer { 0%, 100% { opacity: .48; } 50% { opacity: .95; } }
+@media (max-width: 600px) {
+  .loading-preview { width: min(100% - 24px, 560px); }
+  .loading-preview-grid { grid-template-columns: 1fr; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .loading-preview-bar, .loading-card-image, .loading-card-copy span { animation: none; }
+}
+
 /* Hero stats -----------------------------------------------------------
    The three figures above the search: the directory's readership, how many
    sites it links out to, and the size of the project. No tray — the numbers

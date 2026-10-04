@@ -207,21 +207,24 @@ html::-webkit-scrollbar, body::-webkit-scrollbar { display: none; width: 0; heig
 .submit-url-arrow { margin-left: 8px; color: var(--accent-sky); transition: transform .2s; }
 .submit-url-link:hover { border-color: var(--accent-sky); transform: translateY(-2px); box-shadow: 0 10px 24px -16px var(--accent-sky); }
 .submit-url-link:hover .submit-url-arrow { transform: translate(2px, -2px); }
-.url-submission { scroll-margin-top: 100px; margin: 48px 0 0; padding: 32px; display: grid; grid-template-columns: 1fr 1.25fr; gap: 36px; border: 1px solid color-mix(in srgb, var(--accent-amber) 32%, var(--line)); border-radius: 24px; background: radial-gradient(ellipse at top left, color-mix(in srgb, var(--accent-amber) 10%, transparent), transparent 65%), var(--surface); box-shadow: 0 20px 50px -40px rgb(0 0 0 / 60%); }
-.url-submission-mark { display: grid; place-items: center; width: 48px; height: 48px; margin-bottom: 26px; border: 1px solid color-mix(in srgb, var(--accent-amber) 35%, var(--line)); border-radius: 14px; color: var(--accent-amber); font-size: 26px; }
+.url-submission { scroll-margin-top: 100px; margin: 40px 0 0; padding: 22px; display: grid; grid-template-columns: .85fr 1.3fr; gap: 22px; align-items: center; border: 1px solid color-mix(in srgb, var(--accent-amber) 32%, var(--line)); border-radius: 24px; background: radial-gradient(ellipse at top left, color-mix(in srgb, var(--accent-amber) 10%, transparent), transparent 65%), var(--surface); box-shadow: 0 20px 50px -40px rgb(0 0 0 / 60%); }
+.url-submission-mark { display: grid; place-items: center; width: 34px; height: 34px; margin-bottom: 14px; border: 1px solid color-mix(in srgb, var(--accent-amber) 35%, var(--line)); border-radius: 10px; background: color-mix(in srgb, var(--accent-amber) 10%, var(--surface)); color: var(--accent-amber); font-size: 18px; }
 .url-submission .eyebrow { font-size: 10px; line-height: 1.6; margin-bottom: 12px; }
-.url-submission h2 { margin: 0; color: var(--text-strong); font-size: clamp(28px, 4vw, 38px); letter-spacing: -.045em; line-height: 1.12; }
-.url-submission-copy > p:not(.eyebrow) { color: var(--muted); font-size: 13px; line-height: 1.8; margin: 20px 0; }
+.url-submission h2 { margin: 0; color: var(--text-strong); font-size: clamp(21px, 2.6vw, 26px); letter-spacing: -.035em; line-height: 1.18; }
+.url-submission-copy > p:not(.eyebrow) { color: var(--muted); font-size: 12.5px; line-height: 1.65; margin: 12px 0; }
 .url-submission-note { color: var(--accent-amber); font-size: 10px; line-height: 1.7; }
-.url-submission-form { display: flex; flex-direction: column; gap: 10px; min-width: 0; padding: 22px; border: 1px solid var(--line); border-radius: 18px; background: var(--surface); }
+.url-submission-form { display: flex; flex-direction: column; gap: 6px; min-width: 0; padding: 16px; border: 1px solid var(--line); border-radius: 18px; background: var(--surface); }
 .url-submission-copy { padding: 8px 0; }
 .url-submission-form:focus-within { border-color: color-mix(in srgb, var(--accent-amber) 50%, var(--line)); }
-.url-submission-form label { color: var(--text-strong); font-size: 12px; margin-top: 6px; }
+.url-submission-form label { color: var(--text-strong); font-size: 11.5px; margin-top: 4px; }
 .url-submission-form label span { color: var(--muted); }
-.url-submission-form input, .url-submission-form textarea { width: 100%; border: 1px solid var(--line-strong); border-radius: 10px; padding: 12px 14px; background: var(--input-bg); color: var(--text-strong); font: inherit; font-size: 14px; line-height: 1.6; }
-.url-submission-form textarea { resize: vertical; min-height: 100px; }
+.url-submission-form input, .url-submission-form textarea { width: 100%; border: 1px solid var(--line-strong); border-radius: 9px; padding: 9px 12px; background: var(--input-bg); color: var(--text-strong); font: inherit; font-size: 13.5px; line-height: 1.5; transition: border-color .15s, box-shadow .15s; }
+.url-submission-form input:focus, .url-submission-form textarea:focus { outline: none; border-color: color-mix(in srgb, var(--accent-amber) 60%, var(--line-strong)); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent-amber) 14%, transparent); }
+.url-submission-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.url-submission-row > div { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.url-submission-form textarea { resize: vertical; min-height: 64px; }
 .url-submission-form input::placeholder, .url-submission-form textarea::placeholder { color: var(--subtle); }
-.url-submit-button { min-height: 46px; margin-top: 8px; padding: 12px 18px; border: 1px solid var(--invert-bg); border-radius: 10px; background: var(--invert-bg); color: var(--invert-fg); font: inherit; font-size: 13px; font-weight: 600; cursor: pointer; }
+.url-submit-button { align-self: flex-start; min-height: 38px; margin-top: 6px; padding: 9px 18px; border: 1px solid var(--invert-bg); border-radius: 999px; background: var(--invert-bg); color: var(--invert-fg); font: inherit; font-size: 13px; font-weight: 600; cursor: pointer; }
 .url-submit-button:hover { opacity: .85; }
 .url-submit-button:disabled { opacity: .5; cursor: wait; }
 .url-submission-privacy { margin: 2px 0 0; color: var(--muted); font-size: 10px; line-height: 1.7; }
@@ -253,7 +256,8 @@ html::-webkit-scrollbar, body::-webkit-scrollbar { display: none; width: 0; heig
 .admin-panel th, .admin-panel td { padding: 14px 10px; border-bottom: 1px solid var(--line); }
 .admin-panel td:first-child { overflow-wrap: anywhere; }
 @media (max-width: 720px) {
-  .url-submission { grid-template-columns: 1fr; gap: 24px; padding: 24px; }
+  .url-submission { grid-template-columns: 1fr; gap: 16px; padding: 18px; }
+  .url-submission-row { grid-template-columns: 1fr; }
   .url-submission-mark { margin-bottom: 18px; }
   .url-submission h2 br { display: none; }
   .url-submission h2 br::after { content: " "; }

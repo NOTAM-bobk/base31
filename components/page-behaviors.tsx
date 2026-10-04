@@ -59,6 +59,25 @@ export default function PageBehaviors() {
     gestures.forEach((type) => window.addEventListener(type, markInteracted, { passive: true }));
     window.addEventListener("scroll", markInteracted, { passive: true });
 
+    // 3. Resume position. The scroll offset of each page is remembered (for 30
+    //    days) so a visitor who leaves and comes back lands where they were.
+    //    A link with a #hash always wins over the saved position.
+    const scrollKey = `base31:scroll:${window.location.pathname}`;
+    try {
+      const saved = JSON.parse(window.localStorage.getItem(scrollKey) || "null") as { y: number; t: number } | null;
+      if (!window.location.hash && saved && saved.y > 0 && Date.now() - saved.t < 30 * 864e5) {
+        window.setTimeout(() => window.scrollTo({ top: saved.y, behavior: "auto" }), 80);
+      }
+    } catch { /* storage unavailable */ }
+    let saveTimer: number | undefined;
+    const saveScroll = () => {
+      window.clearTimeout(saveTimer);
+      saveTimer = window.setTimeout(() => {
+        try { window.localStorage.setItem(scrollKey, JSON.stringify({ y: Math.round(window.scrollY), t: Date.now() })); } catch { /* ignore */ }
+      }, 250);
+    };
+    window.addEventListener("scroll", saveScroll, { passive: true });
+
     const onBeforeUnload = (event: BeforeUnloadEvent) => {
       if (!interacted) return;
       // Both of these are required for the browser to show its own confirmation
@@ -73,6 +92,8 @@ export default function PageBehaviors() {
       gestures.forEach((type) => window.removeEventListener(type, markInteracted));
       window.removeEventListener("scroll", markInteracted);
       window.removeEventListener("beforeunload", onBeforeUnload);
+      window.removeEventListener("scroll", saveScroll);
+      window.clearTimeout(saveTimer);
       void sentinel?.release().catch(() => {});
       sentinel = null;
     };

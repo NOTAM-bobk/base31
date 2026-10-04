@@ -33,15 +33,17 @@ export default function UrlRequest() {
     <div className="url-submission-copy">
       <span className="url-submission-mark mono" aria-hidden="true">↗</span>
       <p className="eyebrow mono">good finds deserve company</p>
-      <h2 id="request-url-heading">Found a keeper?<br /> Pass it on.</h2>
+      <h2 id="request-url-heading">Found a keeper? Pass it on.</h2>
       <p>A tiny tool, a useful app, a wonderfully odd website. Send us a link you think belongs here.</p>
       <span className="url-submission-note mono">Private review queue. Never auto-published.</span>
     </div>
     <form className="url-submission-form" onSubmit={submit}>
       <label htmlFor="request-website">Submit a URL</label><input id="request-website" name="request-url" type="url" required maxLength={2048} placeholder="https://your-favorite-find.com" />
-      <label htmlFor="request-title">Site name</label><input id="request-title" name="request-title" required maxLength={100} placeholder="What should we call it?" />
-      <label htmlFor="request-note">What makes it worth a visit?</label><textarea id="request-note" name="request-note" maxLength={500} rows={3} placeholder="Tell us what you love about it…" />
-      <label htmlFor="request-email">Your email <span>(optional)</span></label><input id="request-email" name="request-email" type="email" maxLength={254} autoComplete="email" placeholder="Only if you’d like a reply" />
+      <div className="url-submission-row">
+        <div><label htmlFor="request-title">Site name</label><input id="request-title" name="request-title" required maxLength={100} placeholder="What should we call it?" /></div>
+        <div><label htmlFor="request-email">Your email <span>(optional)</span></label><input id="request-email" name="request-email" type="email" maxLength={254} autoComplete="email" placeholder="For a reply" /></div>
+      </div>
+      <label htmlFor="request-note">What makes it worth a visit?</label><textarea id="request-note" name="request-note" maxLength={500} rows={2} placeholder="Tell us what you love about it…" />
       <button className="url-submit-button" type="submit" disabled={busy}>{busy ? "Sending…" : "Send a discovery ↗"}</button>
       <p className="url-submission-privacy">Suggestions go to the private moderation inbox. <a href="/privacy">Privacy</a></p>
       {status && <p className={failed ? "discussion-error" : "discussion-notice"} role={failed ? "alert" : "status"}>{status}</p>}

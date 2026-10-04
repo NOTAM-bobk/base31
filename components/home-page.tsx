@@ -1524,8 +1524,8 @@ export default function HomePage({ dict = EN, locale = "en" }: { dict?: Dictiona
             <a href="/quality-report">Quality report</a>
             <a href="/stats">Stats</a>
             <a href="/admin/community-sites">Admin</a>
-            <a href="/about">About Us</a>
-            <a href="/our-story">Our Story</a>
+            <a href="/about">About us</a>
+            <a href="/our-story">Our story</a>
             <a href="/terms">Terms of service</a>
             <a href="/privacy">Privacy</a>
             <a href="/security">Security</a>
@@ -1538,7 +1538,7 @@ export default function HomePage({ dict = EN, locale = "en" }: { dict?: Dictiona
               </svg>
               Source code
             </a>
-            <a href="#updates">Bug report</a>
+            <a href="mailto:hello@base31.org?subject=base31%20bug%20report">Bug report</a>
             <button
               type="button"
               className="footer-link-button"

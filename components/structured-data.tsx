@@ -32,6 +32,18 @@ export default function StructuredData() {
           areaServed: "US",
           availableLanguage: ["en", "es", "fr", "pt"],
         },
+        // What the publisher is an authority on, in the words search and
+        // answer engines use to match a question to a source.
+        knowsAbout: [
+          "website directories",
+          "cool and unusual websites",
+          "creative web projects",
+          "free browser tools",
+          "free public APIs",
+          "AI assistants",
+          "no-code AI app and website builders",
+          "the indie web",
+        ],
       },
       {
         "@type": "WebSite",
@@ -42,6 +54,15 @@ export default function StructuredData() {
           "An independent directory of cool sites, fun websites, creative web projects, and useful online tools.",
         inLanguage: ["en", "es", "fr", "pt"],
         publisher: { "@id": `${siteUrl}/#organization` },
+        // The homepage search is a real deep link: /?q=pomodoro opens the
+        // directory filtered to that query (the component reads `q` on mount),
+        // so declaring the sitelinks search box here is accurate rather than
+        // decorative.
+        potentialAction: {
+          "@type": "SearchAction",
+          target: { "@type": "EntryPoint", urlTemplate: `${siteUrl}/?q={search_term_string}` },
+          "query-input": "required name=search_term_string",
+        },
       },
     ],
   };

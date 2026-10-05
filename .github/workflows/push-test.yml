@@ -1,9 +1,0 @@
-# Temporary push test: verifies the connected GitHub app may create files under
-# .github/workflows. Deleted again in the same session it was added.
-name: workflow write test
-on: workflow_dispatch
-jobs:
-  noop:
-    runs-on: ubuntu-latest
-    steps:
-      - run: echo "workflow files are writable"

@@ -1,0 +1,17 @@
+/* About Us and Our Story: the two link cards under the about prose (and the
+   same pair on /about and /our-story). They are meant to stay out of the way,
+   so this file flattens the louder card treatment that app/directory.css still
+   declares — flat surface, hairline border, smaller type, no lift, no coloured
+   glow. It is imported after directory.css in app/layout.tsx, so the same
+   selectors win on order. */
+.about-page-links { gap: 10px; max-width: 440px; margin: 18px 0; }
+.about-page-links .about-page-card { align-items: center; gap: 9px; min-height: 52px; padding: 8px 11px; border: 1px solid var(--line); border-radius: 11px; background: var(--surface); box-shadow: none; transition: border-color .2s, background .2s; }
+.about-page-links .about-page-card:hover, .about-page-links .about-page-card:focus-visible { border-color: var(--line-strong); background: color-mix(in srgb, var(--card-accent) 4%, var(--surface)); box-shadow: none; transform: none; outline: none; }
+.about-page-icon { width: 25px; height: 25px; border-color: color-mix(in srgb, var(--card-accent) 20%, var(--line)); border-radius: 7px; background: color-mix(in srgb, var(--card-accent) 6%, var(--surface)); color: color-mix(in srgb, var(--card-accent) 70%, var(--muted)); }
+.about-page-icon svg { width: 13px; height: 13px; }
+.about-page-text { gap: 1px; }
+.about-page-label { color: var(--text); font-size: 12px; font-weight: 500; letter-spacing: -.005em; }
+.about-page-sub { color: var(--muted); font-size: 10.5px; line-height: 1.3; }
+.about-page-arrow { color: var(--muted); font-size: 13px; }
+.about-page-card:hover .about-page-arrow { transform: translateX(2px); }
+@media (prefers-reduced-motion: reduce) { .about-page-links .about-page-card, .about-page-arrow { transition: none; } .about-page-links .about-page-card:hover { transform: none; } }

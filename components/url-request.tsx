@@ -31,8 +31,6 @@ export default function UrlRequest() {
 
   return <section className="url-submission" id="request-url" aria-labelledby="request-url-heading">
     <div className="url-submission-copy">
-      <span className="url-submission-mark mono" aria-hidden="true">↗</span>
-      <p className="eyebrow mono">good finds deserve company</p>
       <h2 id="request-url-heading">Found a keeper? Pass it on.</h2>
       <p>A tiny tool, a useful app, a wonderfully odd website. Send us a link you think belongs here.</p>
       <span className="url-submission-note mono">Private review queue. Never auto-published.</span>

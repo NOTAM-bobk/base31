@@ -4,6 +4,7 @@ import coolSites from "@/config/cool-sites.json";
 import coolApis from "@/config/cool-apis.json";
 import coolApps from "@/config/cool-apps.json";
 import coolAis from "@/config/cool-ais.json";
+import noCodeAi from "@/config/no-code-ai.json";
 
 export type DirectoryItem = {
   name: string; url: string; description: string; tags?: string[];
@@ -39,6 +40,7 @@ const lists = [
   { items: coolApis, prefix: "apis", section: "Cool APIs", sectionId: "cool-apis" },
   { items: coolApps, prefix: "apps", section: "Cool apps", sectionId: "cool-apps" },
   { items: coolAis, prefix: "ais", section: "Cool AIs", sectionId: "cool-ais" },
+  { items: noCodeAi, prefix: "nocodeai", section: "No-code AI tools", sectionId: "no-code-ai-tools" },
 ];
 const entries: DirectoryEntry[] = [
   ...sites.filter((site) => site.show !== false).map((site) => ({

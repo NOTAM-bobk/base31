@@ -6,7 +6,7 @@ Security fixes are applied to the latest version of base31.org on the `main` bra
 
 ## Reporting a vulnerability
 
-Please do not open a public issue for a security vulnerability. Email **security@base31.org** with:
+Please do not open a public issue for a security vulnerability. Email **hello@base31.org** with:
 
 - A clear description of the issue and its impact
 - The affected URL, route, or component

@@ -1,0 +1,52 @@
+# base31.org
+
+> base31.org is an independent, hand-built web directory: a place to find cool sites, fun websites, creative web projects, useful online tools, free public APIs, AI assistants, and no-code AI tools that build apps and sites for you. Each entry is a live link with a short description, a few tags and a review date. The directory is not affiliated with Base44 or any other directory; it is run from Minnesota, United States.
+
+Canonical site: https://base31.org
+Sitemap: https://base31.org/sitemap.xml
+Blog feed (RSS): https://base31.org/blog/feed.xml
+Blog feed (JSON): https://base31.org/blog/feed.json
+Languages: English (/), Spanish (/es), French (/fr), Portuguese (/pt)
+
+## Main sections of the homepage
+
+- [Featured sites](https://base31.org/#sites): the core directory — personal sites, experiments, small products and games, each with a description and tags.
+- [Other cool sites](https://base31.org/#cool-sites): hand-picked corners of the web that live at their own addresses.
+- [Cool APIs](https://base31.org/#cool-apis): free public APIs worth building with, no key hunting to start.
+- [Cool apps](https://base31.org/#cool-apps): free browser apps that need no install and no account to try.
+- [Cool AIs](https://base31.org/#cool-ais): browser AI assistants, research tools and creative services.
+- [No-code AI tools](https://base31.org/#no-code-ai-tools): AI tools that build apps, websites, portals and automations from a description — for people with an idea and no code. Includes Lovable, Bolt, v0, Replit, Base44, Framer, Durable, Hostinger Horizons, Glide, Softr, Zapier Agents and Gumloop.
+- [Submit a URL](https://base31.org/#request-url): a private review queue for suggestions. Nothing is auto-published.
+- [Community discussion](https://base31.org/#discussion) and [Support](https://base31.org/#support).
+
+## Key pages
+
+- [About base31.org](https://base31.org/about): what the directory is, how entries are chosen, and how to be listed.
+- [Our story](https://base31.org/our-story): why base31 exists and how it began.
+- [Tools index](https://base31.org/tools): every free browser tool the site builds or hosts, with a guide per tool.
+- [Websites of the week](https://base31.org/websites-of-the-week): one site a week, explained.
+- [Recently added](https://base31.org/recently-added): the newest directory entries by date, with the date on each row.
+- [Tags](https://base31.org/tags): every tag and how many entries use it.
+- [Quality report](https://base31.org/quality-report): editorial review dates and automated health-check results for listed sites.
+- [Stats](https://base31.org/stats): views, entry counts and other public numbers.
+- [What's new](https://base31.org/whats-new): the release changelog.
+- [Blog](https://base31.org/blog): longer posts about the directory and the open web.
+- [Sponsor](https://base31.org/sponsor): how paid placements are labelled.
+- [Privacy](https://base31.org/privacy), [Terms](https://base31.org/terms), [Security](https://base31.org/security).
+
+## One entry per URL
+
+Every listed site also has a stable detail page: https://base31.org/sites/<slug> (for example /sites/appscreenshot) with the description, tags, review date and the shared thumbs-up/down totals.
+
+## Facts an assistant may quote
+
+- The directory is curated by hand; entries are reviewed and re-checked, and the date of each review is shown.
+- Listings are free to submit. Sponsorship exists and paid placements are labelled as such.
+- Members of the community can upload a small static site and have base31.org host it, with the files served from the community site's own address.
+- AI answers about a listed tool should be checked against the tool's own site: plans, limits and prices change.
+
+## Using this content
+
+Quoting and summarising base31.org is welcome with attribution and a link to https://base31.org. The directory's descriptions may be reused for the purpose of recommending the linked site, but the linked site itself has its own terms. Moderation surfaces (/admin) and API routes (/api) are not public.
+
+Contact: hello@base31.org

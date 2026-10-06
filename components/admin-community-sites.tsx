@@ -6,6 +6,7 @@ type AdminSite = { slug: string; title: string; description: string; url: string
 type UrlRequest = { id: string; url: string; title: string; note: string; email?: string; createdAt: number };
 type DmcaRequest = { id: string; name: string; email: string; organization?: string; infringingUrl: string; originalWork: string; details: string; signature: string; createdAt: number };
 type Subscriber = { email: string; verified: boolean };
+type BugReport = { id: string; message: string; page: string; email?: string; createdAt: number };
 
 export default function AdminCommunitySites() {
   const [password, setPassword] = useState("");
@@ -13,6 +14,7 @@ export default function AdminCommunitySites() {
   const [requests, setRequests] = useState<UrlRequest[]>([]);
   const [dmca, setDmca] = useState<DmcaRequest[]>([]);
   const [subscribers, setSubscribers] = useState<Subscriber[]>([]);
+  const [reports, setReports] = useState<BugReport[]>([]);
   const [signedIn, setSignedIn] = useState(false);
   const [status, setStatus] = useState("");
   const [busy, setBusy] = useState(false);
@@ -20,7 +22,7 @@ export default function AdminCommunitySites() {
   // Empties the inbox. Called whenever the page stops being signed in, so the
   // section counts can never keep showing the last admin's numbers.
   const clearData = useCallback(() => {
-    setSites([]); setRequests([]); setDmca([]); setSubscribers([]); setSignedIn(false);
+    setSites([]); setRequests([]); setDmca([]); setSubscribers([]); setReports([]); setSignedIn(false);
   }, []);
 
   const authHeaders = useCallback(() => ({ "x-admin-password": password.trim(), "Content-Type": "application/json" }), [password]);
@@ -35,6 +37,7 @@ export default function AdminCommunitySites() {
       setRequests(Array.isArray(data?.requests) ? data.requests : []);
       setDmca(Array.isArray(data?.dmca) ? data.dmca : []);
       setSubscribers(Array.isArray(data?.subscribers) ? data.subscribers : []);
+      setReports(Array.isArray(data?.reports) ? data.reports : []);
       setSignedIn(true);
       setStatus("Admin data loaded.");
     } catch (error) {
@@ -93,12 +96,25 @@ export default function AdminCommunitySites() {
     finally { setBusy(false); }
   };
 
+  // A report is only ever filed by the site's own form and only ever read here:
+  // dismissing it deletes the record rather than resolving anything a visitor
+  // could see, so no confirmation step is needed.
+  const dismissReport = async (item: BugReport) => {
+    setBusy(true);
+    try {
+      const response = await fetch("/api/admin", { method: "DELETE", headers: authHeaders(), body: JSON.stringify({ kind: "report", id: item.id }) });
+      if (!response.ok) throw new Error("Could not dismiss that report.");
+      setReports((current) => current.filter((entry) => entry.id !== item.id)); setStatus("Report dismissed.");
+    } catch (error) { setStatus(error instanceof Error ? error.message : "Could not dismiss that report."); }
+    finally { setBusy(false); }
+  };
+
   return (
     <main className="admin-shell">
       <a className="privacy-back mono" href="/">← base31.org</a>
       <p className="eyebrow mono">moderation</p>
       <h1>Community inbox</h1>
-      <p className="admin-lede">Review DMCA takedown requests, URL suggestions, published community sites, and newsletter signups. Nothing submitted here is published automatically.</p>
+      <p className="admin-lede">Review DMCA takedown requests, URL suggestions, bug and feature reports, published community sites, and newsletter signups. Nothing submitted here is published automatically.</p>
       <form className="admin-form" onSubmit={(event) => { event.preventDefault(); void loadData(); }}>
         <label htmlFor="admin-password">Admin password</label>
         <input id="admin-password" type="password" value={password} onChange={(event) => changePassword(event.target.value)} autoComplete="current-password" placeholder="Your private password" />
@@ -120,6 +136,12 @@ export default function AdminCommunitySites() {
           <section className="admin-section"><div className="admin-section-head"><h2>URL requests</h2><span className="mono">{requests.length}</span></div>
             {requests.length === 0 ? <p className="admin-empty">No pending suggestions.</p> : requests.map((item) => (
               <article className="admin-site" key={item.id}><div><h3>{item.title}</h3><p><a href={item.url} target="_blank" rel="noreferrer">{item.url}</a></p>{item.note && <p>{item.note}</p>}<p className="mono">{item.email || "No reply email"} · {new Date(item.createdAt).toLocaleString()}</p></div><button type="button" className="admin-remove" disabled={busy} onClick={() => void dismissRequest(item)}>Dismiss</button></article>
+            ))}
+          </section>
+
+          <section className="admin-section"><div className="admin-section-head"><h2>Bug and feature reports</h2><span className="mono">{reports.length}</span></div>
+            {reports.length === 0 ? <p className="admin-empty">No reports waiting.</p> : reports.map((item) => (
+              <article className="admin-site" key={item.id}><div><p className="admin-report-body">{item.message}</p><p className="mono"><a href={item.page} target="_blank" rel="noreferrer">{item.page}</a></p><p className="mono">{item.email || "No reply email"} · {new Date(item.createdAt).toLocaleString()}</p></div><button type="button" className="admin-remove" disabled={busy} onClick={() => void dismissReport(item)}>Dismiss</button></article>
             ))}
           </section>
 

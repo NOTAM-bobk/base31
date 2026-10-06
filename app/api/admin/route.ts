@@ -24,10 +24,10 @@ export async function DELETE(request: Request) {
   if (!authorized(request)) return NextResponse.json({ error: "Invalid admin password." }, { status: 401 });
   let payload: { kind?: unknown; id?: unknown };
   try { payload = await request.json() as typeof payload; } catch { return NextResponse.json({ error: "Invalid request." }, { status: 400 }); }
-  if ((payload.kind !== "site" && payload.kind !== "request" && payload.kind !== "dmca") || typeof payload.id !== "string") {
+  if ((payload.kind !== "site" && payload.kind !== "request" && payload.kind !== "dmca" && payload.kind !== "report") || typeof payload.id !== "string") {
     return NextResponse.json({ error: "Invalid delete request." }, { status: 400 });
   }
-  const base = payload.kind === "site" ? "/admin/sites/" : payload.kind === "dmca" ? "/admin/dmca/" : "/admin/requests/";
+  const base = payload.kind === "site" ? "/admin/sites/" : payload.kind === "dmca" ? "/admin/dmca/" : payload.kind === "report" ? "/admin/reports/" : "/admin/requests/";
   const path = `${base}${encodeURIComponent(payload.id)}`;
   const response = await fetch(`${workerUrl}${path}`, {
     method: "DELETE",

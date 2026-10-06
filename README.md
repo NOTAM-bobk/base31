@@ -174,7 +174,7 @@ The site has two faces, and both render the same component (`components/home-pag
 
 | Route | Mode | What it is |
 | --- | --- | --- |
-| `/` (and `/es`, `/fr`, `/pt`) | `home` | The landing page: the hero and its Explore control, the section keys, the editor's picks, the Top 10, the submission form and the tag shelf, then About the directory, the support hub, the community board, the FAQ, the launch clock and the signup. |
+| `/` (and `/es`, `/fr`, `/pt`) | `home` | The landing page: the hero and its Explore control, the section keys, the editor's picks, the Top 10, the website of the week, the submission form and the tag shelf, then About the directory, the support hub, the community board, the FAQ, the launch clock and the signup. |
 | `/explore` | `explore` | The directory: the search field, the tag filters and sort, the featured sites, the five off-directory strips and the URL request form. |
 | `/explore/<section>` | — | One section on a page of its own: every card in it, its own search field and filter chips, and the same vote ranking. See “Sections have pages too”. |
 
@@ -183,6 +183,8 @@ They share one implementation on purpose. The directory's query, filters, sort, 
 The landing page's browsing half is a way **in**, not a second copy of the directory. Its section keys are ordinary links to `/explore#<section-id>`, so a bare `#sites` would scroll nowhere from the homepage; its editor's-picks carousel is the same `components/editors-picks.tsx` component; and "Browse by tag" links the 18 most-used tags straight to their `/tags/<slug>` pages. The editor's picks belong to the landing page alone — `/explore` is there to be searched, and a carousel above the search field put an editorial slide between the visitor and the list.
 
 The prose half of the landing page runs About the directory, then the support hub directly under it, then the community board, the FAQ and the launch clock. About and Support are one pair — who this is, and how it stays free — so nothing sits between them; the countdown closes the prose rather than interrupting the questions. The Top 10 (`components/top-ten.tsx`) ranks the directory's live up/down totals with the same `compareVotes` rule the strips and `/stats` use — **community votes, not page views**. There is no per-day vote history to rank by, so the heading follows the streaming-service convention it is imitating while the caption under it says plainly what the numbers are, an entry nobody has voted on prints `no votes yet` rather than a score, and a board at zero is labelled as such instead of being padded with an invented order. Ranking a real "today" would mean the Worker recording votes by day.
+
+The landing page's editorial spotlight is the website of the week (`components/website-of-the-week.tsx`), between the Top 10 and the submission form. It prints the newest entry from `config/websites-of-the-week.json` via `lib/websites-of-the-week.ts` — tagline and story included — and links to the archive on `/websites-of-the-week`. Both surfaces read the same newest-first list, so the two can never lead with a different week, and the section renders nothing at all rather than an empty frame if the list is somehow empty. Adding one is prepending an entry to that config; the date, a tagline and a story long enough for `npm run validate:content` are the whole registration.
 
 The URL request form (`components/url-request.tsx`) is on **both** faces: between the Top 10 and the tag shelf on the landing page, and at the bottom of `/explore` after the five strips. Both copies post to the same Worker route, and the hero's own “Submit a URL” button anchors to the copy the visitor is already looking at rather than sending them to the other page.
 
@@ -210,16 +212,16 @@ Dates are rendered as semantic timestamps. Review badges are **not uptime guaran
 
 ## Keys and environment configuration
 
-The directory and public GitHub statistics do **not** need a GitHub API key. Email delivery, optional upload mirroring, and push notifications require their own credentials.
+The directory and public GitHub statistics do **not** need a GitHub API key. Publication-update email, optional upload mirroring, and push notifications require their own credentials, and all three live in the Worker.
 
 ### Next.js hosting environment
 
 | Variable | Required for | Notes |
 | --- | --- | --- |
 | `NEXT_PUBLIC_COUNTER_URL` | Optional Worker override | Public base URL; defaults to the existing live Worker. Build-time variable—redeploy after changing it. Never put a secret in a `NEXT_PUBLIC_` variable. |
-| `RESEND_API_KEY` | Bug/feature report email | Server-only Resend credential |
-| `RESEND_FROM_EMAIL` | Bug/feature report email | Verified sender, e.g. `base31 <reports@example.com>` |
-| `BUG_REPORT_TO` | Optional report destination | Defaults to `hello@base31.org` |
+| `ADMIN_PANEL_PASSWORD` | `/admin/community-sites` | The password the moderation page asks for; it must match the Worker's `COUNTER_SECRET` |
+
+A bug or feature report needs **no** credential on this side: the route queues it with the Worker, so the Resend variables that used to deliver it are no longer part of the Next.js environment. `RESEND_API_KEY` and `RESEND_FROM_EMAIL` remain Worker secrets, where they send publication updates.
 
 ### Cloudflare Worker secrets and bindings
 
@@ -251,6 +253,7 @@ Resend's test sender has recipient restrictions. For real subscriber delivery, v
 | `GET /sites` | List community-published sites |
 | `GET /quality` | Public health-check report: last check time and failure count per community site, behind `/quality-report` |
 | `POST /submit` | Publish static files with title, description, tags, and slug |
+| `POST /report` | File a bug report or feature idea; saved to KV and listed in the admin inbox, never emailed |
 | `GET /s/<slug>/…` | Serve a community site's files from KV |
 | `GET /discussion?before=<id>` | Newest 20 threads and up to 100 replies each; `nextCursor` for older pages |
 | `POST /discussion` | `{ name, body, replyTo? }`; returns the stored message |
@@ -258,7 +261,7 @@ Resend's test sender has recipient restrictions. For real subscriber delivery, v
 
 `POST /subscribe` saves an active email immediately; success is returned only after storage succeeds, with no confirmation email or Resend requirement. Existing confirmation links still work for older pending records. Subscriber emails are listed in the existing `/admin/community-sites` inbox through `/api/admin` and the protected Worker `/admin/data` endpoint. Existing `ADMIN_PANEL_PASSWORD` (Next.js) and `COUNTER_SECRET` (Worker) credentials must match; no new password is required. Unsubscribe tokens are never returned. KV lists are eventually consistent, so new emails may take about a minute to appear. Older pending signups are not automatically activated.
 
-URL suggestions use the existing `/request-url` Worker endpoint and private moderation queue, not the email report endpoint. The form is on the landing page and at the bottom of `/explore`; both post to the same route. They are reviewed, not automatically published. See `worker/src/index.ts` for legacy confirmation, unsubscribe, and push routes. Single-step signup records form consent but does not verify email ownership; operators should monitor for abusive or unwanted subscriptions.
+URL suggestions use the existing `/request-url` Worker endpoint and private moderation queue. The form is on the landing page and at the bottom of `/explore`; both post to the same route. They are reviewed, not automatically published. Bug reports and feature ideas filed from the community panel travel the same way through `POST /report`: the Next.js route checks the visitor's own throttle and forwards the report (with the visitor's address in `x-report-origin`, since the call is server-to-server) to the Worker, which stores it under `request:report:` and lists it in the same inbox. Nothing is emailed, so a mail-provider outage cannot lose a report. See `worker/src/index.ts` for legacy confirmation, unsubscribe, and push routes. Single-step signup records form consent but does not verify email ownership; operators should monitor for abusive or unwanted subscriptions.
 
 Community uploads are served on the Worker origin, separate from the directory. Limits are 40 files, 2 MB per file, and 8 MB per upload. KV listings are eventually consistent, so new entries may take about a minute to appear elsewhere. Optional GitHub mirroring is best-effort; it does not automatically add an entry to curated `sites.json`.
 
@@ -283,10 +286,8 @@ To moderate, configure `DISCUSSION_MODERATOR_SECRET` as a Worker secret and send
 ### GitHub statistics: free, approximate, resilient
 
 - Header commits use GitHub's public REST commit endpoint and pagination headers, cached in the browser for one hour.
-- Hero source size uses `GET https://api.github.com/repos/NOTAM-bobk/base31/languages`, cached for **24 hours**.
-- GitHub returns **bytes per language, not line counts**. `lib/code-estimate.ts` divides bytes by assumed bytes/line: TypeScript and JavaScript 45, HTML 60, CSS 35; additional languages have documented factors and otherwise use 45.
-- The result is labelled `≈` and **estimated lines of code**. It covers files GitHub Linguist counts, not every repository file, dependency, binary, or generated asset.
-- Public unauthenticated requests have rate limits (normally 60/hour/IP). Failed refreshes retain a cached estimate; without a successful fetch the UI shows a dash, never a made-up fixed number.
+- Public unauthenticated requests have rate limits (normally 60/hour/IP). Without a successful fetch the header shows a dash, never a made-up number.
+- The hero used to print an **estimated source size** from `/repos/…/languages`. It does not any more: the figure and its fetch are gone rather than kept as a third number that could only ever be an estimate. The hero now prints two figures — views and the sites it links to.
 
 ## Deployment and domains
 
@@ -337,7 +338,7 @@ Set the repository **variable** `AI_BLOG_MODEL` to pick a different Workers AI t
 
 ### Styling and accessibility conventions
 
-Use the existing CSS tokens for both themes. Styles load `globals.css` → `overrides.css` → `inner-pages.css` → `late.css` → `directory.css` → `about-links.css` → `subsite.css`. `directory.css` owns the editorial shortlist and refreshed directory cards; `subsite.css` loads last and owns the pages outside the homepage — the path band at the top of every subsite (`base31.org / Tags / discovery`) with its grey gradient, the Best matches block and the per-section explorer. No Tailwind or additional React installation is needed.
+Use the existing CSS tokens for both themes. Styles load `globals.css` → `overrides.css` → `inner-pages.css` → `late.css` → `directory.css` → `about-links.css` → `subsite.css`. `directory.css` owns the editorial shortlist, the landing page's panels (editor's picks, Top 10, the website of the week) and refreshed directory cards; `subsite.css` loads last and owns the pages outside the homepage — the path band at the top of every subsite (`base31.org / Tags / discovery`) with its grey gradient, the Best matches block and the per-section explorer. No Tailwind or additional React installation is needed.
 
 Featured cards place color-coded tags along the bottom of the preview image. `tagTone` in `lib/directory.ts` maps semantic tag families to mint, sky, amber, or coral, with a stable fallback for custom tags. Text labels remain visible, so meaning never depends on color alone. Ratings sit above the Details link in the card footer. The homepage uses coordinated sky, amber and coral accents alongside emerald, with theme-specific contrast values.
 
@@ -359,9 +360,9 @@ Sponsored referrals must remain visibly disclosed and use sponsored link attribu
 | --- | --- |
 | Invalid JSON breaks a deploy | `npm run validate:content`; inspect the changed config array |
 | Unknown editor's pick disappears | `npm run test:directory`; verify the current `/sites/<slug>` |
-| Code estimate or commit count is a dash | GitHub reachability/rate limits; no API key is required |
+| Commit count is a dash | GitHub reachability/rate limits; no API key is required |
 | Votes or uploads fail | Check the configured Worker URL and deployed routes; don't test writes against production unintentionally |
-| Report email returns unavailable | Next.js email variables; verified sender and recipient restrictions |
+| A filed report never reaches the inbox | The Worker's `/report` route is deployed and `/api/admin` can reach the Worker's `/admin/data`; no email provider is involved |
 | Subscriber emails fail | Worker's own email secrets and provider logs |
 | Directory works but a tool 404s | Matching static folder/subdomain, middleware, hosting domain and DNS |
 | Counters unexpectedly reset | Verify `VIEW_COUNTER` still points at the original KV namespace |

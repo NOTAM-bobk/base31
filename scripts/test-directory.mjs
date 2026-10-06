@@ -175,12 +175,6 @@ for (const pick of picks) {
   assert.ok(entries.some((entry) => entry.slug === pick.slug), `Unknown editor's pick: ${pick.slug}`);
   assert.ok(typeof pick.note === "string" && pick.note.length >= 20);
 }
-const { estimateLines } = load("lib/code-estimate.ts");
-assert.equal(estimateLines({ TypeScript: 450, HTML: 600, CSS: 350 }), 30);
-assert.equal(estimateLines({ Unknown: 90 }), 2);
-assert.equal(estimateLines({ TypeScript: -5 }), null);
-assert.equal(estimateLines({ TypeScript: "450" }), null);
-assert.equal(estimateLines({}), null);
 const donation = fs.readFileSync("public/sites/donation/index.html", "utf8");
 const campaign = "https://fundrazr.com/62nDBa";
 assert.equal((donation.match(/href="https:\/\/fundrazr.com\/62nDBa"/g) ?? []).length, 2, "Both support CTAs use the campaign");
@@ -269,12 +263,49 @@ const band = home.indexOf('className="page-band"');
 const homeKeys = home.indexOf('className="quick-jumps"');
 const homePicks = home.indexOf("<EditorsPicks />");
 const homeTopTen = home.indexOf("<TopTen />");
+const homeWeekly = home.indexOf("<WebsiteOfTheWeek />");
 const homeSubmit = home.indexOf("<UrlRequest />");
 const homeTags = home.indexOf('id="browse-tags"');
 assert.ok(
-  band >= 0 && band < homeKeys && homeKeys < homePicks && homePicks < homeTopTen && homeTopTen < homeSubmit && homeSubmit < homeTags,
-  "The landing page runs section keys, then editor's picks, then the top ten, then the request form, then the tags",
+  band >= 0 && band < homeKeys && homeKeys < homePicks && homePicks < homeTopTen && homeTopTen < homeWeekly && homeWeekly < homeSubmit && homeSubmit < homeTags,
+  "The landing page runs section keys, then editor's picks, then the top ten, then the website of the week, then the request form, then the tags",
 );
+
+// The weekly pick is a section of the landing page, not a page of its own, and
+// it reads the same newest-first list /websites-of-the-week does — so the two
+// can never lead with a different week.
+const weeklySource = fs.readFileSync("components/website-of-the-week.tsx", "utf8");
+assert.ok(weeklySource.includes("websitesOfTheWeek"), "The website of the week reads the shared weekly list");
+assert.ok(weeklySource.includes('id="website-of-the-week"'), "The website of the week owns an id the rail can name");
+assert.ok(home.includes('{ id: "website-of-the-week"'), "The section rail walks the new section too");
+assert.match(
+  fs.readFileSync("lib/websites-of-the-week.ts", "utf8"),
+  /sort\(\(a, b\)/,
+  "A rotation of the weekly list must stay newest-first, whatever order the config is in",
+);
+
+// The hero prints two figures now. The lines-of-code estimate and the GitHub
+// byte count behind it are gone, so nothing in the hero depends on a third
+// party for a number.
+const heroStats = fs.readFileSync("components/hero-stats.tsx", "utf8");
+assert.ok(!heroStats.includes("estimated lines of code") && !heroStats.includes("estimateLines"), "The hero no longer prints an estimated line count");
+assert.ok(heroStats.includes('label: "websites linked"'), "The hero still figures the sites it links to");
+assert.ok(!fs.readFileSync("app/directory.css", "utf8").includes(".hero-stat:nth-child(3)"), "The third figure's colour rule went with it");
+
+// The Top 10's podium: the first three rows carry a class of their own so the
+// numerals can be coloured without changing a single figure on the board.
+assert.ok(fs.readFileSync("components/top-ten.tsx", "utf8").includes("is-top-${index + 1}"), "The top three rows are marked for the podium colours");
+assert.match(fs.readFileSync("app/directory.css", "utf8"), /\.top-ten-list \.top-ten-rank\.is-top-1/, "The podium colours outrank the plain outline");
+
+// The two hero actions wear the same shape, so the row reads as one pair of
+// controls; only the fills differ.
+const introSubmitRule = fs.readFileSync("app/directory.css", "utf8").match(/\.intro-links \.submit-url-link \{[^}]*\}/)?.[0] || "";
+assert.ok(
+  introSubmitRule.includes("border-radius: 7px;") && introSubmitRule.includes("min-height: 40px;") && introSubmitRule.includes("padding: 6px 14px 6px 7px;"),
+  "Submit a URL wears the shape of the Surprise me button",
+);
+// The directory button counts picks, not sites: the "N sites" prefix is gone.
+assert.ok(!home.includes("{allSites.length} sites · "), "The Explore the directory button no longer counts sites");
 // The form is on both faces, so the hero anchors to the copy on screen and the
 // drawer keeps its link into /explore's own section.
 assert.ok(home.includes('href="#request-url"'), "The hero's submit button anchors to the form on the current page");
@@ -388,6 +419,19 @@ for (const reset of ["setSites([])", "setRequests([])", "setDmca([])", "setSubsc
 assert.ok(/catch \(error\) \{[\s\S]{0,400}clearData\(\)/.test(adminSource), "A rejected or unauthorized load must not leave stale numbers");
 assert.ok(adminSource.includes("{!signedIn ? ("), "The inbox is only rendered while signed in");
 assert.ok(adminSource.includes("if (!value.trim()) { clearData();"), "Clearing the password field signs the page out");
+
+// Bug reports and feature ideas are an inbox item now, not an email: the route
+// files them with the Worker, and the moderation page reads and dismisses them
+// beside the URL suggestions.
+const bugReportRoute = fs.readFileSync("app/api/bug-report/route.ts", "utf8");
+assert.ok(!bugReportRoute.includes("api.resend.com"), "The report route no longer emails the report");
+assert.ok(bugReportRoute.includes("/report`"), "The report route files the report with the Worker");
+assert.ok(adminSource.includes("setReports([])"), "Signing out must clear the report inbox too");
+assert.ok(adminSource.includes('kind: "report"'), "A report can be dismissed from the inbox");
+const workerIndexSource = fs.readFileSync("worker/src/index.ts", "utf8");
+assert.ok(workerIndexSource.includes('url.pathname === "/report"'), "The Worker owns the report route");
+assert.ok(workerIndexSource.includes("REPORT_PREFIX"), "Reports are stored under their own key prefix");
+assert.match(workerIndexSource, /reports: reports\.sort\(/, "The admin data lists the reports newest-first");
 
 // The weekly blog agent: a Monday-only workflow that writes through the free
 // Cloudflare Workers AI endpoint and commits the result.

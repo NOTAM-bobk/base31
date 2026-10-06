@@ -1,5 +1,13 @@
 [
   {
+    "name": "Deslove",
+    "url": "https://deslove.com/",
+    "category": "Design & code",
+    "tags": ["design", "portfolio", "inspiration", "community"],
+    "description": "A free community where designers share portfolios, projects and thoughts and browse curated design resources — a discovery layer for creative work, next to the inspiration and visual-reference sites already in the directory.",
+    "addedAt": "2026-10-06"
+  },
+  {
     "addedAt": "2026-10-03",
     "name": "SpriteFrame PNG to Sprite Sheet",
     "category": "Design & code",

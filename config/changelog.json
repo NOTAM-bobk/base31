@@ -1,5 +1,20 @@
 [
   {
+    "version": "1.46.0",
+    "date": "2026-10-06",
+    "title": "A weekly pick, and an inbox for reports",
+    "summary": "The landing page gains a website of the week, bug and feature reports now land in the site's own moderation inbox instead of an email, the hero prints two figures rather than three, and the Top 10 has a podium.",
+    "highlights": [
+      "The landing page carries a website of the week between the Top 10 and the submission form: the current pick with its tagline and its story, and a link to the archive. It reads the same newest-first list /websites-of-the-week does, so the two can never name a different week.",
+      "Bug reports and feature ideas go to the admin panel. The form files them with the Worker, they are listed in the moderation inbox beside the URL suggestions, and nothing is emailed — so a mail-provider outage cannot lose a report.",
+      "Submit a URL now wears the same shape as Surprise me: the same corners, height, padding and round glyph, so the two hero actions read as one pair. Only the fills differ.",
+      "The Explore the directory button drops its site count. The picks it leads to are still counted; the \"19 sites\" prefix is gone.",
+      "The hero prints two figures instead of three. The estimated lines of code, its GitHub fetch and its cache are removed rather than shown from a stale estimate.",
+      "The Top 10 has a podium: the first three numerals carry gold, silver and bronze, drawn from the accents the page already uses, and the remaining rows keep their neutral outline.",
+      "Deslove joined the design picks — a free community where designers share portfolios, projects and thoughts."
+    ]
+  },
+  {
     "version": "1.45.0",
     "date": "2026-10-06",
     "title": "Every section gets its own page",

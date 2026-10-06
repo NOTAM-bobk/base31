@@ -196,6 +196,9 @@
 .admin-site h2 { margin: 0; color: var(--text-strong); font-size: 16px; font-weight: 500; }
 .admin-site p { margin: 7px 0 0; color: var(--muted); font-size: 13px; line-height: 1.55; }
 .admin-site p.mono { color: var(--subtle); font-size: 10px; }
+/* A report is free text typed into a textarea, so its line breaks are part of
+   what the visitor wrote. */
+.admin-site .admin-report-body { white-space: pre-wrap; }
 .admin-remove { flex: 0 0 auto; border-color: color-mix(in srgb, var(--danger) 50%, var(--line)); color: var(--danger); }
 .admin-empty { color: var(--subtle); font-size: 13px; }
 @media (max-width: 600px) {

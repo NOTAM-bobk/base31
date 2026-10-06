@@ -131,7 +131,7 @@ export default function DirectoryNotifications() {
       const result = await response.json().catch(() => null);
       if (!response.ok) throw new Error(result?.error || "Could not send the report right now.");
       form.reset();
-      setReportStatus("Thanks — your report has been sent.");
+      setReportStatus("Thanks — your report has been filed.");
     } catch (error) {
       setReportStatus(error instanceof Error ? error.message : "Could not send the report right now.");
     } finally {
@@ -167,8 +167,8 @@ export default function DirectoryNotifications() {
       <details className="bug-report-details">
         <summary>Found a bug or have an idea? Send a report</summary>
         <p className="community-privacy-note">
-          Bug reports and feature ideas both go to{" "}
-          <a href="mailto:hello@base31.org">hello@base31.org</a>, together with the page you were on.
+          Bug reports and feature ideas both land in the base31 moderation inbox, together with the page you were on. They
+          are read by hand — nothing here is published automatically.
         </p>
         <form className="submit-form bug-report-form" onSubmit={sendBugReport}>
           <label className="submit-field">

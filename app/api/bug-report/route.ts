@@ -2,6 +2,12 @@ import { NextResponse } from "next/server";
 
 export const runtime = "nodejs";
 
+// The Worker already holds the moderation inbox, so a report is queued there
+// rather than emailed: it is read next to the URL suggestions and takedown
+// notices on /admin/community-sites, it survives a mail-provider outage, and
+// nothing leaves the site's own storage.
+const workerUrl = (process.env.NEXT_PUBLIC_COUNTER_URL || "https://base31-directory-counter.sawyerbobk563.workers.dev").replace(/\/$/, "");
+
 const WINDOW_MS = 10 * 60 * 1000;
 const MAX_REPORTS_PER_WINDOW = 5;
 const recentReports = new Map<string, number[]>();
@@ -14,15 +20,6 @@ const validEmail = (value: unknown): value is string =>
   value.length <= 254 &&
   /^[^\s@<>(),;:\\[\]]+@[^\s@<>(),;:\\[\]]+\.[^\s@<>(),;:\\[\]]+$/.test(value);
 
-const escapeHtml = (value: string) =>
-  value.replace(/[&<>"']/g, (character) => ({
-    "&": "&amp;",
-    "<": "&lt;",
-    ">": "&gt;",
-    '"': "&quot;",
-    "'": "&#39;",
-  })[character]!);
-
 const allowReport = (address: string): boolean => {
   const now = Date.now();
   const recent = (recentReports.get(address) || []).filter((time) => now - time < WINDOW_MS);
@@ -34,7 +31,7 @@ const allowReport = (address: string): boolean => {
   recentReports.set(address, recent);
 
   // Keep this lightweight in long-lived Node instances; entries are only a
-  // best-effort per-instance throttle, with provider-side limits as backup.
+  // best-effort per-instance throttle, with the Worker's own limits as backup.
   if (recentReports.size > 1000) {
     for (const [key, timestamps] of recentReports) {
       if (timestamps.every((time) => now - time >= WINDOW_MS)) recentReports.delete(key);
@@ -68,7 +65,7 @@ export async function POST(request: Request) {
   }
 
   // Quietly accept honeypot submissions so simple bots don't learn how the
-  // form is protected, without sending an email.
+  // form is protected, without queuing anything.
   if (typeof payload.website === "string" && payload.website.trim()) {
     return json({ success: true }, 202);
   }
@@ -91,47 +88,23 @@ export async function POST(request: Request) {
     return json({ error: "Too many reports from this connection. Please try again later." }, 429);
   }
 
-  const apiKey = process.env.RESEND_API_KEY;
-  const from = process.env.RESEND_FROM_EMAIL;
-  // Bug reports and feature ideas both land in the same inbox; the shared
-  // address is the default so the form keeps working when the variable is
-  // unset. `BUG_REPORT_TO` can still point somewhere else.
-  const to = process.env.BUG_REPORT_TO || "hello@base31.org";
-  if (!apiKey || !from) {
-    return json({ error: "Bug reports are temporarily unavailable. Please try again later." }, 503);
-  }
-
-  const safeMessage = escapeHtml(message);
-  const safeEmail = email ? escapeHtml(email) : "Not provided";
-  const safePage = escapeHtml(page);
-  const text = [
-    "New base31.org bug or feature report",
-    `From: ${email || "Not provided"}`,
-    `Page: ${page}`,
-    "",
-    message,
-  ].join("\n");
-  const html = `<h2>New base31.org bug or feature report</h2><p><strong>Reply-to:</strong> ${safeEmail}</p><p><strong>Page:</strong> ${safePage}</p><hr><p>${safeMessage.replace(/\n/g, "<br>")}</p>`;
-
   try {
-    const response = await fetch("https://api.resend.com/emails", {
+    const response = await fetch(`${workerUrl}/report`, {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${apiKey}`,
         "Content-Type": "application/json",
+        // This route is called server-to-server, so the Worker's own throttle
+        // would otherwise key every report on this server's connection. Pass
+        // the visitor along with it.
+        ...(address ? { "x-report-origin": address } : {}),
       },
-      body: JSON.stringify({
-        from,
-        to,
-        subject: "New base31.org bug or feature report",
-        text,
-        html,
-        ...(email ? { reply_to: email } : {}),
-      }),
+      body: JSON.stringify({ message, page, ...(email ? { email } : {}) }),
+      cache: "no-store",
+      signal: AbortSignal.timeout(10000),
     });
-    if (!response.ok) return json({ error: "Could not send the report right now. Please try again later." }, 502);
+    if (!response.ok) return json({ error: "Could not file the report right now. Please try again later." }, 502);
     return json({ success: true }, 202);
   } catch {
-    return json({ error: "Could not send the report right now. Please try again later." }, 502);
+    return json({ error: "Could not file the report right now. Please try again later." }, 502);
   }
 }

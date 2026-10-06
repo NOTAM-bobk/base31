@@ -91,6 +91,7 @@ const SUBMIT_WINDOW_SECONDS = 60 * 60;
 const RATE_PREFIX = "@rate:submit:";
 const REQUEST_PREFIX = "request:url:";
 const DMCA_PREFIX = "request:dmca:";
+const REPORT_PREFIX = "request:report:";
 const HEALTH_FAILURE_THRESHOLD = 2;
 const SUBSCRIBER_PREFIX = "subscriber:";
 const CONFIRM_PREFIX = "confirm:";
@@ -108,6 +109,7 @@ const fileKey = (slug: string, path: string) => `${FILE_PREFIX}${slug}:${path}`;
 const rateKey = (identity: string) => `${RATE_PREFIX}${identity}`;
 const requestKey = (id: string) => `${REQUEST_PREFIX}${id}`;
 const dmcaKey = (id: string) => `${DMCA_PREFIX}${id}`;
+const reportKey = (id: string) => `${REPORT_PREFIX}${id}`;
 
 // A copyright takedown request filed from dmca.base31.org. Stored in the same
 // KV namespace as URL requests and surfaced in the admin inbox for review.
@@ -120,6 +122,18 @@ type DmcaRequest = {
   originalWork: string;
   details: string;
   signature: string;
+  createdAt: number;
+};
+
+// A bug report or feature idea filed from the community panel on the site. It
+// is stored beside the URL requests and the takedown notices and listed in the
+// same admin inbox, rather than emailed, so the queue lives in the site's own
+// storage and cannot be lost to a mail provider.
+type BugReport = {
+  id: string;
+  message: string;
+  page: string;
+  email?: string;
   createdAt: number;
 };
 
@@ -144,8 +158,11 @@ const requestIdentity = async (request: Request): Promise<string> => {
   return (await sha256Hex(`${ip}|${agent}`)).slice(0, 32);
 };
 
-const takeSubmitSlot = async (request: Request, env: Env): Promise<number | null> => {
-  const key = rateKey(await requestIdentity(request));
+// `subject` is for the routes the Next.js server calls on a visitor's behalf:
+// the connection those arrive on is the server, not the person, so the
+// browser's address travels in a header and takes the request's place.
+const takeSubmitSlot = async (request: Request, env: Env, subject?: string): Promise<number | null> => {
+  const key = rateKey(subject ? await sha256Hex(`report:${subject}`) : await requestIdentity(request));
   const raw = await env.VIEW_COUNTER.get(key);
   const now = Math.floor(Date.now() / 1000);
   let state: { count: number; resetAt: number } = { count: 0, resetAt: now + SUBMIT_WINDOW_SECONDS };
@@ -859,6 +876,37 @@ const handleDmcaRequest = async (request: Request, env: Env): Promise<Response> 
   }
 };
 
+// POST /report — a bug report or feature idea from the site's community panel.
+// Called by the Next.js route, which has already checked its own limits; this
+// keeps the same throttle as the other public write routes and saves the report
+// to KV so it appears in the admin inbox. Nothing is emailed and nothing is
+// published.
+const handleBugReport = async (request: Request, env: Env): Promise<Response> => {
+  const subject = request.headers.get("x-report-origin")?.trim();
+  const retryAfter = await takeSubmitSlot(request, env, subject || undefined);
+  if (retryAfter !== null) {
+    return new Response(JSON.stringify({ error: "Too many requests. Please try again later." }), {
+      status: 429,
+      headers: { "Content-Type": "application/json; charset=utf-8", "Retry-After": String(retryAfter), ...CORS_HEADERS },
+    });
+  }
+  let payload: Record<string, unknown>;
+  try { payload = await request.json() as Record<string, unknown>; } catch { return json({ error: "Invalid JSON body" }, 400); }
+  const message = typeof payload.message === "string" ? payload.message.trim().slice(0, 4000) : "";
+  if (message.length < 10) return json({ error: "Please describe the issue in 10–4,000 characters." }, 400);
+  const page = validHttpUrl(payload.page) ? (payload.page as string).slice(0, 2048) : "https://base31.org/";
+  const email = payload.email == null || payload.email === "" ? undefined : payload.email;
+  if (email !== undefined && !validEmail(email)) return json({ error: "Enter a valid email address." }, 400);
+  const id = `${Date.now().toString(36)}-${randomToken().slice(0, 12)}`;
+  const record: BugReport = { id, message, page, ...(email ? { email } : {}), createdAt: Date.now() };
+  try {
+    await env.VIEW_COUNTER.put(reportKey(id), JSON.stringify(record));
+    return json({ success: true }, 201);
+  } catch {
+    return json({ error: "Could not save that report right now." }, 503);
+  }
+};
+
 // GET /s/<slug>/<path> — serves a published site's files from KV.
 const handleServe = async (url: URL, env: Env): Promise<Response> => {
   const rest = url.pathname.slice("/s/".length);
@@ -1147,21 +1195,23 @@ export default {
       return handleQuality(env, url);
     }
 
-    if (url.pathname === "/admin/data" || url.pathname === "/admin/sites" || url.pathname.startsWith("/admin/sites/") || url.pathname.startsWith("/admin/requests/") || url.pathname.startsWith("/admin/dmca/")) {
+    if (url.pathname === "/admin/data" || url.pathname === "/admin/sites" || url.pathname.startsWith("/admin/sites/") || url.pathname.startsWith("/admin/requests/") || url.pathname.startsWith("/admin/dmca/") || url.pathname.startsWith("/admin/reports/")) {
       if (!adminAuthorized(request, env)) return json({ error: "Admin authentication required." }, 401);
       if (url.pathname === "/admin/data") {
         if (request.method !== "GET") return json({ error: "Method not allowed" }, 405);
         try {
-          const [sites, requests, subscribers, dmca] = await Promise.all([
+          const [sites, requests, subscribers, dmca, reports] = await Promise.all([
             listSites(env, true),
             listPrefixRecords<UrlRequest>(env, REQUEST_PREFIX),
             listPrefixRecords<{ email: string; verified: boolean }>(env, SUBSCRIBER_PREFIX),
             listPrefixRecords<DmcaRequest>(env, DMCA_PREFIX),
+            listPrefixRecords<BugReport>(env, REPORT_PREFIX),
           ]);
           return json({
             sites: sites.map((site) => ({ ...publicSite(site, url.origin), lastCheckedAt: site.lastCheckedAt ?? null, healthFailures: site.healthFailures ?? 0 })),
             requests: requests.sort((a, b) => b.createdAt - a.createdAt),
             dmca: dmca.sort((a, b) => b.createdAt - a.createdAt),
+            reports: reports.sort((a, b) => b.createdAt - a.createdAt),
             subscribers: subscribers.filter((subscriber) => validEmail(subscriber.email)).map(({ email, verified }) => ({ email, verified })),
           });
         } catch {
@@ -1180,6 +1230,13 @@ export default {
         const id = url.pathname.slice("/admin/requests/".length);
         if (!/^[A-Za-z0-9_-]{8,80}$/.test(id)) return json({ error: "Invalid request id" }, 400);
         await env.VIEW_COUNTER.delete(requestKey(id));
+        return json({ success: true });
+      }
+      if (url.pathname.startsWith("/admin/reports/")) {
+        if (request.method !== "DELETE") return json({ error: "Method not allowed" }, 405);
+        const id = url.pathname.slice("/admin/reports/".length);
+        if (!/^[A-Za-z0-9_-]{8,80}$/.test(id)) return json({ error: "Invalid report id" }, 400);
+        await env.VIEW_COUNTER.delete(reportKey(id));
         return json({ success: true });
       }
       if (url.pathname === "/admin/sites") {
@@ -1209,6 +1266,11 @@ export default {
     if (url.pathname === "/request-url") {
       if (request.method !== "POST") return json({ error: "Method not allowed" }, 405);
       return handleUrlRequest(request, env);
+    }
+
+    if (url.pathname === "/report") {
+      if (request.method !== "POST") return json({ error: "Method not allowed" }, 405);
+      return handleBugReport(request, env);
     }
 
     if (url.pathname === "/subscribe") {

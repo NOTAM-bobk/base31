@@ -98,7 +98,8 @@ Homepage markup lives in `components/home-page.tsx`; `app/page.tsx` supplies
 the route. The same component also renders `/explore` (`app/explore/page.tsx`)
 with `mode="explore"`, which is where the sites and every list of them live —
 the landing page keeps the hero, a browsing half of its own (the section keys,
-the editor's picks, the Top 10, the submission form, the tag shelf) and the
+the editor's picks, the Top 10, the website of the week, the submission form,
+the tag shelf) and the
 prose sections — About, the support hub directly under it, the community board,
 the FAQ and the launch clock, in that order. One
 file, two modes; see the README's “Pages and navigation” before moving

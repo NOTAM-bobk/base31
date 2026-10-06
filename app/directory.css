@@ -70,7 +70,6 @@ html::-webkit-scrollbar, body::-webkit-scrollbar { display: none; width: 0; heig
 .site-card .favorite-button { width: 36px; height: 36px; border-radius: 10px; }
 /* A little color, without losing the quiet neutral canvas. */
 .hero-stat:nth-child(2) .hero-stat-value { color: var(--accent-sky); }
-.hero-stat:nth-child(3) .hero-stat-value { color: var(--accent-amber); }
 .editors-picks { border-color: color-mix(in srgb, var(--accent-amber) 32%, var(--line)); background: linear-gradient(115deg, color-mix(in srgb, var(--accent-amber) 7%, var(--surface)), var(--surface) 55%, color-mix(in srgb, var(--accent-sky) 6%, var(--surface))); }
 .editors-number { color: color-mix(in srgb, var(--accent-amber) 65%, var(--surface)); }
 .editors-position { color: var(--accent-amber); }
@@ -203,16 +202,20 @@ html::-webkit-scrollbar, body::-webkit-scrollbar { display: none; width: 0; heig
 
 /* Discoveries, conversations, and the wider base31 journal. */
 .intro-links { gap: 12px; align-items: center; }
-/* A solid primary button rather than a tinted pill: submitting a URL is the
-   one action the hero asks a visitor to take, so it carries a filled surface,
-   plain ink and a small glyph, the way a modern app's primary action reads.
-   Scoped under .intro-links so it also outranks the `.intro-links a` colour
-   rule in overrides.css, which would otherwise force white text onto the
-   fill. */
-.intro-links .submit-url-link { display: inline-flex; align-items: center; justify-content: center; gap: 10px; min-height: 48px; padding: 0 22px; border: 1px solid transparent; border-radius: 999px; background: var(--invert-bg); color: var(--invert-fg); font-size: 13px; font-weight: 600; text-decoration: none; box-shadow: 0 14px 28px -18px var(--invert-bg); transition: transform .2s, box-shadow .2s; }
-.intro-links .submit-url-icon { display: grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; background: color-mix(in srgb, var(--invert-fg) 16%, transparent); color: inherit; font-size: 17px; font-weight: 400; }
+/* A solid primary button rather than a plain text link: submitting a URL is the
+   one action the hero asks a visitor to take, so it carries a filled surface
+   and a small glyph, the way a modern app's primary action reads. It wears the
+   *shape* of the "Surprise me" button beside it — the same 7px corners, the
+   same 40px minimum height, the same padding, the same 27px round badge and
+   the same 8px gap — so the hero reads as one pair of controls rather than a
+   red square next to a white pill; only the fill differs, because the two
+   actions are not the same action. Scoped under .intro-links so it also
+   outranks the `.intro-links a` colour rule in overrides.css, which would
+   otherwise force white text onto the fill. */
+.intro-links .submit-url-link { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 40px; padding: 6px 14px 6px 7px; border: 1px solid transparent; border-radius: 7px; background: var(--invert-bg); color: var(--invert-fg); font-size: 13.5px; font-weight: 600; letter-spacing: .005em; text-decoration: none; box-shadow: 0 6px 18px -12px var(--invert-bg); transition: transform .2s, box-shadow .2s; }
+.intro-links .submit-url-icon { display: grid; place-items: center; width: 27px; height: 27px; border-radius: 50%; background: color-mix(in srgb, var(--invert-fg) 16%, transparent); color: inherit; font-size: 14px; font-weight: 400; }
 .intro-links .submit-url-arrow { margin-left: 0; color: inherit; opacity: .85; transition: transform .2s; }
-.intro-links .submit-url-link:hover { color: var(--invert-fg); border-color: transparent; transform: translateY(-2px); box-shadow: 0 18px 32px -16px var(--invert-bg); }
+.intro-links .submit-url-link:hover { color: var(--invert-fg); border-color: transparent; transform: translateY(-1px); box-shadow: 0 10px 22px -12px var(--invert-bg); }
 .intro-links .submit-url-link:hover .submit-url-arrow { transform: translate(2px, -2px); }
 .intro-links .submit-url-link:active { transform: translateY(0) scale(.98); }
 .url-submission { scroll-margin-top: 100px; margin: 40px 0 0; padding: 22px; display: grid; grid-template-columns: .85fr 1.3fr; gap: 22px; align-items: center; border: 1px solid color-mix(in srgb, var(--accent-amber) 32%, var(--line)); border-radius: 24px; background: radial-gradient(ellipse at top left, color-mix(in srgb, var(--accent-amber) 10%, transparent), transparent 65%), var(--surface); box-shadow: 0 20px 50px -40px rgb(0 0 0 / 60%); }
@@ -564,6 +567,15 @@ html[data-theme="light"] .nav-drawer-scrim { background: rgb(0 0 0 / 32%); }
   -webkit-text-stroke: 1.6px color-mix(in srgb, var(--text-strong) 46%, transparent);
 }
 html[data-theme="light"] .top-ten-rank { -webkit-text-stroke-color: color-mix(in srgb, var(--text-strong) 32%, transparent); }
+/* The podium. Ranks 1–3 carry a colour as well as an outline — gold, silver and
+   bronze, drawn from the three accents the page already uses — so the top of
+   the board reads at a glance while the rest of the list keeps the neutral
+   outline. Scoped under .top-ten-list so the colour also outranks the
+   light-theme stroke correction above; both accents are theme-aware, so one
+   rule covers dark and light. */
+.top-ten-list .top-ten-rank.is-top-1 { color: color-mix(in srgb, var(--accent-amber) 24%, transparent); -webkit-text-stroke-color: var(--accent-amber); }
+.top-ten-list .top-ten-rank.is-top-2 { color: color-mix(in srgb, var(--accent-sky) 24%, transparent); -webkit-text-stroke-color: var(--accent-sky); }
+.top-ten-list .top-ten-rank.is-top-3 { color: color-mix(in srgb, var(--accent-coral) 24%, transparent); -webkit-text-stroke-color: var(--accent-coral); }
 /* The numeral is decorative, but it must not vanish for a reader who is forced
    into one system colour: outline strokes are the first thing to disappear. */
 @media (forced-colors: active) { .top-ten-rank { color: CanvasText; -webkit-text-stroke: 0; } }
@@ -617,4 +629,53 @@ html[data-theme="light"] .top-ten-rank { -webkit-text-stroke-color: color-mix(in
   .top-ten-rank { width: 40px; font-size: 32px; }
   .top-ten-name { font-size: 13.5px; }
   .tag-strip-item { min-height: 32px; font-size: 11.5px; }
+}
+
+/* The website of the week ------------------------------------------------
+   One pick, chosen weekly, between the Top 10 and the submission form. It is
+   the same kind of panel as the two sections above it — a bordered card on the
+   grey band — and it wears the sky accent, which is the one hue the homepage's
+   other sections have not spent. It is a teaser, not the archive: the story is
+   printed in full, and the link out goes to /websites-of-the-week, which reads
+   the same newest-first list. */
+.weekly-pick {
+  margin: 0 auto 32px; padding: 22px 24px 20px;
+  border: 1px solid color-mix(in srgb, var(--accent-sky) 30%, var(--line-strong));
+  border-radius: var(--radius-card);
+  background: linear-gradient(150deg, color-mix(in srgb, var(--accent-sky) 8%, var(--surface)), var(--surface) 62%);
+  box-shadow: var(--shadow);
+}
+.weekly-pick-heading { display: flex; align-items: center; gap: 10px; }
+.weekly-pick-mark {
+  display: grid; width: 34px; height: 34px; flex: 0 0 auto; place-items: center;
+  border: 1px solid color-mix(in srgb, var(--accent-sky) 48%, var(--line));
+  border-radius: 11px;
+  background: color-mix(in srgb, var(--accent-sky) 16%, var(--surface));
+  color: var(--accent-sky); font-size: 16px;
+}
+.weekly-pick-heading h2 {
+  margin: 0; color: var(--text-strong);
+  font-family: var(--font-hand), var(--font-sans); font-size: 27px; font-weight: 400;
+}
+.weekly-pick-week {
+  margin-left: auto; padding: 3px 8px; border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--accent-sky) 34%, var(--line));
+  color: var(--accent-sky); font-size: 9px; letter-spacing: .12em; text-transform: uppercase;
+}
+.weekly-pick-name { margin: 13px 0 0; font-size: 15px; font-weight: 600; letter-spacing: -.01em; }
+.weekly-pick-name a { color: var(--text-strong); text-decoration: none; }
+.weekly-pick-name a:hover { color: var(--accent-sky); }
+.weekly-pick-name a:focus-visible, .weekly-pick-all:focus-visible { outline: 2px solid var(--accent-sky); outline-offset: 3px; }
+.weekly-pick-tagline { max-width: 640px; margin: 5px 0 0; color: var(--text-strong); font-size: 13px; line-height: 1.5; }
+.weekly-pick-story { max-width: 640px; margin: 10px 0 0; color: var(--muted); font-size: 12.5px; line-height: 1.65; }
+.weekly-pick-foot { margin: 16px 0 0; }
+.weekly-pick-all { color: var(--muted); font-size: 12px; text-decoration: none; transition: color 150ms ease; }
+.weekly-pick-all:hover { color: var(--accent-sky); }
+@media (max-width: 600px) {
+  .weekly-pick { padding: 18px 14px 16px; margin-bottom: 26px; }
+  .weekly-pick-heading { flex-wrap: wrap; gap: 8px; }
+  .weekly-pick-heading h2 { font-size: 22px; }
+  .weekly-pick-week { margin-left: 0; }
+  .weekly-pick-name { margin-top: 11px; font-size: 14px; }
+  .weekly-pick-story { font-size: 12px; }
 }

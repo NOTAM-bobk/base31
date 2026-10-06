@@ -59,8 +59,10 @@ export default function TopTen() {
           return (
             <li key={entry.voteKey} className="top-ten-row">
               {/* The numeral is decoration: the <ol> already numbers the rows
-                  for anyone reading the list without seeing the big type. */}
-              <span className="top-ten-rank" aria-hidden="true">{index + 1}</span>
+                  for anyone reading the list without seeing the big type. The
+                  first three carry their own class so the podium reads in
+                  colour without changing what the list says. */}
+              <span className={`top-ten-rank${index < 3 ? ` is-top-${index + 1}` : ""}`} aria-hidden="true">{index + 1}</span>
               <span className="top-ten-body">
                 <Link className="top-ten-name" href={`/sites/${entry.slug}`} onClick={() => tick(12)}>{entry.name}</Link>
                 <span className="top-ten-meta mono">

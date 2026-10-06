@@ -102,9 +102,10 @@ export default function PrivacyPage() {
           automatically.
         </p>
         <p>
-          Bug reports are sent to the site operator through Resend. The report includes the message, the
-          page URL, and an email address only if you choose to provide one. Reports are retained in the
-          email provider’s systems; an optional reply address is used only to respond to the report.
+          Bug reports and feature ideas are stored by our Cloudflare Worker and shown in the site operator’s
+          private moderation inbox, next to the URL suggestions. A report includes the message, the page URL,
+          and an email address only if you choose to provide one; no email provider is involved, and an
+          optional reply address is used only to respond to the report.
         </p>
 
         <h2>Analytics</h2>

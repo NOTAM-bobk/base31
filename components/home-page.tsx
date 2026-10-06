@@ -39,6 +39,7 @@ import { recentlyAdded } from "@/lib/recently-added";
 import { matchesQuery } from "@/lib/search";
 import EditorsPicks from "@/components/editors-picks";
 import TopTen from "@/components/top-ten";
+import WebsiteOfTheWeek from "@/components/website-of-the-week";
 import BestMatches from "@/components/best-matches";
 import { sectionCount, sectionsWithMatches } from "@/lib/sections";
 import { compareVotes } from "@/lib/vote-ranking";
@@ -848,6 +849,7 @@ export default function HomePage({ dict = EN, locale = "en", mode = "home" }: { 
     { id: "page-title", label: "Top" },
     { id: "editors-picks", label: "Editor's picks" },
     { id: "top-ten", label: "Top 10" },
+    { id: "website-of-the-week", label: "Website of the week" },
     { id: "request-url", label: "Submit" },
     { id: "browse-tags", label: "Tags" },
     // The support hub sits directly under About now, so the rail walks them in
@@ -1146,7 +1148,7 @@ export default function HomePage({ dict = EN, locale = "en", mode = "home" }: { 
                 <span className="explore-cta-icon mono" aria-hidden="true">⌕</span>
                 <span className="explore-cta-body">
                   <span className="explore-cta-title">Explore the directory</span>
-                  <span className="explore-cta-meta mono">{allSites.length} sites · {directoryEntries.length} picks · search everything</span>
+                  <span className="explore-cta-meta mono">{directoryEntries.length} picks · search everything</span>
                 </span>
                 <span className="explore-cta-arrow mono" aria-hidden="true">→</span>
               </a>
@@ -1266,6 +1268,12 @@ export default function HomePage({ dict = EN, locale = "en", mode = "home" }: { 
               numeral, a row, a flame. It reads the same shared vote totals the
               cards do, so the two can never disagree. */}
           <TopTen />
+
+          {/* One website, chosen weekly, in the same panel shape as the two
+              lists above it. The archive stays on /websites-of-the-week, and
+              the section reads its own config, so the two can never disagree
+              about which week is current. */}
+          <WebsiteOfTheWeek />
 
           {/* The upload form is not the directory's alone: a visitor who found
               something while browsing the homepage should be able to pass it

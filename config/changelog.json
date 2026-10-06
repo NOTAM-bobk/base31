@@ -1,5 +1,20 @@
 [
   {
+    "version": "1.46.1",
+    "date": "2026-10-06",
+    "title": "A calmer conversation on the landing page",
+    "summary": "The community board reads like a chat now: the opening post carries its reply count and last activity, replies sit in one quieter indent behind a folded line, times read as “12m” instead of a parsed date, and new messages wait behind a tap rather than moving the list under the reader.",
+    "highlights": [
+      "A thread header says what it holds: the replies, when the last one landed, and a green dot on the conversations that moved since your last visit.",
+      "Messages show relative times — just now, 12m, 3d — with the exact stamp on hover, and replies are drawn one size down from the post they answer.",
+      "A thread longer than two replies folds the rest behind one line that counts them, so a busy conversation stays skimmable.",
+      "“Replying to” is a door rather than a label: the quoted line jumps to the message it answers and lights it up, and every message offers Copy link to its own address.",
+      "The composer got quieter — a hand-drawn heading, a counter that warms as you near the limit, ⌘/Ctrl + Enter to post, and one tinted line of feedback instead of a paragraph of empty space.",
+      "New messages wait behind a pill above the feed instead of replacing the list mid-read, and the first paint is a skeleton rather than a sentence.",
+      "The feed counts its conversations, the refresh control turns while it works, and an empty board offers a button that puts the cursor in the box."
+    ]
+  },
+  {
     "version": "1.46.0",
     "date": "2026-10-06",
     "title": "A weekly pick, and an inbox for reports",

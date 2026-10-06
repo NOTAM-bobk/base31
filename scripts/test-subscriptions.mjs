@@ -105,7 +105,12 @@ await env.VIEW_COUNTER.put("votes:liked:up", "9");
 const stats = await (await call("/stats")).json();
 assert.equal(stats.top[0].key, "popular", "Stats ranks by all votes, not net likes or upvotes alone");
 const homepage = fs.readFileSync("components/home-page.tsx", "utf8");
-assert.match(homepage, /<CoolAis[^\n]+\/>\s*<UrlRequest \/>/);
+// The four plain off-directory strips are marked off with dividers, and the
+// URL request form still follows them.
+assert.match(homepage, /<CoolAis[^\n]+\/>[\s\S]{0,160}<UrlRequest \/>/, "CoolAis is followed by the URL request form");
+assert.match(homepage, /<CoolSites[^\n]+\/>[\s\S]*?<hr className="section-divider"[\s\S]*?<CoolApis/, "CoolSites and CoolApis are separated by a divider");
+assert.match(homepage, /<CoolApis[^\n]+\/>[\s\S]*?<hr className="section-divider"[\s\S]*?<CoolApps/, "CoolApis and CoolApps are separated by a divider");
+assert.match(homepage, /<CoolApps[^\n]+\/>[\s\S]*?<hr className="section-divider"[\s\S]*?<CoolAis/, "CoolApps and CoolAis are separated by a divider");
 assert.equal((homepage.match(/<UrlRequest \/>/g) || []).length, 1);
 assert.match(homepage, /href="#request-url"/);
 for (const url of ["https://dev.to/base31", "https://medium.com/@base31dotorg"]) assert.ok(homepage.includes(url));

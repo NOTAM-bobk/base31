@@ -17,7 +17,15 @@
   margin-top: 18px;
 }
 @media (max-width: 600px) {
-  .intro-links { flex-direction: column; align-items: flex-start; gap: 14px; }
+  /* The two hero actions share one row on a phone instead of stacking, so the
+     primary action stays visible without scrolling past another button. Each
+     one takes half the row and shrinks its own glyph so the labels still fit. */
+  .intro-links { display: grid; grid-template-columns: 1fr 1fr; align-items: stretch; gap: 8px; }
+  .intro-links .surprise-button,
+  .intro-links .submit-url-link { width: 100%; min-width: 0; }
+  .intro-links .surprise-button { justify-content: center; padding: 0 12px 0 6px; }
+  .intro-links .submit-url-link { padding: 0 10px; gap: 6px; font-size: 12px; }
+  .intro-links .submit-url-icon { width: 20px; height: 20px; font-size: 14px; }
 }
 
 /* The hero's one button. It used to be a quiet tinted pill beside two text
@@ -195,6 +203,10 @@ html[data-theme="light"] .site-footer {
    quieter than the directory's: no preview, no votes — name, host, one line,
    in a denser three-across grid on a desktop. */
 .cool-section { margin-top: 72px; }
+/* A divider above a strip already owns the gap, so the strip does not stack
+   its own 72px on top of it. Loaded here, after overrides.css, so it beats
+   the equal-specificity `.cool-section` rule above. */
+.section-divider + .cool-section { margin-top: 40px; }
 /* The category chips above the Cool APIs grid; the directory's own chips are
    styled in overrides.css and reused here. */
 .cool-filters { margin: 12px 0 14px; }

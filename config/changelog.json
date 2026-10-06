@@ -1,5 +1,16 @@
 [
   {
+    "version": "1.41.0",
+    "date": "2026-10-06",
+    "title": "Clearer section breaks and a stronger hero action",
+    "summary": "The four off-directory strips are separated by the page's divider, the hero's two actions share one row on phones, and Submit a URL is now a solid primary button.",
+    "highlights": [
+      "The four off-directory strips — Other cool sites, Cool APIs, Cool apps and Cool AIs — are now marked off with the same fading divider the rest of the homepage uses.",
+      "On a phone, Surprise me and Submit a URL sit side by side in one row instead of stacking into two full-width rows.",
+      "Submit a URL is a solid filled button with a small plus glyph and a plain label, so it reads as the hero's primary action rather than a tinted pill."
+    ]
+  },
+  {
     "version": "1.40.0",
     "date": "2026-10-06",
     "title": "A quieter footer and a support section that stays closed",

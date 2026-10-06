@@ -1404,20 +1404,36 @@ export default function HomePage({ dict = EN, locale = "en" }: { dict?: Dictiona
           </p>
         </section>
 
+        {/* The four off-directory strips are plain lists with no border of
+            their own, so each one is marked off with a divider; the bordered
+            blocks below (about, discussion, support) already separate
+            themselves and are left alone. */}
+        <hr className="section-divider" aria-hidden="true" />
+
         {/* Off-directory picks: external cool sites from config/cool-sites.json,
             rendered as smaller, quieter cards than the directory's own. */}
         <CoolSites dict={dict} query={query} />
+
+        <hr className="section-divider" aria-hidden="true" />
 
         {/* A second strip in the same shape as the one above: free public
             APIs from config/cool-apis.json, for visitors who came to build
             something rather than only browse. */}
         <CoolApis dict={dict} query={query} />
 
+        <hr className="section-divider" aria-hidden="true" />
+
         {/* A third strip in the same shape: browser apps from
             config/cool-apps.json, for the visitor who wants a tool to use
             rather than a site to read. */}
         <CoolApps dict={dict} query={query} />
+
+        <hr className="section-divider" aria-hidden="true" />
+
         <CoolAis dict={dict} query={query} />
+
+        <hr className="section-divider" aria-hidden="true" />
+
         <UrlRequest />
 
         <AboutSection />

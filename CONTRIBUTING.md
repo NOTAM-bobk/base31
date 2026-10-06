@@ -95,8 +95,13 @@ restore, CSS custom properties, a `.sr-only` utility, a skip link and a
 ## Changing the homepage
 
 Homepage markup lives in `components/home-page.tsx`; `app/page.tsx` supplies
-the route. Shared components live in `components/`. Styling uses hand-written
-CSS; `app/directory.css` owns editor's picks and the refreshed featured cards.
+the route. The same component also renders `/explore` (`app/explore/page.tsx`)
+with `mode="explore"`, which is where the sites and every list of them live —
+the landing page keeps the hero and the prose sections. One file, two modes;
+see the README's “Pages and navigation” before moving anything between them.
+Shared components live in `components/`. Styling uses hand-written
+CSS; `app/directory.css` owns editor's picks, the refreshed featured cards and
+the mobile navigation drawer.
 Read the README's style load order before changing overrides. Prefer the existing CSS custom properties and component
 patterns over new abstractions.
 

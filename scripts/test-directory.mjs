@@ -117,7 +117,7 @@ assert.ok(shareSource.includes('"use client"'), "The copy button needs the clien
 
 // The new routes exist, are canonical, and are listed in the sitemap.
 const sitemap = fs.readFileSync("app/sitemap.ts", "utf8");
-for (const [route, file] of [["/tags", "app/tags/page.tsx"], ["/recently-added", "app/recently-added/page.tsx"], ["/quality-report", "app/quality-report/page.tsx"]]) {
+for (const [route, file] of [["/explore", "app/explore/page.tsx"], ["/tags", "app/tags/page.tsx"], ["/recently-added", "app/recently-added/page.tsx"], ["/quality-report", "app/quality-report/page.tsx"]]) {
   assert.ok(fs.readFileSync(file, "utf8").includes(`canonical: "${route}"`), `${route} must set its canonical`);
   assert.ok(sitemap.includes(route), `${route} must be in the sitemap`);
 }
@@ -187,6 +187,37 @@ assert.ok(!aboutSection.includes("about-sparkle-credit"), "The sparkle-gif credi
 assert.ok(fs.readFileSync("components/support-section.tsx", "utf8").includes("useState(true)"), "The support section must start collapsed");
 assert.ok(fs.readFileSync("app/our-story/page.tsx", "utf8").includes('canonical: "/our-story"'));
 assert.ok(fs.readFileSync("app/sitemap.ts", "utf8").includes("/our-story"));
+
+// The directory moved off the landing page and onto /explore, and a phone
+// reaches it through the header's drawer. The two halves of home-page.tsx have
+// to stay in step with that: the listings on one page, the prose on the other.
+assert.ok(fs.readFileSync("app/explore/page.tsx", "utf8").includes('mode="explore"'), "The explore route renders the directory mode");
+assert.ok(home.includes("{isExplore && <>"), "The directory block renders on /explore only");
+assert.ok(home.includes("{!isExplore && <>"), "The prose block renders on the landing page only");
+const drawerSource = fs.readFileSync("components/nav-drawer.tsx", "utf8");
+assert.ok(drawerSource.includes('action="/explore"') && drawerSource.includes('name="q"'), "The drawer searches /explore with a real GET form");
+assert.ok(drawerSource.includes("href={link.href}"), "The drawer's categories are ordinary links, so they need no routing code");
+assert.ok(drawerSource.includes("useDialogFocus"), "The drawer traps focus while it is open");
+assert.ok(drawerSource.includes('event.key === "Escape"'), "The drawer closes on Escape");
+assert.ok(drawerSource.includes('document.body.style.overflow = "hidden"'), "The page behind the drawer does not scroll");
+assert.ok(drawerSource.includes('aria-hidden={!open}'), "The closed drawer is hidden from assistive technology");
+const headerSource = fs.readFileSync("components/site-header.tsx", "utf8");
+assert.ok(headerSource.includes('className="icon-button nav-toggle"'), "The header carries the drawer button");
+assert.ok(headerSource.includes('href="/explore"'), "The header links the directory at every width");
+assert.ok(fs.readFileSync("app/directory.css", "utf8").includes("@media (max-width: 819px) { .nav-toggle { display: inline-flex; } }"), "The drawer button is a phone-only control");
+// Every category the drawer offers must land on a section that exists, or the
+// hash is a quiet no-op that scrolls nowhere.
+// Deduplicated: the hero's submit link points at the same form the drawer
+// does, so that one hash is written twice in the file.
+const drawerHashes = [...new Set([...home.matchAll(/"\/explore#([a-z0-9-]+)"/g)].map((match) => match[1]))];
+assert.equal(drawerHashes.length, 7, "The drawer lists every directory section");
+const sectionIds = new Set();
+for (const file of ["components/home-page.tsx", "components/editors-picks.tsx", "components/cool-sites.tsx", "components/cool-apis.tsx", "components/cool-apps.tsx", "components/cool-ais.tsx", "components/url-request.tsx"]) {
+  const source = fs.readFileSync(file, "utf8");
+  for (const [, id] of source.matchAll(/id="([a-z0-9-]+)"/g)) sectionIds.add(id);
+  for (const [, id] of source.matchAll(/id: "([a-z0-9-]+)"/g)) sectionIds.add(id);
+}
+for (const hash of drawerHashes) assert.ok(sectionIds.has(hash), `The drawer links /explore#${hash}, which no section owns`);
 const statsPage = fs.readFileSync("app/stats/page.tsx", "utf8");
 const styles = fs.readFileSync("app/inner-pages.css", "utf8");
 for (const [, classList] of statsPage.matchAll(/className="([^"]+)"/g)) {

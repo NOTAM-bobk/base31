@@ -1,5 +1,17 @@
 [
   {
+    "version": "1.42.0",
+    "date": "2026-10-06",
+    "title": "The directory moves to /explore, behind a phone menu",
+    "summary": "Every list of sites now lives on its own /explore page, the landing page keeps the hero and the prose, and phones get a navigation drawer holding a search box and the category list.",
+    "highlights": [
+      "Sites, editor's picks, the four off-directory strips and the URL request form moved off the homepage and onto a new /explore page, which carries the search field, the tag filters and the sort controls.",
+      "The landing page is now the hero, the about section, the community board, the support hub, the launch clock, the FAQ and the signup — with a full-width “Explore the directory” control where the search field used to sit.",
+      "On a phone a new nav button in the header slides a drawer in from the right: a search box that lands on /explore?q=…, an “Explore:” list linking each section of the directory, and a shorter list of the site's other pages.",
+      "The header links Explore at every width, so the directory is one tap away on desktop too, and /explore joins the sitemap."
+    ]
+  },
+  {
     "version": "1.41.0",
     "date": "2026-10-06",
     "title": "Clearer section breaks and a stronger hero action",

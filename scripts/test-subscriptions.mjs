@@ -112,7 +112,12 @@ assert.match(homepage, /<CoolSites[^\n]+\/>[\s\S]*?<hr className="section-divide
 assert.match(homepage, /<CoolApis[^\n]+\/>[\s\S]*?<hr className="section-divider"[\s\S]*?<CoolApps/, "CoolApis and CoolApps are separated by a divider");
 assert.match(homepage, /<CoolApps[^\n]+\/>[\s\S]*?<hr className="section-divider"[\s\S]*?<CoolAis/, "CoolApps and CoolAis are separated by a divider");
 assert.equal((homepage.match(/<UrlRequest \/>/g) || []).length, 1);
-assert.match(homepage, /href="#request-url"/);
+// The submit link is an in-page anchor on /explore, where the form lives, and
+// an absolute link to it from the landing page, which no longer carries the
+// directory's forms. Both have to be there, or one of the two pages loses its
+// only way into the upload form.
+assert.match(homepage, /"#request-url"/, "The explore page anchors to its own upload form");
+assert.match(homepage, /"\/explore#request-url"/, "The landing page links to the form on /explore");
 for (const url of ["https://dev.to/base31", "https://medium.com/@base31dotorg"]) assert.ok(homepage.includes(url));
 const notifications = fs.readFileSync("components/directory-notifications.tsx", "utf8");
 assert.ok(notifications.includes("result?.success !== true"), "Signup success requires the Worker storage acknowledgement");

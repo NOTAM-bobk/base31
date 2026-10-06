@@ -367,3 +367,141 @@ html::-webkit-scrollbar, body::-webkit-scrollbar { display: none; width: 0; heig
   .editors-copy h3 { font-size: 22px; line-height: 1.25; }
   .editors-cta { width: 100%; min-height: 46px; justify-content: space-between; }
 }
+
+/* The landing page's way into the directory ---------------------------
+   The homepage no longer carries the lists, so the hero needs one control
+   that says where they went. It is shaped like the search field it replaces
+   — same raised frame, same glyph tile, same hover ring — but it is an <a>,
+   because the searching happens on /explore. Sharing the frame keeps the
+   hero looking the same; the meta line names what is behind the tap, so the
+   link is not a mystery door. */
+.explore-cta {
+  display: flex; align-items: center; gap: 12px;
+  max-width: 560px; margin-top: 30px; padding: 9px 11px;
+  border: 1px solid var(--line-strong); border-radius: 14px;
+  background: linear-gradient(180deg, var(--surface-hover), var(--input-bg) 72%);
+  color: var(--text); text-decoration: none;
+  box-shadow: 0 10px 26px rgb(0 0 0 / 18%), inset 0 1px 0 color-mix(in srgb, var(--text-strong) 7%, transparent);
+  transition: border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+}
+html[data-theme="light"] .explore-cta { box-shadow: 0 8px 22px rgb(0 0 0 / 6%), inset 0 1px 0 #fff; }
+.explore-cta:hover { border-color: color-mix(in srgb, var(--live) 52%, var(--line-strong)); transform: translateY(-1px); }
+.explore-cta:active { transform: translateY(0) scale(0.995); }
+.explore-cta-icon {
+  display: grid; width: 30px; height: 30px; flex: 0 0 auto; place-items: center;
+  border: 1px solid var(--line); border-radius: 9px; background: var(--surface);
+  color: var(--muted); font-size: 14px; line-height: 1;
+  transition: color 160ms ease, border-color 160ms ease, background 160ms ease;
+}
+.explore-cta:hover .explore-cta-icon {
+  border-color: color-mix(in srgb, var(--live) 55%, var(--line));
+  background: color-mix(in srgb, var(--live) 12%, var(--surface));
+  color: var(--live);
+}
+.explore-cta-body { display: flex; flex: 1; min-width: 0; flex-direction: column; gap: 2px; }
+.explore-cta-title { color: var(--text-strong); font-size: 14px; font-weight: 600; }
+.explore-cta-meta { color: var(--subtle); font-size: 10.5px; }
+.explore-cta-arrow { flex: 0 0 auto; color: var(--muted); font-size: 14px; transition: transform 160ms ease, color 160ms ease; }
+.explore-cta:hover .explore-cta-arrow { color: var(--live); transform: translateX(3px); }
+
+/* Mobile navigation drawer -------------------------------------------
+   The phone's menu. The header button that opens it only exists below 820px
+   (`.nav-toggle`), so a wide screen keeps the header links and the section
+   rail and never sees this panel.
+
+   The panel slides in from the right edge over a scrim and covers most,
+   not all, of the screen: the strip of scrim left showing is the tap-out
+   target, and Escape and the panel's own close button are the other two ways
+   out (components/nav-drawer.tsx). It is mounted at every width and hidden
+   with `visibility` rather than `display`, so it can transition both ways and
+   so nothing inside it is reachable by keyboard while it is shut. */
+.nav-toggle { display: none; }
+@media (max-width: 819px) { .nav-toggle { display: inline-flex; } }
+
+.nav-drawer-scrim {
+  position: fixed; inset: 0; z-index: 88;
+  background: rgb(0 0 0 / 55%);
+  opacity: 0; visibility: hidden; pointer-events: none;
+  transition: opacity 220ms ease, visibility 220ms ease;
+}
+.nav-drawer-scrim.is-open { opacity: 1; visibility: visible; pointer-events: auto; }
+html[data-theme="light"] .nav-drawer-scrim { background: rgb(0 0 0 / 32%); }
+
+.nav-drawer {
+  position: fixed; inset: 0; z-index: 89;
+  display: flex; justify-content: flex-end;
+  visibility: hidden; pointer-events: none;
+}
+.nav-drawer.is-open { visibility: visible; pointer-events: auto; }
+.nav-drawer-panel {
+  display: flex; width: min(360px, 88vw); height: 100%; flex-direction: column;
+  padding: 18px 18px calc(26px + env(safe-area-inset-bottom));
+  overflow-y: auto; overscroll-behavior: contain;
+  border-left: 1px solid var(--line-strong);
+  background: var(--surface);
+  box-shadow: -28px 0 70px rgb(0 0 0 / 48%);
+  transform: translateX(101%);
+  transition: transform 260ms cubic-bezier(.22,.68,.24,1);
+}
+.nav-drawer.is-open .nav-drawer-panel { transform: none; }
+.nav-drawer-panel:focus { outline: none; }
+@media (prefers-reduced-motion: reduce) { .nav-drawer-panel { transition: none; } }
+
+.nav-drawer-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.nav-drawer-head .eyebrow { margin: 0; }
+.nav-drawer-close {
+  display: grid; width: 32px; height: 32px; flex: 0 0 auto; place-items: center; padding: 0;
+  border: 1px solid var(--line); border-radius: 999px; background: var(--surface);
+  color: var(--muted); font-size: 16px; line-height: 1; cursor: pointer;
+  transition: border-color 150ms ease, color 150ms ease, background 150ms ease;
+}
+.nav-drawer-close:hover { border-color: var(--line-strong); color: var(--text-strong); background: var(--surface-hover); }
+
+.nav-drawer-search {
+  display: flex; align-items: center; gap: 10px; margin-top: 16px;
+  padding: 6px 7px 6px 10px;
+  border: 1px solid var(--line-strong); border-radius: 14px;
+  background: linear-gradient(180deg, var(--surface-hover), var(--input-bg) 72%);
+}
+.nav-drawer-search:focus-within { border-color: color-mix(in srgb, var(--live) 58%, var(--line-strong)); }
+.nav-drawer-search .search-icon {
+  display: grid; width: 28px; height: 28px; flex: 0 0 auto; place-items: center;
+  border: 1px solid var(--line); border-radius: 9px; background: var(--surface);
+  color: var(--muted); font-size: 13px; line-height: 1;
+}
+.nav-drawer-search input {
+  width: 100%; min-width: 0; height: 34px; border: 0; outline: 0; background: transparent;
+  color: var(--text-strong); font: inherit; font-size: 13.5px;
+}
+.nav-drawer-search input::placeholder { color: var(--subtle); }
+.nav-drawer-search input::-webkit-search-cancel-button,
+.nav-drawer-search input::-webkit-search-decoration { -webkit-appearance: none; appearance: none; }
+.nav-drawer-go {
+  flex: 0 0 auto; min-height: 34px; padding: 0 12px;
+  border: 1px solid transparent; border-radius: 9px;
+  background: var(--invert-bg); color: var(--invert-fg);
+  font-size: 11px; letter-spacing: 0.04em; cursor: pointer;
+}
+.nav-drawer-go:active { transform: scale(0.97); }
+
+.nav-drawer-label { margin: 24px 0 8px; }
+.nav-drawer-links { display: grid; gap: 2px; }
+.nav-drawer-links a {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  min-height: 44px; padding: 10px 11px; border-radius: 10px;
+  color: var(--text-strong); font-size: 13.5px; text-decoration: none;
+  transition: background 150ms ease, color 150ms ease;
+}
+.nav-drawer-links a:hover { background: var(--surface-hover); color: var(--live); }
+.nav-drawer-meta { color: var(--subtle); font-size: 10px; }
+.nav-drawer-links.is-secondary a { color: var(--muted); font-size: 12.5px; }
+
+@media (max-width: 600px) {
+  .explore-cta { margin-top: 26px; }
+  .explore-cta-meta { font-size: 10px; }
+  /* A phone's header has room for the wordmark, the GitHub count and the two
+     buttons — not for the links as well. They move into the drawer, which is
+     where a phone looks for them anyway; the drawer's "More on base31" list
+     carries the same destinations. */
+  .site-nav { display: none; }
+}

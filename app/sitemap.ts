@@ -27,6 +27,15 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 1,
     },
     {
+      // The directory itself: every site and every list of them now lives here
+      // rather than on the homepage, so it is the second most important URL on
+      // the site and the one the nav, the drawer and the hero all point at.
+      url: `${siteUrl}/explore`,
+      lastModified: newestPost,
+      changeFrequency: "weekly",
+      priority: 0.9,
+    },
+    {
       url: `${siteUrl}/about`,
       changeFrequency: "monthly",
       priority: 0.6,

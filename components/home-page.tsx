@@ -1,7 +1,7 @@
 "use client";
 
 import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from "react";
-import type { CSSProperties, FormEvent, RefObject } from "react";
+import type { CSSProperties, FormEvent } from "react";
 import Image from "next/image";
 import sites from "@/config/sites.json";
 import pkg from "@/package.json";
@@ -18,6 +18,8 @@ import CoolSites from "@/components/cool-sites";
 import CoolApis from "@/components/cool-apis";
 import CoolApps from "@/components/cool-apps";
 import SiteHeader from "@/components/site-header";
+import NavDrawer, { type DrawerLink } from "@/components/nav-drawer";
+import { useDialogFocus } from "@/lib/dialog-focus";
 import { LOCALES, type Dictionary, type Locale, EN } from "@/lib/i18n";
 import { resetConsent, useConsent } from "@/lib/consent";
 import coolSites, { searchCoolSites } from "@/lib/cool-sites";
@@ -75,49 +77,6 @@ const SECTION_PREVIEW = 9;
 // matcher keeps the JSX a plain list instead of a per-locale special case.
 const HERO_ACCENT_WORD = /^(not|no|nada|pas)$/i;
 const heroWordsOf = (title: string) => title.split(/\s+/).filter(Boolean);
-
-// Keeps keyboard focus inside an open dialog, moves it in on open, and hands it
-// back to whatever opened the dialog on close.
-function useDialogFocus<T extends HTMLElement>(open: boolean, containerRef: RefObject<T>) {
-  useEffect(() => {
-    if (!open) return;
-    const container = containerRef.current;
-    if (!container) return;
-    const previous = document.activeElement as HTMLElement | null;
-    const selector = 'a[href], button:not([disabled]), input, select, textarea, [tabindex]:not([tabindex="-1"])';
-    const focusable = () =>
-      Array.from(container.querySelectorAll<HTMLElement>(selector)).filter((element) => element.offsetParent !== null);
-
-    (focusable()[0] ?? container).focus();
-
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key !== "Tab") return;
-      const items = focusable();
-      if (items.length === 0) return;
-      const first = items[0];
-      const last = items[items.length - 1];
-      if (event.shiftKey && document.activeElement === first) {
-        event.preventDefault();
-        last.focus();
-      } else if (!event.shiftKey && document.activeElement === last) {
-        event.preventDefault();
-        first.focus();
-      }
-    };
-    // A stray click outside the trap should not strand focus behind it.
-    const onFocusIn = (event: FocusEvent) => {
-      if (!container.contains(event.target as Node)) (focusable()[0] ?? container).focus();
-    };
-
-    document.addEventListener("keydown", onKeyDown, true);
-    document.addEventListener("focusin", onFocusIn);
-    return () => {
-      document.removeEventListener("keydown", onKeyDown, true);
-      document.removeEventListener("focusin", onFocusIn);
-      previous?.focus?.();
-    };
-  }, [open, containerRef]);
-}
 
 const visibleSites = (sites as Site[]).filter((site) => site.show !== false);
 
@@ -352,7 +311,21 @@ function LaunchClock() {
   );
 }
 
-export default function HomePage({ dict = EN, locale = "en" }: { dict?: Dictionary; locale?: Locale }) {
+// One component, two pages. The homepage (`mode="home"`) is the landing page:
+// the hero, then About, the community board, support, the launch clock, the FAQ
+// and the signup. `/explore` (`mode="explore"`) is the directory: the search
+// field and every list of sites.
+//
+// The split is a prop rather than two components because the directory's state
+// — the query, the tag filter, the sort, pins, votes, the upload form, the
+// reveal observer and the polling effects — is one machine, and the mobile
+// drawer's search is a link into this same page. Keeping both modes here means
+// there is exactly one implementation of the directory, reachable two ways.
+export default function HomePage({ dict = EN, locale = "en", mode = "home" }: { dict?: Dictionary; locale?: Locale; mode?: "home" | "explore" }) {
+  const isExplore = mode === "explore";
+  // The mobile navigation drawer (components/nav-drawer.tsx), opened from the
+  // header button that CSS shows on narrow screens only.
+  const [navOpen, setNavOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [favorites, setFavorites] = useState<string[]>([]);
   const [votes, setVotes] = useState<Record<string, Vote>>({});
@@ -422,16 +395,18 @@ export default function HomePage({ dict = EN, locale = "en" }: { dict?: Dictiona
     return () => window.clearTimeout(timer);
   }, [sitesCollapsed]);
 
-  // A deep link can carry the search: /?q=pomodoro (or /es?q=… on a
-  // translated page) opens the directory filtered to that query, so a shared
-  // link lands where the sharer meant. Runs once on mount.
+  // A deep link can carry the search: /explore?q=pomodoro opens the directory
+  // filtered to that query, so a shared link — and the mobile drawer's search
+  // form, which is a plain GET to this page — lands where the sender meant.
+  // Runs once on mount, and only where there is a list to filter.
   useEffect(() => {
+    if (!isExplore) return;
     const fromUrl = new URLSearchParams(window.location.search).get("q");
     if (fromUrl) {
       setQuery(fromUrl);
       setSitesCollapsed(false);
     }
-  }, []);
+  }, [isExplore]);
 
   // Load saved preferences after mount so SSR markup stays stable.
   useEffect(() => {
@@ -623,6 +598,9 @@ export default function HomePage({ dict = EN, locale = "en" }: { dict?: Dictiona
       }
       if (typing) return;
       if (event.key === "/") {
+        // Only the directory has a search field to focus; on the homepage the
+        // key would otherwise swallow a slash for no reason.
+        if (!isExplore) return;
         event.preventDefault();
         searchRef.current?.focus();
       } else if (event.key.toLowerCase() === "s" && !shareOpen && !submitOpen && milestone == null) {
@@ -632,7 +610,7 @@ export default function HomePage({ dict = EN, locale = "en" }: { dict?: Dictiona
     };
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [milestone, shareOpen, submitOpen]);
+  }, [isExplore, milestone, shareOpen, submitOpen]);
 
   // Hide the floating support affordance once the visitor reaches the bottom
   // of the page, where the real donation board and support button live.
@@ -847,11 +825,11 @@ export default function HomePage({ dict = EN, locale = "en" }: { dict?: Dictiona
 
   const newCutoff = Date.now() - NEW_WINDOW_MS;
 
-  // The section rail walks the page in render order. The two labels the
-  // dictionary holds are used from it, so a translated homepage reads its own
-  // words there; the rest are the English names those sections already print
-  // on every locale.
-  const railSections = useMemo<RailSection[]>(() => [
+  // The section rail walks the page in render order, so it lists the sections
+  // the page actually renders. The two labels the dictionary holds are used
+  // from it, so a translated page reads its own words there; the rest are the
+  // English names those sections already print on every locale.
+  const railSections = useMemo<RailSection[]>(() => (isExplore ? [
     { id: "page-title", label: "Top" },
     { id: "editors-picks", label: "Editor's picks" },
     { id: "sites", label: dict.featured },
@@ -859,12 +837,41 @@ export default function HomePage({ dict = EN, locale = "en" }: { dict?: Dictiona
     { id: "cool-apis", label: dict.coolApis },
     { id: "cool-apps", label: dict.coolApps },
     { id: "cool-ais", label: dict.coolAis },
+    { id: "request-url", label: "Submit" },
+  ] : [
+    { id: "page-title", label: "Top" },
     { id: "about", label: "About" },
     { id: "discussion", label: "Community" },
     { id: "support", label: "Support" },
     { id: "faq-heading", label: "FAQ" },
     { id: "updates", label: "Updates" },
-  ], [dict]);
+  ]), [dict, isExplore]);
+
+  // The mobile drawer's two lists. "Explore" is the directory's own sections:
+  // every row is a plain link to /explore with that section's id as the hash,
+  // so the browser loads the page and scrolls to the list the visitor asked
+  // for without any routing code. "More" is the rest of the site.
+  const drawerCategories = useMemo<DrawerLink[]>(() => [
+    { href: "/explore", label: "Everything", meta: `${allSites.length} sites` },
+    { href: "/explore#editors-picks", label: "Editor's picks" },
+    { href: "/explore#sites", label: dict.featured, meta: `${allSites.length}` },
+    { href: "/explore#cool-sites", label: dict.coolSites, meta: `${coolSites.length}` },
+    { href: "/explore#cool-apis", label: dict.coolApis, meta: `${coolApis.length}` },
+    { href: "/explore#cool-apps", label: dict.coolApps, meta: `${coolApps.length}` },
+    { href: "/explore#cool-ais", label: dict.coolAis, meta: `${allCoolAis.length}` },
+    { href: "/explore#request-url", label: "Submit a URL" },
+  ], [allSites.length, dict]);
+
+  const drawerMore = useMemo<DrawerLink[]>(() => [
+    { href: "/blog", label: "Blog" },
+    { href: "/tools", label: "Tool guides" },
+    { href: "/recently-added", label: "Recently added", meta: `${recentlyAdded.length}` },
+    { href: "/tags", label: "Tags", meta: `${tagCount}` },
+    { href: "/quality-report", label: "Quality report" },
+    { href: "/websites-of-the-week", label: "Website of the week" },
+    { href: "/stats", label: "Stats" },
+    { href: "/about", label: "About us" },
+  ], []);
 
   // How many off-directory picks the same search found — the cool sites, the
   // cool APIs and the cool apps down the page — so the directory's empty state
@@ -1033,21 +1040,53 @@ export default function HomePage({ dict = EN, locale = "en" }: { dict?: Dictiona
   const structuredData = {
     "@context": "https://schema.org",
     "@type": "ItemList",
-    "@id": `${siteUrl}/#directory`,
+    "@id": `${siteUrl}${isExplore ? "/explore" : "/"}#directory`,
     name: "base31.org website directory",
     description: "A list of live sites and web projects on base31.org.",
     numberOfItems: visibleSites.length,
     itemListElement: visibleSites.map((site, index) => ({ "@type": "ListItem", position: index + 1, name: site.name, url: site.url })),
   };
 
+  // The headline, laid out one span per word so it can rise into place on
+  // load (the animation lives in app/late.css). One word also carries the
+  // accent — the negation in "Totally Not Boring Websites" — matched by
+  // `HERO_ACCENT_WORD`, so no translation renders a headline nobody styled.
+  // The explore page uses the same treatment for its own title.
+  const heroHeading = (title: string) => (
+    <span className="h1-line h1-title">
+      {heroWordsOf(title).map((word, index) => (
+        <Fragment key={`${word}-${index}`}>
+          {index > 0 ? " " : null}
+          <span
+            className={`h1-word${HERO_ACCENT_WORD.test(word) ? " is-not" : ""}`}
+            style={{ animationDelay: `${90 + index * 85}ms` }}
+          >
+            {word}
+          </span>
+        </Fragment>
+      ))}
+    </span>
+  );
+
   return (
     <>
       <Cursor />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
 
-      <a className="skip-link" href="#sites">Skip to the directory</a>
+      <a className="skip-link" href={isExplore ? "#sites" : "#page-title"}>
+        {isExplore ? "Skip to the directory" : "Skip to the content"}
+      </a>
 
-      <SiteHeader theme={theme} onToggleTheme={switchTheme} />
+      <SiteHeader
+        theme={theme}
+        onToggleTheme={switchTheme}
+        onOpenNav={() => { tick(10); setNavOpen(true); }}
+        navOpen={navOpen}
+      />
+
+      {/* The phone's menu: the search field and the category list, drawn over
+          the page instead of under it. */}
+      <NavDrawer open={navOpen} onClose={() => setNavOpen(false)} categories={drawerCategories} more={drawerMore} />
 
       {/* The lines down the right edge: where you are, and the fast way
           between sections. */}
@@ -1055,7 +1094,7 @@ export default function HomePage({ dict = EN, locale = "en" }: { dict?: Dictiona
 
       <main className="home-main">
         <section className="intro" aria-labelledby="page-title">
-          <p className="eyebrow mono">the real web directory</p>
+          <p className="eyebrow mono">{isExplore ? "the directory" : "the real web directory"}</p>
           {/* One line, three words: the title is a single phrase now, so it
               needs no per-line spaces to read correctly when flattened to
               text (search snippets, screen readers). It is rendered word by
@@ -1063,37 +1102,50 @@ export default function HomePage({ dict = EN, locale = "en" }: { dict?: Dictiona
               can still wrap the line — which is what lets the headline rise
               into place on load. The negation in the middle wears the accent
               (see `.h1-word.is-not` in app/late.css). */}
-          <h1 id="page-title">
-            <span className="h1-line h1-title">
-              {heroWordsOf(dict.heroTitle).map((word, index) => (
-                <Fragment key={`${word}-${index}`}>
-                  {index > 0 ? " " : null}
-                  <span
-                    className={`h1-word${HERO_ACCENT_WORD.test(word) ? " is-not" : ""}`}
-                    style={{ animationDelay: `${90 + index * 85}ms` }}
-                  >
-                    {word}
-                  </span>
-                </Fragment>
-              ))}
-            </span>
-          </h1>
-          <p className="subtitle">{dict.subtitle}</p>
-          {/* Views, unique directory destinations, and estimated source lines. */}
-          <HeroStats visitors={views} sites={new Set([...directoryEntries, ...allSites].map((site) => site.url.replace(/\/$/, ""))).size} />
+          <h1 id="page-title">{heroHeading(isExplore ? "Explore the directory" : dict.heroTitle)}</h1>
+          <p className="subtitle">
+            {isExplore
+              ? "Every site, tool, API and app base31 has picked, in one list. Search it, filter it by tag, or start at the top and keep scrolling."
+              : dict.subtitle}
+          </p>
+          {!isExplore && (
+            <>
+              {/* Views, unique directory destinations, and estimated source lines. */}
+              <HeroStats visitors={views} sites={new Set([...directoryEntries, ...allSites].map((site) => site.url.replace(/\/$/, ""))).size} />
+              {/* The landing page's one job is to get people into the list, so
+                  the directory gets a full-width control of its own, shaped
+                  like the search field it replaces. It is a link, not an
+                  input, because the searching happens on /explore — where the
+                  field is, and where the query ends up in the URL. */}
+              <a className="explore-cta" href="/explore" onClick={() => tick(12)}>
+                <span className="explore-cta-icon mono" aria-hidden="true">⌕</span>
+                <span className="explore-cta-body">
+                  <span className="explore-cta-title">Explore the directory</span>
+                  <span className="explore-cta-meta mono">{allSites.length} sites · {directoryEntries.length} picks · search everything</span>
+                </span>
+                <span className="explore-cta-arrow mono" aria-hidden="true">→</span>
+              </a>
+            </>
+          )}
           {/* One call to action, directly under the numbers. The "Why base31?"
               anchor and the old "Browse all sites" link are both gone: the
-              directory is the next thing down the page, and the rail already
-              steps to About, so each only duplicated something else. */}
+              list is one tap away, and the rail already steps to About, so
+              each only duplicated something else. */}
           <div className="intro-links">
             <button type="button" className="surprise-button" onClick={surpriseMe} title="Open a random matching pick from any collection">
               <span className="surprise-icon" aria-hidden="true">↯</span>
               <span className="surprise-label">{dict.surprise}</span>
             </button>
-            <a className="submit-url-link" href="#request-url"><span className="submit-url-icon" aria-hidden="true">＋</span><span>Submit a URL</span><span className="submit-url-arrow" aria-hidden="true">↗</span></a>
+            {/* On the landing page the upload form lives with the directory,
+                so the link travels there and lands on the form itself. */}
+            <a className="submit-url-link" href={isExplore ? "#request-url" : "/explore#request-url"}><span className="submit-url-icon" aria-hidden="true">＋</span><span>Submit a URL</span><span className="submit-url-arrow" aria-hidden="true">↗</span></a>
           </div>
-          {/* A search landmark with an explicit name: the wrapping label used
-              to name the field "/" (its only text was the shortcut hint). */}
+          {/* The directory's search. The landing page has no list to filter,
+              so its hero carries the explore call to action instead and the
+              field lives here — and in the phone's drawer. A landmark with an
+              explicit name: the wrapping label used to name the field "/"
+              (its only text was the shortcut hint). */}
+          {isExplore && <>
           <div className="search-wrap" role="search">
             <span className="search-icon mono" aria-hidden="true">⌕</span>
             <input
@@ -1128,6 +1180,7 @@ export default function HomePage({ dict = EN, locale = "en" }: { dict?: Dictiona
             <span className="mono">Try a tag</span>
             {searchTags.map((tag) => <button type="button" key={tag} aria-pressed={query.toLowerCase() === `#${tag.toLowerCase()}`} onClick={() => { setQuery(`#${tag}`); searchRef.current?.focus(); }}>#{tag}</button>)}
           </div>
+          </>}
         </section>
 
         {/* Everything from here down to the footer sits on the page's grey
@@ -1136,6 +1189,14 @@ export default function HomePage({ dict = EN, locale = "en" }: { dict?: Dictiona
             above a grey body. The quick jumps moved out of the hero and into
             the slab, since they belong to the browsing half of the page. */}
         <div className="page-band">
+          {/* Two halves of one component. Everything between here and the
+              URL request form is the directory, and the directory is
+              `/explore`; below it the landing page keeps the prose sections
+              and the signup. The two blocks are wrapped rather than split
+              into separate files so there is one implementation of the
+              directory — its state, its filters, its polling — and so the
+              section order its tests pin stays in one readable place. */}
+          {isExplore && <>
           {!query.trim() && <EditorsPicks />}
           {/* Five boxes that jump straight into a section, for the visitor who
               would rather browse than type. Each one is an in-page anchor, so
@@ -1436,6 +1497,9 @@ export default function HomePage({ dict = EN, locale = "en" }: { dict?: Dictiona
 
         <UrlRequest />
 
+          </>}
+
+        {!isExplore && <>
         <AboutSection />
         <DiscussionBoard />
 
@@ -1463,6 +1527,7 @@ export default function HomePage({ dict = EN, locale = "en" }: { dict?: Dictiona
         {/* The bottom of the page: the decorative sparkle and the sponsorship
             invitation, directly above the footer. */}
         <FooterSponsor />
+        </>}
         </div>
       </main>
 
@@ -1533,7 +1598,9 @@ export default function HomePage({ dict = EN, locale = "en" }: { dict?: Dictiona
           <nav className="footer-links" aria-label="Footer navigation">
             <a href="/blog">Blog</a>
             <a href="/tools">Tools</a>
-            <a href="#updates">Updates</a>
+            {/* The signup block is on the landing page only, so the directory
+                has to link back to it rather than to a hash it does not have. */}
+            <a href={isExplore ? "/#updates" : "#updates"}>Updates</a>
             <a href="/whats-new">What&rsquo;s new</a>
             <a href="/recently-added">Recently added</a>
             <a href="/tags">Tags</a>

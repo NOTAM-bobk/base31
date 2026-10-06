@@ -168,6 +168,19 @@ Add an `addedAt` date and the entry appears on `/recently-added`; add a tag and 
 
 `middleware.ts` maps `tags.base31.org` to the `/tags` routes instead of a static folder; the bare host is the tag index and `tags.base31.org/<tag>` is that tag's page. `tags` is therefore reserved and must not be used as a tool subdomain.
 
+### Pages and navigation
+
+The site has two faces, and both render the same component (`components/home-page.tsx`) with a `mode` prop:
+
+| Route | Mode | What it is |
+| --- | --- | --- |
+| `/` (and `/es`, `/fr`, `/pt`) | `home` | The landing page: the hero, the about section, the community board, the support hub, the launch clock, the FAQ and the signup. No listings. |
+| `/explore` | `explore` | The directory: the search field, the tag filters and sort, the featured sites, the four off-directory strips and the URL request form. |
+
+They share one implementation on purpose. The directory's query, filters, sort, pins, votes, upload form and polling effects are one state machine, and the phone's drawer searches straight into `/explore`, so two components would mean two of everything. Moving a list from one half to the other means moving markup between the `{isExplore && <>…</>}` and `{!isExplore && <>…</>}` blocks in that file; nothing else has to change, and the section order the regression tests pin stays in one readable place.
+
+On a phone the header carries a nav button (`components/site-header.tsx`, hidden above 819px) that opens `components/nav-drawer.tsx`: a panel that slides in from the right over a scrim. It holds the search field — a plain `GET` form to `/explore`, so the query travels in the URL and works before hydration — and the "Explore:" list, one link per section, written as `/explore#<section-id>`. Those are ordinary anchors, so the browser loads the page and scrolls to the section itself. **Section ids are therefore an interface**: the drawer, the section rail and every shared `/explore#…` link break if one is renamed. `npm run test:directory` checks that each hash the drawer offers is an id a section actually owns.
+
 ### Record dates honestly
 
 `addedAt` and `lastChecked` are optional `YYYY-MM-DD` dates. Set an addition date when the entry is actually added, and only update review dates after an editorial check—not because an automated crawler received a response.

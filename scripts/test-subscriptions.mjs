@@ -111,13 +111,11 @@ assert.match(homepage, /<CoolAis[^\n]+\/>[\s\S]{0,160}<UrlRequest \/>/, "CoolAis
 assert.match(homepage, /<CoolSites[^\n]+\/>[\s\S]*?<hr className="section-divider"[\s\S]*?<CoolApis/, "CoolSites and CoolApis are separated by a divider");
 assert.match(homepage, /<CoolApis[^\n]+\/>[\s\S]*?<hr className="section-divider"[\s\S]*?<CoolApps/, "CoolApis and CoolApps are separated by a divider");
 assert.match(homepage, /<CoolApps[^\n]+\/>[\s\S]*?<hr className="section-divider"[\s\S]*?<CoolAis/, "CoolApps and CoolAis are separated by a divider");
-assert.equal((homepage.match(/<UrlRequest \/>/g) || []).length, 1);
-// The submit link is an in-page anchor on /explore, where the form lives, and
-// an absolute link to it from the landing page, which no longer carries the
-// directory's forms. Both have to be there, or one of the two pages loses its
-// only way into the upload form.
-assert.match(homepage, /"#request-url"/, "The explore page anchors to its own upload form");
-assert.match(homepage, /"\/explore#request-url"/, "The landing page links to the form on /explore");
+assert.equal((homepage.match(/<UrlRequest \/>/g) || []).length, 2);
+// The form is on both faces now: the hero's submit button anchors to the copy
+// the current page renders, and the phone drawer still links /explore's own.
+assert.match(homepage, /href="#request-url"/, "The submit button anchors to the form the current page renders");
+assert.match(homepage, /"\/explore#request-url"/, "The drawer still links the form on /explore");
 // The landing page leads with its keys into every directory section, including
 // the tag shelf, so the indexes stay reachable without opening the drawer.
 for (const jump of ["editors-picks", "sites", "cool-sites", "cool-apis", "cool-apps", "cool-ais"]) {

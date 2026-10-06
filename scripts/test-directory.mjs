@@ -222,8 +222,7 @@ assert.ok(headerSource.includes('href="/explore"'), "The header links the direct
 assert.ok(fs.readFileSync("app/directory.css", "utf8").includes("@media (max-width: 819px) { .nav-toggle { display: inline-flex; } }"), "The drawer button is a phone-only control");
 // Every category the drawer offers must land on a section that exists, or the
 // hash is a quiet no-op that scrolls nowhere.
-// Deduplicated: the hero's submit link points at the same form the drawer
-// does, so that one hash is written twice in the file.
+// The hashes the drawer and the landing page's keys offer, one entry each.
 const drawerHashes = [...new Set([...home.matchAll(/"\/explore#([a-z0-9-]+)"/g)].map((match) => match[1]))];
 assert.equal(drawerHashes.length, 7, "The drawer lists every directory section");
 const sectionIds = new Set();
@@ -235,18 +234,23 @@ for (const file of ["components/home-page.tsx", "components/editors-picks.tsx", 
 for (const hash of drawerHashes) assert.ok(sectionIds.has(hash), `The drawer links /explore#${hash}, which no section owns`);
 
 // The landing page carries a browsing half of its own again: the section keys,
-// the editor's picks, the top ten and the tag shelf, in that order. The keys
-// point into /explore's own sections, because the lists themselves stay on that
-// page — a bare "#sites" would scroll nowhere from the homepage.
+// the editor's picks, the top ten, the URL request form and the tag shelf, in
+// that order. The keys point into /explore's own sections, because the lists
+// themselves stay on that page — a bare "#sites" would scroll nowhere from the
+// homepage.
 const band = home.indexOf('className="page-band"');
 const homeKeys = home.indexOf('className="quick-jumps"');
 const homePicks = home.indexOf("<EditorsPicks />");
 const homeTopTen = home.indexOf("<TopTen />");
+const homeSubmit = home.indexOf("<UrlRequest />");
 const homeTags = home.indexOf('id="browse-tags"');
 assert.ok(
-  band >= 0 && band < homeKeys && homeKeys < homePicks && homePicks < homeTopTen && homeTopTen < homeTags,
-  "The landing page runs section keys, then editor's picks, then the top ten, then the tags",
+  band >= 0 && band < homeKeys && homeKeys < homePicks && homePicks < homeTopTen && homeTopTen < homeSubmit && homeSubmit < homeTags,
+  "The landing page runs section keys, then editor's picks, then the top ten, then the request form, then the tags",
 );
+// The form is on both faces, so the hero anchors to the copy on screen and the
+// drawer keeps its link into /explore's own section.
+assert.ok(home.includes('href="#request-url"'), "The hero's submit button anchors to the form on the current page");
 assert.match(home, /href: "\/explore#sites"/, "The landing page's section keys point into /explore");
 for (const jump of ["editors-picks", "cool-sites", "cool-apis", "cool-apps", "cool-ais"]) {
   assert.ok(home.includes(`href: "/explore#${jump}"`), `The landing page's keys include the ${jump} section`);
@@ -260,6 +264,12 @@ assert.ok(topTen.includes("useSiteVotes(CANDIDATE_KEYS)"), "The top ten ranks re
 assert.ok(topTen.includes("rankByVotes(CANDIDATES, totals, RANKS)"), "The top ten uses the same ranking rule as /stats and the strips");
 assert.ok(topTen.includes("no votes yet"), "An unvoted entry shows no count rather than a made-up one");
 assert.ok(topTen.includes('id="top-ten"'), "The top ten owns a section a rail link can name");
+
+// The submission box no longer claims a private review queue, and the rule
+// that styled that line went with it.
+const urlRequestSource = fs.readFileSync("components/url-request.tsx", "utf8");
+assert.ok(!urlRequestSource.includes("Private review queue"), "The submission box no longer claims a private review queue");
+assert.ok(!fs.readFileSync("app/directory.css", "utf8").includes(".url-submission-note"), "The removed note's style rule is gone too");
 
 // The confirm-to-close leave warning is gone; the two quiet behaviors stay.
 const behaviors = fs.readFileSync("components/page-behaviors.tsx", "utf8");

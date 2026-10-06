@@ -220,7 +220,6 @@ html::-webkit-scrollbar, body::-webkit-scrollbar { display: none; width: 0; heig
 .url-submission .eyebrow { font-size: 10px; line-height: 1.6; margin-bottom: 12px; }
 .url-submission h2 { margin: 0; color: var(--text-strong); font-size: clamp(21px, 2.6vw, 26px); letter-spacing: -.035em; line-height: 1.18; }
 .url-submission-copy > p:not(.eyebrow) { color: var(--muted); font-size: 12.5px; line-height: 1.65; margin: 12px 0; }
-.url-submission-note { color: var(--accent-amber); font-size: 10px; line-height: 1.7; }
 .url-submission-form { display: flex; flex-direction: column; gap: 6px; min-width: 0; padding: 16px; border: 1px solid var(--line); border-radius: 18px; background: var(--surface); }
 .url-submission-copy { padding: 8px 0; }
 .url-submission-form:focus-within { border-color: color-mix(in srgb, var(--accent-amber) 50%, var(--line)); }
@@ -236,6 +235,10 @@ html::-webkit-scrollbar, body::-webkit-scrollbar { display: none; width: 0; heig
 .url-submit-button:hover { opacity: .85; }
 .url-submit-button:disabled { opacity: .5; cursor: wait; }
 .url-submission-privacy { margin: 2px 0 0; color: var(--muted); font-size: 10px; line-height: 1.7; }
+/* The form is on both faces. On the landing page it sits between the Top 10
+   and the tag shelf, so it needs room below it as well as the margin-top it
+   already carries; on /explore it is the last block and nothing follows it. */
+.page-band > .url-submission + .tag-strip { margin-top: 34px; }
 .url-submission :focus-visible, .submit-url-link:focus-visible, .footer-publications a:focus-visible, .admin-panel :focus-visible { outline: 2px solid var(--accent-sky); outline-offset: 4px; }
 .discussion-board { position: relative; border-color: color-mix(in srgb, var(--accent-sky) 30%, var(--line)); background: radial-gradient(ellipse at top right, color-mix(in srgb, var(--accent-sky) 11%, transparent), transparent 60%), var(--surface); box-shadow: 0 20px 50px -40px rgb(0 0 0 / 60%); }
 .discussion-heading { padding-bottom: 24px; border-bottom: 1px solid var(--line); }

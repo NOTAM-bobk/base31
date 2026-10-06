@@ -1,5 +1,17 @@
 [
   {
+    "version": "1.44.0",
+    "date": "2026-10-06",
+    "title": "Submit a URL from the homepage",
+    "summary": "The landing page carries the URL request form above its tag shelf and the hero's Submit a URL button anchors to it, and the submission box no longer claims a private review queue.",
+    "highlights": [
+      "The URL request form now sits on the landing page too, between the Top 10 and the tag shelf. Both copies post to the same Worker route, so a find can be passed on without opening /explore first.",
+      "The hero's Submit a URL button anchors to the copy on whatever page the visitor is reading, instead of always sending them to /explore.",
+      "The line “Private review queue. Never auto-published.” is gone from the submission box, along with the style rule that only that line used.",
+      "The landing page's section rail names the form as its own step, between Top 10 and Tags."
+    ]
+  },
+  {
     "version": "1.43.0",
     "date": "2026-10-06",
     "title": "The homepage gets its lists back",

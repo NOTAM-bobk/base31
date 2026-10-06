@@ -846,6 +846,7 @@ export default function HomePage({ dict = EN, locale = "en", mode = "home" }: { 
     { id: "page-title", label: "Top" },
     { id: "editors-picks", label: "Editor's picks" },
     { id: "top-ten", label: "Top 10" },
+    { id: "request-url", label: "Submit" },
     { id: "browse-tags", label: "Tags" },
     { id: "about", label: "About" },
     { id: "discussion", label: "Community" },
@@ -1143,9 +1144,9 @@ export default function HomePage({ dict = EN, locale = "en", mode = "home" }: { 
               <span className="surprise-icon" aria-hidden="true">↯</span>
               <span className="surprise-label">{dict.surprise}</span>
             </button>
-            {/* On the landing page the upload form lives with the directory,
-                so the link travels there and lands on the form itself. */}
-            <a className="submit-url-link" href={isExplore ? "#request-url" : "/explore#request-url"}><span className="submit-url-icon" aria-hidden="true">＋</span><span>Submit a URL</span><span className="submit-url-arrow" aria-hidden="true">↗</span></a>
+            {/* The submission form is on both faces now, so the button
+                anchors to the copy the visitor is already looking at. */}
+            <a className="submit-url-link" href="#request-url"><span className="submit-url-icon" aria-hidden="true">＋</span><span>Submit a URL</span><span className="submit-url-arrow" aria-hidden="true">↗</span></a>
           </div>
           {/* The directory's search. The landing page has no list to filter,
               so its hero carries the explore call to action instead and the
@@ -1245,6 +1246,14 @@ export default function HomePage({ dict = EN, locale = "en", mode = "home" }: { 
               numeral, a row, a flame. It reads the same shared vote totals the
               cards do, so the two can never disagree. */}
           <TopTen />
+
+          {/* The upload form is not the directory's alone: a visitor who found
+              something while browsing the homepage should be able to pass it
+              on without opening /explore first. It is the same component and
+              the same Worker route as the copy at the bottom of /explore, and
+              it sits between the Top 10 and the tag shelf so those two lists
+              stay the pair they were. */}
+          <UrlRequest />
 
           {/* Tags are an index of their own, so the landing page offers the
               shelf rather than only a link to it: every chip is a real

@@ -33,7 +33,6 @@ export default function UrlRequest() {
     <div className="url-submission-copy">
       <h2 id="request-url-heading">Found a keeper? Pass it on.</h2>
       <p>A tiny tool, a useful app, a wonderfully odd website. Send us a link you think belongs here.</p>
-      <span className="url-submission-note mono">Private review queue. Never auto-published.</span>
     </div>
     <form className="url-submission-form" onSubmit={submit}>
       <label htmlFor="request-website">Submit a URL</label><input id="request-website" name="request-url" type="url" required maxLength={2048} placeholder="https://your-favorite-find.com" />

@@ -70,6 +70,22 @@ assert.match(trustedSignal, /^[a-f0-9]{64}$/);
 assert.notEqual(trustedSignal, visitor(1), "The Worker replaces client-supplied rate-limit signals");
 const homepage = fs.readFileSync("components/home-page.tsx", "utf8");
 assert.match(homepage, /<AboutSection \/>\s*<DiscussionBoard \/>/);
-assert.ok(!fs.readFileSync("components/discussion-board.tsx", "utf8").includes("dangerouslySetInnerHTML"));
+const board = fs.readFileSync("components/discussion-board.tsx", "utf8");
+assert.ok(!board.includes("dangerouslySetInnerHTML"));
+
+// Avatars: DiceBear draws a deterministic picture from the display name, and
+// the name only ever travels as an encoded seed.
+const avatarModule = { exports: {} };
+new Function("module", "exports", ts.transpileModule(fs.readFileSync("lib/discussion-avatar.ts", "utf8"), { compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 } }).outputText)(avatarModule, avatarModule.exports);
+const { discussionAvatarUrl, DISCUSSION_AVATAR_STYLE } = avatarModule.exports;
+assert.equal(DISCUSSION_AVATAR_STYLE, "bottts");
+assert.equal(discussionAvatarUrl("Jane"), "https://api.dicebear.com/9.x/bottts/svg?seed=Jane");
+assert.equal(discussionAvatarUrl("  A B & C  "), "https://api.dicebear.com/9.x/bottts/svg?seed=A%20B%20%26%20C");
+assert.ok(discussionAvatarUrl("x?y=1").includes("seed=x%3Fy%3D1"), "The seed must be URL-encoded so a name cannot escape the query string");
+assert.equal(discussionAvatarUrl("Jane"), discussionAvatarUrl("Jane"), "The same name must draw the same avatar");
+assert.notEqual(discussionAvatarUrl("Jane"), discussionAvatarUrl("Sam"));
+assert.ok(board.includes("discussionAvatarUrl(message.name)"), "Every message builds its avatar from the display name");
+assert.ok(board.includes('loading="lazy"') && board.includes('alt=""'), "Avatars are decorative and lazy-loaded");
+assert.ok(!board.includes("message.name.slice(0, 1)"), "The old initial-letter placeholder is gone");
 db.close();
 console.log("Discussion tests passed: persisted threads, nested replies, atomic rate limits, pagination, moderation and validation.");

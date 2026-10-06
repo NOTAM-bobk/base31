@@ -248,6 +248,8 @@ Posting uses a display name (1–32 characters), plain-text body (1–2,000 char
 
 The board polls every 15 seconds only while the tab is visible; it is not WebSocket realtime. Drafts survive failed submissions but not page reloads. Only the display name is saved locally. Messages/names are public and names are **not verified identities**. Rate limits are basic protection, not a substitute for active moderation, CAPTCHA or authentication at higher traffic.
 
+Each message shows a small avatar built by the DiceBear API from the display name (style `bottts`, seed = the name). It is deterministic, so the same name always draws the same picture, and nothing is stored or uploaded. The request is made by the visitor's browser to `api.dicebear.com` and carries the name in its URL — it is a third-party request, not a local one. The avatar is decorative and hidden from assistive technology; the message header is what names the author.
+
 To moderate, configure `DISCUSSION_MODERATOR_SECRET` as a Worker secret and send an authenticated `POST /discussion/moderate` with `{ "id": 123 }` and the matching `x-discussion-secret` header from trusted tooling. Never expose this key in frontend configuration. Removal clears the author's name/body and leaves a tombstone so replies stay understandable; removing a root closes its thread to further replies. Visitors can report messages to `hello@base31.org`. There is no automatic moderation or self-service delete identity. Review reports and usage regularly.
 
 `npm run test:discussion` exercises the actual SQL against in-memory SQLite: messages, nested replies, concurrent rate limits, pagination, validation and moderation. It does not contact or write to the live Worker. Local tests and frontend CI do not prove the Worker has been deployed.
@@ -307,7 +309,7 @@ Homepage reveal state uses `data-revealed`, not a React-managed class, and the o
 
 Curated detail pages and tool guides ship canonical/social metadata and JSON-LD. `app/sitemap.ts` includes curated details and guides; community uploads aren't build-time sitemap entries. Static tools need their own title, description, canonical, social tags, `robots.txt`, and `sitemap.xml`—copy a maintained tool's structure and adapt the content. Never invent ratings, prices, or review dates.
 
-The root layout includes Google Analytics and Umami on every visit. Clarity and homepage ad scripts are consent-gated; some static tools have separate consent implementations or ungated scripts. Screenshot previews request third-party services (WordPress mShots/thum.io), and community favicon requests reach their own origins. Don't describe third-party requests as entirely local or automatically anonymous. See `app/privacy`, `lib/consent.ts`, and the consent-aware components before changing tracking behavior.
+The root layout includes Google Analytics and Umami on every visit. Clarity and homepage ad scripts are consent-gated; some static tools have separate consent implementations or ungated scripts. Screenshot previews request third-party services (WordPress mShots/thum.io), community favicon requests reach their own origins, and community discussion avatars are requested from the DiceBear API with the display name as their seed. Don't describe third-party requests as entirely local or automatically anonymous. See `app/privacy`, `lib/consent.ts`, and the consent-aware components before changing tracking behavior.
 
 Sponsored referrals must remain visibly disclosed and use sponsored link attributes. Editor's picks must remain distinct from those paid slots.
 

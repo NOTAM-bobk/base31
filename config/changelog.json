@@ -1,5 +1,15 @@
 [
   {
+    "version": "1.38.0",
+    "date": "2026-10-06",
+    "title": "Avatars for the discussion, and a playable pick",
+    "summary": "Every community discussion message now draws a deterministic avatar from its display name, and Runboli — a personal site you play inside Halo 3 — joins Other Cool Sites.",
+    "highlights": [
+      "Community discussion messages show a stable DiceBear avatar derived from the display name, so the same person looks the same without an account or an uploaded image.",
+      "Runboli, Runbo Li's personal website rebuilt as a playable Halo 3 campaign, joins Other Cool Sites and appears in the recently-added index."
+    ]
+  },
+  {
     "version": "1.37.0",
     "date": "2026-10-03",
     "title": "Tags, recently added, and an honest quality report",

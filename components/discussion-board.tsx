@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { FormEvent } from "react";
+import { discussionAvatarUrl } from "@/lib/discussion-avatar";
 
 type Message = { id: number; rootId: number | null; replyTo: number | null; name: string; body: string; createdAt: number; removed: number };
 type Thread = Message & { replies: Message[] };
@@ -75,7 +76,13 @@ export default function DiscussionBoard() {
   const renderMessage = (message: Message, thread: Thread) => {
     const parent = message.replyTo ? [thread, ...thread.replies].find(item => item.id === message.replyTo) : null;
     return <article className={`discussion-message${message.removed ? " is-removed" : ""}`} key={message.id} id={`message-${message.id}`}>
-      <div className="discussion-avatar" aria-hidden="true">{message.name.slice(0, 1).toUpperCase()}</div>
+      <div className="discussion-avatar" aria-hidden="true">
+        {/* DiceBear draws a stable avatar from the display name. It is
+            decorative, so it stays hidden from assistive tech — the header
+            reads the name itself. */}
+        {/* eslint-disable-next-line @next/next/no-img-element -- an SVG from the DiceBear API at a fixed 36px; next/image would need a remotePatterns entry for one decorative image. */}
+        <img src={discussionAvatarUrl(message.name)} alt="" width={36} height={36} loading="lazy" decoding="async" />
+      </div>
       <div className="discussion-message-copy">
         <header><strong>{message.name}</strong><time dateTime={new Date(message.createdAt).toISOString()}>{new Date(message.createdAt).toLocaleString(undefined, { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" })}</time></header>
         {parent && <span className="discussion-reply-label">↳ replying to {parent.name}</span>}

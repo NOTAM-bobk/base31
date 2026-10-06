@@ -370,5 +370,13 @@
     "category": "Games",
     "tags": ["game", "story", "writing", "adventure"],
     "description": "A rich browser-based narrative game set in a dark, surreal underground Victorian world."
+  },
+  {
+    "name": "Runboli",
+    "url": "https://runboli.com/",
+    "category": "Games",
+    "tags": ["games", "personal", "interactive", "art"],
+    "description": "Runbo Li's personal website rebuilt as a playable Halo 3 campaign: drop into the Guardian map, finish quests, and uncover hidden memories.",
+    "addedAt": "2026-10-06"
   }
 ]

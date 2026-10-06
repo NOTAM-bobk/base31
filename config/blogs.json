@@ -1,1 +1,632 @@
-[{"slug":"why-you-should-build-a-digital-garden","title":"Why Digital Gardens Are Replacing Traditional Blogs","description":"An introduction to digital gardens — non-linear, evolving web spaces where ideas grow over time rather than sinking under a chronological timeline.","date":"2026-09-23","tags":["digital garden","indie web","note taking","personal web"],"body":["Traditional blogs place content on a conveyor belt. The moment you publish a post, it begins to sink into the past, regardless of how relevant or useful it remains. Digital gardens flip this model on its head.","## Plant seeds, not posts","A digital garden is organized by topic and connection rather than publication date. Instead of publishing finished essays, gardeners post rough notes, half-formed thoughts, and ongoing research, updating pages as their understanding deepens.","## Why the format works so well","Moving away from chronological feeds changes how you write and think on the web. It takes away the pressure to deliver polished, definitive answers and encourages continuous learning.","## Core features of a digital garden","- Bi-directional links that connect related concepts across different pages.","- Growth status indicators showing whether a page is a seedling, a sprout, or an evergreen piece.","- Non-linear navigation that allows readers to explore through topics rather than dates.","- Minimal analytics and distraction-free design focused on readability.","## How to cultivate your own","You do not need a complex setup to start. A collection of linked markdown files deployed to a static host is enough to begin planting your first ideas."]},{"slug":"the-magic-of-browser-audio-toys","title":"The Joy of Single-Purpose Web Audio Toys","description":"Why tiny, browser-based sound generators, synthesizer toys, and ambient noise machines offer a peaceful alternative to algorithmic streaming.","date":"2026-09-24","tags":["web audio","sound toys","creative web","fun websites"],"body":["In an internet dominated by endless recommendation algorithms and heavy web applications, single-purpose web audio toys remain a quiet delight.","## Creativity inside a single tab","Web audio experiments strip away complexity. They give you a interactive grid, a canvas of bouncing nodes, or a simple generative drone synthesizer that responds to mouse movements in real time.","## What makes web audio projects special","The Web Audio API allows developers to synthesize sound directly inside the browser without downloading heavy software or creating an account. You open a tab, click around, and create music immediately.","## Examples worth seeking out","- Generative ambient noise generators that react to your local weather.","- Canvas-based step sequencers where visual shapes create rhythmic loops.","- Interactive radio maps that let you listen to broadcast stations across the globe.","- Virtual synthesizer keyboards designed with retro retro-futuristic interfaces.","## Taking a break from feed culture","Spending ten minutes manipulating sound waves in a browser tab offers genuine playfulness without demanding your attention or tracking your habits."]},{"slug":"bringing-back-the-webring","title":"Why Webrings and Blogrolls Are Making a Comeback","description":"How human curation and mutual linking are rebuilding a connected, serendipitous web away from centralized social media platforms.","date":"2026-09-25","tags":["webring","blogroll","indie web","web history"],"body":["Before social media algorithms decided what you should read next, websites were connected through human trust. Webrings and blogrolls were the original discovery engine of the internet, and they are experiencing a major revival.","## The mechanics of mutual discovery","A webring is a collection of sites linked together in a circular structure. Each site contains navigation controls to jump to the previous or next site in the ring. A blogroll, similarly, is a simple list of recommended sites curated by an author.","## Why human curation beats the algorithm","Algorithms optimize for engagement, which often leads to outrage and repetition. Human recommendation lists optimize for affinity, sharing sites simply because someone thought they were neat or valuable.","## Advantages of decentralized discovery","- No single point of failure or centralized platform controlling traffic.","- Authentic recommendations based on shared interests rather than viral potential.","- Direct connections between independent creators and readers.","- Serendipitous browsing that leads you to unusual, hyper-niche projects.","## Joining the small web movement","Adding a blogroll or joining a topic-specific webring is one of the simplest steps you can take to help keep the independent web interconnected."]},{"slug":"reclaiming-your-attention-with-rss","title":"Reclaiming Your Attention with RSS","description":"Take back control of your media diet by using Really Simple Syndication (RSS) to read what you want, when you want, without the algorithmic noise.","date":"2026-09-26","tags":["rss","indie web","digital minimalism","focus"],"body":["Modern social media feeds are designed to keep you scrolling infinitely. RSS (Really Simple Syndication) offers an escape hatch, returning control of what you consume back to you.","## The algorithmic trap","When a platform controls your feed, it prioritizes content that maximizes your time on site. This often means surfacing controversial or high-emotion posts rather than the nuanced, thoughtful writing you actually wanted to read.","## The RSS solution","RSS flips the power dynamic. Instead of visiting ten different sites or relying on a social feed to show you updates, you subscribe to a site's RSS feed. When the author publishes something new, it drops directly into your RSS reader.","## Getting started with RSS","- Find a reader: Applications like NetNewsWire, Feedly, or Miniflux are excellent starting points.","- Look for the icon: Keep an eye out for the classic orange radio-wave icon on your favorite blogs.","- Curate ruthlessly: Only subscribe to voices that genuinely add value to your day.","- Read at your own pace: Unread counts in an RSS reader aren't an inbox to clear; they are a library waiting for you.","## A quieter internet","Switching to RSS means opting out of the attention economy and returning to a more intentional, quieter internet experience."]},{"slug":"markdown-the-forever-format","title":"Markdown: The Forever Format for Your Thoughts","description":"Why plain text and Markdown remain the most durable, portable, and reliable ways to store your writing for the long term.","date":"2026-09-27","tags":["markdown","writing","note taking","plain text"],"body":["Apps come and go, companies pivot, and proprietary file formats eventually become obsolete. If you want your writing to last decades, you need to store it in plain text.","## Avoiding vendor lock-in","When you write your notes in a specialized application with a closed database, you don't truly own your data. If the app shuts down or introduces a mandatory subscription fee, extracting your work can be a nightmare.","## The beauty of simplicity","Markdown is a lightweight markup language that allows you to add formatting (like headers, bold text, and lists) using standard keyboard characters. It requires no specialized software to open—just a basic text editor.","## Why Markdown endures","- Human readable: Even without a Markdown viewer, the raw text makes perfect sense.","- Universally supported: Almost every modern blogging platform, static site generator, and note-taking app supports it.","- Version control friendly: Plain text files play beautifully with Git, allowing you to track changes over time.","- Incredibly lightweight: A lifetime of writing in plain text can fit on a cheap USB drive.","## Future-proofing your data","By standardizing your notes and blog drafts in Markdown, you ensure that your digital legacy remains accessible regardless of which software dominates the market in twenty years."]},{"slug":"the-charm-of-brutalist-web-design","title":"The Charm of Brutalist Web Design","description":"Exploring the aesthetic and functional benefits of stripped-down, lightweight web design that prioritizes content over complex styling.","date":"2026-09-28","tags":["web design","brutalism","performance","accessibility"],"body":["The modern web is bloated. Websites routinely load megabytes of JavaScript, massive tracking frameworks, and high-resolution videos just to display a few paragraphs of text. Brutalism is the natural pushback.","## Less is definitely more","Web brutalism takes its name from brutalist architecture, which showcases raw materials like concrete. In web design, the raw materials are unstyled HTML, system fonts, and default browser behaviors.","## Why brutalism works","By stripping away heavy CSS frameworks and complex animations, brutalist websites put the focus entirely on the content. They don't try to be apps; they are proudly, fundamentally web pages.","## Key elements of brutalist design","- Default system fonts like Times New Roman, Arial, or monospace.","- High contrast, sometimes clashing color palettes.","- Visible borders and lack of drop shadows or gradients.","- Extremely fast load times, even on slow network connections.","## Speed as a feature","In a world where attention spans are short and mobile data can be expensive, a website that loads in 200 milliseconds is a profound luxury. Brutalism proves that you don't need a heavy framework to make a statement."]},{"slug":"why-local-first-software-matters","title":"Why Local-First Software Matters More Than Ever","description":"A look into the local-first software movement, ensuring users retain ownership, speed, and offline capability in their applications.","date":"2026-09-29","tags":["local-first","software architecture","privacy","offline"],"body":["We have grown accustomed to software that only works when we have an internet connection. Local-first software is a paradigm shift aiming to bring data ownership and speed back to our local devices.","## The cloud dependency problem","Cloud software is incredibly convenient for collaboration, but it comes with significant drawbacks. If your internet goes down, you can't work. If the service experiences an outage, your data is hostage.","## What does local-first mean?","Local-first applications store your primary data on your local hard drive and use the cloud purely for synchronization and backup, rather than as the primary source of truth.","## Core benefits of a local-first approach","- Zero latency: Applications respond instantly because they don't have to wait for a server round-trip.","- True offline capability: You can work on an airplane, in a cabin, or during a network outage without missing a beat.","- Data ownership: Your files live on your computer in open formats, meaning you aren't tied to a specific provider.","- Privacy by default: Because data is processed locally, sensitive information doesn't need to traverse the internet.","## The future of personal computing","By combining the responsiveness of classic desktop apps with the seamless collaboration of cloud apps, local-first software represents the next logical step in how we build for the web."]},{"slug":"building-a-personal-api","title":"Building a Personal API for Your Life","description":"How exposing your own reading lists, watch logs, and listening habits through a simple API can foster a more interconnected, open web.","date":"2026-09-30","tags":["api","quantified self","indie web","open data"],"body":["Personal websites are usually static, offering a one-way broadcast of information. But what if your website could talk to other websites automatically? Enter the personal API.","## Sharing beyond the feed","A personal API allows you to expose structured data about your digital life. Instead of just writing a blog post about a book you read, you can output a JSON file of your current reading list for other developers to parse.","## What is a personal API?","It is simply a set of endpoints hosted on your domain that returns lightweight data about your activities, making your personal site programmable.","## Ideas for your personal API endpoints","- /api/now-playing: Pull data from Last.fm or Spotify to show what track you are currently listening to.","- /api/reading: A live feed of the books you are currently reading, drawn from an open database.","- /api/status: A micro-blogging endpoint that displays your current location or general mood.","- /api/projects: A structured list of your active repositories or creative pursuits.","## Connecting the small web","When multiple people run personal APIs, we can build custom dashboards, dynamic blogrolls, and ambient social networks that exist entirely outside of corporate silos."]},{"slug":"the-revival-of-the-personal-homepage","title":"The Revival of the Personal Homepage","description":"Why people are fleeing homogenized social profiles to build their own quirky, personalized corners of the web.","date":"2026-10-01","tags":["personal web","indie web","web design","nostalgia"],"body":["For the past decade, our online identities have been squeezed into sterile, blue-and-white templates on massive social platforms. But a rebellion is brewing: the personal homepage is back.","## Rented space vs. owned land","Building your identity on a social media platform is like decorating a rented apartment where the landlord can change the locks at any time. A personal homepage on a custom domain is a house you own.","## Embrace the quirky web","Platforms enforce uniformity. Personal sites enforce creativity. We are seeing a glorious return to custom cursors, bizarre color schemes, webmaster badges, and layouts that break the rules of corporate UX.","## Why build one?","- Complete creative control over how you present yourself.","- A centralized hub for your links, projects, and thoughts.","- An opportunity to learn basic HTML and CSS in a low-stakes environment.","- A way to express your personality without algorithms judging its \"engagement\" value.","## Reclaiming the weird internet","If you miss the days when surfing the web felt like exploring strange new worlds rather than scrolling a sanitized mall, building your own homepage is the first step to bringing that magic back."]},{"slug":"fighting-link-rot-on-the-web","title":"Fighting Link Rot: How to Build Websites That Last","description":"Strategies for preserving your digital footprint and ensuring your web links don't break over time.","date":"2026-10-02","tags":["web history","link rot","web architecture","preservation"],"body":["Have you ever clicked a bookmark from five years ago only to be met with a frustrating 404 error? This phenomenon is known as link rot, and it is quietly destroying the history of the internet.","## The ephemeral web","Websites redesign, domains expire, and content management systems change URL structures. When this happens, inbound links from across the web break, severing the connective tissue of information.","## Cool URIs don't change","In 1998, web pioneer Tim Berners-Lee wrote an essay stating that a well-designed URL should never need to change. If you structure your site correctly, a link created today should still work in fifty years.","## Strategies for link longevity","- Avoid file extensions in URLs: Link to /about/ instead of /about.html or /about.php.","- Keep URLs simple and hierarchical: Don't include temporary database IDs or complex query strings in your permanent links.","- Setup proper redirects: If you must move a page, always use a 301 Permanent Redirect to forward traffic from the old URL to the new one.","- Use the Internet Archive: Submit your most important pages to the Wayback Machine so a snapshot exists even if your server dies.","## Your responsibility as a webmaster","By designing thoughtful, durable URL structures, you are contributing to a more reliable, historical, and robust web."]},{"slug":"introduction-to-the-indieweb","title":"Owning Your Data: An Introduction to the IndieWeb","description":"Take back your online identity by self-hosting your content and syndicating it everywhere else.","date":"2026-10-03","tags":["indie web","posse","self-hosting","webmentions"],"body":["The IndieWeb is a community of independent, personal websites connected by open standards. It is based on a simple premise: your content is yours, and you should own it.","## The problem with silos","When you post a photo to Instagram or a thought to Twitter, you are giving away your content to a corporate silo. They monetize your data, and if they shut down or ban you, your history is gone.","## The IndieWeb philosophy","The core principle is owning your domain name. Your personal website becomes the primary home for everything you create—your photos, articles, status updates, and bookmarks.","## POSSE: Publish (on your) Own Site, Syndicate Elsewhere","You don't have to quit social media to join the IndieWeb. With POSSE, you publish a post on your own blog first, and then automatically push a copy of it out to social networks to reach your audience.","## Webmentions: The decentralized comment section","Instead of a centralized database of comments, IndieWeb sites use Webmentions. If someone writes a response to your blog post on their own blog, their server sends a notification to your server, and their comment appears on your site.","## A resilient web","The IndieWeb isn't a single piece of software; it's a movement to build an internet that outlasts any single tech company."]},{"slug":"why-static-sites-are-the-future","title":"Why Static Sites Are the Future of Personal Publishing","description":"The security, speed, and simplicity benefits of using static site generators like Eleventy and Hugo.","date":"2026-10-04","tags":["static site generators","web development","jamstack","performance"],"body":["For years, Content Management Systems (CMS) like WordPress dominated web publishing. But for personal blogs and portfolios, a simpler, faster alternative has taken over: the Static Site Generator (SSG).","## The database bottleneck","A traditional CMS requires a database and a server. Every time someone visits your site, the server runs code, queries the database, stitches the page together, and sends it to the browser. This takes time and computing power.","## Enter the SSG","A Static Site Generator works differently. It takes your raw content (usually Markdown files) and templates, and builds the entire website into basic HTML files ahead of time. When a user visits, the server just hands them the ready-made file.","## Why static sites win","- Blazing fast speed: Pre-built HTML files load almost instantly, providing an incredible user experience.","- Bulletproof security: With no database to hack and no server-side code to exploit, static sites are inherently secure.","- Cheap and easy hosting: You can host static files for free on services like GitHub Pages, Netlify, or Vercel.","- Version control: Because your entire site is just text files, you can store it in Git and track every change you ever make.","## Developer joy","Tools like Eleventy, Hugo, and Astro have made building static sites an incredibly fun, flexible, and rewarding experience for developers and writers alike."]},{"slug":"web-accessibility-is-not-optional","title":"Web Accessibility is Not Optional","description":"Simple steps to make your personal website welcoming and usable for everyone, regardless of ability.","date":"2026-10-05","tags":["accessibility","a11y","web design","inclusive design"],"body":["The web was designed to be universal, but modern design trends often leave disabled users behind. Making your personal website accessible isn't just about compliance; it's about basic empathy.","## Designing for humans","Accessibility (often abbreviated as a11y) means ensuring that people with visual, motor, auditory, or cognitive disabilities can navigate and understand your website.","## The foundation: Semantic HTML","The easiest way to make a site accessible is to use HTML the way it was intended. A button should be a <button>, a link should be an <a>, and your headings should follow a logical order (H1, then H2, etc.). Screen readers rely on this structure.","## High-impact accessibility fixes","- Meaningful alt text: Always describe images in the alt attribute so visually impaired users know what is on the screen.","- Keyboard navigation: Ensure every interactive element on your site can be reached and used with just the Tab and Enter keys.","- Color contrast: Grey text on a slightly lighter grey background is impossible for many to read. Ensure high contrast between text and background.","- Respect user preferences: Use CSS media queries like prefers-reduced-motion to disable animations for users who get motion sickness.","## The inclusive web","An accessible website is simply a better website. The improvements you make for disabled users almost always create a clearer, faster, and more robust experience for everyone else."]},{"slug":"how-to-get-your-site-discovered","title":"How a Small Website Gets Found in 2026","description":"Search, directories, webrings and word of mouth: a practical look at how a one-person site actually finds readers instead of waiting to be stumbled upon.","date":"2026-10-06","tags":["seo","discovery","indie web","small web"],"body":["Publishing is the easy half. The hard half is the part nobody sees: helping the right person arrive at a page you made in an afternoon, without turning your site into a marketing funnel.","## Search still does the heavy lifting","Most visitors to a small site arrive from a search engine looking for one specific thing. That rewards pages with a clear subject: a page about a single tool, game, or answer will outperform a page that tries to cover everything. Write the title the way somebody would type the question, and answer it in the first paragraph rather than the fourth.","## Directories are the shortcut","A good directory does discovery work for you. It groups sites by what they do, links out without an interstitial, and gives a crawler a reason to come back. One listing in a curated place is worth more than a hundred automatic backlinks, and it costs nothing but a description that says plainly what the site is.","## The parts nobody counts","- Word of mouth: the friend who sends one link to another friend who needed exactly that thing.","- Webrings and link pages: small communities that trade visitors instead of audiences.","- Writing about the work: a short post explaining what you built and why tends to outrank the thing itself.","- Longevity: a site that is still online in five years collects links the way a tree collects rings.","## Make one page worth linking to","You do not need a content strategy. You need one page somebody would bookmark, send to a friend, or cite in a forum thread. Everything else on the site exists to make that page easy to find and pleasant to read."]},{"slug":"why-browser-games-still-matter","title":"Why Browser Games Are Quietly Thriving","description":"No installs, no accounts, no thirty-gigabyte download: a look at why short games that live in a browser tab are finding players again.","date":"2026-10-07","tags":["browser games","games","creative web","fun websites"],"body":["The most-played games on a given day are not the ones with the biggest budgets. They are the ones that load in a second inside a tab that was already open.","## The shortest possible path to play","A browser game asks for nothing. No store page, no launcher, no update, no account, and no tutorial that treats the first ten minutes as an audition. You click and you are playing, which is the whole reason the format outlived every platform shift since Flash.","## Constraints become the design","When you cannot count on a powerful machine, a long download, or a returning audience, you build around a single mechanic. Some of the best games in any browser are one screen, one button and one idea, executed well enough that you play four more rounds than you meant to.","## What a good one gets right","- It fits one screen, with no scrolling and no fullscreen prompt.","- The controls work without reading instructions, and the pointer is never trapped in the tab.","- It ends. A session you can finish is easier to recommend than a world that needs maintaining.","- Sound stays off until it is asked for, because half of these tabs are open at work.","## The shelf life is the feature","A game that runs in a browser keeps working on machines that will never install anything again. That is a strange kind of permanence, and it is why a directory of tiny games is still worth browsing."]},{"slug":"why-plain-text-outlasts-software","title":"Why Plain Text Outlives the Software That Made It","description":"Notes, drafts and documentation saved as plain text keep opening decades later, which makes the most boring file format on the web the safest bet.","date":"2026-10-08","tags":["plain text","markdown","writing","archiving"],"body":["Every few years a company stops making the app your notes live in. The files stay on the drive, the app that can read them does not, and what you actually own stops being a philosophical question and becomes a practical one.","## A file is not the same thing as access","A file format is a promise that some piece of software will keep existing to read it. Plain text makes a much smaller promise: that any computer will open it, now or in twenty years, with no licence, no version and no migration.","## Markdown is the compromise that held","Markdown was designed to be readable before anything renders it, which is why it spread so far. Write a heading with a hash and a list with a dash and you get a file that is legible raw and formatted later, in a browser, an editor, or a static site generator.","## What plain text is good at","- Notes and drafts that mainly need to be readable rather than designed.","- Configuration, documentation and README files that live next to code.","- Anything you expect to still care about after the tool you wrote it in has been discontinued.","## The habit matters more than the format","Keep notes as files the machine can already open, name them so they can be found without searching, and back them up somewhere that is not one company's account. Plain text is not nostalgia. It is the only format with no expiry date."]},{"slug":"how-to-make-a-website-feel-fast","title":"How to Make a Website Feel Fast Without a Rewrite","description":"Four changes that make a small site feel instant on a phone: honest images, fewer fonts, no third-party scripts ahead of the content, and a layout that never jumps.","date":"2026-10-09","tags":["web performance","design","static sites","accessibility"],"body":["Speed is the cheapest design upgrade there is and the one most small sites skip, because it is invisible when it works. It does not need a new framework. It needs four decisions.","## Serve images at the size they are displayed","A photograph exported for print and scaled down in CSS is the most common reason a small site feels heavy on a phone. Export at the width it actually renders, use a modern format, and set width and height so the text does not jump around while the picture arrives.","## Cut a font you are not using","Every typeface is a download before the first word can be read. Two families are plenty, one is often better, and a system font stack costs nothing at all. If a face is only used for headings, load only that weight.","## Keep third-party scripts off the critical path","Analytics, chat widgets and consent banners all queue ahead of your content unless you make them wait. Load them after the page is usable, and question every one of them: a script that has never told you anything useful has been charging rent in milliseconds.","## Make the layout predictable","- Reserve space for anything that loads late, so nothing shifts under a reader's thumb.","- Choose a fallback font that matches the real one closely, so the swap is not a layout change.","- Keep the first screen useful with images unsent and JavaScript blocked.","- Measure on a phone on a slow connection, not on the machine you build on.","## Fast is a feeling","Nobody perceives a millisecond. People notice a page that is readable before they finish scrolling to it, and they notice the one that is not. Build for the second case and the numbers look after themselves."]},{"slug":"how-to-build-a-personal-website","title":"How to Build a Personal Website People Remember","description":"A practical guide to making a personal website memorable: choose a clear idea, write a useful homepage, and make the site feel like yours.","date":"2026-10-10","tags":["personal website","web design","indie web","beginner guide"],"body":["A personal website does not need a complicated visual identity or a clever growth strategy. It needs one clear reason to exist and enough personality that a visitor can tell a person made it.","## Start with a promise","The strongest personal homepages answer a simple question in their first few lines: what will I find here? You might publish notes about local history, document a project, collect field recordings, or keep a list of tools you actually use. A focused promise is easier to remember than a biography that tries to include everything.","## Give the homepage a job","Treat the homepage as a helpful starting point rather than a poster. Link to your best work, explain what changed recently, and make the next click obvious. A short introduction, a few durable links, and a visible contact method are usually more useful than a grid of decorative sections.","## Make it unmistakably yours","Personal does not mean adding random effects. It can be a recurring color, a hand-written heading, a strange but useful navigation label, or a page about a niche interest that would never survive a corporate design review. Small choices create recognition.","## Design for return visits","Add a page that changes over time: a now page, reading list, project log, or monthly notes. A returning visitor should see evidence that the site is alive. Keep older pages available so the website becomes an archive instead of a stream that disappears.","## Let the site stay small","A website is easier to maintain when every part earns its place. Start with a few plain pages, use readable HTML, and add features only when they solve a real problem. The best personal website is often the one its owner can still update a year later."]},{"slug":"what-is-the-indie-web","title":"What Is the Indie Web? A Practical Guide to Owning Your Online Presence","description":"Learn what the IndieWeb means, why owning a domain matters, and how to start publishing on a personal site without leaving the social web behind.","date":"2026-10-11","tags":["indie web","personal website","publishing","digital ownership"],"body":["The Indie Web is a way of using the internet in which your own website is the primary home for your writing, projects, photos, and identity. It is less about a specific platform than a set of habits: own a domain, publish on your site first, and make it easy for other people to connect with you.","## Your domain is an address you control","A profile on a social platform is convenient, but its layout, reach, and rules belong to someone else. A domain gives your work a stable address. You can change hosts, redesign the site, or move from a static generator to a different tool without changing the link people use to find you.","## Publish on your site first","POSSE — Publish on your Own Site, Syndicate Elsewhere — does not require abandoning social media. Write the durable version on your own domain, then share a shorter version wherever your friends already are. The post, archive, and context remain yours even if a feed changes.","## Link out generously","The Indie Web grows through links rather than locked recommendation systems. Keep a blogroll, cite the source of an idea, join a webring, or link to a small project you enjoyed. Good outbound links make a personal site useful even when the author is not trying to become an influencer.","## Start with one durable page","You can begin with an about page, a contact address, and one page that explains something you know. Add an RSS feed when you have updates, and use plain URLs that will still make sense years from now. The goal is not to launch a perfect site; it is to create a home you can keep improving.","## Keep the social web in its place","Social platforms can still be good places to meet people and discover ideas. The difference is that they become distribution channels rather than the only copy of your work. Owning the original gives you a backup, a long memory, and a place where your choices are yours."]},{"slug":"how-to-make-a-website-worth-bookmarking","title":"How to Make a Website Worth Bookmarking","description":"The small details that turn a website from a one-time click into a useful bookmark: clear purpose, fast pages, durable URLs, and something worth returning to.","date":"2026-10-12","tags":["website ideas","web design","user experience","small web"],"body":["A website earns a bookmark when it saves someone time, gives them a feeling, or helps them do something they cannot do as easily somewhere else. It does not need thousands of pages. It needs a reason to come back.","## Solve one recognizable problem","A focused site is easier to remember than a homepage that promises everything. A neighborhood archive, a browser toy, a collection of public-domain maps, and a carefully edited directory all tell visitors what they are for. Name the problem in the page title and the first paragraph.","## Make the first visit effortless","Do not make people create an account before they understand the site. Keep the first interaction visible, use familiar controls, and explain unusual behavior before it surprises anyone. A useful empty state is better than a page that looks broken.","## Speed is part of the idea","A site that loads quickly feels more trustworthy because it respects the visitor's time. Resize images, avoid unnecessary scripts, reserve space for content that loads later, and test on a phone with a slow connection. Performance is not only a technical metric; it is part of the welcome.","## Build a return loop","Give people a reason to revisit without manufacturing urgency. A weekly collection, a growing archive, a rotating puzzle, a project changelog, or a page of new links can create a natural rhythm. Tell visitors what changes and how often.","## Use URLs that can age well","A bookmark should still work after a redesign. Prefer short, descriptive paths, keep old URLs redirected, and avoid putting temporary database details in the address. The web becomes more useful when a link from today remains readable next year.","## Leave a human trace","The memorable part is often a sentence, a note about how the project was made, or a link to the person behind it. Utility gets someone to save a site. Care is what makes them recommend it."]}]
+[
+  {
+    "slug": "why-you-should-build-a-digital-garden",
+    "title": "Why Digital Gardens Are Replacing Traditional Blogs",
+    "description": "An introduction to digital gardens — non-linear, evolving web spaces where ideas grow over time rather than sinking under a chronological timeline.",
+    "date": "2026-09-23",
+    "tags": [
+      "digital garden",
+      "indie web",
+      "note taking",
+      "personal web"
+    ],
+    "body": [
+      "Traditional blogs place content on a conveyor belt. The moment you publish a post, it begins to sink into the past, regardless of how relevant or useful it remains. Digital gardens flip this model on its head.",
+      "## Plant seeds, not posts",
+      "A digital garden is organized by topic and connection rather than publication date. Instead of publishing finished essays, gardeners post rough notes, half-formed thoughts, and ongoing research, updating pages as their understanding deepens.",
+      "## Why the format works so well",
+      "Moving away from chronological feeds changes how you write and think on the web. It takes away the pressure to deliver polished, definitive answers and encourages continuous learning.",
+      "## Core features of a digital garden",
+      "- Bi-directional links that connect related concepts across different pages.",
+      "- Growth status indicators showing whether a page is a seedling, a sprout, or an evergreen piece.",
+      "- Non-linear navigation that allows readers to explore through topics rather than dates.",
+      "- Minimal analytics and distraction-free design focused on readability.",
+      "## How to cultivate your own",
+      "You do not need a complex setup to start. A collection of linked markdown files deployed to a static host is enough to begin planting your first ideas."
+    ]
+  },
+  {
+    "slug": "the-magic-of-browser-audio-toys",
+    "title": "The Joy of Single-Purpose Web Audio Toys",
+    "description": "Why tiny, browser-based sound generators, synthesizer toys, and ambient noise machines offer a peaceful alternative to algorithmic streaming.",
+    "date": "2026-09-24",
+    "tags": [
+      "web audio",
+      "sound toys",
+      "creative web",
+      "fun websites"
+    ],
+    "body": [
+      "In an internet dominated by endless recommendation algorithms and heavy web applications, single-purpose web audio toys remain a quiet delight.",
+      "## Creativity inside a single tab",
+      "Web audio experiments strip away complexity. They give you a interactive grid, a canvas of bouncing nodes, or a simple generative drone synthesizer that responds to mouse movements in real time.",
+      "## What makes web audio projects special",
+      "The Web Audio API allows developers to synthesize sound directly inside the browser without downloading heavy software or creating an account. You open a tab, click around, and create music immediately.",
+      "## Examples worth seeking out",
+      "- Generative ambient noise generators that react to your local weather.",
+      "- Canvas-based step sequencers where visual shapes create rhythmic loops.",
+      "- Interactive radio maps that let you listen to broadcast stations across the globe.",
+      "- Virtual synthesizer keyboards designed with retro retro-futuristic interfaces.",
+      "## Taking a break from feed culture",
+      "Spending ten minutes manipulating sound waves in a browser tab offers genuine playfulness without demanding your attention or tracking your habits."
+    ]
+  },
+  {
+    "slug": "bringing-back-the-webring",
+    "title": "Why Webrings and Blogrolls Are Making a Comeback",
+    "description": "How human curation and mutual linking are rebuilding a connected, serendipitous web away from centralized social media platforms.",
+    "date": "2026-09-25",
+    "tags": [
+      "webring",
+      "blogroll",
+      "indie web",
+      "web history"
+    ],
+    "body": [
+      "Before social media algorithms decided what you should read next, websites were connected through human trust. Webrings and blogrolls were the original discovery engine of the internet, and they are experiencing a major revival.",
+      "## The mechanics of mutual discovery",
+      "A webring is a collection of sites linked together in a circular structure. Each site contains navigation controls to jump to the previous or next site in the ring. A blogroll, similarly, is a simple list of recommended sites curated by an author.",
+      "## Why human curation beats the algorithm",
+      "Algorithms optimize for engagement, which often leads to outrage and repetition. Human recommendation lists optimize for affinity, sharing sites simply because someone thought they were neat or valuable.",
+      "## Advantages of decentralized discovery",
+      "- No single point of failure or centralized platform controlling traffic.",
+      "- Authentic recommendations based on shared interests rather than viral potential.",
+      "- Direct connections between independent creators and readers.",
+      "- Serendipitous browsing that leads you to unusual, hyper-niche projects.",
+      "## Joining the small web movement",
+      "Adding a blogroll or joining a topic-specific webring is one of the simplest steps you can take to help keep the independent web interconnected."
+    ]
+  },
+  {
+    "slug": "reclaiming-your-attention-with-rss",
+    "title": "Reclaiming Your Attention with RSS",
+    "description": "Take back control of your media diet by using Really Simple Syndication (RSS) to read what you want, when you want, without the algorithmic noise.",
+    "date": "2026-09-26",
+    "tags": [
+      "rss",
+      "indie web",
+      "digital minimalism",
+      "focus"
+    ],
+    "body": [
+      "Modern social media feeds are designed to keep you scrolling infinitely. RSS (Really Simple Syndication) offers an escape hatch, returning control of what you consume back to you.",
+      "## The algorithmic trap",
+      "When a platform controls your feed, it prioritizes content that maximizes your time on site. This often means surfacing controversial or high-emotion posts rather than the nuanced, thoughtful writing you actually wanted to read.",
+      "## The RSS solution",
+      "RSS flips the power dynamic. Instead of visiting ten different sites or relying on a social feed to show you updates, you subscribe to a site's RSS feed. When the author publishes something new, it drops directly into your RSS reader.",
+      "## Getting started with RSS",
+      "- Find a reader: Applications like NetNewsWire, Feedly, or Miniflux are excellent starting points.",
+      "- Look for the icon: Keep an eye out for the classic orange radio-wave icon on your favorite blogs.",
+      "- Curate ruthlessly: Only subscribe to voices that genuinely add value to your day.",
+      "- Read at your own pace: Unread counts in an RSS reader aren't an inbox to clear; they are a library waiting for you.",
+      "## A quieter internet",
+      "Switching to RSS means opting out of the attention economy and returning to a more intentional, quieter internet experience."
+    ]
+  },
+  {
+    "slug": "markdown-the-forever-format",
+    "title": "Markdown: The Forever Format for Your Thoughts",
+    "description": "Why plain text and Markdown remain the most durable, portable, and reliable ways to store your writing for the long term.",
+    "date": "2026-09-27",
+    "tags": [
+      "markdown",
+      "writing",
+      "note taking",
+      "plain text"
+    ],
+    "body": [
+      "Apps come and go, companies pivot, and proprietary file formats eventually become obsolete. If you want your writing to last decades, you need to store it in plain text.",
+      "## Avoiding vendor lock-in",
+      "When you write your notes in a specialized application with a closed database, you don't truly own your data. If the app shuts down or introduces a mandatory subscription fee, extracting your work can be a nightmare.",
+      "## The beauty of simplicity",
+      "Markdown is a lightweight markup language that allows you to add formatting (like headers, bold text, and lists) using standard keyboard characters. It requires no specialized software to open—just a basic text editor.",
+      "## Why Markdown endures",
+      "- Human readable: Even without a Markdown viewer, the raw text makes perfect sense.",
+      "- Universally supported: Almost every modern blogging platform, static site generator, and note-taking app supports it.",
+      "- Version control friendly: Plain text files play beautifully with Git, allowing you to track changes over time.",
+      "- Incredibly lightweight: A lifetime of writing in plain text can fit on a cheap USB drive.",
+      "## Future-proofing your data",
+      "By standardizing your notes and blog drafts in Markdown, you ensure that your digital legacy remains accessible regardless of which software dominates the market in twenty years."
+    ]
+  },
+  {
+    "slug": "the-charm-of-brutalist-web-design",
+    "title": "The Charm of Brutalist Web Design",
+    "description": "Exploring the aesthetic and functional benefits of stripped-down, lightweight web design that prioritizes content over complex styling.",
+    "date": "2026-09-28",
+    "tags": [
+      "web design",
+      "brutalism",
+      "performance",
+      "accessibility"
+    ],
+    "body": [
+      "The modern web is bloated. Websites routinely load megabytes of JavaScript, massive tracking frameworks, and high-resolution videos just to display a few paragraphs of text. Brutalism is the natural pushback.",
+      "## Less is definitely more",
+      "Web brutalism takes its name from brutalist architecture, which showcases raw materials like concrete. In web design, the raw materials are unstyled HTML, system fonts, and default browser behaviors.",
+      "## Why brutalism works",
+      "By stripping away heavy CSS frameworks and complex animations, brutalist websites put the focus entirely on the content. They don't try to be apps; they are proudly, fundamentally web pages.",
+      "## Key elements of brutalist design",
+      "- Default system fonts like Times New Roman, Arial, or monospace.",
+      "- High contrast, sometimes clashing color palettes.",
+      "- Visible borders and lack of drop shadows or gradients.",
+      "- Extremely fast load times, even on slow network connections.",
+      "## Speed as a feature",
+      "In a world where attention spans are short and mobile data can be expensive, a website that loads in 200 milliseconds is a profound luxury. Brutalism proves that you don't need a heavy framework to make a statement."
+    ]
+  },
+  {
+    "slug": "why-local-first-software-matters",
+    "title": "Why Local-First Software Matters More Than Ever",
+    "description": "A look into the local-first software movement, ensuring users retain ownership, speed, and offline capability in their applications.",
+    "date": "2026-09-29",
+    "tags": [
+      "local-first",
+      "software architecture",
+      "privacy",
+      "offline"
+    ],
+    "body": [
+      "We have grown accustomed to software that only works when we have an internet connection. Local-first software is a paradigm shift aiming to bring data ownership and speed back to our local devices.",
+      "## The cloud dependency problem",
+      "Cloud software is incredibly convenient for collaboration, but it comes with significant drawbacks. If your internet goes down, you can't work. If the service experiences an outage, your data is hostage.",
+      "## What does local-first mean?",
+      "Local-first applications store your primary data on your local hard drive and use the cloud purely for synchronization and backup, rather than as the primary source of truth.",
+      "## Core benefits of a local-first approach",
+      "- Zero latency: Applications respond instantly because they don't have to wait for a server round-trip.",
+      "- True offline capability: You can work on an airplane, in a cabin, or during a network outage without missing a beat.",
+      "- Data ownership: Your files live on your computer in open formats, meaning you aren't tied to a specific provider.",
+      "- Privacy by default: Because data is processed locally, sensitive information doesn't need to traverse the internet.",
+      "## The future of personal computing",
+      "By combining the responsiveness of classic desktop apps with the seamless collaboration of cloud apps, local-first software represents the next logical step in how we build for the web."
+    ]
+  },
+  {
+    "slug": "building-a-personal-api",
+    "title": "Building a Personal API for Your Life",
+    "description": "How exposing your own reading lists, watch logs, and listening habits through a simple API can foster a more interconnected, open web.",
+    "date": "2026-09-30",
+    "tags": [
+      "api",
+      "quantified self",
+      "indie web",
+      "open data"
+    ],
+    "body": [
+      "Personal websites are usually static, offering a one-way broadcast of information. But what if your website could talk to other websites automatically? Enter the personal API.",
+      "## Sharing beyond the feed",
+      "A personal API allows you to expose structured data about your digital life. Instead of just writing a blog post about a book you read, you can output a JSON file of your current reading list for other developers to parse.",
+      "## What is a personal API?",
+      "It is simply a set of endpoints hosted on your domain that returns lightweight data about your activities, making your personal site programmable.",
+      "## Ideas for your personal API endpoints",
+      "- /api/now-playing: Pull data from Last.fm or Spotify to show what track you are currently listening to.",
+      "- /api/reading: A live feed of the books you are currently reading, drawn from an open database.",
+      "- /api/status: A micro-blogging endpoint that displays your current location or general mood.",
+      "- /api/projects: A structured list of your active repositories or creative pursuits.",
+      "## Connecting the small web",
+      "When multiple people run personal APIs, we can build custom dashboards, dynamic blogrolls, and ambient social networks that exist entirely outside of corporate silos."
+    ]
+  },
+  {
+    "slug": "the-revival-of-the-personal-homepage",
+    "title": "The Revival of the Personal Homepage",
+    "description": "Why people are fleeing homogenized social profiles to build their own quirky, personalized corners of the web.",
+    "date": "2026-10-01",
+    "tags": [
+      "personal web",
+      "indie web",
+      "web design",
+      "nostalgia"
+    ],
+    "body": [
+      "For the past decade, our online identities have been squeezed into sterile, blue-and-white templates on massive social platforms. But a rebellion is brewing: the personal homepage is back.",
+      "## Rented space vs. owned land",
+      "Building your identity on a social media platform is like decorating a rented apartment where the landlord can change the locks at any time. A personal homepage on a custom domain is a house you own.",
+      "## Embrace the quirky web",
+      "Platforms enforce uniformity. Personal sites enforce creativity. We are seeing a glorious return to custom cursors, bizarre color schemes, webmaster badges, and layouts that break the rules of corporate UX.",
+      "## Why build one?",
+      "- Complete creative control over how you present yourself.",
+      "- A centralized hub for your links, projects, and thoughts.",
+      "- An opportunity to learn basic HTML and CSS in a low-stakes environment.",
+      "- A way to express your personality without algorithms judging its \"engagement\" value.",
+      "## Reclaiming the weird internet",
+      "If you miss the days when surfing the web felt like exploring strange new worlds rather than scrolling a sanitized mall, building your own homepage is the first step to bringing that magic back."
+    ]
+  },
+  {
+    "slug": "fighting-link-rot-on-the-web",
+    "title": "Fighting Link Rot: How to Build Websites That Last",
+    "description": "Strategies for preserving your digital footprint and ensuring your web links don't break over time.",
+    "date": "2026-10-02",
+    "tags": [
+      "web history",
+      "link rot",
+      "web architecture",
+      "preservation"
+    ],
+    "body": [
+      "Have you ever clicked a bookmark from five years ago only to be met with a frustrating 404 error? This phenomenon is known as link rot, and it is quietly destroying the history of the internet.",
+      "## The ephemeral web",
+      "Websites redesign, domains expire, and content management systems change URL structures. When this happens, inbound links from across the web break, severing the connective tissue of information.",
+      "## Cool URIs don't change",
+      "In 1998, web pioneer Tim Berners-Lee wrote an essay stating that a well-designed URL should never need to change. If you structure your site correctly, a link created today should still work in fifty years.",
+      "## Strategies for link longevity",
+      "- Avoid file extensions in URLs: Link to /about/ instead of /about.html or /about.php.",
+      "- Keep URLs simple and hierarchical: Don't include temporary database IDs or complex query strings in your permanent links.",
+      "- Setup proper redirects: If you must move a page, always use a 301 Permanent Redirect to forward traffic from the old URL to the new one.",
+      "- Use the Internet Archive: Submit your most important pages to the Wayback Machine so a snapshot exists even if your server dies.",
+      "## Your responsibility as a webmaster",
+      "By designing thoughtful, durable URL structures, you are contributing to a more reliable, historical, and robust web."
+    ]
+  },
+  {
+    "slug": "introduction-to-the-indieweb",
+    "title": "Owning Your Data: An Introduction to the IndieWeb",
+    "description": "Take back your online identity by self-hosting your content and syndicating it everywhere else.",
+    "date": "2026-10-03",
+    "tags": [
+      "indie web",
+      "posse",
+      "self-hosting",
+      "webmentions"
+    ],
+    "body": [
+      "The IndieWeb is a community of independent, personal websites connected by open standards. It is based on a simple premise: your content is yours, and you should own it.",
+      "## The problem with silos",
+      "When you post a photo to Instagram or a thought to Twitter, you are giving away your content to a corporate silo. They monetize your data, and if they shut down or ban you, your history is gone.",
+      "## The IndieWeb philosophy",
+      "The core principle is owning your domain name. Your personal website becomes the primary home for everything you create—your photos, articles, status updates, and bookmarks.",
+      "## POSSE: Publish (on your) Own Site, Syndicate Elsewhere",
+      "You don't have to quit social media to join the IndieWeb. With POSSE, you publish a post on your own blog first, and then automatically push a copy of it out to social networks to reach your audience.",
+      "## Webmentions: The decentralized comment section",
+      "Instead of a centralized database of comments, IndieWeb sites use Webmentions. If someone writes a response to your blog post on their own blog, their server sends a notification to your server, and their comment appears on your site.",
+      "## A resilient web",
+      "The IndieWeb isn't a single piece of software; it's a movement to build an internet that outlasts any single tech company."
+    ]
+  },
+  {
+    "slug": "why-static-sites-are-the-future",
+    "title": "Why Static Sites Are the Future of Personal Publishing",
+    "description": "The security, speed, and simplicity benefits of using static site generators like Eleventy and Hugo.",
+    "date": "2026-10-04",
+    "tags": [
+      "static site generators",
+      "web development",
+      "jamstack",
+      "performance"
+    ],
+    "body": [
+      "For years, Content Management Systems (CMS) like WordPress dominated web publishing. But for personal blogs and portfolios, a simpler, faster alternative has taken over: the Static Site Generator (SSG).",
+      "## The database bottleneck",
+      "A traditional CMS requires a database and a server. Every time someone visits your site, the server runs code, queries the database, stitches the page together, and sends it to the browser. This takes time and computing power.",
+      "## Enter the SSG",
+      "A Static Site Generator works differently. It takes your raw content (usually Markdown files) and templates, and builds the entire website into basic HTML files ahead of time. When a user visits, the server just hands them the ready-made file.",
+      "## Why static sites win",
+      "- Blazing fast speed: Pre-built HTML files load almost instantly, providing an incredible user experience.",
+      "- Bulletproof security: With no database to hack and no server-side code to exploit, static sites are inherently secure.",
+      "- Cheap and easy hosting: You can host static files for free on services like GitHub Pages, Netlify, or Vercel.",
+      "- Version control: Because your entire site is just text files, you can store it in Git and track every change you ever make.",
+      "## Developer joy",
+      "Tools like Eleventy, Hugo, and Astro have made building static sites an incredibly fun, flexible, and rewarding experience for developers and writers alike."
+    ]
+  },
+  {
+    "slug": "web-accessibility-is-not-optional",
+    "title": "Web Accessibility is Not Optional",
+    "description": "Simple steps to make your personal website welcoming and usable for everyone, regardless of ability.",
+    "date": "2026-10-05",
+    "tags": [
+      "accessibility",
+      "a11y",
+      "web design",
+      "inclusive design"
+    ],
+    "body": [
+      "The web was designed to be universal, but modern design trends often leave disabled users behind. Making your personal website accessible isn't just about compliance; it's about basic empathy.",
+      "## Designing for humans",
+      "Accessibility (often abbreviated as a11y) means ensuring that people with visual, motor, auditory, or cognitive disabilities can navigate and understand your website.",
+      "## The foundation: Semantic HTML",
+      "The easiest way to make a site accessible is to use HTML the way it was intended. A button should be a <button>, a link should be an <a>, and your headings should follow a logical order (H1, then H2, etc.). Screen readers rely on this structure.",
+      "## High-impact accessibility fixes",
+      "- Meaningful alt text: Always describe images in the alt attribute so visually impaired users know what is on the screen.",
+      "- Keyboard navigation: Ensure every interactive element on your site can be reached and used with just the Tab and Enter keys.",
+      "- Color contrast: Grey text on a slightly lighter grey background is impossible for many to read. Ensure high contrast between text and background.",
+      "- Respect user preferences: Use CSS media queries like prefers-reduced-motion to disable animations for users who get motion sickness.",
+      "## The inclusive web",
+      "An accessible website is simply a better website. The improvements you make for disabled users almost always create a clearer, faster, and more robust experience for everyone else."
+    ]
+  },
+  {
+    "slug": "how-to-get-your-site-discovered",
+    "title": "How a Small Website Gets Found in 2026",
+    "description": "Search, directories, webrings and word of mouth: a practical look at how a one-person site actually finds readers instead of waiting to be stumbled upon.",
+    "date": "2026-10-06",
+    "tags": [
+      "seo",
+      "discovery",
+      "indie web",
+      "small web"
+    ],
+    "body": [
+      "Publishing is the easy half. The hard half is the part nobody sees: helping the right person arrive at a page you made in an afternoon, without turning your site into a marketing funnel.",
+      "## Search still does the heavy lifting",
+      "Most visitors to a small site arrive from a search engine looking for one specific thing. That rewards pages with a clear subject: a page about a single tool, game, or answer will outperform a page that tries to cover everything. Write the title the way somebody would type the question, and answer it in the first paragraph rather than the fourth.",
+      "## Directories are the shortcut",
+      "A good directory does discovery work for you. It groups sites by what they do, links out without an interstitial, and gives a crawler a reason to come back. One listing in a curated place is worth more than a hundred automatic backlinks, and it costs nothing but a description that says plainly what the site is.",
+      "## The parts nobody counts",
+      "- Word of mouth: the friend who sends one link to another friend who needed exactly that thing.",
+      "- Webrings and link pages: small communities that trade visitors instead of audiences.",
+      "- Writing about the work: a short post explaining what you built and why tends to outrank the thing itself.",
+      "- Longevity: a site that is still online in five years collects links the way a tree collects rings.",
+      "## Make one page worth linking to",
+      "You do not need a content strategy. You need one page somebody would bookmark, send to a friend, or cite in a forum thread. Everything else on the site exists to make that page easy to find and pleasant to read."
+    ]
+  },
+  {
+    "slug": "why-browser-games-still-matter",
+    "title": "Why Browser Games Are Quietly Thriving",
+    "description": "No installs, no accounts, no thirty-gigabyte download: a look at why short games that live in a browser tab are finding players again.",
+    "date": "2026-10-07",
+    "tags": [
+      "browser games",
+      "games",
+      "creative web",
+      "fun websites"
+    ],
+    "body": [
+      "The most-played games on a given day are not the ones with the biggest budgets. They are the ones that load in a second inside a tab that was already open.",
+      "## The shortest possible path to play",
+      "A browser game asks for nothing. No store page, no launcher, no update, no account, and no tutorial that treats the first ten minutes as an audition. You click and you are playing, which is the whole reason the format outlived every platform shift since Flash.",
+      "## Constraints become the design",
+      "When you cannot count on a powerful machine, a long download, or a returning audience, you build around a single mechanic. Some of the best games in any browser are one screen, one button and one idea, executed well enough that you play four more rounds than you meant to.",
+      "## What a good one gets right",
+      "- It fits one screen, with no scrolling and no fullscreen prompt.",
+      "- The controls work without reading instructions, and the pointer is never trapped in the tab.",
+      "- It ends. A session you can finish is easier to recommend than a world that needs maintaining.",
+      "- Sound stays off until it is asked for, because half of these tabs are open at work.",
+      "## The shelf life is the feature",
+      "A game that runs in a browser keeps working on machines that will never install anything again. That is a strange kind of permanence, and it is why a directory of tiny games is still worth browsing."
+    ]
+  },
+  {
+    "slug": "why-plain-text-outlasts-software",
+    "title": "Why Plain Text Outlives the Software That Made It",
+    "description": "Notes, drafts and documentation saved as plain text keep opening decades later, which makes the most boring file format on the web the safest bet.",
+    "date": "2026-10-08",
+    "tags": [
+      "plain text",
+      "markdown",
+      "writing",
+      "archiving"
+    ],
+    "body": [
+      "Every few years a company stops making the app your notes live in. The files stay on the drive, the app that can read them does not, and what you actually own stops being a philosophical question and becomes a practical one.",
+      "## A file is not the same thing as access",
+      "A file format is a promise that some piece of software will keep existing to read it. Plain text makes a much smaller promise: that any computer will open it, now or in twenty years, with no licence, no version and no migration.",
+      "## Markdown is the compromise that held",
+      "Markdown was designed to be readable before anything renders it, which is why it spread so far. Write a heading with a hash and a list with a dash and you get a file that is legible raw and formatted later, in a browser, an editor, or a static site generator.",
+      "## What plain text is good at",
+      "- Notes and drafts that mainly need to be readable rather than designed.",
+      "- Configuration, documentation and README files that live next to code.",
+      "- Anything you expect to still care about after the tool you wrote it in has been discontinued.",
+      "## The habit matters more than the format",
+      "Keep notes as files the machine can already open, name them so they can be found without searching, and back them up somewhere that is not one company's account. Plain text is not nostalgia. It is the only format with no expiry date."
+    ]
+  },
+  {
+    "slug": "how-to-make-a-website-feel-fast",
+    "title": "How to Make a Website Feel Fast Without a Rewrite",
+    "description": "Four changes that make a small site feel instant on a phone: honest images, fewer fonts, no third-party scripts ahead of the content, and a layout that never jumps.",
+    "date": "2026-10-09",
+    "tags": [
+      "web performance",
+      "design",
+      "static sites",
+      "accessibility"
+    ],
+    "body": [
+      "Speed is the cheapest design upgrade there is and the one most small sites skip, because it is invisible when it works. It does not need a new framework. It needs four decisions.",
+      "## Serve images at the size they are displayed",
+      "A photograph exported for print and scaled down in CSS is the most common reason a small site feels heavy on a phone. Export at the width it actually renders, use a modern format, and set width and height so the text does not jump around while the picture arrives.",
+      "## Cut a font you are not using",
+      "Every typeface is a download before the first word can be read. Two families are plenty, one is often better, and a system font stack costs nothing at all. If a face is only used for headings, load only that weight.",
+      "## Keep third-party scripts off the critical path",
+      "Analytics, chat widgets and consent banners all queue ahead of your content unless you make them wait. Load them after the page is usable, and question every one of them: a script that has never told you anything useful has been charging rent in milliseconds.",
+      "## Make the layout predictable",
+      "- Reserve space for anything that loads late, so nothing shifts under a reader's thumb.",
+      "- Choose a fallback font that matches the real one closely, so the swap is not a layout change.",
+      "- Keep the first screen useful with images unsent and JavaScript blocked.",
+      "- Measure on a phone on a slow connection, not on the machine you build on.",
+      "## Fast is a feeling",
+      "Nobody perceives a millisecond. People notice a page that is readable before they finish scrolling to it, and they notice the one that is not. Build for the second case and the numbers look after themselves."
+    ]
+  },
+  {
+    "slug": "how-to-build-a-personal-website",
+    "title": "How to Build a Personal Website People Remember",
+    "description": "A practical guide to making a personal website memorable: choose a clear idea, write a useful homepage, and make the site feel like yours.",
+    "date": "2026-10-10",
+    "tags": [
+      "personal website",
+      "web design",
+      "indie web",
+      "beginner guide"
+    ],
+    "body": [
+      "A personal website does not need a complicated visual identity or a clever growth strategy. It needs one clear reason to exist and enough personality that a visitor can tell a person made it.",
+      "## Start with a promise",
+      "The strongest personal homepages answer a simple question in their first few lines: what will I find here? You might publish notes about local history, document a project, collect field recordings, or keep a list of tools you actually use. A focused promise is easier to remember than a biography that tries to include everything.",
+      "## Give the homepage a job",
+      "Treat the homepage as a helpful starting point rather than a poster. Link to your best work, explain what changed recently, and make the next click obvious. A short introduction, a few durable links, and a visible contact method are usually more useful than a grid of decorative sections.",
+      "## Make it unmistakably yours",
+      "Personal does not mean adding random effects. It can be a recurring color, a hand-written heading, a strange but useful navigation label, or a page about a niche interest that would never survive a corporate design review. Small choices create recognition.",
+      "## Design for return visits",
+      "Add a page that changes over time: a now page, reading list, project log, or monthly notes. A returning visitor should see evidence that the site is alive. Keep older pages available so the website becomes an archive instead of a stream that disappears.",
+      "## Let the site stay small",
+      "A website is easier to maintain when every part earns its place. Start with a few plain pages, use readable HTML, and add features only when they solve a real problem. The best personal website is often the one its owner can still update a year later."
+    ]
+  },
+  {
+    "slug": "what-is-the-indie-web",
+    "title": "What Is the Indie Web? A Practical Guide to Owning Your Online Presence",
+    "description": "Learn what the IndieWeb means, why owning a domain matters, and how to start publishing on a personal site without leaving the social web behind.",
+    "date": "2026-10-11",
+    "tags": [
+      "indie web",
+      "personal website",
+      "publishing",
+      "digital ownership"
+    ],
+    "body": [
+      "The Indie Web is a way of using the internet in which your own website is the primary home for your writing, projects, photos, and identity. It is less about a specific platform than a set of habits: own a domain, publish on your site first, and make it easy for other people to connect with you.",
+      "## Your domain is an address you control",
+      "A profile on a social platform is convenient, but its layout, reach, and rules belong to someone else. A domain gives your work a stable address. You can change hosts, redesign the site, or move from a static generator to a different tool without changing the link people use to find you.",
+      "## Publish on your site first",
+      "POSSE — Publish on your Own Site, Syndicate Elsewhere — does not require abandoning social media. Write the durable version on your own domain, then share a shorter version wherever your friends already are. The post, archive, and context remain yours even if a feed changes.",
+      "## Link out generously",
+      "The Indie Web grows through links rather than locked recommendation systems. Keep a blogroll, cite the source of an idea, join a webring, or link to a small project you enjoyed. Good outbound links make a personal site useful even when the author is not trying to become an influencer.",
+      "## Start with one durable page",
+      "You can begin with an about page, a contact address, and one page that explains something you know. Add an RSS feed when you have updates, and use plain URLs that will still make sense years from now. The goal is not to launch a perfect site; it is to create a home you can keep improving.",
+      "## Keep the social web in its place",
+      "Social platforms can still be good places to meet people and discover ideas. The difference is that they become distribution channels rather than the only copy of your work. Owning the original gives you a backup, a long memory, and a place where your choices are yours."
+    ]
+  },
+  {
+    "slug": "how-to-make-a-website-worth-bookmarking",
+    "title": "How to Make a Website Worth Bookmarking",
+    "description": "The small details that turn a website from a one-time click into a useful bookmark: clear purpose, fast pages, durable URLs, and something worth returning to.",
+    "date": "2026-10-12",
+    "tags": [
+      "website ideas",
+      "web design",
+      "user experience",
+      "small web"
+    ],
+    "body": [
+      "A website earns a bookmark when it saves someone time, gives them a feeling, or helps them do something they cannot do as easily somewhere else. It does not need thousands of pages. It needs a reason to come back.",
+      "## Solve one recognizable problem",
+      "A focused site is easier to remember than a homepage that promises everything. A neighborhood archive, a browser toy, a collection of public-domain maps, and a carefully edited directory all tell visitors what they are for. Name the problem in the page title and the first paragraph.",
+      "## Make the first visit effortless",
+      "Do not make people create an account before they understand the site. Keep the first interaction visible, use familiar controls, and explain unusual behavior before it surprises anyone. A useful empty state is better than a page that looks broken.",
+      "## Speed is part of the idea",
+      "A site that loads quickly feels more trustworthy because it respects the visitor's time. Resize images, avoid unnecessary scripts, reserve space for content that loads later, and test on a phone with a slow connection. Performance is not only a technical metric; it is part of the welcome.",
+      "## Build a return loop",
+      "Give people a reason to revisit without manufacturing urgency. A weekly collection, a growing archive, a rotating puzzle, a project changelog, or a page of new links can create a natural rhythm. Tell visitors what changes and how often.",
+      "## Use URLs that can age well",
+      "A bookmark should still work after a redesign. Prefer short, descriptive paths, keep old URLs redirected, and avoid putting temporary database details in the address. The web becomes more useful when a link from today remains readable next year.",
+      "## Leave a human trace",
+      "The memorable part is often a sentence, a note about how the project was made, or a link to the person behind it. Utility gets someone to save a site. Care is what makes them recommend it."
+    ]
+  },
+  {
+    "slug": "how-to-curate-a-link-collection",
+    "title": "How to Curate a Link Collection People Actually Use",
+    "description": "A practical method for collecting, trimming, and organizing links so a list stays useful long after the first share.",
+    "date": "2026-10-13",
+    "tags": [
+      "curation",
+      "directories",
+      "small web"
+    ],
+    "body": [
+      "Anyone can save a hundred links. A collection becomes valuable when someone else can open it and immediately find the one they need.",
+      "## Decide who the list is for",
+      "A list for designers, a list for students, and a list for bored people on a Sunday will contain very different things. Write the audience at the top of the page and let it decide what stays.",
+      "## Write one honest sentence per link",
+      "A bare URL forces visitors to click blindly. One sentence that says what the site does and why it is worth a visit turns a pile of links into a guide.",
+      "## Prune on a schedule",
+      "Websites move, change owners, and disappear. Set a monthly reminder to check every entry, remove anything broken or no longer special, and note the date of the last review.",
+      "## Group by intent, not by format",
+      "Visitors arrive wanting to learn, make, play, or fix something. Grouping links by what people want to do is easier to browse than grouping them by whether they are apps, blogs, or tools."
+    ]
+  },
+  {
+    "slug": "why-every-website-needs-a-colophon",
+    "title": "Why Every Website Needs a Colophon",
+    "description": "A short page about how a site was made builds trust, credits the people behind it, and helps other builders learn.",
+    "date": "2026-10-14",
+    "tags": [
+      "web design",
+      "indie web",
+      "transparency"
+    ],
+    "body": [
+      "A colophon is a small note describing how something was made. Printed books have used them for centuries, and they fit the web just as well.",
+      "## What to include",
+      "- The tools, frameworks, and hosting the site runs on",
+      "- The fonts and where they came from",
+      "- Credits for images, icons, and borrowed code",
+      "- When the site was started and last updated",
+      "## Why it matters",
+      "A colophon tells visitors a real person is behind the page. It also gives credit where it is due and helps curious builders understand how a site was put together.",
+      "## Keep it short",
+      "A colophon does not need to be a manifesto. A few honest lines, linked from the footer, are enough to make a website feel more human."
+    ]
+  },
+  {
+    "slug": "how-to-write-a-great-about-page",
+    "title": "How to Write a Great About Page",
+    "description": "The about page is often the second page people visit. Here is how to make it clear, personal, and worth reading.",
+    "date": "2026-10-15",
+    "tags": [
+      "writing",
+      "websites",
+      "personal sites"
+    ],
+    "body": [
+      "Visitors open an about page to answer a simple question: who made this, and should I trust it? Good about pages answer that quickly.",
+      "## Lead with what the site does",
+      "Before telling your life story, explain what the site offers in one or two sentences. A visitor who understands the purpose is more interested in the people behind it.",
+      "## Show the human side",
+      "Mention why you started the project, what you care about, and what keeps you working on it. A photo, a signature, or a small anecdote makes the page memorable.",
+      "## Give people a next step",
+      "End with a way to get in touch, follow updates, or explore the best parts of the site. An about page that leads nowhere is a missed opportunity."
+    ]
+  },
+  {
+    "slug": "understanding-dmca-takedowns-for-small-sites",
+    "title": "Understanding DMCA Takedowns for Small Websites",
+    "description": "What a DMCA takedown notice is, what it needs to contain, and how small directories and hosts should handle one fairly.",
+    "date": "2026-10-16",
+    "tags": [
+      "copyright",
+      "dmca",
+      "web publishing"
+    ],
+    "body": [
+      "The Digital Millennium Copyright Act gives copyright owners a way to ask websites to remove material that infringes their work. Even a small directory can receive one.",
+      "## What a valid notice contains",
+      "- The copyrighted work that is being infringed",
+      "- The exact URL of the material to remove",
+      "- Contact details for the person filing",
+      "- A good-faith statement that the use is not authorized",
+      "- A statement that the information is accurate, signed by the owner or their agent",
+      "## How base31 handles requests",
+      "base31.org accepts takedown requests through a dedicated form at dmca.base31.org. Every request goes straight to the moderation inbox, where it is reviewed by a person before anything is removed.",
+      "## Be fair to both sides",
+      "Takedowns should be used for real copyright problems, not to silence criticism. Filing a knowingly false notice can carry legal consequences, so only submit one when you own the work or represent someone who does."
+    ]
+  },
+  {
+    "slug": "the-joy-of-single-purpose-websites",
+    "title": "The Joy of Single-Purpose Websites",
+    "description": "Sites that do exactly one thing are fast, memorable, and oddly delightful. Here is why they keep winning bookmarks.",
+    "date": "2026-10-17",
+    "tags": [
+      "small web",
+      "tools",
+      "website ideas"
+    ],
+    "body": [
+      "Some of the best websites answer exactly one question: is this site down, what time is it there, what is my IP address. They load fast and get out of the way.",
+      "## A clear promise",
+      "When a site does one thing, its name and URL often explain it completely. Visitors know what they will get before the page even loads.",
+      "## Easy to share",
+      "Single-purpose sites travel well. They fit in a message, a tweet, or a bookmark folder without any explanation.",
+      "## Easy to finish",
+      "For builders, a focused idea is a project you can actually complete in a weekend. Shipping something small teaches more than planning something enormous.",
+      "## Find more",
+      "base31's tools page collects dozens of small, focused utilities. Each one began as a simple idea that someone decided to finish."
+    ]
+  }
+]

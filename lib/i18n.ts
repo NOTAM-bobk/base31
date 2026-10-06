@@ -59,6 +59,11 @@ export const EN = {
   coolAisLede: "Browser AI assistants, research tools and creative services. Plans vary; verify important answers and avoid sharing sensitive information.",
   coolAisClosed: "The AI picks are folded away — open the heading to explore them.",
   coolAisNoMatch: "No AI tools match that search — clear it to see them all.",
+  noCodeAiTools: "No-code AI tools",
+  noCodeAiToolsLede:
+    "AI tools that build the thing for you — apps, websites, portals and automations — for people with an idea and no code to type. Plans and limits vary; check what each one costs before you commit.",
+  noCodeAiToolsClosed: "The no-code AI tools are folded away — open the heading to see them.",
+  noCodeAiToolsNoMatch: "No no-code AI tool matches that search — clear it to see them all.",
   coolApps: "Cool apps",
   coolAppsLede:
     "Free web apps worth a bookmark — everything here runs in a tab, with no install and no account just to try it.",
@@ -111,6 +116,11 @@ export const ES: Dictionary = {
   coolAisLede: "Asistentes de IA y herramientas de investigación y creación. Los planes varían; verifica las respuestas y evita compartir datos sensibles.",
   coolAisClosed: "Las IAs están plegadas: abre el título para explorarlas.",
   coolAisNoMatch: "Ninguna IA coincide: borra la búsqueda para verlas todas.",
+  noCodeAiTools: "Herramientas de IA sin código",
+  noCodeAiToolsLede:
+    "Herramientas de IA que construyen la app, el sitio, el portal o la automatización por ti: para quien tiene una idea y no escribe código. Los planes y límites varían; revisa el precio antes de decidir.",
+  noCodeAiToolsClosed: "Las herramientas de IA sin código están plegadas: abre el título para verlas.",
+  noCodeAiToolsNoMatch: "Ninguna herramienta de IA sin código coincide: borra la búsqueda para verlas todas.",
   coolApps: "Apps geniales",
   coolAppsLede:
     "Apps web gratuitas que vale la pena guardar: todo funciona en una pestaña, sin instalar nada ni crear cuenta solo para probarlo.",
@@ -162,6 +172,11 @@ export const FR: Dictionary = {
   coolAisLede: "Assistants IA et outils de recherche et de création. Les offres varient ; vérifiez les réponses et évitez les données sensibles.",
   coolAisClosed: "Les IAs sont repliées — ouvrez le titre pour les explorer.",
   coolAisNoMatch: "Aucune IA ne correspond — effacez la recherche pour toutes les voir.",
+  noCodeAiTools: "Outils IA sans code",
+  noCodeAiToolsLede:
+    "Des outils IA qui construisent l’application, le site, le portail ou l’automatisation à votre place, pour qui a une idée sans écrire de code. Les offres et les limites varient ; vérifiez le prix avant de vous engager.",
+  noCodeAiToolsClosed: "Les outils IA sans code sont repliés — ouvrez le titre pour les voir.",
+  noCodeAiToolsNoMatch: "Aucun outil IA sans code ne correspond — effacez la recherche pour tous les voir.",
   coolApps: "Applis sympas",
   coolAppsLede:
     "Des applis web gratuites à garder en favori : tout tourne dans un onglet, sans installation ni compte juste pour essayer.",
@@ -213,6 +228,11 @@ export const PT: Dictionary = {
   coolAisLede: "Assistentes de IA e ferramentas de pesquisa e criação. Os planos variam; confira as respostas e evite compartilhar dados sensíveis.",
   coolAisClosed: "As IAs estão recolhidas — abra o título para explorá-las.",
   coolAisNoMatch: "Nenhuma IA corresponde — limpe a pesquisa para ver todas.",
+  noCodeAiTools: "Ferramentas de IA sem código",
+  noCodeAiToolsLede:
+    "Ferramentas de IA que constroem o app, o site, o portal ou a automação por você — para quem tem uma ideia e não escreve código. Planos e limites variam; confira o preço antes de decidir.",
+  noCodeAiToolsClosed: "As ferramentas de IA sem código estão recolhidas — abra o título para vê-las.",
+  noCodeAiToolsNoMatch: "Nenhuma ferramenta de IA sem código corresponde — limpe a pesquisa para vê-las todas.",
   coolApps: "Apps legais",
   coolAppsLede:
     "Apps web gratuitos que valem um favorito: tudo roda em uma aba, sem instalar nada nem criar conta só para testar.",

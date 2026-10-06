@@ -12,6 +12,9 @@ import "./inner-pages.css";
 // file). See the file header for why it exists.
 import "./late.css";
 import "./directory.css";
+// Last of the stylesheets: the quieter About/Our Story link cards, which have to
+// win over the same selectors in directory.css.
+import "./about-links.css";
 import { GOOGLE_ANALYTICS_ID, googleTagSnippet } from "@/lib/analytics";
 import CodeBackdrop from "@/components/code-backdrop";
 import ConsentAwareAds from "@/components/consent-aware-ads";
@@ -43,10 +46,22 @@ export const metadata: Metadata = {
     // explicit map instead of guessing from /es-style slugs. x-default
     // (searchers whose language is not covered) points at English.
     languages: { "x-default": "/", en: "/", es: "/es", fr: "/fr", pt: "/pt" },
-    types: { "application/rss+xml": "/blog/feed.xml", "application/feed+json": "/blog/feed.json" },
+    types: {
+      "application/rss+xml": "/blog/feed.xml",
+      "application/feed+json": "/blog/feed.json",
+      // The plain-text map of the site written for AI assistants and answer
+      // engines. Advertised here so a crawler that would never guess at
+      // /llms.txt can still find it.
+      "text/plain": "/llms.txt",
+    },
   },
   manifest: "/manifest.webmanifest",
-  keywords: ["base31", "base31.org", "base 31", "website directory", "cool sites", "fun websites", "creative web projects", "indie web", "online tools", "interesting websites"],
+  applicationName: "base31.org",
+  category: "technology",
+  authors: [{ name: "base31.org", url: siteUrl }],
+  creator: "base31.org",
+  publisher: "base31.org",
+  keywords: ["base31", "base31.org", "base 31", "website directory", "cool sites", "fun websites", "creative web projects", "indie web", "online tools", "interesting websites", "no code ai tools", "no-code ai tools", "ai app builder", "ai website builder", "free browser tools", "free public apis"],
   openGraph: {
     type: "website",
     url: siteUrl,

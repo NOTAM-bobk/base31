@@ -1,5 +1,15 @@
 [
   {
+    "version": "1.39.0",
+    "date": "2026-10-06",
+    "title": "A weekly blog agent, and a moderation page that signs out cleanly",
+    "summary": "A free GitHub Actions workflow now writes one blog post every Monday with an AI model, and the moderation page clears its numbers the moment the admin signs out.",
+    "highlights": [
+      "A new weekly-blog.yml workflow runs every Monday, asks a free Cloudflare Workers AI model for a post about the open web, checks it against the same rules as the content validator, and commits it to config/blogs.json.",
+      "The moderation page gains a Sign out control: signing out, or a rejected password, clears the inbox and hides every count so the last admin's numbers are never left on screen while signed out."
+    ]
+  },
+  {
     "version": "1.38.0",
     "date": "2026-10-06",
     "title": "Avatars for the discussion, and a playable pick",

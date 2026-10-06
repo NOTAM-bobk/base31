@@ -1,0 +1,77 @@
+# Writes one new blog post every Monday with a free AI model and commits it.
+#
+# GitHub's own Models API was retired on 30 July 2026, so this uses Cloudflare
+# Workers AI instead: it is free on Cloudflare's free plan (10,000 Neurons a
+# day) and this repository already holds Cloudflare credentials for the Worker
+# deploy. The script asks a Workers AI model for a post about the open web,
+# checks the answer against the same rules scripts/validate-content.mjs
+# enforces, and only then writes config/blogs.json.
+#
+# One-time setup (repo Settings -> Secrets and variables -> Actions):
+#   CLOUDFLARE_ACCOUNT_ID — already set for the Worker deploy; reused here.
+#   CLOUDFLARE_AI_TOKEN   — a Cloudflare API token that has
+#                           "Account > Workers AI > Read". Create one at
+#                           Cloudflare dashboard -> My Profile -> API Tokens.
+#                           Optional: instead of a new token you may add the
+#                           Workers AI permission to the existing
+#                           CLOUDFLARE_API_TOKEN, which this workflow falls
+#                           back to when CLOUDFLARE_AI_TOKEN is unset.
+#
+# Optional repository variable:
+#   AI_BLOG_MODEL — a Workers AI text model. Defaults to
+#                   @cf/meta/llama-3.1-8b-instruct.
+#
+# With no token the job runs, prints a note, and commits nothing, so it stays
+# quiet until it is configured. If the repository protects `main` and requires
+# pull requests, point this job at a branch instead of pushing directly.
+name: Weekly blog post
+
+on:
+  schedule:
+    # Every Monday at 13:00 UTC.
+    - cron: "0 13 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+# One writer at a time; a slow run must not overlap the next Monday.
+concurrency:
+  group: weekly-blog
+  cancel-in-progress: false
+
+jobs:
+  write:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Generate a post with a free AI model
+        run: node scripts/generate-weekly-blog.mjs
+        env:
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_AI_TOKEN: ${{ secrets.CLOUDFLARE_AI_TOKEN || secrets.CLOUDFLARE_API_TOKEN }}
+          AI_BLOG_MODEL: ${{ vars.AI_BLOG_MODEL }}
+
+      - name: Validate the generated content
+        run: node scripts/validate-content.mjs
+
+      - name: Commit and push the new post
+        run: |
+          if git diff --quiet -- config/blogs.json; then
+            echo "No new post was written; nothing to commit."
+            exit 0
+          fi
+          git config user.name "base31 blog agent"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add config/blogs.json
+          git commit -m "Add the weekly blog post from the AI agent"
+          git pull --rebase --autostash origin main
+          git push origin HEAD:main

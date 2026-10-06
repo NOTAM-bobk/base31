@@ -276,6 +276,19 @@ For wildcard tool routing, configure the apex and `*.base31.org` in Vercel. Verc
 
 **Before changing nameservers:** export/recreate web, mail, verification, and DKIM records at the new authoritative host. A successful application build does not prove DNS or TLS works. Run `npm run check:domain` after DNS changes and check the hosting dashboard's domain status. Do not change the KV namespace ID during redeployment.
 
+### Weekly AI blog post
+
+`.github/workflows/weekly-blog.yml` runs every Monday at 13:00 UTC and can also be started by hand from the Actions tab. It runs `scripts/generate-weekly-blog.mjs`, which asks a model for one post about the open web, accepts it only when it satisfies the same rules `scripts/validate-content.mjs` enforces, prepends it to `config/blogs.json`, then lets the workflow commit and push the result. A post already dated that day is skipped, so reruns are safe and a week is never doubled up.
+
+The model is **Cloudflare Workers AI** through its OpenAI-compatible endpoint. It is free on Cloudflare's free plan (10,000 Neurons a day), and this repository already holds Cloudflare credentials for the Worker deploy. GitHub's own Models API, which once made this possible with no key at all, was retired on 30 July 2026.
+
+| Secret | Purpose |
+| --- | --- |
+| `CLOUDFLARE_ACCOUNT_ID` | Already set for the Worker deploy; reused here |
+| `CLOUDFLARE_AI_TOKEN` | Cloudflare API token with **Account → Workers AI → Read**. Falls back to `CLOUDFLARE_API_TOKEN` when unset |
+
+Set the repository **variable** `AI_BLOG_MODEL` to pick a different Workers AI text model; the default is `@cf/meta/llama-3.1-8b-instruct`. With no token the job prints a note and commits nothing, so it never fails just for being unconfigured. If `main` is protected and requires pull requests, retarget the job at a branch instead of pushing directly. Generated posts are unedited model output — read them as you would any other submission before treating them as published editorial.
+
 ## Maintenance checklist
 
 ### Every content or UI change
@@ -293,6 +306,7 @@ For wildcard tool routing, configure the apex and `*.base31.org` in Vercel. Verc
 - Rotate the editorial shortlist and remove broken/retired services.
 - Read Dependabot PR checks before merging; major Next.js upgrades need deliberate testing.
 - Review community uploads, rate limits, Worker KV usage, email/push failures, and abuse reports.
+- Read the weekly AI-generated blog posts and edit or remove anything that does not sound like base31.
 - Audit analytics/ads and privacy copy together; keep consent behavior consistent with what the site discloses.
 
 ### Styling and accessibility conventions

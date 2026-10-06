@@ -13,12 +13,19 @@ export default function AdminCommunitySites() {
   const [requests, setRequests] = useState<UrlRequest[]>([]);
   const [dmca, setDmca] = useState<DmcaRequest[]>([]);
   const [subscribers, setSubscribers] = useState<Subscriber[]>([]);
+  const [signedIn, setSignedIn] = useState(false);
   const [status, setStatus] = useState("");
   const [busy, setBusy] = useState(false);
 
+  // Empties the inbox. Called whenever the page stops being signed in, so the
+  // section counts can never keep showing the last admin's numbers.
+  const clearData = useCallback(() => {
+    setSites([]); setRequests([]); setDmca([]); setSubscribers([]); setSignedIn(false);
+  }, []);
+
   const authHeaders = useCallback(() => ({ "x-admin-password": password.trim(), "Content-Type": "application/json" }), [password]);
   const loadData = useCallback(async () => {
-    if (!password.trim()) { setStatus("Enter your admin password to continue."); return; }
+    if (!password.trim()) { clearData(); setStatus("Enter your admin password to continue."); return; }
     setBusy(true); setStatus("");
     try {
       const response = await fetch("/api/admin", { headers: authHeaders() });
@@ -28,10 +35,30 @@ export default function AdminCommunitySites() {
       setRequests(Array.isArray(data?.requests) ? data.requests : []);
       setDmca(Array.isArray(data?.dmca) ? data.dmca : []);
       setSubscribers(Array.isArray(data?.subscribers) ? data.subscribers : []);
+      setSignedIn(true);
       setStatus("Admin data loaded.");
-    } catch (error) { setStatus(error instanceof Error ? error.message : "Could not load admin data."); }
+    } catch (error) {
+      // A wrong, changed or expired password signs the page out: clear the
+      // inbox so the numbers fall back to their empty state instead of
+      // lingering from the previous successful load.
+      clearData();
+      setStatus(error instanceof Error ? error.message : "Could not load admin data.");
+    }
     finally { setBusy(false); }
-  }, [authHeaders, password]);
+  }, [authHeaders, clearData, password]);
+
+  const signOut = useCallback(() => {
+    setPassword("");
+    clearData();
+    setStatus("Signed out. The inbox is hidden until you sign in again.");
+  }, [clearData]);
+
+  // Clearing the password field is the other way to sign out; do it there too
+  // so the count update is immediate rather than waiting for a failed load.
+  const changePassword = (value: string) => {
+    setPassword(value);
+    if (!value.trim()) { clearData(); setStatus(""); }
+  };
 
   const removeSite = async (site: AdminSite) => {
     if (!window.confirm(`Remove ${site.title} (${site.slug})? This deletes its hosted files from the Worker.`)) return;
@@ -74,32 +101,39 @@ export default function AdminCommunitySites() {
       <p className="admin-lede">Review DMCA takedown requests, URL suggestions, published community sites, and newsletter signups. Nothing submitted here is published automatically.</p>
       <form className="admin-form" onSubmit={(event) => { event.preventDefault(); void loadData(); }}>
         <label htmlFor="admin-password">Admin password</label>
-        <input id="admin-password" type="password" value={password} onChange={(event) => setPassword(event.target.value)} autoComplete="current-password" placeholder="Your private password" />
+        <input id="admin-password" type="password" value={password} onChange={(event) => changePassword(event.target.value)} autoComplete="current-password" placeholder="Your private password" />
         <button type="submit" disabled={busy}>{busy ? "Loading…" : "Open inbox"}</button>
+        {password && <button type="button" className="admin-signout" onClick={signOut} disabled={busy}>Sign out</button>}
       </form>
       {status && <p className="admin-status" role="status">{status}</p>}
 
-      <section className="admin-section" id="dmca"><div className="admin-section-head"><h2>DMCA takedown requests</h2><span className="mono">{dmca.length}</span></div>
-        {dmca.length === 0 ? <p className="admin-empty">No takedown requests.</p> : dmca.map((item) => (
-          <article className="admin-site" key={item.id}><div><h3>{item.name}{item.organization ? ` · ${item.organization}` : ""}</h3><p><strong>Remove:</strong> <a href={item.infringingUrl} target="_blank" rel="noreferrer">{item.infringingUrl}</a></p><p><strong>Original work:</strong> {item.originalWork}</p>{item.details && <p>{item.details}</p>}<p className="mono"><a href={`mailto:${item.email}`}>{item.email}</a> · signed &ldquo;{item.signature}&rdquo; · {new Date(item.createdAt).toLocaleString()}</p></div><button type="button" className="admin-remove" disabled={busy} onClick={() => void resolveDmca(item)}>Resolve</button></article>
-        ))}
-      </section>
+      {!signedIn ? (
+        <p className="admin-empty" role="status">Sign in to load the inbox. While you are signed out no counts or entries are shown, so the page never displays the last loaded numbers.</p>
+      ) : (
+        <>
+          <section className="admin-section" id="dmca"><div className="admin-section-head"><h2>DMCA takedown requests</h2><span className="mono">{dmca.length}</span></div>
+            {dmca.length === 0 ? <p className="admin-empty">No takedown requests.</p> : dmca.map((item) => (
+              <article className="admin-site" key={item.id}><div><h3>{item.name}{item.organization ? ` · ${item.organization}` : ""}</h3><p><strong>Remove:</strong> <a href={item.infringingUrl} target="_blank" rel="noreferrer">{item.infringingUrl}</a></p><p><strong>Original work:</strong> {item.originalWork}</p>{item.details && <p>{item.details}</p>}<p className="mono"><a href={`mailto:${item.email}`}>{item.email}</a> · signed &ldquo;{item.signature}&rdquo; · {new Date(item.createdAt).toLocaleString()}</p></div><button type="button" className="admin-remove" disabled={busy} onClick={() => void resolveDmca(item)}>Resolve</button></article>
+            ))}
+          </section>
 
-      <section className="admin-section"><div className="admin-section-head"><h2>URL requests</h2><span className="mono">{requests.length}</span></div>
-        {requests.length === 0 ? <p className="admin-empty">No pending suggestions.</p> : requests.map((item) => (
-          <article className="admin-site" key={item.id}><div><h3>{item.title}</h3><p><a href={item.url} target="_blank" rel="noreferrer">{item.url}</a></p>{item.note && <p>{item.note}</p>}<p className="mono">{item.email || "No reply email"} · {new Date(item.createdAt).toLocaleString()}</p></div><button type="button" className="admin-remove" disabled={busy} onClick={() => void dismissRequest(item)}>Dismiss</button></article>
-        ))}
-      </section>
+          <section className="admin-section"><div className="admin-section-head"><h2>URL requests</h2><span className="mono">{requests.length}</span></div>
+            {requests.length === 0 ? <p className="admin-empty">No pending suggestions.</p> : requests.map((item) => (
+              <article className="admin-site" key={item.id}><div><h3>{item.title}</h3><p><a href={item.url} target="_blank" rel="noreferrer">{item.url}</a></p>{item.note && <p>{item.note}</p>}<p className="mono">{item.email || "No reply email"} · {new Date(item.createdAt).toLocaleString()}</p></div><button type="button" className="admin-remove" disabled={busy} onClick={() => void dismissRequest(item)}>Dismiss</button></article>
+            ))}
+          </section>
 
-      <section className="admin-section"><div className="admin-section-head"><h2>Newsletter subscribers</h2><span className="mono">{subscribers.length}</span></div>
-        {subscribers.length === 0 ? <p className="admin-empty">No saved addresses yet.</p> : <ul className="admin-subscriber-list">{subscribers.map((subscriber) => <li key={subscriber.email}><span>{subscriber.email}</span><span className="mono">{subscriber.verified ? "active" : "pending"}</span></li>)}</ul>}
-      </section>
+          <section className="admin-section"><div className="admin-section-head"><h2>Newsletter subscribers</h2><span className="mono">{subscribers.length}</span></div>
+            {subscribers.length === 0 ? <p className="admin-empty">No saved addresses yet.</p> : <ul className="admin-subscriber-list">{subscribers.map((subscriber) => <li key={subscriber.email}><span>{subscriber.email}</span><span className="mono">{subscriber.verified ? "active" : "pending"}</span></li>)}</ul>}
+          </section>
 
-      <section className="admin-section"><div className="admin-section-head"><h2>Published sites</h2><span className="mono">{sites.length}</span></div>
-        {sites.length === 0 ? <p className="admin-empty">No community sites loaded.</p> : sites.map((site) => (
-          <article className={`admin-site${site.active ? "" : " is-inactive"}`} key={site.slug}><div><h3>{site.title}</h3><p className="mono">/s/{site.slug}/ · {site.active ? "visible" : "hidden"} · {site.healthFailures} failed checks</p><p>{site.description || "No description"}</p><p className="mono">Last check: {site.lastCheckedAt ? new Date(site.lastCheckedAt).toLocaleString() : "not checked yet"}</p></div><button type="button" className="admin-remove" disabled={busy} onClick={() => void removeSite(site)}>Remove</button></article>
-        ))}
-      </section>
+          <section className="admin-section"><div className="admin-section-head"><h2>Published sites</h2><span className="mono">{sites.length}</span></div>
+            {sites.length === 0 ? <p className="admin-empty">No community sites loaded.</p> : sites.map((site) => (
+              <article className={`admin-site${site.active ? "" : " is-inactive"}`} key={site.slug}><div><h3>{site.title}</h3><p className="mono">/s/{site.slug}/ · {site.active ? "visible" : "hidden"} · {site.healthFailures} failed checks</p><p>{site.description || "No description"}</p><p className="mono">Last check: {site.lastCheckedAt ? new Date(site.lastCheckedAt).toLocaleString() : "not checked yet"}</p></div><button type="button" className="admin-remove" disabled={busy} onClick={() => void removeSite(site)}>Remove</button></article>
+            ))}
+          </section>
+        </>
+      )}
     </main>
   );
 }

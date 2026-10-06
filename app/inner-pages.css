@@ -188,6 +188,7 @@
 .admin-form input { width: 100%; box-sizing: border-box; padding: 12px 13px; border: 1px solid var(--line-strong); border-radius: 10px; background: var(--surface); color: var(--text); font: inherit; }
 .admin-form button, .admin-remove { padding: 12px 15px; border: 1px solid color-mix(in srgb, var(--live) 45%, var(--line)); border-radius: 10px; background: color-mix(in srgb, var(--live) 12%, var(--surface)); color: var(--live); cursor: pointer; font: inherit; }
 .admin-form button:disabled, .admin-remove:disabled { opacity: .5; cursor: wait; }
+.admin-form .admin-signout { border-color: var(--line-strong); background: var(--surface); color: var(--muted); }
 .admin-status { margin: 18px 0 0; color: var(--muted); font-size: 13px; }
 .admin-list { display: grid; gap: 12px; margin-top: 28px; }
 .admin-site { display: flex; align-items: center; justify-content: space-between; gap: 18px; padding: 18px; border: 1px solid var(--line); border-radius: 14px; background: var(--surface); }

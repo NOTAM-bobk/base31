@@ -1,7 +1,10 @@
 import assert from "node:assert/strict";
 import fs from "node:fs";
+import os from "node:os";
 import path from "node:path";
+import http from "node:http";
 import { createRequire } from "node:module";
+import { spawn, spawnSync } from "node:child_process";
 import ts from "typescript";
 
 const require = createRequire(import.meta.url);
@@ -193,4 +196,91 @@ assert.equal(directory.tagTone("puzzle"), "amber");
 assert.equal(directory.tagTone("privacy"), "coral");
 assert.equal(directory.tagTone(" custom-tag "), directory.tagTone("CUSTOM-TAG"));
 assert.ok(["mint", "sky", "amber", "coral"].includes(directory.tagTone("unknown")));
+
+// Signing out of the moderation page must clear its numbers instead of leaving
+// the last admin's inbox on screen, and a failed load must do the same.
+const adminSource = fs.readFileSync("components/admin-community-sites.tsx", "utf8");
+assert.ok(adminSource.includes('>Sign out<'), "The moderation page needs a sign-out control");
+assert.ok(/clearData\s*=\s*useCallback/.test(adminSource), "Signing out must clear the inbox");
+for (const reset of ["setSites([])", "setRequests([])", "setDmca([])", "setSubscribers([])", "setSignedIn(false)"]) {
+  assert.ok(adminSource.includes(reset), `Signing out must reset ${reset}`);
+}
+assert.ok(/catch \(error\) \{[\s\S]{0,400}clearData\(\)/.test(adminSource), "A rejected or unauthorized load must not leave stale numbers");
+assert.ok(adminSource.includes("{!signedIn ? ("), "The inbox is only rendered while signed in");
+assert.ok(adminSource.includes("if (!value.trim()) { clearData();"), "Clearing the password field signs the page out");
+
+// The weekly blog agent: a Monday-only workflow that writes through the free
+// Cloudflare Workers AI endpoint and commits the result.
+const blogWorkflow = fs.readFileSync(".github/workflows/weekly-blog.yml", "utf8");
+assert.ok(blogWorkflow.includes('- cron: "0 13 * * 1"'), "The blog agent runs every Monday");
+assert.ok(blogWorkflow.includes("workflow_dispatch:"), "The blog agent can be run by hand");
+assert.ok(/permissions:\s*\n\s*contents: write/.test(blogWorkflow), "The blog agent needs push permission");
+assert.ok(blogWorkflow.includes("node scripts/generate-weekly-blog.mjs"), "The workflow runs the generator");
+assert.ok(blogWorkflow.includes("node scripts/validate-content.mjs"), "The workflow validates before committing");
+assert.ok(blogWorkflow.includes("secrets.CLOUDFLARE_AI_TOKEN || secrets.CLOUDFLARE_API_TOKEN"), "The workflow falls back to the deploy token");
+const generatorSource = fs.readFileSync("scripts/generate-weekly-blog.mjs", "utf8");
+assert.ok(generatorSource.includes("/ai/v1/chat/completions"), "The generator uses the Workers AI OpenAI-compatible endpoint");
+assert.ok(generatorSource.includes("CLOUDFLARE_ACCOUNT_ID"), "The generator reads the Cloudflare account id");
+assert.ok(generatorSource.includes("Skipping:"), "The generator stays quiet before it is configured");
+assert.ok(generatorSource.includes("description.length < 40"), "A generated post must meet the content rules");
+// Run the generator with no credentials: it must exit cleanly and touch nothing.
+const bareEnv = { ...process.env };
+delete bareEnv.CLOUDFLARE_ACCOUNT_ID;
+delete bareEnv.CLOUDFLARE_AI_TOKEN;
+delete bareEnv.CLOUDFLARE_API_TOKEN;
+const blogsBefore = fs.readFileSync("config/blogs.json", "utf8");
+const generatorRun = spawnSync(process.execPath, ["scripts/generate-weekly-blog.mjs"], { env: bareEnv, encoding: "utf8" });
+assert.equal(generatorRun.status, 0, `An unconfigured generator run must not fail: ${generatorRun.stderr}`);
+assert.equal(fs.readFileSync("config/blogs.json", "utf8"), blogsBefore, "An unconfigured run must not rewrite blogs.json");
+assert.ok(fs.readFileSync("README.md", "utf8").includes("CLOUDFLARE_AI_TOKEN"), "The blog agent's secret is documented");
+
+// Drive the generator for real against a local mock model server, in a
+// throwaway copy of the repo, to prove it writes only a valid post. This must
+// use async spawn: a synchronous spawn would block this process and the mock
+// server could never answer the child.
+const runNode = (args, options) => new Promise((resolve) => {
+  const child = spawn(process.execPath, args, options);
+  let stdout = "";
+  let stderr = "";
+  child.stdout.on("data", (chunk) => { stdout += chunk.toString(); });
+  child.stderr.on("data", (chunk) => { stderr += chunk.toString(); });
+  const timer = setTimeout(() => child.kill("SIGKILL"), 30000);
+  child.on("close", (status) => { clearTimeout(timer); resolve({ status, stdout, stderr }); });
+});
+const cannedPost = {
+  title: "A Field Guide to Small Personal Websites",
+  description: "A short, concrete guide to finding and keeping the small personal websites that make the open web worth browsing.",
+  tags: ["indie web", "discovery"],
+  body: ["Opening paragraph.", "## First heading", "Paragraph two.", "Paragraph three.", "- a list item", "Paragraph four.", "## Second heading", "Closing paragraph."],
+};
+const mock = http.createServer((request, response) => {
+  response.setHeader("Content-Type", "application/json");
+  response.end(JSON.stringify({ choices: [{ message: { content: JSON.stringify(cannedPost) } }] }));
+});
+await new Promise((resolve) => mock.listen(0, "127.0.0.1", resolve));
+const sandbox = fs.mkdtempSync(path.join(os.tmpdir(), "base31-blog-"));
+fs.mkdirSync(path.join(sandbox, "config"), { recursive: true });
+fs.mkdirSync(path.join(sandbox, "scripts"), { recursive: true });
+fs.copyFileSync("scripts/generate-weekly-blog.mjs", path.join(sandbox, "scripts", "generate-weekly-blog.mjs"));
+fs.writeFileSync(path.join(sandbox, "config", "blogs.json"), "[]\n");
+const mockEnv = { ...bareEnv, CLOUDFLARE_ACCOUNT_ID: "test-account", CLOUDFLARE_AI_TOKEN: "test-token", AI_BLOG_API_URL: `http://127.0.0.1:${mock.address().port}/v1/chat/completions` };
+const generated = await runNode(["scripts/generate-weekly-blog.mjs"], { cwd: sandbox, env: mockEnv });
+assert.equal(generated.status, 0, `The generator must succeed against a valid answer: ${generated.stderr}`);
+const writtenPosts = JSON.parse(fs.readFileSync(path.join(sandbox, "config", "blogs.json"), "utf8"));
+assert.equal(writtenPosts.length, 1, "A successful run writes exactly one post");
+assert.equal(writtenPosts[0].slug, "a-field-guide-to-small-personal-websites");
+assert.equal(writtenPosts[0].date, new Date().toISOString().slice(0, 10));
+assert.deepEqual(writtenPosts[0].body, cannedPost.body);
+// An off-spec answer must fail the run and leave the file untouched.
+const badMock = http.createServer((request, response) => {
+  response.setHeader("Content-Type", "application/json");
+  response.end(JSON.stringify({ choices: [{ message: { content: JSON.stringify({ title: "Too Short", description: "tiny", tags: ["x"], body: ["one", "two"] }) } }] }));
+});
+await new Promise((resolve) => badMock.listen(0, "127.0.0.1", resolve));
+fs.writeFileSync(path.join(sandbox, "config", "blogs.json"), "[]\n");
+const rejected = await runNode(["scripts/generate-weekly-blog.mjs"], { cwd: sandbox, env: { ...mockEnv, AI_BLOG_API_URL: `http://127.0.0.1:${badMock.address().port}/v1/chat/completions` } });
+assert.notEqual(rejected.status, 0, "An off-spec answer must fail the run");
+assert.equal(fs.readFileSync(path.join(sandbox, "config", "blogs.json"), "utf8"), "[]\n", "A rejected answer must not touch blogs.json");
+mock.close(); badMock.close();
+fs.rmSync(sandbox, { recursive: true, force: true });
 console.log(`Directory tests passed: ${entries.length} detail pages, four external search indexes, stable shared vote keys.`);

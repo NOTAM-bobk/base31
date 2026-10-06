@@ -11,19 +11,20 @@ import { tick } from "@/lib/haptics";
 /* The support hub. Everything that asks the visitor for something —
    the Trustpilot review collector, the donation board, the sponsored
    referrals and the paid support button — is gathered under one heading that
-   opens and closes, exactly like the "Featured sites" heading. It starts open;
-   the heading button is a real disclosure control with `aria-expanded` and
-   `aria-controls`, and a line of text spells out the closed state so a visitor
-   never faces an empty gap with no explanation. Toggling gives the whole
-   block a short shake (and a haptic tick on devices that support it) so the
-   open/close reads as a physical response rather than a silent swap. */
+   opens and closes, exactly like the "Featured sites" heading. It starts
+   closed, so the page does not lead with donation appeals; the heading button
+   is a real disclosure control with `aria-expanded` and `aria-controls`, and a
+   line of text spells out the closed state so a visitor never faces an empty
+   gap with no explanation. Toggling gives the whole block a short shake (and a
+   haptic tick on devices that support it) so the open/close reads as a
+   physical response rather than a silent swap. */
 export default function SupportSection() {
-  const [collapsed, setCollapsed] = useState(false);
+  const [collapsed, setCollapsed] = useState(true);
   const [vibrating, setVibrating] = useState(false);
   const mounted = useRef(false);
 
   useEffect(() => {
-    // Skip the first render: the section starts open, and that is not a toggle.
+    // Skip the first render: the section starts closed, and that is not a toggle.
     if (!mounted.current) {
       mounted.current = true;
       return;

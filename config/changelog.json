@@ -1,5 +1,17 @@
 [
   {
+    "version": "1.40.0",
+    "date": "2026-10-06",
+    "title": "A quieter footer and a support section that stays closed",
+    "summary": "The footer now carries an explicit 2026 copyright, the support hub stays collapsed until opened, the signup block takes less room on phones, and the about section is trimmed to its prose and links.",
+    "highlights": [
+      "A copyright line, Copyright © 2026 base31.org, now sits in the footer beside the contact details and the version number.",
+      "Support starts closed, so the page no longer leads with reviews, ads and donation appeals; its heading still opens and closes the hub.",
+      "The email signup block is smaller on phones — tighter padding, a smaller heading and less space between the form and the optional browser-alert and bug-report extras.",
+      "The four topic tags and the sparkle-gif credit under “about the directory” are gone, leaving the prose and the About Us / Our Story cards."
+    ]
+  },
+  {
     "version": "1.39.0",
     "date": "2026-10-06",
     "title": "A weekly blog agent, and a moderation page that signs out cleanly",

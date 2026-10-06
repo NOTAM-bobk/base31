@@ -1511,7 +1511,7 @@ export default function HomePage({ dict = EN, locale = "en" }: { dict?: Dictiona
         </div>
         <div className="site-footer-inner mono">
           <span>
-            © {new Date().getFullYear()} base31.org · built by Sawyer Schulz · sparkle gif from{" "}
+            Copyright © 2026 base31.org · built by Sawyer Schulz · sparkle gif from{" "}
             <a href="https://www.glitter-graphics.com" target="_blank" rel="noreferrer">glitter-graphics.com</a>
           </span>
           <nav className="footer-links" aria-label="Footer navigation">

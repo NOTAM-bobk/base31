@@ -40,16 +40,6 @@ export default function AboutSection() {
           <span className="about-page-arrow" aria-hidden="true">→</span>
         </a>
       </nav>
-      <div className="topic-links">
-        <a href="#sites">Cool sites</a>
-        <a href="#sites">Fun websites</a>
-        <a href="#sites">Creative web projects</a>
-        <a href="#sites">Useful online tools</a>
-      </div>
-      <p className="about-sparkle-credit mono">
-        sparkle gif from{" "}
-        <a href="https://www.glitter-graphics.com" target="_blank" rel="noreferrer">glitter-graphics.com</a>
-      </p>
     </section>
   );
 }

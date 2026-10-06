@@ -1322,12 +1322,18 @@ p a:hover, li a:hover, dd a:hover, .privacy-copy a:hover, .blog-article a:hover,
   .clock-value { min-width: 46px; height: 46px; padding: 0 6px; font-size: 22px; }
   .clock-label { font-size: 8px; letter-spacing: 0.1em; }
   .referral-block { margin-top: 56px; padding: 16px; }
-  .community-panel { margin-top: 56px; padding: 21px 17px 17px; border-radius: 16px; }
-  .community-email-form { grid-template-columns: 1fr; }
-  .community-email-form .community-action { min-height: 44px; }
-  .push-opt-in { align-items: flex-start; flex-direction: column; gap: 12px; padding: 13px; }
+  /* The signup block takes less room on a phone: tighter frame, smaller
+     heading, and less space between the form and the optional extras, so it
+     reads as one compact call to action instead of a full page section. */
+  .community-panel { margin-top: 40px; padding: 16px 14px 14px; border-radius: 14px; }
+  .community-panel > .eyebrow { margin-bottom: 9px; }
+  .community-panel h2 { font-size: 21px; }
+  .community-panel-lede { margin-top: 9px; font-size: 12.5px; }
+  .community-email-form { grid-template-columns: 1fr; margin-top: 16px; gap: 8px; }
+  .community-email-form .community-action { min-height: 42px; }
+  .push-opt-in { align-items: flex-start; flex-direction: column; gap: 10px; padding: 11px; }
   .push-opt-in .community-action { width: 100%; }
-  .bug-report-form { padding: 12px; }
+  .bug-report-form { padding: 11px; }
   .referral-head h2 { font-size: 14px; }
   .referral-card { grid-template-columns: 1fr; gap: 12px; }
   .referral-shot { aspect-ratio: 16 / 9; }

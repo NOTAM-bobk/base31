@@ -177,6 +177,14 @@ for (const href of ["/about", "/our-story"]) {
   assert.ok(home.includes(`href="${href}"`));
   assert.ok(fs.readFileSync("components/about-section.tsx", "utf8").includes(`href="${href}"`));
 }
+// The footer carries the copyright, and the about section no longer repeats the
+// four topic tags or the sparkle-gif credit under it.
+assert.ok(home.includes("Copyright © 2026 base31.org"), "The footer must show the 2026 copyright");
+const aboutSection = fs.readFileSync("components/about-section.tsx", "utf8");
+assert.ok(!aboutSection.includes("topic-links"), "The four topic tags were removed from the about section");
+assert.ok(!aboutSection.includes("about-sparkle-credit"), "The sparkle-gif credit was removed from the about section");
+// Support starts closed, so the page does not lead with donation appeals.
+assert.ok(fs.readFileSync("components/support-section.tsx", "utf8").includes("useState(true)"), "The support section must start collapsed");
 assert.ok(fs.readFileSync("app/our-story/page.tsx", "utf8").includes('canonical: "/our-story"'));
 assert.ok(fs.readFileSync("app/sitemap.ts", "utf8").includes("/our-story"));
 const statsPage = fs.readFileSync("app/stats/page.tsx", "utf8");

@@ -12,10 +12,18 @@ import { matchesQuery } from "@/lib/search";
 // Every collection on /explore is listed here — its id (which is also the
 // anchor on /explore and the slug of its own subsite at /explore/<id>), the
 // heading and one-line description it prints, the unit its count is read in,
-// and the whole set of cards it holds. The homepage, the phone drawer, the
-// section rail and the subsite route all read this list instead of each
-// hard-coding the same six names, so a section can never be linked somewhere it
-// does not exist, and adding a seventh collection is one entry here.
+// and the whole set of cards it holds. The subsite route, the sitemap, the
+// count on each key row and the rule that decides which sections a search
+// leaves standing all read it here, so no page can describe a collection that
+// does not exist.
+//
+// The two key rows and the phone drawer still spell out the sections they
+// offer, because each also carries the count text and the href shape that suits
+// its own page — `#sites` here, `/explore/sites` from the landing page. That is
+// what `npm run test:directory` holds together: every hash the drawer offers has
+// to be an id a section owns, and every one of those ids has to be an entry
+// here. A seventh collection is therefore its config file, one entry below, and
+// a key in each row.
 //
 // The filter chips come in two flavours and the registry says which one a
 // section uses: the coarse `category` where the collection is filed under one

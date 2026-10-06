@@ -107,10 +107,12 @@ anything between them. The editor's picks are the landing page's alone:
 
 `/explore/<section>` is a single collection on a page of its own. Those pages
 are built from `lib/sections.ts` — the one place a section's id, heading, lede,
-count unit, filter field and cards are described — so a new collection is one
-entry there plus its `config/*.json` list, not four edits in four places. Add
-it there and the quick jumps, the phone drawer, the section rail, the sitemap
-and `app/explore/[section]/page.tsx` all follow.
+count unit, filter field and cards are described. Add a collection there and its
+page, its canonical metadata, its sitemap line, the count on its key row and the
+rule a search uses to decide whether it stays on screen all follow. The two key
+rows and the phone drawer still carry a row of their own, because each also
+needs its own count text and href shape; `npm run test:directory` fails if any
+hash the drawer offers is missing from the registry.
 
 Shared components live in `components/`. Styling uses hand-written
 CSS; `app/directory.css` owns editor's picks, the Top 10, the refreshed

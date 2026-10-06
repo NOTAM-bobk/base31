@@ -1,5 +1,21 @@
 [
   {
+    "version": "1.43.0",
+    "date": "2026-10-06",
+    "title": "The homepage gets its lists back",
+    "summary": "The landing page now opens on its keys into the directory, the editor's picks, a streaming-style Top 10 and a tag shelf, the confirm-to-close warning is gone, and the Explore control is centred.",
+    "highlights": [
+      "The landing page leads with nine keys into the directory — editor's picks, the featured sites, each of the four off-directory strips, tags, recently added and the quality report — and every one is a link into that section on /explore, where the lists themselves still live.",
+      "The editor's-picks carousel is back on the homepage below those keys, so the editorial shortlist is met without opening a menu.",
+      "A new Top 10 trending today board follows it, dressed the way a streaming service dresses one: a flame on the heading and a big outlined rank numeral down the side of each row.",
+      "The Top 10 is ranked from the same shared vote totals /stats and every card use — real community counts, not page views. An entry nobody has voted on reads “no votes yet”, an all-zero board says so instead of inventing an order, and the caption under the heading states plainly what the numbers are.",
+      "“Browse by tag” puts the 18 most-used tags on the homepage, each linking to its own tag page.",
+      "The browser's “unsaved changes will be discarded” confirmation — raised once a visitor had clicked or scrolled — is removed. The screen wake lock and the 30-day scroll resume stay.",
+      "“Explore the directory” is centred on the hero instead of sitting against the left edge.",
+      "Three new picks: Puzzlify, a photo-to-jigsaw puzzle maker; the SteamVaults Steam Market Fee Calculator; and Igyeon, a Korean-language discussion site of source-linked arguments."
+    ]
+  },
+  {
     "version": "1.42.0",
     "date": "2026-10-06",
     "title": "The directory moves to /explore, behind a phone menu",

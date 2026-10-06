@@ -3,6 +3,7 @@
 import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { CSSProperties, FormEvent } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import sites from "@/config/sites.json";
 import pkg from "@/package.json";
 import AboutSection from "@/components/about-section";
@@ -31,10 +32,13 @@ import HeroStats from "@/components/hero-stats";
 import CoolAis from "@/components/cool-ais";
 import Freshness from "@/components/freshness";
 import { allCoolAis, searchCoolAis, detailPath, directoryEntries, tagTone } from "@/lib/directory";
-import { tagCount } from "@/lib/tags";
+// Aliased because the component below builds its own `allTags` for the filter
+// chips — that one counts the featured sites alone and carries no slug.
+import { allTags as directoryTags, tagCount } from "@/lib/tags";
 import { recentlyAdded } from "@/lib/recently-added";
 import { matchesQuery } from "@/lib/search";
 import EditorsPicks from "@/components/editors-picks";
+import TopTen from "@/components/top-ten";
 import { compareVotes } from "@/lib/vote-ranking";
 
 type Site = { name: string; subdomain: string; url: string; tags?: string[]; description?: string; show?: boolean; community?: boolean; createdAt?: number; icon?: string; lastChecked?: string; addedAt?: string };
@@ -840,6 +844,9 @@ export default function HomePage({ dict = EN, locale = "en", mode = "home" }: { 
     { id: "request-url", label: "Submit" },
   ] : [
     { id: "page-title", label: "Top" },
+    { id: "editors-picks", label: "Editor's picks" },
+    { id: "top-ten", label: "Top 10" },
+    { id: "browse-tags", label: "Tags" },
     { id: "about", label: "About" },
     { id: "discussion", label: "Community" },
     { id: "support", label: "Support" },
@@ -1189,13 +1196,80 @@ export default function HomePage({ dict = EN, locale = "en", mode = "home" }: { 
             above a grey body. The quick jumps moved out of the hero and into
             the slab, since they belong to the browsing half of the page. */}
         <div className="page-band">
-          {/* Two halves of one component. Everything between here and the
-              URL request form is the directory, and the directory is
-              `/explore`; below it the landing page keeps the prose sections
-              and the signup. The two blocks are wrapped rather than split
-              into separate files so there is one implementation of the
-              directory — its state, its filters, its polling — and so the
-              section order its tests pin stays in one readable place. */}
+          {/* Two halves of one component, and three blocks. `/explore`
+              (`isExplore`) carries the directory itself: the search, the
+              filters, the featured sites, the four off-directory strips and
+              the URL request form. The landing page carries a browsing half
+              of its own — the section keys, the editor's picks, the top ten
+              and the tag shelf — followed by the prose sections and the
+              signup. The blocks are wrapped rather than split into separate
+              files so there is one implementation of the directory — its
+              state, its filters, its polling — and so the section order its
+              tests pin stays in one readable place. */}
+          {!isExplore && <>
+          {/* The landing page's way in. The lists themselves live on
+              `/explore`, so every key here is a link into that page's own
+              section (or into one of the derived indexes), not an anchor into
+              this one. They lead the band, above the editor's picks and the
+              top ten, because the whole job of the landing page is to get a
+              visitor into the list. */}
+          <nav className="quick-jumps" aria-label="Jump to a section">
+            {[
+              { href: "/explore#editors-picks", label: "Editor's picks", count: "today's shortlist" },
+              { href: "/explore#sites", label: dict.featured, count: `${allSites.length} sites` },
+              { href: "/explore#cool-sites", label: dict.coolSites, count: `${coolSites.length} sites` },
+              { href: "/explore#cool-apis", label: dict.coolApis, count: `${coolApis.length} APIs` },
+              { href: "/explore#cool-apps", label: dict.coolApps, count: `${coolApps.length} apps` },
+              { href: "/explore#cool-ais", label: dict.coolAis, count: `${allCoolAis.length} AIs` },
+              { href: "/tags", label: "Tags", count: `${tagCount} tags` },
+              { href: "/recently-added", label: "Recently added", count: `${recentlyAdded.length} dated` },
+              { href: "/quality-report", label: "Quality report", count: "reviews" },
+            ].map((jump) => (
+              <a key={jump.href} className="quick-jump" href={jump.href} onClick={() => tick(12)}>
+                <span className="quick-jump-label">{jump.label}</span>
+                <span className="quick-jump-meta">
+                  <span className="quick-jump-count mono">{jump.count}</span>
+                  <span className="quick-jump-arrow mono" aria-hidden="true">→</span>
+                </span>
+              </a>
+            ))}
+          </nav>
+
+          {/* The editor's picks rotate through the shortlist on /explore; the
+              landing page shows the same carousel, because the picks are the
+              editorial voice of the directory and a visitor who never opens
+              a menu should still meet them. */}
+          <EditorsPicks />
+
+          {/* The ten most-voted picks, in the streaming-service shape: a rank
+              numeral, a row, a flame. It reads the same shared vote totals the
+              cards do, so the two can never disagree. */}
+          <TopTen />
+
+          {/* Tags are an index of their own, so the landing page offers the
+              shelf rather than only a link to it: every chip is a real
+              `/tags/<slug>` page listing every entry that carries the tag. */}
+          <section id="browse-tags" className="tag-strip directory-section" aria-labelledby="browse-tags-heading">
+            <div className="tag-strip-heading">
+              <h2 id="browse-tags-heading">Browse by tag</h2>
+              <Link className="tag-strip-all mono" href="/tags" onClick={() => tick(12)}>All {tagCount} tags <span aria-hidden="true">→</span></Link>
+            </div>
+            <div className="tag-strip-list">
+              {directoryTags.slice(0, 18).map((info) => (
+                <Link
+                  key={info.slug}
+                  className={`tag-strip-item tone-${tagTone(info.tag)}`}
+                  href={`/tags/${info.slug}`}
+                  onClick={() => tick(12)}
+                >
+                  <span className="tag-strip-name">#{info.tag}</span>
+                  <span className="tag-strip-count mono">{info.count}</span>
+                </Link>
+              ))}
+            </div>
+          </section>
+          </>}
+
           {isExplore && <>
           {!query.trim() && <EditorsPicks />}
           {/* Five boxes that jump straight into a section, for the visitor who

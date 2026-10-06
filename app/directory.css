@@ -377,7 +377,7 @@ html::-webkit-scrollbar, body::-webkit-scrollbar { display: none; width: 0; heig
    link is not a mystery door. */
 .explore-cta {
   display: flex; align-items: center; gap: 12px;
-  max-width: 560px; margin-top: 30px; padding: 9px 11px;
+  max-width: 560px; margin: 30px auto 0; padding: 9px 11px;
   border: 1px solid var(--line-strong); border-radius: 14px;
   background: linear-gradient(180deg, var(--surface-hover), var(--input-bg) 72%);
   color: var(--text); text-decoration: none;
@@ -398,7 +398,7 @@ html[data-theme="light"] .explore-cta { box-shadow: 0 8px 22px rgb(0 0 0 / 6%), 
   background: color-mix(in srgb, var(--live) 12%, var(--surface));
   color: var(--live);
 }
-.explore-cta-body { display: flex; flex: 1; min-width: 0; flex-direction: column; gap: 2px; }
+.explore-cta-body { display: flex; flex: 1; min-width: 0; flex-direction: column; align-items: center; gap: 2px; text-align: center; }
 .explore-cta-title { color: var(--text-strong); font-size: 14px; font-weight: 600; }
 .explore-cta-meta { color: var(--subtle); font-size: 10.5px; }
 .explore-cta-arrow { flex: 0 0 auto; color: var(--muted); font-size: 14px; transition: transform 160ms ease, color 160ms ease; }
@@ -497,11 +497,121 @@ html[data-theme="light"] .nav-drawer-scrim { background: rgb(0 0 0 / 32%); }
 .nav-drawer-links.is-secondary a { color: var(--muted); font-size: 12.5px; }
 
 @media (max-width: 600px) {
-  .explore-cta { margin-top: 26px; }
+  .explore-cta { margin: 26px auto 0; }
   .explore-cta-meta { font-size: 10px; }
   /* A phone's header has room for the wordmark, the GitHub count and the two
      buttons — not for the links as well. They move into the drawer, which is
      where a phone looks for them anyway; the drawer's "More on base31" list
      carries the same destinations. */
   .site-nav { display: none; }
+}
+
+/* Top 10 trending today ------------------------------------------------
+   The landing page's popularity board, dressed the way a streaming service
+   dresses one: a flame on the heading and a big rank numeral down the left of
+   every row. The numerals are outlined rather than filled — a translucent
+   stroke over the panel — so ten of them in a column read as a list instead of
+   ten competing headlines. `components/top-ten.tsx` explains where the numbers
+   come from; every figure printed in here is a real vote total or the phrase
+   "no votes yet", never an invented score. */
+.top-ten {
+  margin: 0 auto 32px; padding: 22px 24px 18px;
+  border: 1px solid color-mix(in srgb, var(--accent-coral) 26%, var(--line-strong));
+  border-radius: var(--radius-card);
+  background: linear-gradient(160deg, color-mix(in srgb, var(--accent-coral) 7%, var(--surface)), var(--surface) 62%);
+  box-shadow: var(--shadow);
+}
+.top-ten-heading { display: flex; align-items: center; gap: 10px; }
+.top-ten-heading h2 {
+  margin: 0; color: var(--text-strong);
+  font-family: var(--font-hand), var(--font-sans); font-size: 27px; font-weight: 400;
+}
+.top-ten-flame {
+  display: grid; width: 34px; height: 34px; flex: 0 0 auto; place-items: center;
+  border: 1px solid color-mix(in srgb, var(--accent-amber) 48%, var(--line));
+  border-radius: 11px;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--accent-amber) 22%, var(--surface)), color-mix(in srgb, var(--accent-coral) 14%, var(--surface)));
+  color: var(--accent-coral);
+  filter: drop-shadow(0 4px 10px color-mix(in srgb, var(--accent-amber) 40%, transparent));
+}
+.top-ten-badge {
+  margin-left: auto; padding: 3px 8px; border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--live) 38%, var(--line));
+  color: var(--live); font-size: 9px; letter-spacing: .14em; text-transform: uppercase;
+}
+.top-ten-note { max-width: 640px; margin: 10px 0 18px; color: var(--muted); font-size: 12px; line-height: 1.6; }
+.top-ten-list { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.top-ten-row {
+  display: flex; align-items: center; gap: 14px;
+  padding: 9px 14px 9px 10px;
+  border: 1px solid var(--line); border-radius: 14px;
+  background: linear-gradient(180deg, var(--surface-hover), var(--surface));
+  transition: border-color 160ms ease, transform 160ms ease, box-shadow 160ms ease;
+}
+.top-ten-row:hover {
+  border-color: color-mix(in srgb, var(--accent-coral) 46%, var(--line-strong));
+  transform: translateY(-2px);
+  box-shadow: var(--shadow);
+}
+.top-ten-rank {
+  flex: 0 0 auto; width: 54px; text-align: center;
+  font-family: var(--font-display), var(--font-sans);
+  font-size: 42px; font-weight: 800; line-height: .84; letter-spacing: -.08em;
+  color: transparent;
+  -webkit-text-stroke: 1.6px color-mix(in srgb, var(--text-strong) 46%, transparent);
+}
+html[data-theme="light"] .top-ten-rank { -webkit-text-stroke-color: color-mix(in srgb, var(--text-strong) 32%, transparent); }
+/* The numeral is decorative, but it must not vanish for a reader who is forced
+   into one system colour: outline strokes are the first thing to disappear. */
+@media (forced-colors: active) { .top-ten-rank { color: CanvasText; -webkit-text-stroke: 0; } }
+.top-ten-body { display: flex; flex: 1; min-width: 0; flex-direction: column; gap: 3px; }
+.top-ten-name { color: var(--text-strong); font-size: 14.5px; font-weight: 600; text-decoration: none; }
+.top-ten-name:hover { color: var(--live); }
+.top-ten-meta { color: var(--subtle); font-size: 10px; letter-spacing: .04em; }
+.top-ten-open {
+  display: grid; width: 30px; height: 30px; flex: 0 0 auto; place-items: center;
+  border: 1px solid var(--line); border-radius: 9px;
+  background: var(--surface); color: var(--muted); font-size: 13px; text-decoration: none;
+  transition: border-color 160ms ease, color 160ms ease, transform 160ms ease;
+}
+.top-ten-open:hover { border-color: color-mix(in srgb, var(--live) 55%, var(--line)); color: var(--live); transform: translate(1px, -1px); }
+.top-ten-open:focus-visible, .top-ten-name:focus-visible, .top-ten-more:focus-visible { outline: 2px solid var(--live); outline-offset: 3px; }
+.top-ten-foot { margin: 14px 0 0; }
+.top-ten-more { color: var(--muted); font-size: 12px; text-decoration: none; transition: color 150ms ease; }
+.top-ten-more:hover { color: var(--live); }
+
+/* Browse by tag -------------------------------------------------------
+   The shelf of the most-used tags, each chip a real `/tags/<slug>` page. The
+   chips wear the same mint/sky/amber/coral tone system as the cards and the
+   editor's-pick tags, so a tag keeps its colour wherever it appears. */
+.tag-strip { margin: 0 auto; }
+.tag-strip-heading { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
+.tag-strip-heading h2 { margin: 0; color: var(--text-strong); font-size: 17px; font-weight: 500; }
+.tag-strip-all { color: var(--muted); font-size: 10.5px; text-decoration: none; transition: color 150ms ease; }
+.tag-strip-all:hover { color: var(--live); }
+.tag-strip-list { display: flex; flex-wrap: wrap; gap: 8px; }
+.tag-strip-item {
+  display: inline-flex; align-items: center; gap: 7px;
+  min-height: 34px; padding: 0 11px;
+  border: 1px solid var(--line); border-radius: 999px;
+  background: var(--surface); color: var(--muted);
+  font-size: 12px; text-decoration: none;
+  transition: border-color 150ms ease, background 150ms ease, transform 150ms ease;
+}
+.tag-strip-item:hover { background: var(--surface-hover); transform: translateY(-1px); }
+.tag-strip-item:focus-visible { outline: 2px solid var(--live); outline-offset: 3px; }
+.tag-strip-item.tone-mint { color: var(--live); border-color: color-mix(in srgb, var(--live) 34%, var(--line)); }
+.tag-strip-item.tone-sky { color: var(--accent-sky); border-color: color-mix(in srgb, var(--accent-sky) 34%, var(--line)); }
+.tag-strip-item.tone-amber { color: var(--accent-amber); border-color: color-mix(in srgb, var(--accent-amber) 34%, var(--line)); }
+.tag-strip-item.tone-coral { color: var(--accent-coral); border-color: color-mix(in srgb, var(--accent-coral) 34%, var(--line)); }
+.tag-strip-count { color: var(--subtle); font-size: 9.5px; }
+
+@media (max-width: 600px) {
+  .top-ten { padding: 18px 14px 14px; }
+  .top-ten-heading h2 { font-size: 22px; }
+  .top-ten-note { font-size: 11.5px; }
+  .top-ten-row { gap: 10px; padding: 8px 10px; }
+  .top-ten-rank { width: 40px; font-size: 32px; }
+  .top-ten-name { font-size: 13.5px; }
+  .tag-strip-item { min-height: 32px; font-size: 11.5px; }
 }

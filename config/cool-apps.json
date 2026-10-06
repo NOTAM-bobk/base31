@@ -294,5 +294,21 @@
     "url": "https://meet.jit.si",
     "tags": ["video", "calls"],
     "description": "Start a video call in a browser with no account and no download, and share the room link with as many people as you like."
+  },
+  {
+    "addedAt": "2026-10-06",
+    "name": "SteamVaults Steam Market Fee Calculator",
+    "category": "Utilities",
+    "url": "https://steamvaults.org/tools/steam-market-fee-calculator",
+    "tags": ["calculator", "games", "utility"],
+    "description": "A free browser calculator for Steam Community Market fees and estimated Wallet proceeds, showing the fee parts and the cent rounding behind the total. The manual calculator needs no sign-in; the optional inventory features use a Steam login. Steam's own sale confirmation is the authoritative figure, and SteamVaults is independent of Valve. Submitted by its operator."
+  },
+  {
+    "addedAt": "2026-10-06",
+    "name": "Puzzlify",
+    "category": "Images",
+    "url": "https://puzzlify.app/en/puzzle-maker/",
+    "tags": ["puzzle", "image", "games"],
+    "description": "Upload a photo and it becomes a real tab-and-blank jigsaw you play in the browser, 24 to 252 pieces, and recipients need no account. The preview is free; publishing a shareable link costs EUR 3.99. It is a browser puzzle, not a printed one, and not puzzlify.io. Built by the team behind base31."
   }
 ]

@@ -7,14 +7,15 @@ import { useEffect } from "react";
 // 1. Screen Wake Lock. Where the API exists, the page asks the browser to keep
 //    the display awake, and re-acquires the lock whenever the tab is brought
 //    back to the foreground (the browser drops it automatically while hidden).
-// 2. A leave warning. Once the visitor has actually clicked, scrolled, tapped or
-//    typed, closing or reloading the page raises the browser's "unsaved changes
-//    will be discarded" confirmation. Nothing on the page is truly unsaved — the
-//    point is to stop an accidental close from throwing away a half-finished
-//    read (a vote, a search, a scrolling session).
+// 2. Resume position. See below.
 //
-// Both are best-effort: every API call is feature-detected and its failures are
-// swallowed, so browsers without them simply get none of it.
+// There is deliberately **no** leave warning: the page used to raise the
+// browser's "unsaved changes will be discarded" confirmation once the visitor
+// had clicked or scrolled, and it was removed because nothing here is actually
+// unsaved — it only got in the way of closing a tab.
+//
+// Both remaining behaviors are best-effort: every API call is feature-detected
+// and its failures are swallowed, so browsers without them simply get none of it.
 type WakeLockSentinelLike = {
   release: () => Promise<void>;
 };
@@ -48,18 +49,7 @@ export default function PageBehaviors() {
     void acquire();
     document.addEventListener("visibilitychange", onVisibilityChange);
 
-    // Any real gesture marks the session as "in progress". Pointer and key
-    // events cover clicks and typing; a scroll of any kind covers touch and
-    // wheel, which do not always surface as pointer events.
-    let interacted = false;
-    const markInteracted = () => {
-      interacted = true;
-    };
-    const gestures = ["pointerdown", "keydown", "wheel", "touchstart"];
-    gestures.forEach((type) => window.addEventListener(type, markInteracted, { passive: true }));
-    window.addEventListener("scroll", markInteracted, { passive: true });
-
-    // 3. Resume position. The scroll offset of each page is remembered (for 30
+    // 2. Resume position. The scroll offset of each page is remembered (for 30
     //    days) so a visitor who leaves and comes back lands where they were.
     //    A link with a #hash always wins over the saved position.
     const scrollKey = `base31:scroll:${window.location.pathname}`;
@@ -78,20 +68,8 @@ export default function PageBehaviors() {
     };
     window.addEventListener("scroll", saveScroll, { passive: true });
 
-    const onBeforeUnload = (event: BeforeUnloadEvent) => {
-      if (!interacted) return;
-      // Both of these are required for the browser to show its own confirmation
-      // (the message text is not customizable).
-      event.preventDefault();
-      event.returnValue = "";
-    };
-    window.addEventListener("beforeunload", onBeforeUnload);
-
     return () => {
       document.removeEventListener("visibilitychange", onVisibilityChange);
-      gestures.forEach((type) => window.removeEventListener(type, markInteracted));
-      window.removeEventListener("scroll", markInteracted);
-      window.removeEventListener("beforeunload", onBeforeUnload);
       window.removeEventListener("scroll", saveScroll);
       window.clearTimeout(saveTimer);
       void sentinel?.release().catch(() => {});

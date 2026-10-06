@@ -118,6 +118,12 @@ assert.equal((homepage.match(/<UrlRequest \/>/g) || []).length, 1);
 // only way into the upload form.
 assert.match(homepage, /"#request-url"/, "The explore page anchors to its own upload form");
 assert.match(homepage, /"\/explore#request-url"/, "The landing page links to the form on /explore");
+// The landing page leads with its keys into every directory section, including
+// the tag shelf, so the indexes stay reachable without opening the drawer.
+for (const jump of ["editors-picks", "sites", "cool-sites", "cool-apis", "cool-apps", "cool-ais"]) {
+  assert.ok(homepage.includes(`{ href: "/explore#${jump}"`), `The landing page's keys include /explore#${jump}`);
+}
+assert.ok(homepage.includes('{ href: "/tags"'), "The landing page's keys include the tag index");
 for (const url of ["https://dev.to/base31", "https://medium.com/@base31dotorg"]) assert.ok(homepage.includes(url));
 const notifications = fs.readFileSync("components/directory-notifications.tsx", "utf8");
 assert.ok(notifications.includes("result?.success !== true"), "Signup success requires the Worker storage acknowledgement");

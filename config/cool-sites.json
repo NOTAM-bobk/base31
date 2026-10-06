@@ -378,5 +378,13 @@
     "tags": ["games", "personal", "interactive", "art"],
     "description": "Runbo Li's personal website rebuilt as a playable Halo 3 campaign: drop into the Guardian map, finish quests, and uncover hidden memories.",
     "addedAt": "2026-10-06"
+  },
+  {
+    "name": "Igyeon (이견)",
+    "url": "https://igyeon.com/",
+    "category": "Knowledge",
+    "tags": ["korean", "discussion", "arguments"],
+    "description": "A Korean-language discussion site where public questions carry source-linked arguments for and against. Cream-framed cards form a one-question-at-a-time reel with previous and next controls. Guests can read and respond; proposing a question needs an account, automatic news questions are labelled, and the responses are not representative polling, so read them as a debate rather than a survey.",
+    "addedAt": "2026-10-06"
   }
 ]

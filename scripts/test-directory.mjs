@@ -20,11 +20,26 @@ function load(relative) {
   new Function("require", "module", "exports", compiled)(localRequire, module, module.exports);
   return module.exports;
 }
-const { compareVotes, totalVotes } = load("lib/vote-ranking.ts");
+const { compareVotes, rankByVotes, totalVotes } = load("lib/vote-ranking.ts");
 assert.equal(totalVotes({ up: 2, down: 10 }), 12);
 assert.ok(compareVotes({ up: 2, down: 10 }, { up: 9, down: 0 }) < 0);
 assert.ok(compareVotes(undefined, { up: 0, down: 1 }) > 0);
 assert.ok(compareVotes({ up: 5, down: 5 }, { up: 6, down: 4 }) > 0);
+// The homepage's Top 10 ranks through the same rule as /stats and the strips:
+// by total votes rather than net, alphabetically where they are level, and cut
+// to the asked-for length. An unvoted board keeps the directory's own order
+// instead of shuffling.
+const rankedBoard = [
+  { name: "Bravo", voteKey: "b" },
+  { name: "Alpha", voteKey: "a" },
+  { name: "Delta", voteKey: "d" },
+  { name: "Charlie", voteKey: "c" },
+];
+const boardTotals = { b: { up: 0, down: 9 }, d: { up: 4, down: 0 }, a: { up: 2, down: 1 }, c: { up: 0, down: 0 } };
+assert.deepEqual(rankByVotes(rankedBoard, boardTotals, 3).map((entry) => entry.name), ["Bravo", "Delta", "Alpha"], "The board ranks by all votes and cuts to its length");
+assert.deepEqual(rankByVotes(rankedBoard, {}, 4).map((entry) => entry.name), ["Alpha", "Bravo", "Charlie", "Delta"], "An unvoted board falls back to name order, so nothing flaps between renders");
+assert.deepEqual(rankByVotes(rankedBoard, boardTotals, 10).length, 4, "A board shorter than its limit is returned whole");
+assert.deepEqual(rankedBoard.map((entry) => entry.name), ["Bravo", "Alpha", "Delta", "Charlie"], "Ranking must not reorder the caller's own array");
 const directory = load("lib/directory.ts");
 const entries = directory.directoryEntries;
 const sprite = entries.find(item => item.url === "https://spriteframe.com/png-to-sprite-sheet");
@@ -212,12 +227,48 @@ assert.ok(fs.readFileSync("app/directory.css", "utf8").includes("@media (max-wid
 const drawerHashes = [...new Set([...home.matchAll(/"\/explore#([a-z0-9-]+)"/g)].map((match) => match[1]))];
 assert.equal(drawerHashes.length, 7, "The drawer lists every directory section");
 const sectionIds = new Set();
-for (const file of ["components/home-page.tsx", "components/editors-picks.tsx", "components/cool-sites.tsx", "components/cool-apis.tsx", "components/cool-apps.tsx", "components/cool-ais.tsx", "components/url-request.tsx"]) {
+for (const file of ["components/home-page.tsx", "components/editors-picks.tsx", "components/top-ten.tsx", "components/cool-sites.tsx", "components/cool-apis.tsx", "components/cool-apps.tsx", "components/cool-ais.tsx", "components/url-request.tsx"]) {
   const source = fs.readFileSync(file, "utf8");
   for (const [, id] of source.matchAll(/id="([a-z0-9-]+)"/g)) sectionIds.add(id);
   for (const [, id] of source.matchAll(/id: "([a-z0-9-]+)"/g)) sectionIds.add(id);
 }
 for (const hash of drawerHashes) assert.ok(sectionIds.has(hash), `The drawer links /explore#${hash}, which no section owns`);
+
+// The landing page carries a browsing half of its own again: the section keys,
+// the editor's picks, the top ten and the tag shelf, in that order. The keys
+// point into /explore's own sections, because the lists themselves stay on that
+// page — a bare "#sites" would scroll nowhere from the homepage.
+const band = home.indexOf('className="page-band"');
+const homeKeys = home.indexOf('className="quick-jumps"');
+const homePicks = home.indexOf("<EditorsPicks />");
+const homeTopTen = home.indexOf("<TopTen />");
+const homeTags = home.indexOf('id="browse-tags"');
+assert.ok(
+  band >= 0 && band < homeKeys && homeKeys < homePicks && homePicks < homeTopTen && homeTopTen < homeTags,
+  "The landing page runs section keys, then editor's picks, then the top ten, then the tags",
+);
+assert.match(home, /href: "\/explore#sites"/, "The landing page's section keys point into /explore");
+for (const jump of ["editors-picks", "cool-sites", "cool-apis", "cool-apps", "cool-ais"]) {
+  assert.ok(home.includes(`href: "/explore#${jump}"`), `The landing page's keys include the ${jump} section`);
+}
+assert.ok(home.includes("href={`/tags/${info.slug}`}"), "The landing page links the real tag pages, not a lookup page");
+
+// The top ten is built from the shared vote totals every card already reads, and
+// it never invents a figure: an entry nobody has voted on says so.
+const topTen = fs.readFileSync("components/top-ten.tsx", "utf8");
+assert.ok(topTen.includes("useSiteVotes(CANDIDATE_KEYS)"), "The top ten ranks real shared vote totals");
+assert.ok(topTen.includes("rankByVotes(CANDIDATES, totals, RANKS)"), "The top ten uses the same ranking rule as /stats and the strips");
+assert.ok(topTen.includes("no votes yet"), "An unvoted entry shows no count rather than a made-up one");
+assert.ok(topTen.includes('id="top-ten"'), "The top ten owns a section a rail link can name");
+
+// The confirm-to-close leave warning is gone; the two quiet behaviors stay.
+const behaviors = fs.readFileSync("components/page-behaviors.tsx", "utf8");
+assert.ok(!behaviors.includes("beforeunload"), "The confirm-to-close leave warning is removed");
+assert.ok(behaviors.includes("wakeLock.request"), "Screen Wake Lock stays");
+assert.ok(behaviors.includes("base31:scroll:"), "Scroll-position resume stays");
+
+// The landing page's way into the directory is centred on the hero.
+assert.match(fs.readFileSync("app/directory.css", "utf8"), /\.explore-cta \{[^}]*margin: 30px auto 0;/, "The Explore the directory button is centred");
 const statsPage = fs.readFileSync("app/stats/page.tsx", "utf8");
 const styles = fs.readFileSync("app/inner-pages.css", "utf8");
 for (const [, classList] of statsPage.matchAll(/className="([^"]+)"/g)) {

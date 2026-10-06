@@ -1,12 +1,16 @@
 "use client";
 
 import { useEffect } from "react";
+import { usePathname } from "next/navigation";
 
-// Two small page behaviors that ride along with the directory.
+// Two small page behaviors that ride along with the directory. They live in two
+// effects on purpose, because they have different lifetimes: the wake lock is
+// about the tab, the resume position is about the route.
 //
 // 1. Screen Wake Lock. Where the API exists, the page asks the browser to keep
 //    the display awake, and re-acquires the lock whenever the tab is brought
 //    back to the foreground (the browser drops it automatically while hidden).
+//    It is asked for once, on mount — the tab does not change when the route does.
 // 2. Resume position. See below.
 //
 // There is deliberately **no** leave warning: the page used to raise the
@@ -25,6 +29,9 @@ type NavigatorWithWakeLock = Navigator & {
 };
 
 export default function PageBehaviors() {
+  const pathname = usePathname();
+
+  // 1. The screen wake lock belongs to the tab, so it is acquired once.
   useEffect(() => {
     const nav = navigator as NavigatorWithWakeLock;
     let sentinel: WakeLockSentinelLike | null = null;
@@ -49,33 +56,60 @@ export default function PageBehaviors() {
     void acquire();
     document.addEventListener("visibilitychange", onVisibilityChange);
 
-    // 2. Resume position. The scroll offset of each page is remembered (for 30
-    //    days) so a visitor who leaves and comes back lands where they were.
-    //    A link with a #hash always wins over the saved position.
-    const scrollKey = `base31:scroll:${window.location.pathname}`;
-    try {
-      const saved = JSON.parse(window.localStorage.getItem(scrollKey) || "null") as { y: number; t: number } | null;
-      if (!window.location.hash && saved && saved.y > 0 && Date.now() - saved.t < 30 * 864e5) {
-        window.setTimeout(() => window.scrollTo({ top: saved.y, behavior: "auto" }), 80);
-      }
-    } catch { /* storage unavailable */ }
-    let saveTimer: number | undefined;
-    const saveScroll = () => {
-      window.clearTimeout(saveTimer);
-      saveTimer = window.setTimeout(() => {
-        try { window.localStorage.setItem(scrollKey, JSON.stringify({ y: Math.round(window.scrollY), t: Date.now() })); } catch { /* ignore */ }
-      }, 250);
-    };
-    window.addEventListener("scroll", saveScroll, { passive: true });
-
     return () => {
       document.removeEventListener("visibilitychange", onVisibilityChange);
-      window.removeEventListener("scroll", saveScroll);
-      window.clearTimeout(saveTimer);
       void sentinel?.release().catch(() => {});
       sentinel = null;
     };
   }, []);
+
+  // 2. Resume position. The scroll offset of each route is remembered (for 30
+  //    days) so a visitor who leaves and comes back lands where they were. It
+  //    is keyed on the pathname rather than read once on mount, so it covers
+  //    the browser's own back and forward buttons as well as a fresh load: the
+  //    effect is torn down and re-run on every client-side navigation, which
+  //    saves the route being left and restores the one being entered. A link
+  //    with a #hash always wins over the saved position — the visitor asked for
+  //    a specific place on the page, and that is not the place they last were.
+  useEffect(() => {
+    const scrollKey = `base31:scroll:${pathname}`;
+    let restoreTimer: number | undefined;
+    try {
+      const saved = JSON.parse(window.localStorage.getItem(scrollKey) || "null") as { y: number; t: number } | null;
+      if (!window.location.hash && saved && saved.y > 0 && Date.now() - saved.t < 30 * 864e5) {
+        restoreTimer = window.setTimeout(() => window.scrollTo({ top: saved.y, behavior: "auto" }), 80);
+      }
+    } catch { /* storage unavailable */ }
+
+    // The offset is tracked as it moves rather than read when it is written.
+    // Reading `window.scrollY` on the way out would be too late: the router has
+    // already reset the scroll for the page being entered by then, so the flush
+    // below would save a zero over the position it was meant to keep.
+    let lastY = Math.round(window.scrollY);
+    let saveTimer: number | undefined;
+    const write = (y: number) => {
+      if (y <= 0) return;
+      try { window.localStorage.setItem(scrollKey, JSON.stringify({ y, t: Date.now() })); } catch { /* ignore */ }
+    };
+    const saveScroll = () => {
+      lastY = Math.round(window.scrollY);
+      window.clearTimeout(saveTimer);
+      saveTimer = window.setTimeout(() => write(lastY), 250);
+    };
+    window.addEventListener("scroll", saveScroll, { passive: true });
+
+    return () => {
+      window.removeEventListener("scroll", saveScroll);
+      window.clearTimeout(saveTimer);
+      // The debounce would drop the last few hundred milliseconds of scrolling
+      // if the visitor left straight after a flick — which is exactly the
+      // offset back navigation has to restore — so it is flushed here.
+      write(lastY);
+      // The pending restore belongs to the route being left: if it is not
+      // cancelled it would scroll the next page to the previous one's offset.
+      window.clearTimeout(restoreTimer);
+    };
+  }, [pathname]);
 
   return null;
 }

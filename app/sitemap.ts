@@ -5,6 +5,7 @@ import { publishedToolSlugs } from "@/lib/tool-pages";
 import changelog from "@/config/changelog.json";
 import sites from "@/config/sites.json";
 import { allTags } from "@/lib/tags";
+import { directorySections } from "@/lib/sections";
 
 const siteUrl = "https://base31.org";
 
@@ -97,6 +98,15 @@ export default function sitemap(): MetadataRoute.Sitemap {
       url: `${siteUrl}/tags/${info.slug}`,
       changeFrequency: "weekly" as const,
       priority: 0.5,
+    })),
+    // One page per directory section, derived from the same registry the
+    // quick jumps and the section rail read. Like the tag pages, there is
+    // nothing to keep in step by hand: a seventh collection appears here the
+    // moment it is described in lib/sections.ts.
+    ...directorySections.map((section) => ({
+      url: `${siteUrl}/explore/${section.id}`,
+      changeFrequency: "weekly" as const,
+      priority: 0.6,
     })),
     {
       // Newest-first additions, straight from the addedAt metadata.

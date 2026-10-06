@@ -1,0 +1,129 @@
+/* Subsite pages ---------------------------------------------------------
+   Loaded last of all the stylesheets (see app/layout.tsx), so it owns the
+   pages that live outside the homepage: /tags, /tags/<tag>, /sites/<slug>,
+   /tools/<slug>, /recently-added, /quality-report and the per-section
+   subsites at /explore/<section>.
+
+   Two things live here.
+
+   1. The path. Every one of those pages opens with the same
+      `<nav class="breadcrumb mono">` — `base31.org / Tags / discovery` — and
+      until now nothing styled it, so the trail rendered as a bare line of
+      monospace text. It is now the page's own signpost: a rounded grey band
+      with one soft chip per step, the current page lit, and the separators
+      dimmed between them. The band wears a neutral grey gradient rather than
+      any accent colour, because it belongs to the site chrome and not to the
+      content under it, and every subsite gets the same one.
+
+   2. The per-section explorer at /explore/<section>: the search field, the
+      count, and the grid of cards that section owns.
+
+   The token set is the one app/globals.css defines, with the light theme
+   overridden rather than duplicated — the same way the rest of the sheets do
+   it. */
+
+.breadcrumb {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 7px;
+  margin: 0 0 30px;
+  padding: 9px 13px;
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  /* The grey gradient: a lit top edge, a mid grey, a darker floor. */
+  background: linear-gradient(180deg, #2e2e2e 0%, #1b1b1b 52%, #0e0e0e 100%);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 7%),
+    0 14px 34px -28px rgb(0 0 0 / 90%);
+  color: var(--muted);
+  font-size: 11.5px;
+  letter-spacing: 0.03em;
+  line-height: 1.4;
+}
+html[data-theme="light"] .breadcrumb {
+  border-color: #d5d5d5;
+  background: linear-gradient(180deg, #fefefe 0%, #f1f1f1 52%, #e1e1e1 100%);
+  box-shadow:
+    inset 0 1px 0 #fff,
+    0 1px 1px rgb(0 0 0 / 4%),
+    0 8px 22px -18px rgb(0 0 0 / 34%);
+}
+.breadcrumb a {
+  display: inline-block;
+  padding: 3px 10px;
+  border: 1px solid color-mix(in srgb, var(--line-strong) 78%, transparent);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--surface) 66%, transparent);
+  color: var(--muted);
+  text-decoration: none;
+  transition: border-color 150ms ease, background 150ms ease, color 150ms ease;
+}
+.breadcrumb a:hover {
+  border-color: color-mix(in srgb, var(--live) 50%, var(--line-strong));
+  background: color-mix(in srgb, var(--live) 10%, var(--surface));
+  color: var(--text-strong);
+}
+.breadcrumb a:focus-visible { outline: 2px solid var(--live); outline-offset: 2px; }
+/* The separators are the only aria-hidden children; keeping them quiet is what
+   makes the chips read as a path instead of a sentence. */
+.breadcrumb > [aria-hidden="true"] { color: var(--subtle); opacity: 0.55; }
+.breadcrumb > [aria-current="page"] {
+  display: inline-block;
+  padding: 3px 10px;
+  border: 1px solid color-mix(in srgb, var(--live) 34%, transparent);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--live) 13%, transparent);
+  color: var(--text-strong);
+}
+html[data-theme="light"] .breadcrumb a {
+  border-color: #d9d9d9;
+  background: rgb(255 255 255 / 78%);
+  color: #5f5f5f;
+}
+html[data-theme="light"] .breadcrumb > [aria-current="page"] { background: color-mix(in srgb, var(--live) 18%, transparent); }
+@media (max-width: 520px) {
+  .breadcrumb { gap: 5px; padding: 8px 10px; font-size: 10.5px; }
+  .breadcrumb a, .breadcrumb > [aria-current="page"] { padding: 2px 8px; }
+}
+
+/* The way out of a preview. Every strip on /explore is nine cards of a
+   collection that has a page of its own, so each one ends its lede with this
+   link: quiet enough to read as a footnote, but a real link with focus. */
+.section-subsite-link { color: var(--live); font-size: 12.5px; white-space: nowrap; text-decoration: none; }
+.section-subsite-link:hover { text-decoration: underline; text-underline-offset: 3px; }
+.section-subsite-link:focus-visible { outline: 2px solid var(--live); outline-offset: 3px; border-radius: 4px; }
+
+/* Best matches ---------------------------------------------------------
+   The directory is six collections, so a query that lands in several of them
+   used to arrive as several separate lists. This block puts the strongest
+   answers from all of them in one place, above them, and wears the same
+   address card treatment the tag entries use so it reads as a list of results
+   rather than another section of the page. */
+.best-matches { margin: 0 0 34px; padding: 20px 22px 22px; border: 1px solid color-mix(in srgb, var(--live) 34%, var(--line-strong)); border-radius: var(--radius-card); background: linear-gradient(150deg, color-mix(in srgb, var(--live) 7%, var(--surface)), var(--surface) 68%); }
+.best-matches .cool-lede { margin: 10px 0 18px; }
+.best-matches .cool-lede strong { color: var(--text-strong); font-weight: 400; }
+.best-matches-list { display: grid; gap: 9px; margin: 0; padding: 0; list-style: none; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+.best-match { display: flex; align-items: center; justify-content: space-between; gap: 10px 14px; padding: 13px 15px; border: 1px solid var(--line); border-radius: 14px; background: var(--surface); transition: border-color 160ms ease, background 160ms ease; }
+.best-match:hover { border-color: var(--line-strong); background: var(--surface-hover); }
+.best-match-main { display: flex; flex: 1; min-width: 0; flex-direction: column; gap: 6px; color: inherit; text-decoration: none; }
+.best-match-top { display: flex; flex-wrap: wrap; align-items: baseline; gap: 9px; }
+.best-match-name { color: var(--text-strong); font-size: 15px; }
+.best-match-section { color: var(--subtle); font-size: 9.5px; letter-spacing: 0.07em; text-transform: uppercase; }
+.best-match-desc { color: var(--muted); font-size: 12.5px; line-height: 1.6; }
+.best-match-tags { display: flex; flex-wrap: wrap; gap: 5px; }
+.best-match-visit { flex: 0 0 auto; color: var(--live); font-size: 11px; text-decoration: none; }
+.best-match-visit:hover { text-decoration: underline; text-underline-offset: 3px; }
+
+/* A section on a page of its own (/explore/<section>) -------------------   The search field is the same control the hero uses, narrowed to the width
+   of a reading column, and the card grid is the shared `.cool-grid` the strips
+   already draw. */
+.position-search { max-width: 620px; margin: 26px 0 18px; }
+.section-explorer-count { display: block; margin: 14px 0 4px; color: var(--subtle); font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; }
+.section-explorer-grid { margin-top: 18px; }
+.section-explorer-grid .cool-card { transition: border-color 160ms ease, transform 160ms ease; }
+@media (max-width: 600px) {
+  .position-search { margin: 20px 0 14px; }
+  .best-matches { padding: 16px 14px 18px; }
+  .best-matches-list { grid-template-columns: 1fr; }
+}

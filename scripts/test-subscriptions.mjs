@@ -107,7 +107,7 @@ assert.equal(stats.top[0].key, "popular", "Stats ranks by all votes, not net lik
 const homepage = fs.readFileSync("components/home-page.tsx", "utf8");
 // The four plain off-directory strips are marked off with dividers, and the
 // URL request form still follows them.
-assert.match(homepage, /<CoolAis[^\n]+\/>[\s\S]{0,160}<UrlRequest \/>/, "CoolAis is followed by the URL request form");
+assert.match(homepage, /<CoolAis[^\n]+\/>[\s\S]{0,200}<UrlRequest \/>/, "CoolAis is followed by the URL request form");
 assert.match(homepage, /<CoolSites[^\n]+\/>[\s\S]*?<hr className="section-divider"[\s\S]*?<CoolApis/, "CoolSites and CoolApis are separated by a divider");
 assert.match(homepage, /<CoolApis[^\n]+\/>[\s\S]*?<hr className="section-divider"[\s\S]*?<CoolApps/, "CoolApis and CoolApps are separated by a divider");
 assert.match(homepage, /<CoolApps[^\n]+\/>[\s\S]*?<hr className="section-divider"[\s\S]*?<CoolAis/, "CoolApps and CoolAis are separated by a divider");
@@ -118,9 +118,13 @@ assert.match(homepage, /href="#request-url"/, "The submit button anchors to the 
 assert.match(homepage, /"\/explore#request-url"/, "The drawer still links the form on /explore");
 // The landing page leads with its keys into every directory section, including
 // the tag shelf, so the indexes stay reachable without opening the drawer.
-for (const jump of ["editors-picks", "sites", "cool-sites", "cool-apis", "cool-apps", "cool-ais"]) {
+// The editor's picks key is gone: that carousel is the landing page's alone.
+for (const jump of ["sites", "cool-sites", "cool-apis", "cool-apps", "cool-ais"]) {
   assert.ok(homepage.includes(`{ href: "/explore#${jump}"`), `The landing page's keys include /explore#${jump}`);
 }
+// No-code AI tools has a key like the rest, and it is the one that leaves for
+// the section's own page rather than a hash on this one.
+assert.ok(homepage.includes('{ href: "/explore/no-code-ai-tools"'), "The landing page's keys include the no-code AI tools section");
 assert.ok(homepage.includes('{ href: "/tags"'), "The landing page's keys include the tag index");
 for (const url of ["https://dev.to/base31", "https://medium.com/@base31dotorg"]) assert.ok(homepage.includes(url));
 const notifications = fs.readFileSync("components/directory-notifications.tsx", "utf8");

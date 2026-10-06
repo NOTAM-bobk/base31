@@ -612,9 +612,11 @@ html[data-theme="light"] { --page-band: #ececec; }
    visitor who would rather browse than type: Featured sites, Other cool sites,
    Cool APIs and Cool apps. Each is an in-page anchor, so there is no routing —
    the browser scrolls, the section's own `scroll-margin-top` keeps it clear of
-   the header, and the rail follows the move like any other scroll. They sit on
-   the same 480px measure as the search field above them, and stack into four
-   compact rows on a phone.
+   the header, and the rail follows the move like any other scroll. They run
+   the full width of the band across the page — three keys to a row on a
+   desktop, so the nine of them lay out as a solid 3x3 block instead of a
+   narrow column beside the search field — and narrow to two columns, then to
+   one compact row each, as the viewport does.
 
    Each one is raised rather than outlined: a lit hairline along the top, a
    shallow gradient falling to a darker floor, an inner highlight and a shadow
@@ -622,9 +624,12 @@ html[data-theme="light"] { --page-band: #ececec; }
    is set in the hero's own handwriting — the same face the headline uses — so
    the strip has a voice of its own instead of blending into the body text. */
 .quick-jumps {
-  display: grid; gap: 10px; width: 100%; max-width: 480px; margin-top: 16px;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  display: grid; gap: 10px; width: 100%; max-width: none; margin-top: 16px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
 }
+/* Two columns once the three-across row would squeeze the labels, and the
+   single column below 600px is the existing rule further down. */
+@media (max-width: 860px) { .quick-jumps { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 .quick-jump {
   position: relative; overflow: hidden;
   display: flex; flex-direction: column; gap: 7px;
@@ -1030,7 +1035,9 @@ html[data-theme="light"] .freshness-badge.is-stale { color: #80541a; }
 .detail-tags { display: flex; flex-wrap: wrap; gap: 8px; padding: 0; list-style: none; }
 .detail-tags li { padding: 5px 9px; border: 1px solid var(--line); border-radius: 6px; font-size: 11px; }
 .ai-notice { padding: 16px; border-left: 3px solid var(--live); background: var(--surface-hover); font-size: 13px; line-height: 1.7; }
-.quick-jump:last-child:nth-child(odd) { grid-column: 1 / -1; }
+/* A lone tile in the last row stretches across it. Only meaningful while the
+   grid is two columns or wider-and-odd; the desktop 3x3 needs no patch. */
+@media (max-width: 860px) { .quick-jump:last-child:nth-child(odd) { grid-column: 1 / -1; } }
 .hero-stat-value {
   color: var(--text-strong);
   font-family: var(--font-display, inherit);

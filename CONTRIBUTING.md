@@ -99,12 +99,25 @@ the route. The same component also renders `/explore` (`app/explore/page.tsx`)
 with `mode="explore"`, which is where the sites and every list of them live —
 the landing page keeps the hero, a browsing half of its own (the section keys,
 the editor's picks, the Top 10, the submission form, the tag shelf) and the
-prose sections. One
+prose sections — About, the support hub directly under it, the community board,
+the FAQ and the launch clock, in that order. One
 file, two modes; see the README's “Pages and navigation” before moving
-anything between them.
+anything between them. The editor's picks are the landing page's alone:
+`/explore` exists to be searched.
+
+`/explore/<section>` is a single collection on a page of its own. Those pages
+are built from `lib/sections.ts` — the one place a section's id, heading, lede,
+count unit, filter field and cards are described — so a new collection is one
+entry there plus its `config/*.json` list, not four edits in four places. Add
+it there and the quick jumps, the phone drawer, the section rail, the sitemap
+and `app/explore/[section]/page.tsx` all follow.
+
 Shared components live in `components/`. Styling uses hand-written
 CSS; `app/directory.css` owns editor's picks, the Top 10, the refreshed
-featured cards, the tag shelf and the mobile navigation drawer.
+featured cards, the tag shelf and the mobile navigation drawer, and
+`app/subsite.css` (loaded last) owns the pages outside the homepage: the path
+band at the top of every subsite with its grey gradient, the Best matches block
+and the per-section explorer.
 Read the README's style load order before changing overrides. Prefer the existing CSS custom properties and component
 patterns over new abstractions.
 

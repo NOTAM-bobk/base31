@@ -40,6 +40,10 @@ export type LinkStripProps = {
       that narrows the cards to one category. Both strips use it: "Cool APIs"
       files 63 links by topic, "Other cool sites" files 52 by kind. */
   categories?: string[];
+  /** Where this collection lives on a page of its own. The strip is a preview
+      of a section, so it says so and hands over the way to the whole thing
+      rather than pretending nine cards are the collection. */
+  subsiteHref?: string;
 };
 
 // The foldable strips under the directory ("Other cool sites", "Cool APIs").
@@ -67,7 +71,7 @@ export type LinkStripProps = {
 // look always starts from the top of a short list.
 const SECTION_PREVIEW = 9;
 
-export default function LinkStrip({ id, items, search, copy, query = "", categories }: LinkStripProps) {
+export default function LinkStrip({ id, items, search, copy, query = "", categories, subsiteHref }: LinkStripProps) {
   const [collapsed, setCollapsed] = useState(false);
   const [vibrating, setVibrating] = useState(false);
   const [category, setCategory] = useState<string | null>(null);
@@ -161,7 +165,14 @@ export default function LinkStrip({ id, items, search, copy, query = "", categor
       )}
 
       <div id={panelId} className="sites-panel" hidden={collapsed}>
-        <p className="cool-lede">{copy.lede}</p>
+        <p className="cool-lede">
+          {copy.lede}{" "}
+          {subsiteHref && (
+            <Link className="section-subsite-link" href={subsiteHref}>
+              Open the {copy.heading} section <span aria-hidden="true">→</span>
+            </Link>
+          )}
+        </p>
         {categories && categories.length > 0 && (
           <div className="tag-filters cool-filters" role="group" aria-label={copy.filterLabel ?? "Filter by category"}>
             <button

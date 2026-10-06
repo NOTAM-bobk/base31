@@ -16,6 +16,7 @@ export default function CoolApis({ dict = EN, query = "" }: { dict?: Dictionary;
       search={searchCoolApis}
       query={query}
       categories={coolApiCategories}
+      subsiteHref="/explore/cool-apis"
       copy={{
         heading: dict.coolApis,
         lede: dict.coolApisLede,

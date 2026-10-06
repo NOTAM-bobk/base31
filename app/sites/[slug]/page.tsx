@@ -116,7 +116,6 @@ export default function SiteDetailPage({ params }: Props) {
                 <span className="tool-related-summary">{item.description}</span>
                 {!!item.tags?.length && <span className="tool-related-tags mono">{item.tags.slice(0, 4).map((tag) => <span key={tag}>#{tag}</span>)}</span>}
               </Link>
-              <ShareLink compact url={`${origin}/sites/${item.slug}`} title={item.name} />
             </li>
           ))}
         </ul>

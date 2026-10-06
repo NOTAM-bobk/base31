@@ -44,6 +44,7 @@ export default function NoCodeAiTools({ dict = EN, query = "" }: { dict?: Dictio
         search={searchNoCodeAiTools}
         query={query}
         categories={noCodeAiToolCategories}
+        subsiteHref="/explore/no-code-ai-tools"
         copy={{
           heading: dict.noCodeAiTools,
           lede: dict.noCodeAiToolsLede,

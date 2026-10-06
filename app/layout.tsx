@@ -15,6 +15,10 @@ import "./directory.css";
 // Last of the stylesheets: the quieter About/Our Story link cards, which have to
 // win over the same selectors in directory.css.
 import "./about-links.css";
+// The pages that live outside the homepage: the subsite path band and its grey
+// gradient, the Best matches block and the per-section explorer. Last of all so
+// it owns those pages outright.
+import "./subsite.css";
 import { GOOGLE_ANALYTICS_ID, googleTagSnippet } from "@/lib/analytics";
 import CodeBackdrop from "@/components/code-backdrop";
 import ConsentAwareAds from "@/components/consent-aware-ads";

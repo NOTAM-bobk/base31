@@ -17,6 +17,7 @@ export default function CoolSites({ dict = EN, query = "" }: { dict?: Dictionary
       search={searchCoolSites}
       query={query}
       categories={coolSiteCategories}
+      subsiteHref="/explore/cool-sites"
       copy={{
         heading: dict.coolSites,
         lede: dict.coolSitesLede,

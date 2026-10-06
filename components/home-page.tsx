@@ -39,6 +39,8 @@ import { recentlyAdded } from "@/lib/recently-added";
 import { matchesQuery } from "@/lib/search";
 import EditorsPicks from "@/components/editors-picks";
 import TopTen from "@/components/top-ten";
+import BestMatches from "@/components/best-matches";
+import { sectionCount, sectionsWithMatches } from "@/lib/sections";
 import { compareVotes } from "@/lib/vote-ranking";
 
 type Site = { name: string; subdomain: string; url: string; tags?: string[]; description?: string; show?: boolean; community?: boolean; createdAt?: number; icon?: string; lastChecked?: string; addedAt?: string };
@@ -835,12 +837,12 @@ export default function HomePage({ dict = EN, locale = "en", mode = "home" }: { 
   // English names those sections already print on every locale.
   const railSections = useMemo<RailSection[]>(() => (isExplore ? [
     { id: "page-title", label: "Top" },
-    { id: "editors-picks", label: "Editor's picks" },
     { id: "sites", label: dict.featured },
     { id: "cool-sites", label: dict.coolSites },
     { id: "cool-apis", label: dict.coolApis },
     { id: "cool-apps", label: dict.coolApps },
     { id: "cool-ais", label: dict.coolAis },
+    { id: "no-code-ai-tools", label: dict.noCodeAiTools },
     { id: "request-url", label: "Submit" },
   ] : [
     { id: "page-title", label: "Top" },
@@ -848,9 +850,11 @@ export default function HomePage({ dict = EN, locale = "en", mode = "home" }: { 
     { id: "top-ten", label: "Top 10" },
     { id: "request-url", label: "Submit" },
     { id: "browse-tags", label: "Tags" },
+    // The support hub sits directly under About now, so the rail walks them in
+    // that order too — the rail is a readout of the page, not a menu of its own.
     { id: "about", label: "About" },
-    { id: "discussion", label: "Community" },
     { id: "support", label: "Support" },
+    { id: "discussion", label: "Community" },
     { id: "faq-heading", label: "FAQ" },
     { id: "updates", label: "Updates" },
   ]), [dict, isExplore]);
@@ -861,12 +865,12 @@ export default function HomePage({ dict = EN, locale = "en", mode = "home" }: { 
   // for without any routing code. "More" is the rest of the site.
   const drawerCategories = useMemo<DrawerLink[]>(() => [
     { href: "/explore", label: "Everything", meta: `${allSites.length} sites` },
-    { href: "/explore#editors-picks", label: "Editor's picks" },
     { href: "/explore#sites", label: dict.featured, meta: `${allSites.length}` },
     { href: "/explore#cool-sites", label: dict.coolSites, meta: `${coolSites.length}` },
     { href: "/explore#cool-apis", label: dict.coolApis, meta: `${coolApis.length}` },
     { href: "/explore#cool-apps", label: dict.coolApps, meta: `${coolApps.length}` },
     { href: "/explore#cool-ais", label: dict.coolAis, meta: `${allCoolAis.length}` },
+    { href: "/explore#no-code-ai-tools", label: dict.noCodeAiTools, meta: `${sectionCount("no-code-ai-tools")}` },
     { href: "/explore#request-url", label: "Submit a URL" },
   ], [allSites.length, dict]);
 
@@ -891,6 +895,19 @@ export default function HomePage({ dict = EN, locale = "en", mode = "home" }: { 
         : 0,
     [query],
   );
+
+  // What a search leaves on the page. A section with nothing matching is not
+  // rendered at all — heading, divider and closed note included — so the answer
+  // to a question is a short page of the sections that did match instead of six
+  // headings and five "nothing here" lines. The rule itself is
+  // `sectionsWithMatches` in lib/sections.ts; the two AI strips are one block in
+  // the markup, so either of them standing keeps that block up.
+  const visibleSections = useMemo(() => new Set(sectionsWithMatches(query)), [query]);
+  const showSites = visibleSections.has("sites");
+  const showCoolSites = visibleSections.has("cool-sites");
+  const showCoolApis = visibleSections.has("cool-apis");
+  const showCoolApps = visibleSections.has("cool-apps");
+  const showCoolAis = visibleSections.has("cool-ais") || visibleSections.has("no-code-ai-tools");
 
   // Fade each section in as it scrolls into view. The motion flag on <html> is
   // set by the pre-paint script in the layout, so this can never leave content
@@ -1216,12 +1233,15 @@ export default function HomePage({ dict = EN, locale = "en", mode = "home" }: { 
               visitor into the list. */}
           <nav className="quick-jumps" aria-label="Jump to a section">
             {[
-              { href: "/explore#editors-picks", label: "Editor's picks", count: "today's shortlist" },
               { href: "/explore#sites", label: dict.featured, count: `${allSites.length} sites` },
               { href: "/explore#cool-sites", label: dict.coolSites, count: `${coolSites.length} sites` },
               { href: "/explore#cool-apis", label: dict.coolApis, count: `${coolApis.length} APIs` },
               { href: "/explore#cool-apps", label: dict.coolApps, count: `${coolApps.length} apps` },
               { href: "/explore#cool-ais", label: dict.coolAis, count: `${allCoolAis.length} AIs` },
+              // The only key that leaves for a page rather than a section of this
+              // one: no-code AI tools has a subsite of its own, like every other
+              // section, and nothing on the landing page lists it yet.
+              { href: "/explore/no-code-ai-tools", label: dict.noCodeAiTools, count: `${sectionCount("no-code-ai-tools")} tools` },
               { href: "/tags", label: "Tags", count: `${tagCount} tags` },
               { href: "/recently-added", label: "Recently added", count: `${recentlyAdded.length} dated` },
               { href: "/quality-report", label: "Quality report", count: "reviews" },
@@ -1280,12 +1300,21 @@ export default function HomePage({ dict = EN, locale = "en", mode = "home" }: { 
           </>}
 
           {isExplore && <>
-          {!query.trim() && <EditorsPicks />}
-          {/* Five boxes that jump straight into a section, for the visitor who
-              would rather browse than type. Each one is an in-page anchor, so
-              it needs no routing: the browser scrolls, the section's own
-              scroll-margin keeps it clear of the header, and the rail follows
-              the move like any other scroll. */}
+          {/* The answer first: the closest matches from every collection in one
+              block, above the sections that hold them. It renders nothing at
+              all while there is no query, and nothing when nothing matched. */}
+          <BestMatches query={query} />
+
+          {/* The section keys, for the visitor who would rather browse than
+              type. Each one is an in-page anchor, so it needs no routing: the
+              browser scrolls, the section's own scroll-margin keeps it clear
+              of the header, and the rail follows the move like any other
+              scroll. They hide while there is a question on screen, because
+              the list of what matched is the answer and not a menu.
+
+              The editor's picks carousel used to lead this page. It is the
+              landing page's now, and only the landing page's: /explore exists
+              to be searched. */}
           {!query.trim() && <nav className="quick-jumps" aria-label="Jump to a section">
             {[
               { href: "#sites", label: dict.featured, count: `${allSites.length} sites` },
@@ -1293,6 +1322,7 @@ export default function HomePage({ dict = EN, locale = "en", mode = "home" }: { 
               { href: "#cool-apis", label: dict.coolApis, count: `${coolApis.length} APIs` },
               { href: "#cool-apps", label: dict.coolApps, count: `${coolApps.length} apps` },
               { href: "#cool-ais", label: dict.coolAis, count: `${allCoolAis.length} AIs` },
+              { href: "#no-code-ai-tools", label: dict.noCodeAiTools, count: `${sectionCount("no-code-ai-tools")} tools` },
               // The two in-page jumps above are anchors; these three leave the
               // page for the derived indexes. They are grouped last so the row
               // still reads as "browse this page, then browse the whole thing".
@@ -1310,6 +1340,7 @@ export default function HomePage({ dict = EN, locale = "en", mode = "home" }: { 
             ))}
           </nav>}
 
+        {showSites && (
         <section id="sites" className={`directory-section${sitesVibrating ? " is-vibrating" : ""}`} aria-labelledby="sites-heading">
           <div className="section-heading" data-reveal>
             {/* The heading is the disclosure control: the label and the arrow
@@ -1544,37 +1575,56 @@ export default function HomePage({ dict = EN, locale = "en", mode = "home" }: { 
               carry the in-depth copy and the FAQ schema, so this is the entry
               point that lets a visitor (and a crawler) reach them. */}
           <p className="tools-hub-link">
-            Want the full story on any of these? <a href="/tools">Read the tool guides →</a>
+            Want the full story on any of these? <a href="/tools">Read the tool guides →</a>{" "}
+            Or take the whole list with you: <Link href="/explore/sites">open the featured sites section →</Link>
           </p>
         </section>
+        )}
 
         {/* The four off-directory strips are plain lists with no border of
             their own, so each one is marked off with a divider; the bordered
             blocks below (about, discussion, support) already separate
-            themselves and are left alone. */}
+            themselves and are left alone.
+
+            A search decides what is on screen. A strip with nothing matching
+            is not rendered at all — heading, divider and closed note with it —
+            so the answer to a question is a short page of the sections that
+            did match rather than six headings and five "nothing here" lines.
+            Each strip also hands over the way to its own page, where the whole
+            collection can be searched and filtered on its own. */}
+        {showCoolSites && <>
         <hr className="section-divider" aria-hidden="true" />
 
         {/* Off-directory picks: external cool sites from config/cool-sites.json,
             rendered as smaller, quieter cards than the directory's own. */}
         <CoolSites dict={dict} query={query} />
+        </>}
 
+        {showCoolApis && <>
         <hr className="section-divider" aria-hidden="true" />
 
         {/* A second strip in the same shape as the one above: free public
             APIs from config/cool-apis.json, for visitors who came to build
             something rather than only browse. */}
         <CoolApis dict={dict} query={query} />
+        </>}
 
+        {showCoolApps && <>
         <hr className="section-divider" aria-hidden="true" />
 
         {/* A third strip in the same shape: browser apps from
             config/cool-apps.json, for the visitor who wants a tool to use
             rather than a site to read. */}
         <CoolApps dict={dict} query={query} />
+        </>}
 
+        {showCoolAis && <>
         <hr className="section-divider" aria-hidden="true" />
 
+        {/* The last strip is the pair of AI lists, so it stays up while either
+            "Cool AIs" or "No-code AI tools" has something to show. */}
         <CoolAis dict={dict} query={query} />
+        </>}
 
         <hr className="section-divider" aria-hidden="true" />
 
@@ -1584,27 +1634,32 @@ export default function HomePage({ dict = EN, locale = "en", mode = "home" }: { 
 
         {!isExplore && <>
         <AboutSection />
-        <DiscussionBoard />
 
         {/* The support hub: the Trustpilot reviews, the donation board, the
             sponsored referrals and the paid support button, gathered under one
             collapsible "Support" heading. It is open by default and the
-            heading toggles it, the same way the featured-sites heading does. */}
+            heading toggles it, the same way the featured-sites heading does.
+
+            It sits directly under About the directory now: those two are the
+            page's "who this is and how it stays free" pair, and the board
+            follows them instead of interrupting. */}
         <SupportSection />
 
-        <hr className="section-divider" aria-hidden="true" />
-
-        {/* Live count-up from the launch of base31, under the support hub. */}
-        <LaunchClock />
+        <DiscussionBoard />
 
         <hr className="section-divider" aria-hidden="true" />
 
-        {/* SEO FAQ, then the subscribe block: the FAQ moved up so the page
-            ends on the call to action, directly above the footer. */}
+        {/* SEO FAQ. */}
         <Faq />
 
-        {/* The subscribe block sits below the FAQ as the final thing before
-            the footer, so the page ends on the call to action. */}
+        <hr className="section-divider" aria-hidden="true" />
+
+        {/* Live count-up from the launch of base31. It used to sit above the
+            questions; it now closes the page's prose, directly under them. */}
+        <LaunchClock />
+
+        {/* The subscribe block is the last thing before the footer, so the page
+            ends on the call to action. */}
         <DirectoryNotifications />
 
         {/* The bottom of the page: the decorative sparkle and the sponsorship

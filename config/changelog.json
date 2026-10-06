@@ -1,5 +1,22 @@
 [
   {
+    "version": "1.45.0",
+    "date": "2026-10-06",
+    "title": "Every section gets its own page",
+    "summary": "Each collection on /explore now has a page of its own with its own search and filters, a search answers with the best matches first and hides the sections that found nothing, and the subsite paths wear one shared grey band.",
+    "highlights": [
+      "Every collection has a page of its own at /explore/<section> — the whole list, its own search field, its own filter chips and the same vote ranking — and each strip on /explore now hands over the way there.",
+      "A search answers with the best matches first: the strongest results from every collection, ranked by name before tag before description, in one block above the lists.",
+      "Only the sections that actually hold a match are rendered while searching. An empty section is gone entirely, heading and closed note included, instead of five \"nothing here\" lines.",
+      "Subsite paths finally look like paths. base31.org / Tags / discovery is a rounded grey band with one chip per step, on every page that carries a breadcrumb.",
+      "No-code AI tools joined the section keys, and the keys now run the full width of the page — three across on a desktop instead of a narrow column.",
+      "The editor's picks left /explore: they are the landing page's carousel now, and only the landing page's.",
+      "The landing page's prose reordered: Support sits directly under About the directory, and the launch countdown closes the page below the FAQ.",
+      "Share buttons are gone from the related-pick boxes on a site page. The share block stays where it belongs — on the page itself.",
+      "Scroll position is now restored on back and forward navigation, not only on a fresh page load."
+    ]
+  },
+  {
     "version": "1.44.0",
     "date": "2026-10-06",
     "title": "Submit a URL from the homepage",

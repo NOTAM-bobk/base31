@@ -17,6 +17,7 @@ export default function CoolApps({ dict = EN, query = "" }: { dict?: Dictionary;
       search={searchCoolApps}
       query={query}
       categories={coolAppCategories}
+      subsiteHref="/explore/cool-apps"
       copy={{
         heading: dict.coolApps,
         lede: dict.coolAppsLede,

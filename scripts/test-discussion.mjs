@@ -69,7 +69,10 @@ await handleDiscussion(request({ name: "Jane", body: "hello" }), { DISCUSSION: {
 assert.match(trustedSignal, /^[a-f0-9]{64}$/);
 assert.notEqual(trustedSignal, visitor(1), "The Worker replaces client-supplied rate-limit signals");
 const homepage = fs.readFileSync("components/home-page.tsx", "utf8");
-assert.match(homepage, /<AboutSection \/>\s*<DiscussionBoard \/>/);
+// The prose half of the landing page: the support hub sits directly under About
+// the directory, and the board follows that pair.
+assert.match(homepage, /<AboutSection \/>[\s\S]*?<SupportSection \/>/, "The support hub sits directly under About the directory");
+assert.ok(homepage.indexOf("<SupportSection />") < homepage.indexOf("<DiscussionBoard />"), "The board follows the About and Support pair");
 const board = fs.readFileSync("components/discussion-board.tsx", "utf8");
 assert.ok(!board.includes("dangerouslySetInnerHTML"));
 

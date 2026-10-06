@@ -46,8 +46,10 @@ const sprite = entries.find(item => item.url === "https://spriteframe.com/png-to
 assert.equal(sprite.sectionId, "cool-sites");
 assert.equal(entries.filter(item => item.url === sprite.url).length, 1);
 const homeSource = fs.readFileSync("components/home-page.tsx", "utf8");
-assert.ok(homeSource.includes('!query.trim() && <EditorsPicks'));
+// The section keys hide while there is a question on screen — where the search
+// is, the list of what matched is the answer and not a menu.
 assert.ok(homeSource.includes('!query.trim() && <nav className="quick-jumps"'));
+assert.ok(homeSource.includes('<BestMatches query={query} />'), "A search answers with the best matches first");
 assert.ok(fs.readFileSync("components/link-strip.tsx", "utf8").includes('useSiteVotes(items.map('), "Ranking includes votes for cards beyond the preview");
 assert.equal(new Set(entries.map((entry) => entry.slug)).size, entries.length, "Detail slugs must be unique");
 for (const entry of entries) {
@@ -118,9 +120,13 @@ assert.ok(recent.addedWithinDays(0).length <= recent.recentlyAdded.length);
 
 // The detail page has to carry both the related block and the share strip, and
 // the tag chips have to link into the tag pages rather than being plain text.
+// The share row belongs to the page, not to each related-pick box: six rows of
+// identical buttons under six cards buried the cards themselves, so one share
+// block is left, and it is the page's own.
 const detailSource = fs.readFileSync("app/sites/[slug]/page.tsx", "utf8");
 assert.ok(detailSource.includes("<ShareLink url={url}"), "A detail page must offer a share link");
-assert.ok(detailSource.includes("ShareLink compact"), "Each related pick gets its own share row");
+assert.equal((detailSource.match(/<ShareLink/g) || []).length, 1, "The related-pick boxes carry no share row of their own");
+assert.ok(!detailSource.includes("ShareLink compact"), "The compact share control is not rendered inside a related-pick box");
 assert.ok(detailSource.includes('href={`/tags/${tagSlug(tag)}`}'), "Detail tags must link to their tag pages");
 assert.ok(detailSource.includes("Related picks"), "The related block must be titled");
 const shareSource = fs.readFileSync("components/share-link.tsx", "utf8");
@@ -233,6 +239,27 @@ for (const file of ["components/home-page.tsx", "components/editors-picks.tsx", 
 }
 for (const hash of drawerHashes) assert.ok(sectionIds.has(hash), `The drawer links /explore#${hash}, which no section owns`);
 
+// Every collection also has a page of its own at /explore/<id>, so the same ids
+// have to appear in the registry those pages are built from — otherwise a hash
+// the drawer offers would 404 as a page. The registry is the single place the
+// sections are described, and the route builds one page per entry, so a new
+// collection is one entry rather than four edits.
+const sectionsSource = fs.readFileSync("lib/sections.ts", "utf8");
+for (const hash of drawerHashes) {
+  if (hash === "request-url") continue; // the submission form, not a collection
+  assert.ok(sectionsSource.includes(`id: "${hash}"`), `lib/sections.ts has no entry for /explore/${hash}`);
+}
+const sectionRoute = fs.readFileSync("app/explore/[section]/page.tsx", "utf8");
+assert.ok(sectionRoute.includes("directorySections.map"), "The section pages are built from the registry, not a hand-kept list");
+assert.ok(sectionRoute.includes("export const dynamicParams = false"), "An unknown section slug must 404 rather than render an empty page");
+assert.ok(sectionRoute.includes("<SectionExplorer section={section} />"), "A section page hands its collection to the explorer");
+assert.ok(sectionRoute.includes('className="breadcrumb mono"'), "A section page carries the same path as every other subsite");
+assert.ok(sitemap.includes("/explore/${section.id}"), "Every section page must be in the sitemap");
+const explorerSource = fs.readFileSync("components/section-explorer.tsx", "utf8");
+assert.ok(explorerSource.includes("matchesQuery"), "The section explorer searches with the same rule as the hero");
+assert.ok(explorerSource.includes("aria-pressed={filter === name}"), "The section chips are real toggles");
+assert.ok(explorerSource.includes("compareVotes"), "The section explorer ranks with the shared vote rule");
+
 // The landing page carries a browsing half of its own again: the section keys,
 // the editor's picks, the top ten, the URL request form and the tag shelf, in
 // that order. The keys point into /explore's own sections, because the lists
@@ -252,10 +279,63 @@ assert.ok(
 // drawer keeps its link into /explore's own section.
 assert.ok(home.includes('href="#request-url"'), "The hero's submit button anchors to the form on the current page");
 assert.match(home, /href: "\/explore#sites"/, "The landing page's section keys point into /explore");
-for (const jump of ["editors-picks", "cool-sites", "cool-apis", "cool-apps", "cool-ais"]) {
+for (const jump of ["cool-sites", "cool-apis", "cool-apps", "cool-ais"]) {
   assert.ok(home.includes(`href: "/explore#${jump}"`), `The landing page's keys include the ${jump} section`);
 }
+// Editor's picks is the landing page's now, and only the landing page's, so no
+// key offers a hash /explore does not have. No-code AI tools has a key, and it
+// is the one that leaves for a section's own page.
+assert.ok(!home.includes('href: "/explore#editors-picks"'), "No key opens a section /explore no longer has");
+assert.ok(home.includes('href: "/explore/no-code-ai-tools"'), "The landing page's keys include the no-code AI tools section");
+assert.equal((home.match(/<EditorsPicks \/>/g) || []).length, 1, "Only the landing page renders the editor's picks");
 assert.ok(home.includes("href={`/tags/${info.slug}`}"), "The landing page links the real tag pages, not a lookup page");
+
+// A search decides what is on screen: the closest matches first, then only the
+// sections that actually hold a result.
+assert.ok(home.includes("<BestMatches query={query} />"), "A search answers with the best matches first");
+assert.ok(home.includes("new Set(sectionsWithMatches(query))"), "The page renders only the sections a search leaves standing");
+for (const guard of ["showSites", "showCoolSites", "showCoolApis", "showCoolApps", "showCoolAis"]) {
+  assert.ok(home.includes(`${guard} &&`), `An empty section is not rendered: ${guard}`);
+}
+
+// The rule itself, run rather than read: browsing keeps every section, a
+// matching search keeps the ones that match, and a search that matches nothing
+// keeps none of them — not even an empty heading.
+const sections = load("lib/sections.ts");
+const everySection = sections.directorySections.map((section) => section.id);
+assert.deepEqual(sections.sectionsWithMatches(""), everySection, "Browsing shows every section, in page order");
+assert.deepEqual(sections.sectionsWithMatches("   "), everySection, "A blank query is not a search");
+assert.deepEqual(sections.sectionsWithMatches("gemni"), ["cool-ais"], "A search keeps only the sections that hold a match");
+assert.deepEqual(sections.sectionsWithMatches("#openai"), ["cool-ais"], "An exact-tag search keeps its own section alone");
+assert.deepEqual(sections.sectionsWithMatches("no-such-pick-123"), [], "A search that matches nothing renders no section at all");
+assert.ok(everySection.every((id) => sections.sectionById(id)), "Every section id resolves to its description");
+assert.equal(sections.sectionCount("cool-apis"), JSON.parse(fs.readFileSync("config/cool-apis.json", "utf8")).length, "A section's count is its own list");
+for (const section of sections.directorySections) {
+  assert.ok(section.filterField === "category" || section.filterField === "tag", `${section.id} must say what its filter chips narrow`);
+  assert.ok(section.filters.length > 0, `${section.id} needs at least one filter chip`);
+  assert.equal(new Set(section.items.map((item) => item.url)).size, section.items.length, `${section.id} lists a URL twice`);
+  // Every chip has to be a filter that keeps something, or the subsite offers a
+  // button that empties its own list.
+  for (const filter of section.filters) {
+    const keeps = section.filterField === "category"
+      ? section.items.some((item) => item.category === filter)
+      : section.items.some((item) => item.tags.includes(filter));
+    assert.ok(keeps, `${section.id} offers a "\${filter}" chip that matches nothing`);
+  }
+}
+
+// The prose half of the landing page, in order: About, then Support directly
+// under it, then the board, the FAQ and the countdown that closes it out.
+const aboutAt = home.indexOf("<AboutSection />");
+const supportAt = home.indexOf("<SupportSection />");
+const boardAt = home.indexOf("<DiscussionBoard />");
+const faqAt = home.indexOf("<Faq />");
+const clockAt = home.indexOf("<LaunchClock />");
+const subscribeAt = home.indexOf("<DirectoryNotifications />");
+assert.ok(
+  aboutAt >= 0 && aboutAt < supportAt && supportAt < boardAt && boardAt < faqAt && faqAt < clockAt && clockAt < subscribeAt,
+  "The landing page runs About, Support, the board, the FAQ and the countdown, in that order",
+);
 
 // The top ten is built from the shared vote totals every card already reads, and
 // it never invents a figure: an entry nobody has voted on says so.

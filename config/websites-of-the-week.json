@@ -3,8 +3,8 @@
     "weekOf": "2026-10-07",
     "name": "Nychthemeron",
     "url": "https://nychthemeron.vercel.app/",
-    "tagline": "A social network that deletes it self after 24hrs.",
-    "story": "Nychthemeron creates a social network unlike anything else. it comtply resets after 24hrs, no saveing at all. comptly vanishes. only think that stays is your acount.",
+    "tagline": "A ephemeral social network that resets itself every 24 hours.",
+    "story": "Nychthemeron creates a unique social network experience where everything vanishes after 24 hours. The entire platform completely resets, leaving no trace—except for your account. It's a thought-provoking exploration of temporary digital connections and what it means when nothing is meant to last.",
     "tags": ["interactive art", "experimental", "poetic web"]
   },
   {
@@ -12,7 +12,7 @@
     "name": "Low-tech Magazine",
     "url": "https://solar.lowtechmagazine.com/",
     "tagline": "A solar-powered magazine about sustainable technology.",
-    "story": "Low-tech Magazine is a great example of a website whose design follows its subject. Its solar-powered server can go offline when the battery is low, turning energy use into part of the reading experience instead of hiding it behind a dashboard. The site is thoughtful, unusual, and useful: it makes research about technology feel tangible, and its constraints give the publication a character that a polished media template could never provide.",
+    "story": "Low-tech Magazine is a great example of a website whose design follows its subject. Its solar-powered server can go offline when the battery is low, turning energy use into part of the reading experience.",
     "tags": ["sustainable web", "technology", "independent publishing"]
   }
 ]

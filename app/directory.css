@@ -101,64 +101,135 @@ html::-webkit-scrollbar, body::-webkit-scrollbar { display: none; width: 0; heig
 }
 @media (pointer: coarse) { .search-tag-suggestions button { min-height: 40px; } }
 
-/* Community corner: a small writing desk alongside the shared conversation. */
+/* Community corner: a small writing desk alongside the shared conversation.
+   The board is a room, not a column of prose — the page band already gives it
+   up to 1080px — and the conversation is drawn as a chat: one clear opening post
+   per thread, replies tucked under it in a quieter indent with a smaller
+   avatar, the time read as "12m" instead of a parsed date, and anything long
+   folded behind one line that says how much is behind it. */
 .discussion-board { margin: 48px 0; padding: 30px; border: 1px solid var(--line-strong); border-radius: 20px; background: linear-gradient(135deg, color-mix(in srgb, var(--accent-sky) 6%, var(--surface)), var(--surface) 55%); }
 .discussion-heading { display: flex; justify-content: space-between; align-items: flex-start; gap: 20px; margin-bottom: 26px; }
 .discussion-heading h2 { color: var(--text-strong); font-family: var(--font-hand), var(--font-sans); font-weight: 400; font-size: clamp(28px, 4vw, 38px); margin: 8px 0; }
 .discussion-heading p:not(.eyebrow) { color: var(--muted); font-size: 13px; line-height: 1.7; max-width: 530px; }
 .discussion-badge { flex-shrink: 0; padding: 8px 10px; border: 1px solid var(--line); border-radius: 20px; font-size: 10px; color: var(--accent-sky); }
-.discussion-layout { display: grid; grid-template-columns: minmax(240px, .8fr) minmax(0, 1.4fr); gap: 28px; align-items: start; }
+.discussion-layout { display: grid; grid-template-columns: minmax(240px, .75fr) minmax(0, 1.5fr); gap: 28px; align-items: start; }
+
+/* The writing desk */
 .discussion-composer { border: 1px solid var(--line); border-radius: 14px; padding: 20px; background: var(--surface); min-width: 0; }
 .discussion-board h3 { font-size: 16px; color: var(--text-strong); margin: 0; }
+.discussion-composer > h3 { font-family: var(--font-hand), var(--font-sans); font-weight: 400; font-size: 21px; letter-spacing: -.01em; padding-bottom: 12px; border-bottom: 1px solid var(--line); }
 .discussion-composer > p { color: var(--muted); font-size: 12px; line-height: 1.65; }
-.discussion-composer label { display: block; font-size: 12px; color: var(--text-strong); margin: 20px 0 8px; }
-.discussion-composer input, .discussion-composer textarea { width: 100%; box-sizing: border-box; border: 1px solid var(--line-strong); border-radius: 8px; padding: 12px; background: var(--input-bg); color: var(--text-strong); font: inherit; font-size: 14px; line-height: 1.6; }
+.discussion-composer label { display: block; font-size: 10px; letter-spacing: .07em; text-transform: uppercase; color: var(--subtle); margin: 18px 0 7px; }
+.discussion-composer input, .discussion-composer textarea { width: 100%; box-sizing: border-box; border: 1px solid var(--line); border-radius: 10px; padding: 11px 12px; background: var(--input-bg); color: var(--text-strong); font: inherit; font-size: 14px; line-height: 1.6; transition: border-color .2s, box-shadow .2s; }
 .discussion-composer textarea { resize: vertical; min-height: 140px; }
 .discussion-composer input::placeholder, .discussion-composer textarea::placeholder { color: var(--subtle); }
+.discussion-composer input:focus, .discussion-composer textarea:focus { border-color: var(--accent-sky); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent-sky) 16%, transparent); }
 .discussion-composer-footer { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 12px; }
-.discussion-composer-footer > span { color: var(--subtle); font-size: 10px; }
+.discussion-composer-meta { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.discussion-composer-meta > span { color: var(--subtle); font-size: 10px; }
+.discussion-composer-meta > .is-warn { color: var(--accent-amber); }
+.discussion-composer-meta > .is-over { color: var(--accent-coral); }
+.discussion-hint { color: var(--subtle); font-size: 10px; }
 .discussion-board button { font: inherit; cursor: pointer; }
-.discussion-post { padding: 12px 16px; min-height: 44px; border: 1px solid var(--live); border-radius: 8px; background: var(--live); color: var(--background); font-size: 12px !important; font-weight: 600 !important; }
+.discussion-post { padding: 12px 16px; min-height: 44px; border: 1px solid var(--live); border-radius: 10px; background: var(--live); color: var(--background); font-size: 12px !important; font-weight: 600 !important; }
 .discussion-post:hover { filter: brightness(1.1); }
 .discussion-board button:disabled { opacity: .5; cursor: not-allowed; }
 .discussion-board :focus-visible { outline: 2px solid var(--accent-sky); outline-offset: 4px; }
 .discussion-rules { margin-top: 18px; font-size: 11px !important; }
 .discussion-rules a { color: var(--accent-sky); text-underline-offset: 3px; }
-.discussion-reply-context { padding: 12px; margin-top: 16px; border-left: 2px solid var(--accent-sky); background: var(--surface-hover); font-size: 12px; line-height: 1.6; color: var(--muted); overflow-wrap: anywhere; }
-.discussion-reply-context button { display: block; border: 0; padding: 10px 0 0; color: var(--accent-sky); background: none; }
+
+/* One line of feedback, and only when there is something to say: a tinted strip
+   reads as an answer to the press, where coloured text looked like a caption. */
+.discussion-notice, .discussion-error { margin: 14px 0 0; padding: 9px 12px; border: 1px solid; border-radius: 10px; font-size: 12px; line-height: 1.6; }
+.discussion-notice { color: var(--live) !important; border-color: color-mix(in srgb, var(--live) 26%, var(--line)); background: color-mix(in srgb, var(--live) 7%, var(--surface)); }
+.discussion-error { color: var(--accent-coral) !important; border-color: color-mix(in srgb, var(--accent-coral) 30%, var(--line)); background: color-mix(in srgb, var(--accent-coral) 6%, var(--surface)); }
+
+/* Reply mode: the message being answered, quoted at the top of the desk. */
+.discussion-reply-context { display: flex; align-items: flex-start; gap: 10px; padding: 10px 12px; margin-top: 14px; border: 1px solid color-mix(in srgb, var(--accent-sky) 26%, var(--line)); border-left-width: 3px; border-radius: 10px; background: color-mix(in srgb, var(--accent-sky) 5%, var(--surface)); font-size: 12px; line-height: 1.6; color: var(--muted); }
+.discussion-reply-context > span { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.discussion-reply-context strong { color: var(--text-strong); }
+.discussion-reply-cancel { flex: 0 0 auto; width: 26px; height: 26px; padding: 0; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); color: var(--muted); font-size: 12px; line-height: 1; }
+.discussion-reply-cancel:hover { color: var(--text-strong); border-color: var(--line-strong); }
+
+/* The feed */
 .discussion-feed { min-width: 0; padding: 20px; border: 1px solid var(--line); border-radius: 18px; background: color-mix(in srgb, var(--accent-sky) 3%, var(--background)); }
-.discussion-composer input:focus, .discussion-composer textarea:focus { border-color: var(--accent-sky); }
-.discussion-composer > h3 { padding-bottom: 12px; border-bottom: 1px solid var(--line); }
-.discussion-thread .discussion-message-copy > .discussion-text-button { padding: 6px 12px; margin-top: 10px; min-height: 36px; border-radius: 8px; background: var(--surface-hover); }
-@media (min-width: 900px) { .discussion-composer { position: sticky; top: 96px; } }
-.discussion-feed-heading { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
-.discussion-text-button { border: 0; background: none; color: var(--accent-sky); padding: 10px 0; min-height: 44px; font-size: 11px !important; }
-.discussion-poll-note { color: var(--subtle); font-size: 10px; line-height: 1.6; margin: 0 0 18px; }
-.discussion-thread { padding: 18px 0; border-top: 1px solid var(--line); }
-.discussion-message { display: flex; gap: 12px; scroll-margin-top: 100px; }
+.discussion-feed-heading { display: flex; align-items: center; gap: 10px; padding: 0 0 4px; }
+.discussion-feed-heading h3 { flex: 1; min-width: 0; }
+.discussion-count { color: var(--subtle); font-size: 10px; white-space: nowrap; }
+.discussion-refresh { display: inline-flex; align-items: center; gap: 6px; flex: 0 0 auto; min-height: 34px; padding: 6px 12px; border: 1px solid var(--line); border-radius: 999px; background: var(--surface); color: var(--muted); font-size: 11px; }
+.discussion-refresh:hover { color: var(--text-strong); border-color: var(--line-strong); }
+.discussion-refresh svg { width: 13px; height: 13px; }
+.discussion-refresh.is-loading svg { animation: discussion-spin .9s linear infinite; }
+@keyframes discussion-spin { to { transform: rotate(360deg); } }
+.discussion-poll-note { color: var(--subtle); font-size: 10px; line-height: 1.6; margin: 6px 0 16px; }
+
+/* New messages wait behind a tap instead of moving the list under the reader. */
+.discussion-new-pill { display: flex; align-items: center; justify-content: center; gap: 9px; width: 100%; margin: 0 0 14px; padding: 10px 14px; border: 1px solid color-mix(in srgb, var(--live) 32%, var(--line)); border-radius: 999px; background: color-mix(in srgb, var(--live) 8%, var(--surface)); color: var(--text-strong); font-size: 12px; }
+.discussion-new-pill:hover { border-color: var(--live); }
+.discussion-new-dot { flex: 0 0 auto; width: 6px; height: 6px; border-radius: 50%; background: var(--live); box-shadow: 0 0 0 3px color-mix(in srgb, var(--live) 16%, transparent); }
+.discussion-thread-meta { margin-left: auto; color: var(--subtle); font-size: 10px; white-space: nowrap; }
+
+/* Threads: the opening post, then its replies at one quieter depth. */
+.discussion-thread { margin: 12px 0; padding: 18px; border: 1px solid var(--line); border-radius: 16px; background: var(--surface); transition: border-color .2s; }
+.discussion-thread:hover { border-color: var(--line-strong); }
+.discussion-thread.is-fresh { border-color: color-mix(in srgb, var(--live) 26%, var(--line)); }
+.discussion-message { display: flex; gap: 12px; padding: 6px 8px; margin: -6px -8px; border-radius: 12px; scroll-margin-top: 120px; }
+.discussion-message.is-target { animation: discussion-target 1.8s ease forwards; }
+@keyframes discussion-target { 0%, 45% { background: color-mix(in srgb, var(--accent-sky) 12%, transparent); } 100% { background: transparent; } }
 .discussion-avatar { width: 32px; height: 32px; border-radius: 10px; display: grid; place-items: center; flex-shrink: 0; overflow: hidden; background: color-mix(in srgb, var(--accent-sky) 12%, var(--surface)); color: var(--accent-sky); font-size: 13px; }
 .discussion-avatar img { display: block; width: 100%; height: 100%; border-radius: inherit; object-fit: cover; }
 .discussion-message-copy { min-width: 0; flex: 1; }
-.discussion-message header { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: baseline; }
+.discussion-message header { display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: baseline; }
 .discussion-message strong { font-size: 13px; color: var(--text-strong); overflow-wrap: anywhere; }
 .discussion-message time { font-size: 10px; color: var(--subtle); }
-.discussion-message p { white-space: pre-wrap; overflow-wrap: anywhere; color: var(--muted); line-height: 1.75; font-size: 13px; margin: 8px 0 0; }
-.discussion-replies { margin: 8px 0 0 16px; padding-left: 20px; border-left: 1px solid var(--line-strong); display: grid; gap: 18px; }
-.discussion-replies .discussion-avatar { color: var(--accent-amber); background: color-mix(in srgb, var(--accent-amber) 10%, var(--surface)); }
-.discussion-reply-label { color: var(--subtle); font-size: 10px; display: block; margin-top: 6px; }
-.discussion-message.is-removed p { font-style: italic; }
+.discussion-message p { white-space: pre-wrap; overflow-wrap: anywhere; color: var(--text); line-height: 1.7; font-size: 13px; margin: 6px 0 0; max-width: 66ch; }
+.discussion-message.is-removed p { font-style: italic; color: var(--muted); }
+.discussion-replies { margin: 12px 0 0 44px; padding-left: 16px; border-left: 1px solid color-mix(in srgb, var(--accent-amber) 38%, var(--line)); display: grid; gap: 14px; }
+.discussion-replies .discussion-avatar { width: 26px; height: 26px; border-radius: 9px; }
+.discussion-replies .discussion-message { gap: 10px; }
+.discussion-replies .discussion-message p { font-size: 12.5px; line-height: 1.7; }
+.discussion-fold { justify-self: start; min-height: 34px; padding: 5px 12px; border: 1px solid var(--line); border-radius: 999px; background: var(--surface); color: var(--muted); font-size: 11px; }
+.discussion-fold:hover { color: var(--text-strong); border-color: var(--line-strong); }
+
+/* "Replying to" is a door, not a label: it jumps to the message it quotes. */
+.discussion-reply-quote { display: flex; align-items: baseline; gap: 8px; max-width: 100%; margin-top: 6px; padding: 5px 10px; border: 0; border-left: 2px solid color-mix(in srgb, var(--accent-sky) 45%, var(--line)); border-radius: 0 8px 8px 0; background: var(--surface-hover); color: var(--subtle); font-size: 11px; line-height: 1.5; text-align: left; }
+.discussion-reply-quote:hover { color: var(--muted); background: color-mix(in srgb, var(--accent-sky) 7%, var(--surface-hover)); }
+.discussion-reply-quote-name { flex: 0 0 auto; color: var(--accent-sky); white-space: nowrap; }
+.discussion-reply-quote-body { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.discussion-message-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 10px; }
+.discussion-text-button { border: 0; background: var(--surface-hover); color: var(--accent-sky); padding: 7px 11px; min-height: 34px; border-radius: 8px; font-size: 11px !important; }
+.discussion-text-button:hover { color: var(--text-strong); }
+
+/* Empty, loading and paging */
 .discussion-empty { text-align: center; border: 1px dashed var(--line-strong); border-radius: 12px; padding: 40px 20px; color: var(--muted); font-size: 13px; line-height: 1.7; }
 .discussion-empty > span { display: block; font-size: 32px; color: var(--accent-amber); margin-bottom: 12px; }
-.discussion-error { color: var(--accent-coral) !important; font-size: 12px; line-height: 1.7; }
-.discussion-notice { color: var(--live) !important; min-height: 18px; }
-.discussion-pagination { display: flex; flex-wrap: wrap; gap: 10px; }
-.discussion-pagination button { border: 1px solid var(--line-strong); background: var(--surface); color: var(--text-strong); border-radius: 8px; min-height: 44px; padding: 10px 14px; font-size: 12px; }
+.discussion-empty h3 { margin: 0 0 6px; }
+.discussion-empty p { max-width: 380px; margin: 0 auto; }
+.discussion-empty-cta { margin-top: 18px; min-height: 42px; padding: 10px 18px; border: 1px solid var(--line-strong); border-radius: 999px; background: var(--surface); color: var(--text-strong); font-size: 12px; }
+.discussion-empty-cta:hover { border-color: var(--accent-sky); }
+.discussion-skeletons { display: grid; gap: 12px; }
+.discussion-skeleton { display: flex; gap: 12px; padding: 18px; border: 1px solid var(--line); border-radius: 16px; background: var(--surface); animation: skeleton-shimmer 1.6s ease-in-out infinite; }
+.discussion-skeleton-avatar { flex: 0 0 auto; width: 32px; height: 32px; border-radius: 10px; background: var(--surface-hover); }
+.discussion-skeleton-lines { flex: 1; display: grid; gap: 9px; align-content: start; }
+.discussion-skeleton-lines i { display: block; height: 9px; border-radius: 999px; background: var(--surface-hover); }
+.discussion-skeleton-lines i:nth-child(1) { width: 28%; background: var(--line-strong); }
+.discussion-skeleton-lines i:nth-child(2) { width: 88%; }
+.discussion-skeleton-lines i:nth-child(3) { width: 62%; }
+.discussion-pagination { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-top: 18px; }
+.discussion-pagination button { border: 1px solid var(--line-strong); background: var(--surface); color: var(--text-strong); border-radius: 10px; min-height: 44px; padding: 10px 14px; font-size: 12px; }
+.discussion-page-label { margin-left: auto; color: var(--subtle); font-size: 10px; }
+
+@media (min-width: 900px) { .discussion-composer { position: sticky; top: 96px; } }
+/* Two columns are only worth it while each one is worth reading: under 900px
+   the desk sits above the conversation instead of squeezing it. */
+@media (max-width: 899px) { .discussion-layout { grid-template-columns: 1fr; gap: 24px; } }
 @media (max-width: 720px) {
   .discussion-board { padding: 20px 16px; }
   .discussion-heading { flex-direction: column; gap: 10px; }
-  .discussion-layout { grid-template-columns: 1fr; gap: 24px; }
-  .discussion-replies { margin-left: 8px; padding-left: 12px; }
+  .discussion-replies { margin-left: 0; padding-left: 12px; }
+  .discussion-hint { display: none; }
 }
+@media (hover: none) { .discussion-hint { display: none; } }
 /* Phones: the board gets a tighter frame and every control a full-width,
    thumb-sized target. The 16px inputs also stop mobile Safari from zooming
    the page when a field is focused. */
@@ -172,15 +243,26 @@ html::-webkit-scrollbar, body::-webkit-scrollbar { display: none; width: 0; heig
   .discussion-composer input, .discussion-composer textarea { font-size: 16px; padding: 11px; }
   .discussion-composer textarea { min-height: 120px; }
   .discussion-composer-footer { flex-wrap: wrap; gap: 8px; }
-  .discussion-composer-footer > span { order: 2; }
+  .discussion-composer-meta { order: 2; }
   .discussion-post { flex: 1 1 100%; min-height: 48px; font-size: 13px !important; }
+  .discussion-feed { padding: 16px 12px; }
+  .discussion-feed-heading { flex-wrap: wrap; }
   .discussion-message { gap: 10px; }
   .discussion-avatar { width: 28px; height: 28px; border-radius: 9px; }
-  .discussion-replies { margin-left: 4px; padding-left: 12px; gap: 16px; }
+  .discussion-replies { padding-left: 10px; gap: 12px; }
+  .discussion-replies .discussion-avatar { width: 24px; height: 24px; }
+  .discussion-thread { padding: 14px 12px; border-radius: 12px; }
+  .discussion-text-button { min-height: 40px; padding: 9px 12px; font-size: 12px !important; }
   .discussion-empty { padding: 30px 16px; }
   .discussion-pagination { gap: 8px; }
   .discussion-pagination button { flex: 1 1 auto; min-height: 48px; }
-  .discussion-feed-heading { flex-wrap: wrap; }
+  .discussion-page-label { flex: 1 1 100%; margin-left: 0; text-align: center; }
+}
+/* The flourishes are decoration, and both of them are motion. */
+@media (prefers-reduced-motion: reduce) {
+  .discussion-skeleton { animation: none; }
+  .discussion-message.is-target { animation: none; background: color-mix(in srgb, var(--accent-sky) 12%, transparent); }
+  .discussion-refresh.is-loading svg { animation: none; }
 }
 
 /* About and support paths stay visible without competing with the directory. */
@@ -248,13 +330,6 @@ html::-webkit-scrollbar, body::-webkit-scrollbar { display: none; width: 0; heig
 .discussion-badge { display: inline-flex; align-items: center; gap: 7px; background: color-mix(in srgb, var(--live) 7%, var(--surface)); color: var(--live); border-color: color-mix(in srgb, var(--live) 25%, var(--line)); }
 .discussion-badge::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
 .discussion-composer { background: color-mix(in srgb, var(--accent-sky) 3%, var(--surface)); border-radius: 16px; box-shadow: inset 0 1px 0 color-mix(in srgb, var(--text-strong) 5%, transparent); }
-.discussion-thread { margin: 14px 0; padding: 18px; border: 1px solid var(--line); border-radius: 16px; background: var(--surface); transition: border-color .2s; }
-.discussion-thread:hover { border-color: var(--line-strong); }
-.discussion-avatar { width: 36px; height: 36px; border-radius: 12px; border: 1px solid color-mix(in srgb, var(--accent-sky) 20%, var(--line)); font-weight: 600; }
-.discussion-message p { color: var(--text); }
-.discussion-replies { margin-top: 16px; padding-top: 8px; border-left-color: color-mix(in srgb, var(--accent-amber) 38%, var(--line)); }
-.discussion-feed-heading { padding: 0 0 4px; }
-.discussion-feed-heading .discussion-text-button { padding: 8px 12px; border: 1px solid var(--line); border-radius: 999px; }
 .footer-publications { width: min(100% - 48px, 960px); margin: 0 auto; padding: 32px 0; display: flex; align-items: center; flex-wrap: wrap; gap: 12px; }
 .footer-publications > span { margin-right: auto; color: var(--subtle); font-size: 10px; text-transform: uppercase; letter-spacing: .08em; }
 .site-footer .footer-publications a { display: inline-flex; align-items: center; gap: 12px; min-height: 48px; padding: 10px 16px; border: 1px solid var(--line-strong); border-radius: 12px; color: var(--text-strong); background: var(--surface); transition: border-color .2s, transform .2s; }
@@ -280,12 +355,8 @@ html::-webkit-scrollbar, body::-webkit-scrollbar { display: none; width: 0; heig
 @media (max-width: 600px) {
   .url-submission { padding: 22px 16px; border-radius: 18px; }
   .url-submission-form { padding: 16px 12px; }
-  .discussion-feed { padding: 16px 12px; }
   .about-page-links { grid-template-columns: 1fr; }
   .url-submission-form input, .url-submission-form textarea { font-size: 16px; }
-  .discussion-thread { padding: 14px 12px; border-radius: 12px; }
-  .discussion-avatar { width: 28px; height: 28px; border-radius: 9px; }
-  .discussion-heading { padding-bottom: 18px; }
   .footer-publications { width: calc(100% - 32px); }
   .site-footer .footer-publications a { flex: 1 1 100%; justify-content: space-between; }
 }

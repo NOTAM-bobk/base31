@@ -20,7 +20,26 @@ function load(relative) {
   new Function("require", "module", "exports", compiled)(localRequire, module, module.exports);
   return module.exports;
 }
-const { compareVotes, rankByVotes, totalVotes } = load("lib/vote-ranking.ts");
+/** The transpiled source of one file, for the loaders above to run. */
+function loadSource(relative) {
+  return ts.transpileModule(fs.readFileSync(relative, "utf8"), {
+    compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2017, esModuleInterop: true },
+  }).outputText;
+}
+// The Worker's fetch handler, transpiled and loaded so a route can be driven
+// in-process. The only two specifiers it needs are its shared ranking rule and
+// its Durable Object, which the fire and vote routes never touch.
+function loadWorker(relative) {
+  const module = { exports: {} };
+  const localRequire = (id) => {
+    if (id === "../../lib/vote-ranking") return load("lib/vote-ranking.ts");
+    if (id === "./discussion") return {};
+    try { return require(id); } catch { return {}; }
+  };
+  new Function("require", "module", "exports", loadSource(relative))(localRequire, module, module.exports);
+  return module.exports;
+}
+const { compareVotes, rankByVotes, totalVotes, FIRE_VOTE_WEIGHT } = load("lib/vote-ranking.ts");
 assert.equal(totalVotes({ up: 2, down: 10 }), 12);
 assert.ok(compareVotes({ up: 2, down: 10 }, { up: 9, down: 0 }) < 0);
 assert.ok(compareVotes(undefined, { up: 0, down: 1 }) > 0);
@@ -427,6 +446,128 @@ assert.ok(topTen.includes("useSiteVotes(CANDIDATE_KEYS)"), "The top ten ranks re
 assert.ok(topTen.includes("rankByVotes(CANDIDATES, totals, RANKS)"), "The top ten uses the same ranking rule as /stats and the strips");
 assert.ok(topTen.includes("no votes yet"), "An unvoted entry shows no count rather than a made-up one");
 assert.ok(topTen.includes('id="top-ten"'), "The top ten owns a section a rail link can name");
+
+// A fire is worth ten votes and has a clock on it. Nothing stores a score to
+// decrement later: the Worker keeps the timestamps the fires were cast at and
+// drops the expired ones as it reads them, so a boost runs out on its own.
+assert.equal(FIRE_VOTE_WEIGHT, 10, "A fire is worth ten votes");
+assert.equal(totalVotes({ up: 0, down: 0, fires: 1 }), 10, "One fire counts as ten votes");
+assert.equal(totalVotes({ up: 3, down: 2, fires: 2 }), 25, "Fires add to the thumbs rather than replacing them");
+assert.equal(totalVotes({ up: 1, down: 1 }), 2, "A key with no fires on it ranks exactly as it always did");
+assert.ok(compareVotes({ up: 0, down: 0, fires: 1 }, { up: 9, down: 0 }) < 0, "One fire outranks nine thumbs");
+assert.ok(compareVotes({ up: 0, down: 0, fires: 2 }, { up: 12, down: 0 }) < 0, "Two fires outrank twelve thumbs");
+assert.ok(compareVotes({ up: 0, down: 0, fires: 1 }, { up: 10, down: 0 }) > 0, "A fire is not worth more than the ten votes it is worth");
+// `workerSource` above already holds the Worker's source.
+assert.ok(workerSource.includes('url.pathname === "/fire"'), "The Worker owns a fire route");
+assert.ok(workerSource.includes("const FIRE_WINDOW_MS = 24 * 60 * 60 * 1000"), "A fire is worth its ten votes for exactly one day");
+assert.match(workerSource, /value > cutoff/, "Expired fires are dropped as they are read, not swept up later");
+assert.ok(workerSource.includes("return { up, down, fires: fires.length }"), "Every vote read carries the live fire count with it");
+assert.ok(workerSource.includes("prefix: FIRE_PREFIX"), "/stats folds the fires in with the votes");
+
+// The fire button is drawn once and spent for a day per visitor; the browser's
+// own half of that rule lives beside the votes it is shown with.
+const siteVotesSource = fs.readFileSync("components/site-votes.tsx", "utf8");
+assert.ok(siteVotesSource.includes("${counterUrl}/fire"), "The shared vote component posts a fire");
+assert.ok(siteVotesSource.includes("export function FireButton("), "The fire button is drawn in exactly one place");
+assert.equal((home.match(/<FireButton/g) || []).length, 1, "An /explore card carries the fire button too");
+assert.ok(home.includes("isFireActive(fireStamps, site.subdomain)"), "A card's fire is spent for the visitor who cast it");
+const firesSource = fs.readFileSync("lib/fires.ts", "utf8");
+assert.ok(firesSource.includes('"base31-fires"'), "The visitor's own fires are remembered beside their votes");
+const { isFireActive, FIRE_WINDOW_MS } = load("lib/fires.ts");
+assert.equal(isFireActive({ a: 1000 }, "a", 1000 + FIRE_WINDOW_MS - 1), true, "A fire still counts a moment before its day is up");
+assert.equal(isFireActive({ a: 1000 }, "a", 1000 + FIRE_WINDOW_MS), false, "A fire stops counting when its day is up");
+assert.equal(isFireActive({}, "a"), false, "Nothing is fired to begin with");
+
+// The visitor's half of the reset, against a stub storage: an old stamp is
+// dropped as it is read, so a spent button comes back by itself the next day
+// rather than needing anything to clear it.
+const memory = new Map();
+globalThis.localStorage = {
+  getItem: (key) => (memory.has(key) ? memory.get(key) : null),
+  setItem: (key, value) => { memory.set(key, String(value)); },
+  removeItem: (key) => { memory.delete(key); },
+};
+const fireStore = load("lib/fires.ts");
+assert.deepEqual(fireStore.readFireStamps(10_000), {}, "Nothing is remembered to begin with");
+fireStore.stampFire("external:example.com:2", 10_000);
+assert.equal(fireStore.readFireStamps(10_000)["external:example.com:2"], 10_000, "A fire is remembered where the button reads it");
+assert.equal(fireStore.fireHoursLeft(fireStore.readFireStamps(10_000), "external:example.com:2", 10_000), 24, "A fresh fire has a whole day to run");
+assert.equal(fireStore.fireHoursLeft(fireStore.readFireStamps(10_000), "external:example.com:2", 10_000 + FIRE_WINDOW_MS), 0, "A fire that has run out has nothing left");
+assert.deepEqual(fireStore.readFireStamps(10_000 + FIRE_WINDOW_MS), {}, "Once its day is up the stamp is dropped and the button is live again");
+delete globalThis.localStorage;
+
+// `POST /fire` is worth ten votes for a day and then nothing at all, and the
+// only way to be sure is to run it: the Worker is loaded here and called
+// in-process over a Map-backed KV binding, so no deployment and no network are
+// involved. The day is ended by ageing the stored timestamps, which is the only
+// state the route ever reads.
+const kvStore = new Map();
+const workerEnv = {
+  VIEW_COUNTER: {
+    get: async (key) => (kvStore.has(key) ? kvStore.get(key) : null),
+    put: async (key, value) => { kvStore.set(key, String(value)); },
+    delete: async (key) => { kvStore.delete(key); },
+    list: async ({ prefix = "", cursor } = {}) => ({
+      keys: [...kvStore.keys()].filter((key) => key.startsWith(prefix)).sort().map((name) => ({ name })),
+      list_complete: true,
+      cursor: undefined,
+    }),
+  },
+};
+const workerHandler = loadWorker("worker/src/index.ts").default;
+const workerFetch = (path, init) => workerHandler.fetch(new Request(`https://test.invalid${path}`, init), workerEnv);
+const workerPost = (path, body) => workerFetch(path, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+const FIRED_KEY = "external:example.com:1";
+const firesOn = async () => (await (await workerFetch(`/votes?keys=${encodeURIComponent(FIRED_KEY)}`)).json()).votes[FIRED_KEY];
+
+assert.deepEqual(await (await workerPost("/fire", { key: FIRED_KEY })).json(), { key: FIRED_KEY, up: 0, down: 0, fires: 1 }, "A fire comes back with the totals it produced");
+assert.equal((await (await workerPost("/fire", { key: FIRED_KEY })).json()).fires, 2, "A second fire adds a second ten votes");
+assert.equal((await workerPost("/fire", { key: "not a key!" })).status, 400, "A fire needs a key the directory would actually use");
+assert.equal((await workerFetch("/fire")).status, 405, "A fire is a POST and nothing else");
+assert.deepEqual(await (await workerPost("/vote", { key: FIRED_KEY, from: 0, to: 1 })).json(), { key: FIRED_KEY, up: 1, down: 0, fires: 2 }, "A vote answers with the fire count beside the thumbs, so one round trip is enough");
+assert.deepEqual(await firesOn(), { up: 1, down: 0, fires: 2 }, "The bulk read the cards make carries the fire count too");
+assert.deepEqual((await (await workerFetch("/stats?days=7")).json()).top[0], { key: FIRED_KEY, up: 1, down: 0, fires: 2 }, "/stats ranks through the same totals, fires included");
+
+// And then the day ends: both fires stop counting on their own, with nothing to
+// decrement and no sweep to run.
+kvStore.set(`fires:${FIRED_KEY}`, JSON.stringify([Date.now() - FIRE_WINDOW_MS - 1, Date.now() - FIRE_WINDOW_MS - 1]));
+assert.deepEqual(await firesOn(), { up: 1, down: 0, fires: 0 }, "A fire older than its day has stopped counting");
+assert.equal(totalVotes(await firesOn()), 1, "With no live fire an entry ranks on its thumbs alone");
+kvStore.set(`fires:${FIRED_KEY}`, JSON.stringify([Date.now() - FIRE_WINDOW_MS - 1, Date.now() - 1_000]));
+assert.deepEqual(await firesOn(), { up: 1, down: 0, fires: 1 }, "Only the fires still inside their day are counted");
+
+// The trending board shows the fire as a marker only: the act of firing belongs
+// on the card, where the visitor is already looking at one site.
+assert.ok(topTen.includes('className="top-ten-fire"'), "A boosted row carries the fire emoji");
+assert.ok(!topTen.includes("<FireButton"), "The trending board marks the fire rather than offering it");
+assert.match(fs.readFileSync("app/directory.css", "utf8"), /\.top-ten-name-row \{/, "The name and its fire share a line");
+
+// The website of the week lost the little tinted box with the glyph in it.
+// `weeklySource` above already holds the weekly pick's source.
+assert.ok(!weeklySource.includes("weekly-pick-mark"), "The weekly pick's heading is just the title and the week");
+assert.ok(!fs.readFileSync("app/directory.css", "utf8").includes(".weekly-pick-mark"), "The removed mark's style rule is gone with it");
+
+// The site web: the whole directory as one branching map at the foot of the
+// landing page, built from the registry and the entry list rather than from a
+// hand-kept list, so a new config entry appears on the next publish.
+const siteWeb = fs.readFileSync("components/site-web.tsx", "utf8");
+const siteWebCode = siteWeb.replace(/\/\*[\s\S]*?\*\//g, "").replace(/^\s*\/\/.*$/gm, "");
+assert.ok(siteWeb.includes('id="site-web"'), "The site web owns a section a rail link can name");
+assert.ok(siteWeb.includes("directorySections.map") && siteWeb.includes("for (const entry of directoryEntries)"), "The web is built from the registry and the entry list");
+assert.ok(!siteWebCode.includes("Math.random") && !siteWebCode.includes("Date.now"), "The web's geometry is hashed, so the server and the browser draw the same picture");
+assert.ok(siteWeb.includes("href={`/sites/${leaf.slug}`}") && siteWeb.includes("href={`/explore/${hub.id}`}"), "Every node in the web is a real link to its own page");
+assert.ok(fs.readFileSync("app/late.css", "utf8").includes('html[data-motion="enabled"] .site-web-leaf-dot'), "The map's idle drift waits for motion to be allowed");
+assert.equal((home.match(/<SiteWeb \/>/g) || []).length, 1, "The landing page renders the web once");
+assert.ok(home.includes('{ id: "site-web", label: "The web" }'), "The rail walks the page and names the web");
+
+// SEO: the question people really ask about the useless web is answered on the
+// page, repeated in the FAQPage structured data, and spelled out for an
+// assistant in llms.txt. Nothing is claimed that the directory cannot show.
+const faqSource = fs.readFileSync("components/faq.tsx", "utf8");
+assert.ok(faqSource.toLowerCase().includes("the useless web"), "The FAQ answers the useless-web question");
+assert.ok(faqSource.includes('className="sr-only"'), "The FAQ carries the hidden repeat of that copy");
+assert.ok(fs.readFileSync("public/llms.txt", "utf8").toLowerCase().includes("the useless web"), "llms.txt tells an assistant what the useless web is");
+assert.ok(fs.readFileSync("app/layout.tsx", "utf8").includes('"the useless web"'), "The root metadata covers the phrase");
 
 // The submission box no longer claims a private review queue, and the rule
 // that styled that line went with it.

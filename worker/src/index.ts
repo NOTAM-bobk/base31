@@ -42,7 +42,10 @@ interface WorkerContext {
 // A visitor's choice: 1 = thumbs up, -1 = thumbs down, 0 = no vote.
 type Vote = -1 | 0 | 1;
 
-type VoteTotals = { up: number; down: number };
+// `fires` is not a third vote: it is how many fires on this key are still
+// inside their 24 hours. Each one is worth `FIRE_VOTE_WEIGHT` votes to the one
+// ranking rule the site and the Worker share (lib/vote-ranking.ts).
+type VoteTotals = { up: number; down: number; fires?: number };
 
 // A file published as part of a community site. `data` is stored separately
 // (base64) so this record stays small enough to read on every request.
@@ -79,6 +82,22 @@ const CORS_HEADERS: Record<string, string> = {
 
 const MAX_KEY_LENGTH = 128;
 const MAX_BULK_KEYS = 100;
+
+// Fires. A fire is a boost with a clock on it: it is worth ten votes while it
+// lasts and stops counting by itself after a day, so nothing anywhere stores a
+// score that has to be decremented later. The storage is the list of the
+// timestamps the fires were cast at, and every read drops the ones that have
+// already expired — that is the whole of the expiry rule.
+const FIRE_PREFIX = "fires:";
+const FIRE_WINDOW_MS = 24 * 60 * 60 * 1000;
+// A ceiling on how many timestamps one key stores in a day, so a single popular
+// entry can never grow a KV value without bound. Past the ceiling the oldest
+// fires fall off first, which is the right end to lose: they are the ones
+// closest to expiring anyway.
+const MAX_FIRES_PER_KEY = 400;
+// The 24 hours plus two hours of slack, so KV only collects a value once every
+// timestamp inside it has expired on its own duty rather than by TTL.
+const FIRE_TTL_SECONDS = 26 * 60 * 60;
 
 // Publishing limits. KV values cap out at 25 MiB, so these keep a single
 // uploaded site comfortably inside one namespace.
@@ -366,12 +385,40 @@ const bumpUnique = async (env: Env, request: Request): Promise<number | null> =>
 
 const voteKey = (key: string, side: "up" | "down") => `votes:${key}:${side}`;
 
-const readVotes = async (env: Env, key: string): Promise<VoteTotals> => {
-  const [up, down] = await Promise.all([
+const fireStoreKey = (key: string) => `${FIRE_PREFIX}${key}`;
+
+// The fires on one key that are still running, oldest first. Anything older
+// than the window is discarded here rather than swept up on a schedule: this is
+// the only place the expiry is expressed, so it cannot drift.
+const readFires = async (env: Env, key: string, now: number): Promise<number[]> => {
+  let stored: unknown;
+  try {
+    stored = JSON.parse((await env.VIEW_COUNTER.get(fireStoreKey(key))) || "[]");
+  } catch {
+    return [];
+  }
+  if (!Array.isArray(stored)) return [];
+  const cutoff = now - FIRE_WINDOW_MS;
+  return stored.filter(
+    (value): value is number => typeof value === "number" && Number.isFinite(value) && value > cutoff,
+  );
+};
+
+// Records one fire and hands back the list that was written, so the caller
+// answers with the count it just stored instead of reading the value again.
+const addFire = async (env: Env, key: string, now: number): Promise<number[]> => {
+  const next = [...(await readFires(env, key, now)), now].slice(-MAX_FIRES_PER_KEY);
+  await env.VIEW_COUNTER.put(fireStoreKey(key), JSON.stringify(next), { expirationTtl: FIRE_TTL_SECONDS });
+  return next;
+};
+
+const readVotes = async (env: Env, key: string, now: number = Date.now()): Promise<VoteTotals> => {
+  const [up, down, fires] = await Promise.all([
     readCount(env, voteKey(key, "up")),
     readCount(env, voteKey(key, "down")),
+    readFires(env, key, now),
   ]);
-  return { up, down };
+  return { up, down, fires: fires.length };
 };
 
 // KV has no atomic increment, so every step is a read-modify-write. A vote only
@@ -428,6 +475,7 @@ const countPrefix = async (env: Env, prefix: string, keep?: (value: unknown) => 
 // greedy, so a key that itself contains a colon stays in one bucket.
 const readAllVotes = async (env: Env): Promise<Record<string, VoteTotals>> => {
   const totals: Record<string, VoteTotals> = {};
+  const now = Date.now();
   let cursor: string | undefined;
   for (;;) {
     const page = await env.VIEW_COUNTER.list({ prefix: "votes:", limit: 200, cursor });
@@ -439,6 +487,24 @@ const readAllVotes = async (env: Env): Promise<Record<string, VoteTotals>> => {
       const side = match[2] as "up" | "down";
       const record = totals[match[1]] ?? (totals[match[1]] = { up: 0, down: 0 });
       record[side] = value;
+    }
+    if (page.list_complete || !page.cursor) break;
+    cursor = page.cursor;
+  }
+  // Fires are folded in the same pass, under the same key, so `/stats` ranks
+  // entries the way the rest of the site does — a fire is worth ten votes there
+  // too. A key with fires and no votes at all still gets a record, which is why
+  // the empty object is created before the count is known to be non-zero.
+  cursor = undefined;
+  for (;;) {
+    const page = await env.VIEW_COUNTER.list({ prefix: FIRE_PREFIX, limit: 200, cursor });
+    for (const entry of page.keys) {
+      const key = entry.name.slice(FIRE_PREFIX.length);
+      if (!key) continue;
+      const live = (await readFires(env, key, now)).length;
+      if (live === 0) continue;
+      const record = totals[key] ?? (totals[key] = { up: 0, down: 0 });
+      record.fires = (record.fires ?? 0) + live;
     }
     if (page.list_complete || !page.cursor) break;
     cursor = page.cursor;
@@ -470,9 +536,13 @@ const handleStats = async (env: Env, url: URL): Promise<Response> => {
     ]);
 
     const sum = (window: { views: number }[]) => window.reduce((running, point) => running + point.views, 0);
-    const voteTotals = Object.values(votes).reduce(
-      (running, totals) => ({ up: running.up + totals.up, down: running.down + totals.down }),
-      { up: 0, down: 0 },
+    const voteTotals = Object.values(votes).reduce<VoteTotals>(
+      (running, totals) => ({
+        up: running.up + totals.up,
+        down: running.down + totals.down,
+        fires: (running.fires ?? 0) + (totals.fires ?? 0),
+      }),
+      { up: 0, down: 0, fires: 0 },
     );
     const top = Object.entries(votes)
       .map(([key, totals]) => ({ key, ...totals }))
@@ -1135,7 +1205,8 @@ export default {
 
     if (url.pathname === "/discussion" || url.pathname.startsWith("/discussion/")) return handleDiscussion(request, env);
 
-    // GET /votes?keys=a,b,c → { votes: { a: { up, down }, b: … } }
+    // GET /votes?keys=a,b,c → { votes: { a: { up, down, fires }, b: … } }
+    // `fires` is how many of that key's fires are still inside their 24 hours.
     if (url.pathname === "/votes") {
       if (request.method !== "GET") return json({ error: "Method not allowed" }, 405);
       const keys = (url.searchParams.get("keys") || "")
@@ -1155,7 +1226,9 @@ export default {
       }
     }
 
-    // POST /vote { key, from, to } → { key, up, down } for the new totals.
+    // POST /vote { key, from, to } → { key, up, down, fires } for the new totals.
+    // The fire count comes back with the vote totals so a client never has to
+    // ask again for the half it did not touch.
     if (url.pathname === "/vote") {
       if (request.method !== "POST") return json({ error: "Method not allowed" }, 405);
       let payload: { key?: unknown; from?: unknown; to?: unknown };
@@ -1170,6 +1243,38 @@ export default {
       if (from === null || to === null) return json({ error: "from and to must be 1, 0 or -1" }, 400);
       try {
         return json({ key: payload.key, ...(await applyVote(env, payload.key, from, to)) });
+      } catch {
+        return json({ error: "Counter temporarily unavailable" }, 503);
+      }
+    }
+
+    // POST /fire { key } → { key, up, down, fires } for the new totals.
+    //
+    // A fire is a boost, not a third vote: it is worth FIRE_VOTE_WEIGHT votes
+    // (lib/vote-ranking.ts) for as long as it lasts and then stops counting by
+    // itself. There is deliberately no "unfire": the gesture has a clock on it,
+    // so the way to take it back is to wait for it. The visitor's own 24-hour
+    // limit lives in their browser (lib/fires.ts) — this end only refuses a key
+    // it does not recognise, because a per-visitor limit needs an identity and
+    // the directory does not keep one.
+    if (url.pathname === "/fire") {
+      if (request.method !== "POST") return json({ error: "Method not allowed" }, 405);
+      let payload: { key?: unknown };
+      try {
+        payload = (await request.json()) as typeof payload;
+      } catch {
+        return json({ error: "Invalid JSON body" }, 400);
+      }
+      if (!isValidKey(payload.key)) return json({ error: "Invalid key" }, 400);
+      const key = payload.key;
+      try {
+        const now = Date.now();
+        const live = await addFire(env, key, now);
+        const [up, down] = await Promise.all([
+          readCount(env, voteKey(key, "up")),
+          readCount(env, voteKey(key, "down")),
+        ]);
+        return json({ key, up, down, fires: live.length });
       } catch {
         return json({ error: "Counter temporarily unavailable" }, 503);
       }

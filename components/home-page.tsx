@@ -27,6 +27,7 @@ import coolSites, { searchCoolSites } from "@/lib/cool-sites";
 import coolApis, { searchCoolApis } from "@/lib/cool-apis";
 import coolApps, { searchCoolApps } from "@/lib/cool-apps";
 import { tick } from "@/lib/haptics";
+import { isFireActive, readFireStamps, stampFire } from "@/lib/fires";
 import SectionRail, { type RailSection } from "@/components/section-rail";
 import HeroStats from "@/components/hero-stats";
 import CoolAis from "@/components/cool-ais";
@@ -40,6 +41,8 @@ import { matchesQuery } from "@/lib/search";
 import EditorsPicks from "@/components/editors-picks";
 import TopTen from "@/components/top-ten";
 import WebsiteOfTheWeek from "@/components/website-of-the-week";
+import SiteWeb from "@/components/site-web";
+import { FireButton } from "@/components/site-votes";
 import BestMatches from "@/components/best-matches";
 import { sectionCount, sectionsWithMatches } from "@/lib/sections";
 import { compareVotes } from "@/lib/vote-ranking";
@@ -51,7 +54,10 @@ type Theme = "dark" | "light";
 type Vote = 1 | -1;
 // Every choice the worker understands: 1 = up, -1 = down, 0 = cleared.
 type VoteValue = 1 | 0 | -1;
-type VoteTotals = { up: number; down: number };
+// `fires` is how many fires on the key are still inside their 24 hours; each
+// one is worth ten votes (`FIRE_VOTE_WEIGHT` in lib/vote-ranking.ts), which is
+// what makes a fired site move in the "liked" sort as well as on the board.
+type VoteTotals = { up: number; down: number; fires?: number };
 // A site a visitor uploaded. The worker hosts its files from Cloudflare KV.
 type PublishedSite = { slug: string; title: string; description: string; tags: string[]; url: string; createdAt: number };
 
@@ -350,6 +356,9 @@ export default function HomePage({ dict = EN, locale = "en", mode = "home" }: { 
   // One rising "+1"/"-1" per click, counted per site so a repeat click on the
   // same thumb replays the animation instead of sitting still.
   const [votePops, setVotePops] = useState<Record<string, { up: number; down: number }>>({});
+  // This visitor's own fires, so a spent button stays spent across visits.
+  const [fireStamps, setFireStamps] = useState<Record<string, number>>({});
+  const [firePending, setFirePending] = useState<Record<string, boolean>>({});
   const [theme, setTheme] = useState<Theme>("dark");
   const [views, setViews] = useState<number | null>(null);
   const [milestone, setMilestone] = useState<number | null>(null);
@@ -548,6 +557,19 @@ export default function HomePage({ dict = EN, locale = "en", mode = "home" }: { 
     };
   }, []);
 
+  // The visitor's own fire stamps, read from the same localStorage the button
+  // writes; the storage event keeps two open tabs agreeing about what is spent.
+  useEffect(() => {
+    const sync = () => setFireStamps(readFireStamps());
+    sync();
+    window.addEventListener("storage", sync);
+    window.addEventListener("base31-vote-change", sync);
+    return () => {
+      window.removeEventListener("storage", sync);
+      window.removeEventListener("base31-vote-change", sync);
+    };
+  }, []);
+
   // Shared vote totals from the worker, so thumbs show real community counts.
   // Uploaded sites share the same vote keys, so they rank alongside the rest.
   useEffect(() => {
@@ -718,9 +740,60 @@ export default function HomePage({ dict = EN, locale = "en", mode = "home" }: { 
       if (!response.ok) return;
       const data = await response.json();
       if (!Number.isFinite(data?.up) || !Number.isFinite(data?.down)) return;
-      setVoteTotals((current) => ({ ...current, [key]: { up: Number(data.up), down: Number(data.down) } }));
+      // The worker returns the fire count with the thumbs, so a vote can never
+      // blank out a boost that is still running.
+      setVoteTotals((current) => ({
+        ...current,
+        [key]: { up: Number(data.up), down: Number(data.down), fires: Number.isFinite(data.fires) ? Number(data.fires) : current[key]?.fires ?? 0 },
+      }));
     } catch {}
   }, []);
+
+  // Push a fire to the worker and let its count stand. Nothing is written
+  // locally until this answers, so a request that never lands leaves the button
+  // live to try again instead of spending the visitor's one fire on a boost
+  // nobody received.
+  const sendFire = useCallback(async (key: string): Promise<boolean> => {
+    try {
+      const response = await fetch(`${counterUrl}/fire`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ key }),
+      });
+      if (!response.ok) return false;
+      const data = await response.json();
+      if (!Number.isFinite(data?.fires)) return false;
+      setVoteTotals((current) => ({
+        ...current,
+        [key]: {
+          up: Number.isFinite(data.up) ? Number(data.up) : current[key]?.up ?? 0,
+          down: Number.isFinite(data.down) ? Number(data.down) : current[key]?.down ?? 0,
+          fires: Number(data.fires),
+        },
+      }));
+      return true;
+    } catch {
+      return false;
+    }
+  }, []);
+
+  // One fire per visitor per site per day, and the browser is what remembers it
+  // (lib/fires.ts) — the same place the button reads the state from, so a second
+  // tab cannot spend a second fire. A fire has no undo: it is worth ten votes
+  // for a day and then stops counting by itself.
+  const castFire = useCallback((key: string) => {
+    if (firePending[key] || isFireActive(readFireStamps(), key)) return;
+    buzz([12, 30]);
+    setFirePending((current) => ({ ...current, [key]: true }));
+    void sendFire(key).then((ok) => {
+      setFirePending((current) => ({ ...current, [key]: false }));
+      if (!ok) {
+        notify("Could not add your fire. Try again.");
+        return;
+      }
+      setFireStamps(stampFire(key));
+    });
+  }, [buzz, firePending, notify, sendFire]);
 
   const castVote = useCallback((key: string, direction: Vote) => {
     const previous: VoteValue = votes[key] ?? 0;
@@ -741,7 +814,7 @@ export default function HomePage({ dict = EN, locale = "en", mode = "home" }: { 
     // Optimistic count so the number moves on click, corrected by the worker.
     setVoteTotals((current) => {
       const base = current[key] ?? { up: 0, down: 0 };
-      const updated: VoteTotals = { up: base.up, down: base.down };
+      const updated: VoteTotals = { up: base.up, down: base.down, fires: base.fires ?? 0 };
       if (previous === 1) updated.up = Math.max(0, updated.up - 1);
       if (previous === -1) updated.down = Math.max(0, updated.down - 1);
       if (next === 1) updated.up += 1;
@@ -862,6 +935,7 @@ export default function HomePage({ dict = EN, locale = "en", mode = "home" }: { 
     { id: "website-of-the-week", label: "Website of the week" },
     { id: "request-url", label: "Submit" },
     { id: "browse-tags", label: "Tags" },
+    { id: "site-web", label: "The web" },
     // The support hub sits directly under About now, so the rail walks them in
     // that order too — the rail is a readout of the page, not a menu of its own.
     { id: "about", label: "About" },
@@ -1321,6 +1395,13 @@ export default function HomePage({ dict = EN, locale = "en", mode = "home" }: { 
               ))}
             </div>
           </section>
+
+          {/* The site web closes the browsing half: the whole directory drawn
+              as one branching map, hubs for its collections and a thread for
+              every pick. It is built from the same registry and the same entry
+              list as every card above it, so a new config entry appears here
+              on the next publish with no edit in this file. */}
+          <SiteWeb />
           </>}
 
           {isExplore && <>
@@ -1540,6 +1621,16 @@ export default function HomePage({ dict = EN, locale = "en", mode = "home" }: { 
                             <span key={`pop-${pops.down}`} className="vote-pop mono" aria-hidden="true">-1</span>
                           ) : null}
                         </button>
+                        {/* The fire is the third control in the row, the one
+                            with a clock on it; see `.site-card-lower` in
+                            app/late.css for how the three share the width. */}
+                        <FireButton
+                          name={site.name}
+                          count={totals?.fires ?? 0}
+                          fired={isFireActive(fireStamps, site.subdomain)}
+                          pending={!!firePending[site.subdomain]}
+                          onFire={() => castFire(site.subdomain)}
+                        />
                       </span>
                     </div>
                     {detailPath(site.url) && <a className="site-detail-link featured-detail-link" href={detailPath(site.url)!}>Details <span aria-hidden="true">→</span><span className="sr-only"> about {site.name}</span></a>}

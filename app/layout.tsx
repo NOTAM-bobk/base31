@@ -65,7 +65,7 @@ export const metadata: Metadata = {
   authors: [{ name: "base31.org", url: siteUrl }],
   creator: "base31.org",
   publisher: "base31.org",
-  keywords: ["base31", "base31.org", "base 31", "website directory", "cool sites", "fun websites", "creative web projects", "indie web", "online tools", "interesting websites", "no code ai tools", "no-code ai tools", "ai app builder", "ai website builder", "free browser tools", "free public apis"],
+  keywords: ["base31", "base31.org", "base 31", "website directory", "cool sites", "fun websites", "creative web projects", "indie web", "online tools", "interesting websites", "no code ai tools", "no-code ai tools", "ai app builder", "ai website builder", "free browser tools", "free public apis", "the useless web", "useless websites", "fun websites to waste time", "random websites to visit"],
   openGraph: {
     type: "website",
     url: siteUrl,

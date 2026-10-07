@@ -884,6 +884,7 @@ html[data-theme="light"] { --link: #1450c8; }
 .site-card-lower .vote-button { height: 32px; }
 @media (pointer: coarse) {
   .site-card-lower .vote-button { height: 38px; }
+  .site-card-lower .fire-button { height: 38px; }
 }
 
 /* "Surprise me", in red ------------------------------------------------
@@ -1028,6 +1029,24 @@ html[data-theme="light"] .freshness-badge.is-stale { color: #80541a; }
 .external-vote:hover, .external-vote.is-active { color: var(--live); border-color: var(--live); }
 .external-vote:disabled { cursor: wait; opacity: .6; }
 .external-vote:focus-visible, .cool-card-link:focus-visible, .site-detail-link:focus-visible { outline: 2px solid var(--live); outline-offset: 4px; }
+/* The fire button -------------------------------------------------------
+   The one control on the site with a clock on it, so it wears the amber accent
+   rather than either thumb's green or red: a fire is worth ten votes
+   (FIRE_VOTE_WEIGHT in lib/vote-ranking.ts) for the next 24 hours and then
+   stops counting by itself. It is drawn in exactly one place,
+   `FireButton` in components/site-votes.tsx, and its two homes are the vote row
+   on a strip and the foot of an /explore card — the card's rules below make it
+   share that row evenly with the two thumbs instead of trailing after them. */
+.fire-button { display: inline-flex; min-height: 34px; min-width: 46px; align-items: center; justify-content: center; gap: 4px; padding: 5px 9px; border: 1px solid color-mix(in srgb, var(--accent-amber) 34%, var(--line-strong)); border-radius: 7px; background: var(--surface); color: var(--muted); font-size: 12px; cursor: pointer; transition: color 150ms ease, border-color 150ms ease, background 150ms ease; }
+.fire-button:hover { border-color: var(--accent-amber); color: var(--text-strong); }
+/* Spent: this visitor has already fired this site today. It stays legible
+   rather than greyed out, because "fired" is a state worth seeing. */
+.fire-button.is-fired { border-color: color-mix(in srgb, var(--accent-amber) 55%, var(--line-strong)); background: color-mix(in srgb, var(--accent-amber) 13%, var(--surface)); color: var(--accent-amber); cursor: default; }
+.fire-button:disabled:not(.is-fired) { cursor: wait; opacity: .6; }
+.fire-button:focus-visible { outline: 2px solid var(--accent-amber); outline-offset: 4px; }
+.fire-count { color: var(--subtle); font-size: 10px; }
+.fire-button.is-fired .fire-count { color: var(--accent-amber); }
+.site-card-lower .fire-button { flex: 1 1 0; min-width: 0; height: 32px; padding: 0 10px; font-size: 11px; }
 .vote-error { display: block; max-width: 220px; margin-top: 6px; color: var(--danger); font-size: 11px; }
 .site-detail-page h1 { font-family: var(--font-hand), var(--font-sans); font-weight: 400; letter-spacing: .005em; }
 .site-detail-preview { overflow: hidden; margin: 28px 0; aspect-ratio: 2; border: 1px solid var(--line); border-radius: 16px; background: linear-gradient(135deg, var(--surface-hover), var(--surface)); }
@@ -1108,3 +1127,111 @@ html[data-theme="light"] .freshness-badge.is-stale { color: #80541a; }
 .admin-subscriber-list li { display: flex; justify-content: space-between; gap: 14px; padding: 12px 14px; border: 1px solid var(--line); border-radius: 10px; color: var(--muted); font-size: 13px; }
 .admin-subscriber-list li .mono { color: var(--subtle); font-size: 10px; }
 @media (max-width: 600px) { .url-request-panel { padding: 16px; } .admin-section { margin-top: 34px; } }
+
+/* The site web -----------------------------------------------------------
+   The branching map of the whole directory, at the foot of the homepage
+   (components/site-web.tsx). It is a panel like the Top 10 and the website of
+   the week, but it is drawn rather than typed: one hub per collection, and a
+   thread and a dot per pick.
+
+   Each branch wears one tint. The palette is the four accents the page already
+   spends — emerald, sky, amber and coral — plus two mixes, so a collection
+   keeps the same colour on the canvas, on its legend chip and in the tip line.
+   A node's `site-web-tone-*` class sets `--web-tone`, and the dot, the thread,
+   the hub and the chip all read that one variable.
+
+   Hovering or focusing a node gives the panel `.is-dimmed` and gives every node
+   and thread of that branch `.is-hot`, so the branch under the pointer is the
+   only thing at full strength. The fade sits on the node wrapper rather than on
+   the circle inside it on purpose: the idle animation owns the circle's
+   opacity, and an animation is applied after normal declarations, so a fade
+   written on the animated element would simply be overridden.
+
+   A phone cannot draw 200 nodes at a readable size, so below 700px the canvas
+   keeps a 640px minimum width inside `.site-web-scroll`, which scrolls sideways
+   on its own. The page itself never scrolls horizontally (globals.css clips
+   it); this box does. */
+.site-web { margin: 0 auto 34px; padding: 22px 24px 20px; border: 1px solid color-mix(in srgb, var(--accent-sky) 26%, var(--line-strong)); border-radius: var(--radius-card); background: linear-gradient(160deg, color-mix(in srgb, var(--accent-sky) 6%, var(--surface)), var(--surface) 64%); box-shadow: var(--shadow); }
+.site-web-head { display: flex; align-items: center; gap: 10px; }
+.site-web-head h2 { margin: 0; color: var(--text-strong); font-family: var(--font-hand), var(--font-sans); font-size: 27px; font-weight: 400; }
+.site-web-badge { margin-left: auto; padding: 3px 8px; border: 1px solid color-mix(in srgb, var(--accent-sky) 38%, var(--line)); border-radius: 999px; color: var(--accent-sky); font-size: 9px; letter-spacing: .14em; text-transform: uppercase; }
+.site-web-lede { max-width: 680px; margin: 10px 0 0; color: var(--muted); font-size: 12.5px; line-height: 1.65; }
+
+.site-web-scroll { margin-top: 12px; overflow-x: auto; overscroll-behavior-x: contain; }
+.site-web-canvas { display: block; width: 100%; height: auto; }
+@media (max-width: 700px) { .site-web-canvas { min-width: 640px; } }
+
+/* One tint per branch. Set on the node, read by everything inside it. */
+.site-web-tone-0 { --web-tone: var(--live); }
+.site-web-tone-1 { --web-tone: var(--accent-sky); }
+.site-web-tone-2 { --web-tone: var(--accent-amber); }
+.site-web-tone-3 { --web-tone: var(--accent-coral); }
+.site-web-tone-4 { --web-tone: color-mix(in srgb, var(--accent-sky) 58%, var(--live)); }
+.site-web-tone-5 { --web-tone: color-mix(in srgb, var(--accent-coral) 55%, var(--accent-amber)); }
+
+.site-web-node { cursor: pointer; }
+.site-web-edge { stroke: color-mix(in srgb, var(--web-tone, var(--line-strong)) 40%, var(--line-strong)); stroke-width: 1; stroke-dasharray: 2 7; stroke-linecap: round; transition: stroke 180ms ease; }
+/* The dot stays small so a cluster of 60 of them reads as a cloud, and the
+   fat transparent stroke around it is the tap target — a colour, so it still
+   receives the pointer, where `none` would not. */
+.site-web-leaf-dot { fill: color-mix(in srgb, var(--web-tone, var(--accent-sky)) 72%, var(--muted)); stroke: transparent; stroke-width: 8; }
+.site-web-hub-ring { fill: color-mix(in srgb, var(--surface) 86%, transparent); stroke: color-mix(in srgb, var(--web-tone, var(--accent-sky)) 62%, var(--line-strong)); stroke-width: 1.4; }
+.site-web-hub-core { fill: var(--web-tone, var(--accent-sky)); opacity: .82; }
+
+/* Lighting a branch: everything else steps back. */
+.site-web.is-dimmed .site-web-leaf,
+.site-web.is-dimmed .site-web-hub,
+.site-web.is-dimmed .site-web-edge { opacity: .16; }
+.site-web .site-web-node.is-hot,
+.site-web .site-web-edge.is-hot { opacity: 1; }
+.site-web-edge.is-hot { stroke: var(--live); stroke-dasharray: 3 5; }
+.site-web-leaf.is-hot .site-web-leaf-dot { fill: var(--live); }
+.site-web-hub.is-hot .site-web-hub-ring { fill: color-mix(in srgb, var(--live) 14%, var(--surface)); stroke: var(--live); stroke-width: 2; }
+.site-web-hub.is-hot .site-web-hub-core { fill: var(--live); opacity: 1; }
+/* The dot grows under the pointer. `fill-box` makes the origin the dot's own
+   centre rather than the canvas's. */
+.site-web-leaf { transform-box: fill-box; transform-origin: center; transition: transform 160ms ease; }
+.site-web-leaf.is-hot { transform: scale(1.8); }
+
+/* Keyboard focus. SVG elements do not get a native outline everywhere, so this
+   draws its own ring on the node rather than relying on the browser's. */
+.site-web-node:focus { outline: none; }
+.site-web-node:focus-visible .site-web-leaf-dot { stroke: var(--live); stroke-width: 3; }
+.site-web-node:focus-visible .site-web-hub-ring { stroke: var(--live); stroke-width: 3; }
+.site-web-chip:focus-visible { outline: 2px solid var(--live); outline-offset: 2px; }
+
+.site-web-tip { min-height: 1.6em; margin: 12px 0 0; color: var(--muted); font-size: 11.5px; }
+.site-web-tip strong { color: var(--text-strong); font-weight: 600; }
+.site-web-tip-note { color: var(--subtle); font-size: 10.5px; }
+
+.site-web-legend { display: flex; flex-wrap: wrap; gap: 7px; margin: 14px 0 0; padding: 0; list-style: none; }
+.site-web-chip { display: inline-flex; min-height: 34px; align-items: center; gap: 8px; padding: 0 11px; border: 1px solid var(--line); border-radius: 999px; background: var(--surface); color: var(--muted); font-size: 11.5px; text-decoration: none; transition: border-color 150ms ease, color 150ms ease; }
+.site-web-chip:hover { border-color: color-mix(in srgb, var(--web-tone, var(--accent-sky)) 55%, var(--line)); color: var(--text-strong); }
+.site-web-legend-dot { width: 7px; height: 7px; flex: 0 0 auto; border-radius: 50%; background: var(--web-tone, var(--accent-sky)); }
+.site-web-count { color: var(--subtle); font-size: 9.5px; }
+
+/* The idle drift. It runs only while <html> carries data-motion="enabled",
+   which the pre-paint script in app/layout.tsx sets for visitors who have not
+   asked for reduced motion — so the picture is never still-by-accident, and
+   never moving for someone who does not want it to. */
+html[data-motion="enabled"] .site-web-leaf-dot { animation: site-web-pulse 7s ease-in-out infinite; animation-delay: calc(var(--i, 0) * -0.37s); }
+html[data-motion="enabled"] .site-web-edge { animation: site-web-flow 3.6s linear infinite; animation-delay: calc(var(--i, 0) * -0.11s); }
+html[data-motion="enabled"] .site-web-hub-core { animation: site-web-breathe 5.5s ease-in-out infinite; }
+@keyframes site-web-pulse { 0%, 100% { opacity: .5; } 46% { opacity: 1; } }
+@keyframes site-web-breathe { 0%, 100% { opacity: .62; } 50% { opacity: 1; } }
+@keyframes site-web-flow { from { stroke-dashoffset: 0; } to { stroke-dashoffset: -9; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .site-web-leaf-dot, .site-web-edge, .site-web-hub-core { animation: none; }
+  .site-web-leaf { transition: none; }
+  .site-web-leaf.is-hot { transform: none; }
+}
+
+@media (max-width: 600px) {
+  .site-web { padding: 18px 12px 16px; margin-bottom: 26px; }
+  .site-web-head { flex-wrap: wrap; gap: 8px; }
+  .site-web-head h2 { font-size: 22px; }
+  .site-web-badge { margin-left: 0; }
+  .site-web-lede { font-size: 12px; }
+  .site-web-chip { min-height: 32px; font-size: 11px; }
+}

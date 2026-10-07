@@ -25,6 +25,13 @@ import { tick } from "@/lib/haptics";
 // shares — total votes, up plus down, then name — so this board cannot disagree
 // with the strips or with the `top` array `/stats` prints. `npm run test:directory`
 // covers that rule directly, order and cut included.
+//
+// A fire is folded into that same rule rather than ranked beside it: each fire
+// still counting is worth ten votes (`FIRE_VOTE_WEIGHT`), so a row that has been
+// fired today climbs and then slides back on its own when the day is up. This
+// board is the one place the fire is only a marker — no button, just the emoji
+// next to the name — because the act of firing belongs on the card, where the
+// visitor is already looking at one site.
 const RANKS = 10;
 const CANDIDATES = directoryEntries;
 const CANDIDATE_KEYS = CANDIDATES.map((entry) => entry.voteKey);
@@ -33,6 +40,7 @@ export default function TopTen() {
   const { totals } = useSiteVotes(CANDIDATE_KEYS);
   const ranked = useMemo(() => rankByVotes(CANDIDATES, totals, RANKS), [totals]);
   const boardVotes = ranked.reduce((running, entry) => running + totalVotes(totals[entry.voteKey]), 0);
+  const boardFires = ranked.reduce((running, entry) => running + (totals[entry.voteKey]?.fires ?? 0), 0);
   if (ranked.length === 0) return null;
 
   return (
@@ -51,11 +59,14 @@ export default function TopTen() {
         {boardVotes === 0
           ? " Nobody has voted on these ten yet, so they are in the directory's own order rather than a made-up one."
           : ` ${boardVotes} vote${boardVotes === 1 ? "" : "s"} across the ten.`}{" "}
+        A fire is worth ten votes for a day and then stops counting by itself
+        {boardFires > 0 ? `, so the ${boardFires === 1 ? "row" : "rows"} marked 🔥 below ${boardFires === 1 ? "is" : "are"} boosted right now.` : ", which is why a row can climb and slide back on its own."}{" "}
         Community tallies, not page views.
       </p>
       <ol className="top-ten-list">
         {ranked.map((entry, index) => {
           const count = totalVotes(totals[entry.voteKey]);
+          const fires = totals[entry.voteKey]?.fires ?? 0;
           return (
             <li key={entry.voteKey} className="top-ten-row">
               {/* The numeral is decoration: the <ol> already numbers the rows
@@ -64,7 +75,18 @@ export default function TopTen() {
                   colour without changing what the list says. */}
               <span className={`top-ten-rank${index < 3 ? ` is-top-${index + 1}` : ""}`} aria-hidden="true">{index + 1}</span>
               <span className="top-ten-body">
-                <Link className="top-ten-name" href={`/sites/${entry.slug}`} onClick={() => tick(12)}>{entry.name}</Link>
+                {/* The name and the fire sit on one line; the numeral, the
+                    name and the arrow are each read on their own, so the
+                    emoji is hidden and the boost is spelled out after it. */}
+                <span className="top-ten-name-row">
+                  <Link className="top-ten-name" href={`/sites/${entry.slug}`} onClick={() => tick(12)}>{entry.name}</Link>
+                  {fires > 0 && (
+                    <>
+                      <span className="top-ten-fire" aria-hidden="true">🔥</span>
+                      <span className="sr-only">, boosted by {fires} fire{fires === 1 ? "" : "s"} today</span>
+                    </>
+                  )}
+                </span>
                 <span className="top-ten-meta mono">
                   {entry.section} · {count > 0 ? `${count} ${count === 1 ? "vote" : "votes"}` : "no votes yet"}
                 </span>

@@ -1,6 +1,23 @@
-export type VoteTotals = { up: number; down: number };
+export type VoteTotals = { up: number; down: number; fires?: number };
 
-export const totalVotes = (totals?: VoteTotals) => (totals?.up ?? 0) + (totals?.down ?? 0);
+/**
+ * What one fire is worth in the ranking.
+ *
+ * A fire is not a third kind of vote — it is a short-lived boost. Every fire
+ * still counting on an entry adds ten votes here, so a single fire lifts a site
+ * past nine ordinary thumbs without inventing a second scoreboard: the one
+ * comparison the whole site shares (`compareVotes`) is still the only thing
+ * that decides an order, and `/explore`, the Top 10, the strips and the `top`
+ * array `/stats` prints all read this same number.
+ *
+ * The Worker owns the clock. It stores the timestamp of every fire and drops
+ * the ones older than a day as it reads them, so `fires` is always the count
+ * still in force and nothing outside the Worker has to expire anything.
+ */
+export const FIRE_VOTE_WEIGHT = 10;
+
+export const totalVotes = (totals?: VoteTotals) =>
+  (totals?.up ?? 0) + (totals?.down ?? 0) + FIRE_VOTE_WEIGHT * (totals?.fires ?? 0);
 
 export function compareVotes(a: VoteTotals | undefined, b: VoteTotals | undefined): number {
   return totalVotes(b) - totalVotes(a) || (b?.up ?? 0) - (a?.up ?? 0);

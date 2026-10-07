@@ -1,5 +1,18 @@
 [
   {
+    "version": "1.48.0",
+    "date": "2026-10-07",
+    "title": "A fire button, and the whole directory drawn as one web",
+    "summary": "Any listed site can be fired once a day: a fire is worth ten votes for its next 24 hours and then stops counting on its own, the trending board shows the fires that are running, the website of the week lost its little glyph box, the FAQ answers the useless web, and the landing page ends on a living map of every collection and every pick.",
+    "highlights": [
+      "Every card and every detail page carries a fire button beside the thumbs. One visitor can fire a site once a day, remembered in their own browser, and a fire is worth ten votes: the one ranking rule the whole site shares counts each fire still running, so a fired site climbs the /explore order, the Top 10 and the /stats list together. Nothing is decremented — the Worker stores the timestamps a fire was cast at and drops the expired ones as it reads them, so a boost runs out by itself exactly 24 hours later.",
+      "The Top 10 shows the fire as a marker and nothing more: a row that has been fired today carries the emoji next to its name, because the act of firing belongs on the card where the visitor is already looking at one site.",
+      "The website of the week no longer leads with the small tinted box and its glyph; the heading is the title and the week, and the rule that drew the box went with it.",
+      "The FAQ now answers where to find the useless web and what the best useless websites are, names The Useless Web and the directory's own fun and random picks, repeats those answers in the FAQPage structured data, spells the same searches out in a block only a screen reader and a crawler read, and tells an assistant what to say in public/llms.txt.",
+      "The landing page closes its browsing half with the site web: one hub per collection and one thread per pick, drawn from the section registry and the entry list rather than a hand-kept list, so a new config entry appears on the next publish with no edit in the component. Hovering, tapping or tabbing a node lights its whole branch and dims the rest, and every node is a real link."
+    ]
+  },
+  {
     "version": "1.47.0",
     "date": "2026-10-07",
     "title": "A drawer that answers, and one grey everywhere",

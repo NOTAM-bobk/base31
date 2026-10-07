@@ -25,7 +25,7 @@ Useful browser tools, playful websites, public APIs, creative apps, and AI picks
 - Use `#utility` or `tag:no-key` for an exact tag; combine words such as `#utility image` to narrow results. Normal browsing starts with nine cards per section; search shows every match.
 - Discover a rotating **Editor's picks** shortlist, browse categories, pin featured sites, sort them, or open a random matching pick.
 - Read detail pages at `/sites/<slug>` with related picks, recorded addition/review dates, voting, canonical metadata, and structured data. Deeper tool guides live at `/tools/<subdomain>`.
-- Vote on featured and external picks, publish a community static site, or opt into email/push updates.
+- Vote on featured and external picks, fire the ones worth a boost, publish a community static site, or opt into email/push updates.
 - Join the public community discussion below About: start a conversation or reply to another visitor without creating an account.
 - Browse in English, Spanish, French, or Portuguese, with dark/light themes and reduced-motion support.
 
@@ -174,7 +174,7 @@ The site has two faces, and both render the same component (`components/home-pag
 
 | Route | Mode | What it is |
 | --- | --- | --- |
-| `/` (and `/es`, `/fr`, `/pt`) | `home` | The landing page: the hero and its Explore control, the section keys, the editor's picks, the Top 10, the website of the week, the submission form and the tag shelf, then About the directory, the support hub, the community board, the FAQ, the launch clock and the signup. |
+| `/` (and `/es`, `/fr`, `/pt`) | `home` | The landing page: the hero and its Explore control, the section keys, the editor's picks, the Top 10, the website of the week, the submission form, the tag shelf and the site web, then About the directory, the support hub, the community board, the FAQ, the launch clock and the signup. |
 | `/explore` | `explore` | The directory: the search field, the tag filters and sort, the featured sites, the five off-directory strips and the URL request form. |
 | `/explore/<section>` | — | One section on a page of its own: every card in it, its own search field and filter chips, and the same vote ranking. See “Sections have pages too”. |
 
@@ -182,9 +182,13 @@ They share one implementation on purpose. The directory's query, filters, sort, 
 
 The landing page's browsing half is a way **in**, not a second copy of the directory. Its section keys are ordinary links to `/explore#<section-id>`, so a bare `#sites` would scroll nowhere from the homepage; its editor's-picks carousel is the same `components/editors-picks.tsx` component; and "Browse by tag" links the 18 most-used tags straight to their `/tags/<slug>` pages. The editor's picks belong to the landing page alone — `/explore` is there to be searched, and a carousel above the search field put an editorial slide between the visitor and the list.
 
-The prose half of the landing page runs About the directory, then the support hub directly under it, then the community board, the FAQ and the launch clock. About and Support are one pair — who this is, and how it stays free — so nothing sits between them; the countdown closes the prose rather than interrupting the questions. The Top 10 (`components/top-ten.tsx`) ranks the directory's live up/down totals with the same `compareVotes` rule the strips and `/stats` use — **community votes, not page views**. There is no per-day vote history to rank by, so the heading follows the streaming-service convention it is imitating while the caption under it says plainly what the numbers are, an entry nobody has voted on prints `no votes yet` rather than a score, and a board at zero is labelled as such instead of being padded with an invented order. Ranking a real "today" would mean the Worker recording votes by day.
+The prose half of the landing page runs About the directory, then the support hub directly under it, then the community board, the FAQ and the launch clock. About and Support are one pair — who this is, and how it stays free — so nothing sits between them; the countdown closes the prose rather than interrupting the questions. The Top 10 (`components/top-ten.tsx`) ranks the directory's live up/down totals with the same `compareVotes` rule the strips and `/stats` use — **community votes, not page views**. There is no per-day vote history to rank by, so the heading follows the streaming-service convention it is imitating while the caption under it says plainly what the numbers are, an entry nobody has voted on prints `no votes yet` rather than a score, and a board at zero is labelled as such instead of being padded with an invented order. Ranking a real "today" would mean the Worker recording votes by day; the fires below are the one thing here that does carry a clock of its own.
+
+The board also carries the fire. Every card and every detail page has a fire button (`FireButton` in `components/site-votes.tsx`) beside its thumbs, and a fire is worth ten votes for the twenty-four hours it is live: `totalVotes` in `lib/vote-ranking.ts` adds `FIRE_VOTE_WEIGHT` for each active fire, so one fire lifts a pick through the same `compareVotes` rule the board, the `/explore` sort and the `/stats` top list all share. A visitor may fire a given pick once a day — the button is disabled for the rest of that window, and the visitor's own stamps are kept in `base31-fires` in their browser (`lib/fires.ts`). A fire stops counting by itself a day after it was cast, because the Worker stores the timestamps and drops the expired ones as it reads them; nothing has to be swept up and no vote total is ever rewritten. On the Top 10 the fire is only a marker: a row that has been fired today prints the emoji next to its name and carries no control of its own.
 
 The landing page's editorial spotlight is the website of the week (`components/website-of-the-week.tsx`), between the Top 10 and the submission form. It prints the newest entry from `config/websites-of-the-week.json` via `lib/websites-of-the-week.ts` — tagline and story included — and links to the archive on `/websites-of-the-week`. Both surfaces read the same newest-first list, so the two can never lead with a different week, and the section renders nothing at all rather than an empty frame if the list is somehow empty. Adding one is prepending an entry to that config; the date, a tagline and a story long enough for `npm run validate:content` are the whole registration.
+
+The foot of the landing page's browsing half is the site web (`components/site-web.tsx`): every collection as a hub with all of its picks hanging off it, drawn as one branching picture under the tag shelf. Hovering, tapping or tabbing a node lights its whole branch and dims the rest, and every node is a real link — a hub opens `/explore/<id>`, a pick opens `/sites/<slug>` — so the picture is a usable index of the directory before any JavaScript has run. It is built from `lib/sections.ts` and `lib/directory.ts`, the same registry and derived entry list every other surface reads, so adding an entry to a config file puts it in the web on the next publish with no edit in the component. The geometry is worked out once at module scope from a hash of each slug rather than from `Math.random()` or the clock, which is what lets the server and the browser draw the same picture; the styling and the idle animation live in `app/late.css` under their own heading, and the animation only runs while `<html>` carries `data-motion="enabled"`, so reduced-motion visitors get a still map.
 
 The URL request form (`components/url-request.tsx`) is on **both** faces: between the Top 10 and the tag shelf on the landing page, and at the bottom of `/explore` after the five strips. Both copies post to the same Worker route, and the hero's own “Submit a URL” button anchors to the copy the visitor is already looking at rather than sending them to the other page.
 
@@ -250,8 +254,9 @@ Resend's test sender has recipient restrictions. For real subscriber delivery, v
 | --- | --- |
 | `GET /?key=<name>` | Increment view counter; return views and unique estimate |
 | `GET /stats?days=<n>` | Aggregates and daily series used by `/stats` |
-| `GET /votes?keys=a,b,c` | Read shared up/down totals |
+| `GET /votes?keys=a,b,c` | Read shared up/down totals with each key's live fire count |
 | `POST /vote` | `{ key, from, to }`, where choices are `-1`, `0`, or `1` |
+| `POST /fire` | `{ key }`; record one fire and return that key's totals and fire count |
 | `GET /sites` | List community-published sites |
 | `GET /quality` | Public health-check report: last check time and failure count per community site, behind `/quality-report` |
 | `POST /submit` | Publish static files with title, description, tags, and slug |
@@ -267,7 +272,7 @@ URL suggestions use the existing `/request-url` Worker endpoint and private mode
 
 Community uploads are served on the Worker origin, separate from the directory. Limits are 40 files, 2 MB per file, and 8 MB per upload. KV listings are eventually consistent, so new entries may take about a minute to appear elsewhere. Optional GitHub mirroring is best-effort; it does not automatically add an entry to curated `sites.json`.
 
-**Operational limitations:** votes rely on browser-local choices and client-supplied transitions, not verified identities; they are not abuse-proof or synchronized across devices. KV totals are not transactional. Community uploads are public and unmoderated. Unique visitor estimates use hashed IP/browser signals, so shared networks can undercount and changes in browser signals can overcount; hashing is not a promise that data is impossible to re-identify. Review these tradeoffs before operating at larger scale.
+**Operational limitations:** votes and fires rely on browser-local choices and client-supplied requests, not verified identities; they are not abuse-proof, not synchronized across devices, and a visitor who clears their browser storage can fire again. KV totals are not transactional, and a key's fires are a short list of timestamps read, pruned and written back on every fire — fine at this traffic, not a guarantee under heavy concurrency. Community uploads are public and unmoderated. Unique visitor estimates use hashed IP/browser signals, so shared networks can undercount and changes in browser signals can overcount; hashing is not a promise that data is impossible to re-identify. Review these tradeoffs before operating at larger scale.
 
 ### Community discussion
 
@@ -344,6 +349,8 @@ Use the existing CSS tokens for both themes. Styles load `globals.css` → `over
 
 Every page outside the homepage wears the same grey the landing page's sections do: `subsite.css` sets `background: var(--page-band)` on `body:has(main:not(.home-main))`. It is set on `<body>` rather than on `main` because `main` is the centered reading column — painting that would leave the gutters on the old colour and draw a visible box down the window — and `:has()` names the one exception (the homepage, whose `.page-band` gradient has to start at `--background`) in a single place instead of on every subsite route.
 
+The site web's rules sit at the foot of `late.css` under their own heading rather than in `directory.css`, because it is a drawn, animated panel and not another variation on a card: the file ends with its palette, its hover and focus states and the idle keyframes, all of which stay off under `prefers-reduced-motion`.
+
 Featured cards place color-coded tags along the bottom of the preview image. `tagTone` in `lib/directory.ts` maps semantic tag families to mint, sky, amber, or coral, with a stable fallback for custom tags. Text labels remain visible, so meaning never depends on color alone. Ratings sit above the Details link in the card footer. The homepage uses coordinated sky, amber and coral accents alongside emerald, with theme-specific contrast values.
 
 Keep pin, vote, and detail controls **outside** outbound card links. New controls need accessible names, visible keyboard focus, and touch-friendly targets. Carousel rotation and decorative motion respect reduced motion. The page scrollbar is visually hidden where supported, but wheel/touch/keyboard scrolling remains enabled; forced-colors users retain native scrollbar chrome.
@@ -353,6 +360,8 @@ Homepage reveal state uses `data-revealed`, not a React-managed class, and the o
 ## SEO, privacy, and third-party requests
 
 Curated detail pages and tool guides ship canonical/social metadata and JSON-LD. `app/sitemap.ts` includes curated details and guides; community uploads aren't build-time sitemap entries. Static tools need their own title, description, canonical, social tags, `robots.txt`, and `sitemap.xml`—copy a maintained tool's structure and adapt the content. Never invent ratings, prices, or review dates.
+
+The FAQ also answers the questions people arrive with from somewhere else: the useless web, and where to find it. Those answers are printed on the page and repeated in the section's `FAQPage` structured data, a visually-hidden block under the questions says the same ground again in the words people actually search with, `public/llms.txt` carries a section on the useless web and the other gloriously pointless corners of the web, and the root metadata keywords name the phrase. All three say only what the visible answers already say, so no claim exists in the hidden copy alone.
 
 The root layout includes Google Analytics and Umami on every visit. Clarity and homepage ad scripts are consent-gated; some static tools have separate consent implementations or ungated scripts. Screenshot previews request third-party services (WordPress mShots/thum.io), community favicon requests reach their own origins, and community discussion avatars are requested from the DiceBear API with the display name as their seed. Don't describe third-party requests as entirely local or automatically anonymous. See `app/privacy`, `lib/consent.ts`, and the consent-aware components before changing tracking behavior.
 

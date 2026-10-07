@@ -12,6 +12,10 @@ import { websitesOfTheWeek } from "@/lib/websites-of-the-week";
  *
  * The story is printed in full: a weekly pick is one site worth a paragraph,
  * and the page it links to keeps the rest of the archive.
+ *
+ * The heading is the title and the week, nothing else: the small tinted square
+ * with a glyph that used to lead it is gone (its rule went with it), so the
+ * panel reads as prose about one site rather than as a badge on a card.
  */
 export default function WebsiteOfTheWeek() {
   const [entry] = websitesOfTheWeek;
@@ -25,7 +29,6 @@ export default function WebsiteOfTheWeek() {
       aria-labelledby="website-of-the-week-heading"
     >
       <div className="weekly-pick-heading">
-        <span className="weekly-pick-mark" aria-hidden="true">✷</span>
         <h2 id="website-of-the-week-heading">Website of the week</h2>
         <span className="weekly-pick-week mono">week of {entry.weekOf}</span>
       </div>

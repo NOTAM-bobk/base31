@@ -84,7 +84,11 @@ export const viewport: Viewport = { themeColor: "#000000", colorScheme: "light d
 // scroll-reveal animations only when the visitor allows motion. Because the
 // flag lives on <html> and is set by this script, `[data-reveal]` content is
 // never hidden when JavaScript is unavailable.
-const themeScript = `try{if(localStorage.getItem("base31-theme")==="light"){document.documentElement.setAttribute("data-theme","light")}}catch(e){}try{if(!matchMedia("(prefers-reduced-motion: reduce)").matches){document.documentElement.setAttribute("data-motion","enabled")}}catch(e){}`;
+// Runs before the first paint, so the page never flashes the wrong theme. The
+// rule is lib/theme.ts's own: an explicit choice wins, otherwise the visitor's
+// device decides — a dark house colour is only the fallback for a browser that
+// reports no preference at all.
+const themeScript = `try{var s=localStorage.getItem("base31-theme");var light=s?s==="light":matchMedia("(prefers-color-scheme: light)").matches;if(light){document.documentElement.setAttribute("data-theme","light")}else{document.documentElement.removeAttribute("data-theme")}}catch(e){}try{if(!matchMedia("(prefers-reduced-motion: reduce)").matches){document.documentElement.setAttribute("data-motion","enabled")}}catch(e){}`;
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (

@@ -826,38 +826,73 @@ html[data-theme="light"] .quick-jump:hover {
 }
 
 /* Footer links read as links --------------------------------------------
-   The footer row was a set of grey words; they are links, so they are drawn as
-   links now: one blue in both themes, underlined, with the underline
-   thickening under the pointer. The blue is a token because two of them have
-   to exist — a light blue on black, a deep one on the light theme's grey — and
-   the underlined set is scoped on purpose: the contact details and the
-   language switcher are pill controls, and a link underline inside a pill
-   reads as a broken chip rather than a link. Those two take the blue and keep
-   their own material. */
+   The footer is the site's own index: it names a link and gets out of its
+   way. One blue in both themes, no underline at rest — the way a wiki draws a
+   link — with the underline arriving under the pointer, which is what makes a
+   footer this dense scannable instead of a field of ruled lines. The blue is a
+   token because two of them have to exist — a light one on black, a deep one
+   on the light theme's grey. The coloured set is scoped on purpose: the
+   contact details, the version and the language switcher are pill controls,
+   and a link underline inside a pill reads as a broken chip rather than a
+   link. Those keep the blue and their own material. */
 :root { --link: #6fb2ff; }
 html[data-theme="light"] { --link: #1450c8; }
+.site-footer a.footer-version,
+.site-footer .footer-contact-item { color: var(--link); }
+.site-footer .footer-cols a,
 .site-footer .footer-links a,
 .site-footer .footer-links button.footer-link-button,
-.site-footer a.footer-version,
-.site-footer .footer-contact-item,
-.site-footer .site-footer-inner > span a { color: var(--link); }
-.site-footer .footer-links a,
-.site-footer .footer-links button.footer-link-button,
-.site-footer a.footer-version,
 .site-footer .site-footer-inner > span a {
-  text-decoration: underline;
-  text-decoration-thickness: 0.08em;
-  text-underline-offset: 3px;
-  text-decoration-color: color-mix(in srgb, currentColor 58%, transparent);
+  color: var(--link);
+  text-decoration: none;
 }
+.site-footer .footer-cols a:hover,
 .site-footer .footer-links a:hover,
 .site-footer .footer-links button.footer-link-button:hover,
-.site-footer a.footer-version:hover,
 .site-footer .site-footer-inner > span a:hover {
   color: var(--link);
-  text-decoration-thickness: 0.16em;
-  text-decoration-color: currentColor;
+  text-decoration: underline;
+  text-decoration-thickness: 0.09em;
+  text-underline-offset: 3px;
+  text-decoration-color: color-mix(in srgb, currentColor 62%, transparent);
 }
+/* The version pill is material, not text: it takes the blue and leans on its
+   edge for the pointer instead of growing a rule inside the pill. */
+.site-footer a.footer-version:hover { text-decoration: none; }
+
+/* Footer categories ------------------------------------------------------
+   The footer's map of the site: six named columns of links, the way a wiki
+   closes its pages. One grid rather than a wrapping row, so the headings line
+   up across the width and the columns stay even as links come and go — and so
+   a long label in one column cannot push the others out of alignment. Three
+   across on a tablet and two on a phone; the columns are the only place the
+   footer wraps, which is why no column needs a rule of its own. */
+.footer-cols {
+  display: grid; width: min(100% - 48px, 960px); margin: 0 auto;
+  grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 28px 20px;
+  padding: 34px 0 30px;
+}
+.footer-col { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.footer-col h3 { margin: 0 0 2px; color: var(--text-strong); font-size: 11px; font-weight: 600; }
+.footer-col a { font-size: 12px; line-height: 1.45; }
+.footer-social { display: inline-flex; align-items: center; gap: 7px; }
+.footer-social svg { flex: 0 0 auto; }
+@media (min-width: 1000px) { .footer-cols { width: min(100% - 64px, 1080px); } }
+@media (max-width: 1000px) { .footer-cols { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (max-width: 600px) {
+  .footer-cols { width: min(100% - 24px, 720px); padding: 26px 0 22px; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px 16px; }
+  .footer-col { gap: 9px; }
+  .footer-col a { padding: 2px 0; font-size: 12.5px; }
+}
+
+/* The 404 wears the site header now, so its centred column has to give the
+   header's height back: `.page-state` is drawn as one full viewport, and a
+   header above it would otherwise push the message past the fold. The two
+   numbers are the header's own min-height (64px, 58px on a phone) plus its
+   hairline. Every other user of `.page-state` — loading, error, the wildcard
+   tool pages — still has no header and keeps the full-height rule. */
+.page-state.has-header { min-height: calc(100vh - 65px); }
+@media (max-width: 600px) { .page-state.has-header { min-height: calc(100vh - 59px); } }
 /* A pill darkens its blue instead of jumping to the text colour, so the whole
    row reads as one family of links rather than two. */
 .site-footer .footer-contact-item:hover { color: color-mix(in srgb, var(--link) 74%, var(--text-strong)); }
@@ -1011,16 +1046,15 @@ html[data-theme="light"] .community-action.is-primary { color: var(--on-live); }
 }
 
 /* Hero stats -----------------------------------------------------------
-   The three figures above the search: the directory's readership, how many
-   sites it links out to, and the size of the project. No tray — the numbers
-   sit straight on the page, in the display face, with only their small caps
-   label under each one. */
+   The one figure above the search: how many websites the directory links out
+   to, and how many collections they are filed under. It is a sentence, not a
+   row of counters — a number and the words that say what it counts, sharing
+   one baseline — so the hero makes a single claim instead of printing
+   statistics at a visitor. */
 .hero-stats {
-  display: flex; flex-wrap: wrap; justify-content: center;
-  gap: 12px 34px; margin: 26px auto 0; padding: 0; list-style: none;
-  max-width: 100%;
+  display: flex; flex-wrap: wrap; align-items: baseline; justify-content: center;
+  gap: 2px 10px; margin: 26px auto 0; max-width: 100%;
 }
-.hero-stat { display: flex; flex-direction: column; align-items: center; gap: 4px; }
 
 /* Shared directory metadata and votes: links and controls are siblings. */
 .cool-card-link { display: flex; flex: 1; flex-direction: column; gap: 8px; color: inherit; text-decoration: none; min-width: 0; }
@@ -1069,17 +1103,14 @@ html[data-theme="light"] .freshness-badge.is-stale { color: #80541a; }
 .hero-stat-value {
   color: var(--text-strong);
   font-family: var(--font-display, inherit);
-  font-size: 30px; font-weight: 400; letter-spacing: 0.01em; line-height: 1;
+  font-size: 34px; font-weight: 400; letter-spacing: 0.01em; line-height: 1;
   font-variant-numeric: tabular-nums;
 }
-.hero-stat-label {
-  color: var(--subtle); font-size: 9.5px; letter-spacing: 0.14em;
-  text-transform: uppercase; white-space: nowrap;
-}
+.hero-stat-label { color: var(--muted); font-size: 13.5px; line-height: 1.4; }
 @media (max-width: 600px) {
-  .hero-stats { gap: 10px 24px; margin-top: 20px; }
-  .hero-stat-value { font-size: 23px; }
-  .hero-stat-label { font-size: 8.5px; letter-spacing: 0.1em; }
+  .hero-stats { gap: 2px 8px; margin-top: 20px; }
+  .hero-stat-value { font-size: 26px; }
+  .hero-stat-label { font-size: 12px; }
 }
 
 /* Support-hub dividers --------------------------------------------------

@@ -74,8 +74,11 @@ export default function EditorsPicks() {
       <div className="editors-slide" key={item.slug} data-direction={direction} role="group" aria-roledescription="slide" aria-label={`${index + 1} of ${items.length}`} aria-live={rotating ? "off" : "polite"}>
         <span className="editors-number" aria-hidden="true">{String(index + 1).padStart(2, "0")}</span>
         <div className="editors-copy">
+          {/* Only the tags now: the pick's collection was printed above its
+              name, and the name of a site already says which kind of thing it
+              is — the label repeated the directory's own furniture on a card
+              that is about one entry. */}
           <div className="editors-meta">
-            <span className="editors-section mono">{item.section}</span>
             {tagChips.length > 0 && (
               <span className="editors-tags" aria-hidden="true">
                 {tagChips.map((tag) => <span key={tag} className={`editors-tag mono tone-${tagTone(tag)}`}>#{tag}</span>)}

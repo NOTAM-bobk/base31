@@ -217,6 +217,49 @@ assert.ok(home.includes("Copyright © 2026 base31.org"), "The footer must show t
 const aboutSection = fs.readFileSync("components/about-section.tsx", "utf8");
 assert.ok(!aboutSection.includes("topic-links"), "The four topic tags were removed from the about section");
 assert.ok(!aboutSection.includes("about-sparkle-credit"), "The sparkle-gif credit was removed from the about section");
+
+// The footer is the site's index, in the shape a wiki's footer takes: named
+// columns of links, one of them the social pair. Every heading has to name a
+// column that exists, the Facebook page has to be one of the outbound links,
+// and the flat row plus its "Beyond the directory" caption are gone.
+const footerCss = fs.readFileSync("app/late.css", "utf8");
+for (const heading of ["Explore", "Tools", "Company", "Community", "Legal", "Elsewhere"]) {
+  assert.ok(
+    home.includes(`<h3 id="footer-col-${heading.toLowerCase()}">${heading}</h3>`),
+    `The footer must carry a ${heading} column`,
+  );
+}
+assert.ok(home.includes("https://www.facebook.com/profile.php?id=61594886203335"), "The footer must link the Facebook page");
+assert.match(home, /className="footer-social"[\s\S]{0,600}?facebook\.com/, "Facebook is one of the footer's icon links");
+assert.ok(!home.includes("Beyond the directory"), "The footer's caption text is gone");
+assert.ok(!home.includes("footer-publications"), "The pill publications row is gone");
+assert.ok(!fs.readFileSync("app/directory.css", "utf8").includes(".footer-publications"), "The removed row's rules went with it");
+assert.ok(!fs.readFileSync("app/overrides.css", "utf8").includes(".footer-source"), "The removed source button's rules went with it");
+// Not underlined at rest, underlined under the pointer: the wiki convention,
+// and the reason a footer this dense stays scannable.
+assert.match(footerCss, /\.site-footer \.footer-cols a,[\s\S]{0,260}?text-decoration: none;/, "Footer links must not be underlined at rest");
+assert.match(footerCss, /\.footer-cols a:hover,[\s\S]{0,260}?text-decoration: underline;/, "Footer links underline under the pointer");
+assert.match(footerCss, /\.footer-cols \{[^}]*grid-template-columns: repeat\(6, minmax\(0, 1fr\)\);/, "The footer's columns are one even grid");
+
+// The site opens in the visitor's own colour scheme. The pre-paint script and
+// the shared hook have to agree, because the first frame is painted by one and
+// every change after that by the other; only a tap on the toggle is stored.
+const layoutSource = fs.readFileSync("app/layout.tsx", "utf8");
+const themeSource = fs.readFileSync("lib/theme.ts", "utf8");
+assert.ok(layoutSource.includes("prefers-color-scheme: light"), "The pre-paint script follows the device's preference");
+assert.ok(themeSource.includes("prefers-color-scheme: light"), "The shared theme hook follows the device's preference");
+assert.ok(themeSource.includes("readStoredTheme() ?? deviceTheme()"), "A stored choice wins over the device; the device decides until then");
+assert.ok(home.includes("useSiteTheme()"), "The homepage takes its theme from the shared hook");
+assert.ok(!home.includes('localStorage.getItem("base31-theme")'), "The homepage no longer keeps its own copy of the theme rule");
+assert.ok(!home.includes('localStorage.setItem("base31-theme"'), "Only the shared hook writes the theme choice");
+
+// The 404 wears the same header bar as every other page, through the one
+// component, and gives the header's height back to its centred column.
+const notFoundSource = fs.readFileSync("app/not-found.tsx", "utf8");
+assert.ok(notFoundSource.includes("<StandaloneHeader />"), "The 404 wears the site header");
+assert.ok(notFoundSource.includes("page-state has-header"), "The 404's column takes the header's height out of the viewport");
+assert.ok(fs.readFileSync("components/standalone-header.tsx", "utf8").includes("useSiteTheme"), "The standalone header shares the one theme rule");
+assert.ok(footerCss.includes(".page-state.has-header"), "The header-aware height rule lives with the other corrections");
 // Support starts closed, so the page does not lead with donation appeals.
 assert.ok(fs.readFileSync("components/support-section.tsx", "utf8").includes("useState(true)"), "The support section must start collapsed");
 assert.ok(fs.readFileSync("app/our-story/page.tsx", "utf8").includes('canonical: "/our-story"'));
@@ -355,13 +398,25 @@ assert.match(
   "A rotation of the weekly list must stay newest-first, whatever order the config is in",
 );
 
-// The hero prints two figures now. The lines-of-code estimate and the GitHub
-// byte count behind it are gone, so nothing in the hero depends on a third
-// party for a number.
+// The hero prints one sentence, not a row of counters: how many websites the
+// directory links to and how many collections hold them. The line-of-code
+// estimate and the read count are both gone from it — the first was an
+// estimate, the second belongs on /stats — and the figure is the sum of the
+// collections it names, so the two halves of the sentence cannot disagree.
 const heroStats = fs.readFileSync("components/hero-stats.tsx", "utf8");
 assert.ok(!heroStats.includes("estimated lines of code") && !heroStats.includes("estimateLines"), "The hero no longer prints an estimated line count");
-assert.ok(heroStats.includes('label: "websites linked"'), "The hero still figures the sites it links to");
+assert.ok(!heroStats.includes("visitors") && !heroStats.includes("views"), "The hero no longer prints the read count");
+assert.ok(heroStats.includes("websites linked across"), "The hero still names the sites it links to and the categories holding them");
+assert.ok(heroStats.includes("categories"), "The hero figures the number of categories");
 assert.ok(!fs.readFileSync("app/directory.css", "utf8").includes(".hero-stat:nth-child(3)"), "The third figure's colour rule went with it");
+const heroCallSite = fs.readFileSync("components/home-page.tsx", "utf8").match(/<HeroStats[\s\S]{0,400}?\/>/)?.[0] || "";
+assert.ok(heroCallSite.includes("categories={directorySections.length}"), "The hero's category count is the registry's own length, not a hard-coded number");
+assert.ok(!heroCallSite.includes("visitors="), "The read count is not passed to the hero");
+assert.equal(
+  directory.directoryEntries.length,
+  load("lib/sections.ts").directorySections.reduce((total, section) => total + section.items.length, 0),
+  "The hero's total is the sum of the collections it names",
+);
 
 // The Top 10's podium: the first three rows carry a class of their own so the
 // numerals can be coloured without changing a single figure on the board.
@@ -546,6 +601,16 @@ assert.match(fs.readFileSync("app/directory.css", "utf8"), /\.top-ten-name-row \
 // `weeklySource` above already holds the weekly pick's source.
 assert.ok(!weeklySource.includes("weekly-pick-mark"), "The weekly pick's heading is just the title and the week");
 assert.ok(!fs.readFileSync("app/directory.css", "utf8").includes(".weekly-pick-mark"), "The removed mark's style rule is gone with it");
+// The week's name is the panel's headline now: the display face at a heading's
+// size, filled with the two hues the panel is built from, with the underline
+// arriving on hover (a clipped gradient leaves `currentColor` transparent, so
+// the rule has to name its own colour) and plain text for forced-colors users.
+const weeklyCss = fs.readFileSync("app/directory.css", "utf8");
+assert.match(weeklyCss, /\.weekly-pick-name \{[\s\S]{0,260}?font-size: clamp\(30px, 5\.2vw, 50px\);/, "The week's name is set as a headline");
+assert.match(weeklyCss, /\.weekly-pick-name \{[\s\S]{0,260}?font-family: var\(--font-display\), var\(--font-sans\);/, "The week's name wears the display face");
+assert.match(weeklyCss, /\.weekly-pick-name a \{[\s\S]{0,300}?background-clip: text;/, "The name is filled with the panel's colours, not one flat colour");
+assert.match(weeklyCss, /\.weekly-pick-name a:hover \{[\s\S]{0,200}?text-decoration-color: var\(--accent-sky\);/, "The hover underline carries its own colour");
+assert.ok(/@media \(forced-colors: active\) \{\s*\.weekly-pick-name a \{ background-image: none; -webkit-text-fill-color: CanvasText; \}/.test(weeklyCss), "A forced-colors visitor gets plain, visible text");
 
 // The site web: the whole directory as one branching map at the foot of the
 // landing page, built from the registry and the entry list rather than from a
@@ -635,6 +700,10 @@ assert.match(styles, /\.stats-chart\s*\{[^}]*width: 100%;[^}]*height: auto;/);
 const carousel = fs.readFileSync("components/editors-picks.tsx", "utf8");
 assert.ok(!carousel.includes("<button") && !carousel.includes("THE SHORTLIST"));
 assert.ok(carousel.includes("onTouchEnd") && carousel.includes("prefers-reduced-motion"));
+// The pick's collection name is gone from the slide, and its rule with it: the
+// entry's own name and tags already say what it is.
+assert.ok(!carousel.includes("editors-section"), "The editor's pick no longer prints its collection name");
+assert.ok(!fs.readFileSync("app/directory.css", "utf8").includes(".editors-section"), "The removed label's rule went with it");
 assert.equal(directory.tagTone("UTILITY"), "mint");
 assert.equal(directory.tagTone("developer"), "sky");
 assert.equal(directory.tagTone("puzzle"), "amber");

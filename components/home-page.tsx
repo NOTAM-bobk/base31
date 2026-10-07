@@ -27,6 +27,7 @@ import coolSites, { searchCoolSites } from "@/lib/cool-sites";
 import coolApis, { searchCoolApis } from "@/lib/cool-apis";
 import coolApps, { searchCoolApps } from "@/lib/cool-apps";
 import { tick } from "@/lib/haptics";
+import { useSiteTheme } from "@/lib/theme";
 import { isFireActive, readFireStamps, stampFire } from "@/lib/fires";
 import SectionRail, { type RailSection } from "@/components/section-rail";
 import HeroStats from "@/components/hero-stats";
@@ -44,12 +45,11 @@ import WebsiteOfTheWeek from "@/components/website-of-the-week";
 import SiteWeb from "@/components/site-web";
 import { FireButton } from "@/components/site-votes";
 import BestMatches from "@/components/best-matches";
-import { sectionCount, sectionsWithMatches } from "@/lib/sections";
+import { directorySections, sectionCount, sectionsWithMatches } from "@/lib/sections";
 import { compareVotes } from "@/lib/vote-ranking";
 
 type Site = { name: string; subdomain: string; url: string; tags?: string[]; description?: string; show?: boolean; community?: boolean; createdAt?: number; icon?: string; lastChecked?: string; addedAt?: string };
 
-type Theme = "dark" | "light";
 // This visitor's own choice, stored locally.
 type Vote = 1 | -1;
 // Every choice the worker understands: 1 = up, -1 = down, 0 = cleared.
@@ -359,8 +359,11 @@ export default function HomePage({ dict = EN, locale = "en", mode = "home" }: { 
   // This visitor's own fires, so a spent button stays spent across visits.
   const [fireStamps, setFireStamps] = useState<Record<string, number>>({});
   const [firePending, setFirePending] = useState<Record<string, boolean>>({});
-  const [theme, setTheme] = useState<Theme>("dark");
-  const [views, setViews] = useState<number | null>(null);
+  // Light/dark, including the default: the device's own preference until this
+  // visitor picks one (lib/theme.ts holds that rule in one place, so the 404's
+  // header bar follows it too). Only the swap's fade and the haptic tick live
+  // here, because they are this page's own dressing on top of it.
+  const { theme, toggleTheme } = useSiteTheme();
   const [milestone, setMilestone] = useState<number | null>(null);
   const [exitNudge, setExitNudge] = useState<Site | null>(null);
   const [activeTag, setActiveTag] = useState<string | null>(null);
@@ -441,8 +444,6 @@ export default function HomePage({ dict = EN, locale = "en", mode = "home" }: { 
       if (Array.isArray(storedFavorites)) setFavorites(storedFavorites.filter((key): key is string => typeof key === "string"));
       const storedVotes = JSON.parse(localStorage.getItem("base31-votes") || "{}");
       if (storedVotes && typeof storedVotes === "object") setVotes(storedVotes as Record<string, Vote>);
-      const storedTheme = localStorage.getItem("base31-theme");
-      setTheme(storedTheme === "light" ? "light" : "dark");
     } catch {}
     setHydrated(true);
   }, []);
@@ -465,20 +466,6 @@ export default function HomePage({ dict = EN, locale = "en", mode = "home" }: { 
     } catch {}
   }, [votes, hydrated]);
 
-  useEffect(() => {
-    if (!hydrated) return;
-    try {
-      localStorage.setItem("base31-theme", theme);
-    } catch {}
-  }, [theme, hydrated]);
-
-  useEffect(() => {
-    const root = document.documentElement;
-    if (theme === "light") root.setAttribute("data-theme", "light");
-    else root.removeAttribute("data-theme");
-    document.querySelector('meta[name="theme-color"]')?.setAttribute("content", theme === "light" ? "#fafafa" : "#000000");
-  }, [theme]);
-
   // Dark and light repaint every surface on the page, and CSS variables swap
   // instantly, so the change used to snap. `theme-fade` on <html> adds one
   // short colour transition for the length of the switch (see
@@ -496,7 +483,7 @@ export default function HomePage({ dict = EN, locale = "en", mode = "home" }: { 
       themeFadeTimer.current = window.setTimeout(() => root.classList.remove("theme-fade"), 480);
     }
     buzz(8);
-    setTheme(theme === "dark" ? "light" : "dark");
+    toggleTheme();
   };
 
   // The fade class lives on <html>, which survives client-side navigation, so
@@ -517,7 +504,9 @@ export default function HomePage({ dict = EN, locale = "en", mode = "home" }: { 
     return () => window.clearTimeout(timer);
   }, []);
 
-  // View counter + milestone detection.
+  // The view counter's two jobs now: bump the count, and notice a round
+  // number. The figure itself is not printed on this page any more — reads
+  // belong on /stats — so nothing here keeps it.
   useEffect(() => {
     const controller = new AbortController();
     const timer = window.setTimeout(() => controller.abort(), 2500);
@@ -527,7 +516,6 @@ export default function HomePage({ dict = EN, locale = "en", mode = "home" }: { 
       .then((data) => {
         if (!alive || !Number.isFinite(data?.views)) return;
         const count = Number(data.views);
-        setViews(count);
         if (count > 0 && count % 10 === 0) setMilestone(count);
       })
       .catch(() => {})
@@ -1227,8 +1215,13 @@ export default function HomePage({ dict = EN, locale = "en", mode = "home" }: { 
           </p>
           {!isExplore && (
             <>
-              {/* Views, unique directory destinations, and estimated source lines. */}
-              <HeroStats visitors={views} sites={new Set([...directoryEntries, ...allSites].map((site) => site.url.replace(/\/$/, ""))).size} />
+              {/* One figure: the sites the directory links to, and the number of
+                  collections they are filed under. The read count moved to
+                  /stats with the rest of the numbers about the site itself. */}
+              <HeroStats
+                sites={new Set([...directoryEntries, ...allSites].map((site) => site.url.replace(/\/$/, ""))).size}
+                categories={directorySections.length}
+              />
               {/* The landing page's one job is to get people into the list, so
                   the directory gets a full-width control of its own, shaped
                   like the search field it replaces. It is a link, not an
@@ -1793,11 +1786,74 @@ export default function HomePage({ dict = EN, locale = "en", mode = "home" }: { 
       </main>
 
       <footer className="site-footer">
-        <nav className="footer-publications" aria-label="Read our posts elsewhere">
-          <span className="mono">Beyond the directory</span>
-          <a href="https://dev.to/base31" target="_blank" rel="noopener noreferrer"><strong>DEV</strong> Read our posts on dev.to <span aria-hidden="true">↗</span></a>
-          <a href="https://medium.com/@base31dotorg" target="_blank" rel="noopener noreferrer"><strong>M</strong> Read our posts on Medium <span aria-hidden="true">↗</span></a>
-        </nav>
+        {/* The site's own index, in the shape a wiki's footer takes: the links
+            gathered under plain headings instead of unspooling as one long row
+            of equal words. A visitor can see the whole map of base31 at a
+            glance, and every heading names something the site actually has —
+            Collections is the six the directory is filed under, Elsewhere is
+            everywhere base31 publishes. Each column is its own <nav> so a
+            screen reader announces "Explore navigation" rather than reading
+            six headings as one list. */}
+        <div className="footer-cols">
+          <nav className="footer-col" aria-labelledby="footer-col-explore">
+            <h3 id="footer-col-explore">Explore</h3>
+            <a href="/explore">Everything</a>
+            <a href="/tags">Tags</a>
+            <a href="/recently-added">Recently added</a>
+            <a href="/websites-of-the-week">Websites of the week</a>
+            <a href="/stats">Stats</a>
+          </nav>
+          <nav className="footer-col" aria-labelledby="footer-col-tools">
+            <h3 id="footer-col-tools">Tools</h3>
+            <a href="/tools">Tools</a>
+            <a href="/blog">Blog</a>
+            <a href="/whats-new">What&rsquo;s new</a>
+            <a href="/quality-report">Quality report</a>
+          </nav>
+          <nav className="footer-col" aria-labelledby="footer-col-company">
+            <h3 id="footer-col-company">Company</h3>
+            <a href="/about">About us</a>
+            <a href="/our-story">Our story</a>
+            <a href="/sponsor">Sponsor</a>
+            <a href="/security">Security</a>
+            <a href="mailto:hello@base31.org">Contact</a>
+          </nav>
+          <nav className="footer-col" aria-labelledby="footer-col-community">
+            <h3 id="footer-col-community">Community</h3>
+            {/* The submission form is on both faces of this component — the
+                landing page and /explore — so the anchor resolves in place on
+                either one instead of sending a directory visitor home. */}
+            <a href="#request-url">Submit a URL</a>
+            <a href="mailto:hello@base31.org?subject=base31%20bug%20report">Bug report</a>
+            <a href="/admin/community-sites">Moderation</a>
+          </nav>
+          <nav className="footer-col" aria-labelledby="footer-col-legal">
+            <h3 id="footer-col-legal">Legal</h3>
+            <a href="/terms">Terms of service</a>
+            <a href="/privacy">Privacy</a>
+            <a href="https://dmca.base31.org" target="_blank" rel="noopener">DMCA takedown</a>
+          </nav>
+          {/* Everywhere base31 publishes, with the icons carried by the two
+              outbound links. Facebook is the newest of them and the only
+              place the directory posts off its own site and the two blogs. */}
+          <nav className="footer-col" aria-labelledby="footer-col-elsewhere">
+            <h3 id="footer-col-elsewhere">Elsewhere</h3>
+            <a className="footer-social" href="https://github.com/NOTAM-bobk/base31" target="_blank" rel="noreferrer">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-hidden="true">
+                <path d="M12 1.8a10.2 10.2 0 0 0-3.2 19.9c.5.1.7-.2.7-.5v-1.9c-2.8.6-3.4-1.3-3.4-1.3-.5-1.2-1.1-1.5-1.1-1.5-.9-.6.1-.6.1-.6 1 .1 1.6 1 1.6 1 .9 1.6 2.4 1.1 3 .9.1-.7.4-1.1.7-1.4-2.3-.3-4.6-1.1-4.6-5 0-1.1.4-2 1-2.7-.1-.3-.4-1.3.1-2.7 0 0 .8-.3 2.8 1a9.5 9.5 0 0 1 5 0c2-1.3 2.8-1 2.8-1 .5 1.4.2 2.4.1 2.7.6.7 1 1.6 1 2.7 0 3.9-2.3 4.7-4.6 5 .4.3.7.9.7 1.9v2.8c0 .3.2.6.7.5A10.2 10.2 0 0 0 12 1.8Z" />
+              </svg>
+              Source code
+            </a>
+            <a className="footer-social" href="https://www.facebook.com/profile.php?id=61594886203335" target="_blank" rel="noreferrer">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-hidden="true">
+                <path d="M12 2.04c-5.5 0-10 4.49-10 10.02 0 5 3.66 9.15 8.44 9.9v-7H7.9v-2.9h2.54V9.85c0-2.51 1.49-3.89 3.78-3.89 1.09 0 2.23.19 2.23.19v2.47h-1.26c-1.24 0-1.63.77-1.63 1.56v1.88h2.78l-.45 2.9h-2.33v7a10 10 0 0 0 8.44-9.9c0-5.53-4.5-10.02-10-10.02Z" />
+              </svg>
+              Facebook
+            </a>
+            <a href="https://dev.to/base31" target="_blank" rel="noopener noreferrer">DEV</a>
+            <a href="https://medium.com/@base31dotorg" target="_blank" rel="noopener noreferrer">Medium</a>
+          </nav>
+        </div>
         {/* Contact details and the deployed build version. They sit at the very
             bottom of the page, for visitors and search crawlers alike. The
             version comes from package.json, so it tracks the release. */}
@@ -1856,33 +1912,11 @@ export default function HomePage({ dict = EN, locale = "en", mode = "home" }: { 
             Copyright © 2026 base31.org · built by Sawyer Schulz · sparkle gif from{" "}
             <a href="https://www.glitter-graphics.com" target="_blank" rel="noreferrer">glitter-graphics.com</a>
           </span>
-          <nav className="footer-links" aria-label="Footer navigation">
-            <a href="/blog">Blog</a>
-            <a href="/tools">Tools</a>
-            {/* The signup block is on the landing page only, so the directory
-                has to link back to it rather than to a hash it does not have. */}
-            <a href={isExplore ? "/#updates" : "#updates"}>Updates</a>
-            <a href="/whats-new">What&rsquo;s new</a>
-            <a href="/recently-added">Recently added</a>
-            <a href="/tags">Tags</a>
-            <a href="/quality-report">Quality report</a>
-            <a href="/stats">Stats</a>
-            <a href="/admin/community-sites">Admin</a>
-            <a href="/about">About us</a>
-            <a href="/our-story">Our story</a>
-            <a href="/terms">Terms of service</a>
-            <a href="/privacy">Privacy</a>
-            <a href="/security">Security</a>
-            <a href="https://dmca.base31.org" target="_blank" rel="noopener">DMCA takedown</a>
-            {/* The one footer item that leaves the site, so it carries the
-                GitHub mark and reads as a small button rather than a link. */}
-            <a className="footer-source" href="https://github.com/NOTAM-bobk/base31" target="_blank" rel="noreferrer">
-              <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-hidden="true">
-                <path d="M12 1.8a10.2 10.2 0 0 0-3.2 19.9c.5.1.7-.2.7-.5v-1.9c-2.8.6-3.4-1.3-3.4-1.3-.5-1.2-1.1-1.5-1.1-1.5-.9-.6.1-.6.1-.6 1 .1 1.6 1 1.6 1 .9 1.6 2.4 1.1 3 .9.1-.7.4-1.1.7-1.4-2.3-.3-4.6-1.1-4.6-5 0-1.1.4-2 1-2.7-.1-.3-.4-1.3.1-2.7 0 0 .8-.3 2.8 1a9.5 9.5 0 0 1 5 0c2-1.3 2.8-1 2.8-1 .5 1.4.2 2.4.1 2.7.6.7 1 1.6 1 2.7 0 3.9-2.3 4.7-4.6 5 .4.3.7.9.7 1.9v2.8c0 .3.2.6.7.5A10.2 10.2 0 0 0 12 1.8Z" />
-              </svg>
-              Source code
-            </a>
-            <a href="mailto:hello@base31.org?subject=base31%20bug%20report">Bug report</a>
+          {/* The two controls that are not links to somewhere: the cookie
+              choice and the way back to the top. Everything else the footer
+              used to list is one of the headings above, which is what keeps
+              this row short enough to read. */}
+          <nav className="footer-links" aria-label="Footer controls">
             <button
               type="button"
               className="footer-link-button"

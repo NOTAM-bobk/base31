@@ -1120,24 +1120,6 @@ html { scroll-behavior: smooth; }
 .footer-link-button { padding: 2px 0; border: 0; background: none; color: var(--muted); font: inherit; font-size: 12px; cursor: pointer; transition: color 150ms ease; }
 .footer-link-button:hover { color: var(--text-strong); }
 
-/* The footer's source-code button: the one footer item that leaves the
-   site, so it carries the GitHub mark and reads as a small solid button
-   beside the plain links rather than as one more link. */
-.footer-source {
-  display: inline-flex; align-items: center; gap: 6px;
-  padding: 4px 11px; border: 1px solid color-mix(in srgb, var(--line-strong) 68%, var(--line));
-  border-radius: 999px; background: var(--surface);
-  box-shadow: 0 1px 2px rgb(0 0 0 / 24%), inset 0 1px 0 rgb(255 255 255 / 5%);
-  color: var(--muted); font-size: 11.5px;
-  transition: border-color 150ms ease, color 150ms ease, background 150ms ease, transform 150ms ease;
-}
-.footer-source svg { flex: 0 0 auto; }
-.footer-source:hover {
-  border-color: var(--line-strong); background: var(--surface-hover); color: var(--text-strong);
-  transform: translateY(-1px);
-}
-.footer-source:active { transform: translateY(0); }
-
 /* Theme swap -----------------------------------------------------------
    Dark and light repaint nearly every surface on the page, and the CSS
    variables swap instantly, so the change used to snap. `theme-fade` is

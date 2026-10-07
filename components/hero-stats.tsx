@@ -10,17 +10,15 @@ const COUNT_MS = 3400;
 /**
  * Counts a figure up from zero to `target` with an ease-out, in a rAF loop.
  *
- * `target` may arrive late (the visitor count is fetched), so the effect waits
- * for a real number: while it is `null` the hook simply holds zero, and the
- * climb starts when the value lands. Visitors who asked for reduced motion get
- * the final number immediately — the figure is information, not decoration, so
- * skipping the animation must not hide it.
+ * Visitors who asked for reduced motion get the final number immediately — the
+ * figure is information, not decoration, so skipping the animation must not
+ * hide it.
  */
-function useCountUp(target: number | null, duration = COUNT_MS) {
+function useCountUp(target: number, duration = COUNT_MS) {
   const [value, setValue] = useState(0);
 
   useEffect(() => {
-    if (target == null || !Number.isFinite(target)) return;
+    if (!Number.isFinite(target)) return;
     const reduced =
       typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (reduced || target <= 0) {
@@ -42,31 +40,29 @@ function useCountUp(target: number | null, duration = COUNT_MS) {
 }
 
 /**
- * The two figures the hero prints directly above the directory's call to
- * action: how many times the directory has been read, and how many sites it
- * links out to (the built-in entries plus the off-directory picks).
+ * The one figure the hero prints, directly above the directory's call to
+ * action: how many websites it links out to and how many collections those
+ * websites are filed under.
  *
- * The labels are deliberately English on every locale, like the rail's own
- * labels — they name the same numbers the counters print in English elsewhere
- * on the page.
+ * It is a sentence rather than a row of counters. Every other number on the
+ * page is a list's own count, and the hero had two figures — reads and links —
+ * that pulled in opposite directions: a read count is about the page, the
+ * links are about the directory, and side by side neither read as the point.
+ * The reads still live on /stats, where a number about the site belongs; what
+ * is left here is the one claim the landing page exists to make. The count is a
+ * live total (`directoryEntries` plus the site list), so it stays true as the
+ * directory grows, and it is exactly the sum of the collections it names.
  */
-export default function HeroStats({ visitors, sites }: { visitors: number | null; sites: number }) {
-  const visitorCount = useCountUp(visitors);
+export default function HeroStats({ sites, categories }: { sites: number; categories: number }) {
   const siteCount = useCountUp(sites);
-
-  const stats = [
-    { label: "views", text: visitors == null ? "—" : visitorCount.toLocaleString() },
-    { label: "websites linked", text: siteCount.toLocaleString() },
-  ];
+  const sentence = `${sites.toLocaleString()} websites linked across ${categories} ${categories === 1 ? "category" : "categories"}`;
 
   return (
-    <ul className="hero-stats" aria-label="base31 at a glance, two figures">
-      {stats.map((stat) => (
-        <li key={stat.label} className="hero-stat">
-          <span className="hero-stat-value">{stat.text}</span>
-          <span className="hero-stat-label mono">{stat.label}</span>
-        </li>
-      ))}
-    </ul>
+    <p className="hero-stats" aria-label={sentence}>
+      <span className="hero-stat-value" aria-hidden="true">{siteCount.toLocaleString()}</span>
+      <span className="hero-stat-label" aria-hidden="true">
+        websites linked across {categories} {categories === 1 ? "category" : "categories"}
+      </span>
+    </p>
   );
 }

@@ -141,4 +141,92 @@ assert.deepEqual(await releaseCase({ exists: true }), []);
 assert.deepEqual(await releaseCase({ moved: true }), []);
 await assert.rejects(() => releaseCase({ conflict: true }), /different commit/);
 await assert.rejects(() => releaseCase({ denied: true }), /not found/);
-console.log('UI tests passed: rail tap/hold/drag/cancel, minute polling, detail structure, AA light tokens and auto-release guards.');
+// The theme rule, run against a fake browser. The site has to open in the
+// visitor's own colour scheme, keep following the device while no choice is
+// stored, and store only an explicit tap on the toggle — so a device that flips
+// at sunset is followed, and a visitor who chose light mode is not overruled by
+// their phone an hour later. React's hook contract is emulated the way `mount`
+// does it: a render registers the effects, they run, and the next pass sees the
+// state they set.
+function themeHarness({ stored = null, light = true } = {}) {
+  const code = ts.transpileModule(fs.readFileSync('lib/theme.ts', 'utf8'), {
+    compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 },
+  }).outputText;
+  const slots = []; const refs = []; const seen = []; let effects = []; let cursor = 0;
+  const react = {
+    // A function argument is an updater, exactly as React reads it — the toggle
+    // flips the theme that way rather than from a stale closure.
+    useState(initial) { const i = cursor++; if (!(i in slots)) slots[i] = typeof initial === 'function' ? initial() : initial; return [slots[i], value => { slots[i] = typeof value === 'function' ? value(slots[i]) : value; }]; },
+    useRef(initial) { const i = cursor++; return refs[i] ??= { current: initial }; },
+    useCallback(fn) { cursor++; return fn; },
+    // The deps array matters here: React runs a `[]` effect once, and the
+    // resolve effect would otherwise put the device's answer back every pass,
+    // hiding whatever the toggle did.
+    useEffect(fn, deps) {
+      const i = cursor++;
+      const previous = seen[i];
+      const changed = !previous || !deps || !previous.deps || deps.length !== previous.deps.length || deps.some((dep, k) => !Object.is(dep, previous.deps[k]));
+      seen[i] = { deps };
+      effects.push(changed ? fn : null);
+    },
+  };
+  const store = new Map(stored ? [['base31-theme', stored]] : []);
+  const listeners = new Set();
+  const attrs = {};
+  const html = { setAttribute: (key, value) => { attrs[key] = value; }, removeAttribute: key => { delete attrs[key]; } };
+  const globals = {
+    localStorage: { getItem: key => store.get(key) ?? null, setItem: (key, value) => { store.set(key, value); } },
+    // `matches` is read live, the way a real MediaQueryList reports it: the
+    // query object is asked again when the device flips.
+    window: { matchMedia: () => ({ get matches() { return light; }, addEventListener: (_event, fn) => listeners.add(fn), removeEventListener: (_event, fn) => listeners.delete(fn) }) },
+    document: { documentElement: html, querySelector: () => ({ setAttribute() {} }) },
+  };
+  const module = { exports: {} };
+  new Function('require', 'module', 'exports', ...Object.keys(globals), code)(
+    id => { if (id === 'react') return react; throw new Error(`Unexpected import ${id}`); },
+    module, module.exports, ...Object.values(globals),
+  );
+  let api = null;
+  const pass = () => {
+    cursor = 0; effects = [];
+    api = module.exports.useSiteTheme();
+    const registered = effects;
+    for (const fn of registered) if (typeof fn === 'function') fn();
+  };
+  // Two passes: the resolve effect sets state, and the second render is what
+  // the effects that depend on it run against.
+  pass(); pass();
+  return {
+    theme: () => api.theme,
+    toggle: () => { api.toggleTheme(); pass(); pass(); },
+    flipDevice: value => { light = value; listeners.forEach(fn => fn()); pass(); pass(); },
+    stored: () => store.get('base31-theme') ?? null,
+    dataTheme: () => attrs['data-theme'] ?? null,
+  };
+}
+
+const deviceLight = themeHarness({ light: true });
+assert.equal(deviceLight.theme(), 'light', 'A light-mode device opens the site in light mode');
+assert.equal(deviceLight.dataTheme(), 'light', 'The pre-paint attribute matches the device preference');
+assert.equal(deviceLight.stored(), null, 'Following the device is not a stored choice');
+assert.equal(themeHarness({ light: false }).theme(), 'dark', 'A device with no light preference stays dark');
+assert.equal(themeHarness({ stored: 'dark', light: true }).theme(), 'dark', 'A stored choice beats a light-mode device');
+assert.equal(themeHarness({ stored: 'light', light: false }).theme(), 'light', 'A stored choice beats a dark-mode device');
+// The device keeps driving the page until the visitor disagrees with it.
+const followed = themeHarness({ light: false });
+followed.flipDevice(true);
+assert.equal(followed.theme(), 'light', 'The site follows the device while nothing is stored');
+const chosen = themeHarness({ stored: 'dark', light: true });
+chosen.flipDevice(false);
+assert.equal(chosen.theme(), 'dark', 'A stored choice is not overruled by the device');
+// The toggle is what stores one, and it flips the other way.
+const toggled = themeHarness({ light: true });
+toggled.toggle();
+assert.equal(toggled.theme(), 'dark', 'The toggle flips the theme');
+assert.equal(toggled.stored(), 'dark', 'The toggle stores the choice');
+assert.equal(toggled.dataTheme(), null, 'Dark mode removes the attribute rather than setting it');
+toggled.toggle();
+assert.equal(toggled.theme(), 'light', 'The toggle flips back');
+assert.equal(toggled.stored(), 'light', 'The stored choice follows the toggle');
+
+console.log('UI tests passed: rail tap/hold/drag/cancel, minute polling, detail structure, AA light tokens, device-default theme rule and auto-release guards.');

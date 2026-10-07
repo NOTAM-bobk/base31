@@ -25,6 +25,9 @@
 .stats-rank-votes { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 10px; font-size: 11px; }
 .stats-rank-up { color: var(--live); }
 .stats-rank-down { color: var(--danger); }
+/* A fire is not a vote: it is the ten votes a boosted entry is carrying, so the
+   row says how many are live rather than adding them to the thumbs. */
+.stats-rank-fire { color: var(--accent-amber, #f3cc76); }
 .stats-foot { margin-top: 40px; color: var(--muted); font-size: 13px; line-height: 1.8; }
 .stats-foot a, .stats-notice a { color: var(--live); text-underline-offset: 4px; }
 @media (max-width: 720px) { .stats-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); } }

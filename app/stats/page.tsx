@@ -46,9 +46,13 @@ type StatsTotals = {
   sites: number;
   subscribers: number;
   pushDevices: number;
-  votes: { up: number; down: number };
+  // `fires` is how many of a key's fires are still inside their 24 hours. They
+  // are not votes cast; each one is worth `FIRE_VOTE_WEIGHT` votes to the
+  // ranking, which is why it is carried separately here and shown separately on
+  // the page rather than folded into the thumbs.
+  votes: { up: number; down: number; fires?: number };
 };
-type StatsPayload = { generatedAt: number; days: number; series: DayPoint[]; uniqueSeries: UniquePoint[]; totals: StatsTotals; top: { key: string; up: number; down: number }[] };
+type StatsPayload = { generatedAt: number; days: number; series: DayPoint[]; uniqueSeries: UniquePoint[]; totals: StatsTotals; top: { key: string; up: number; down: number; fires?: number }[] };
 
 const number = new Intl.NumberFormat("en-US");
 const dayLabel = new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric", timeZone: "UTC" });
@@ -232,7 +236,11 @@ export default async function StatsPage() {
               note={trend === null ? "no previous week to compare" : `${trend >= 0 ? "▲" : "▼"} ${Math.abs(trend)}% vs the week before`}
             />
             <Card label="tools listed" value={number.format(sitesConfig.length)} note={`${totals.sites} published by visitors`} />
-            <Card label="votes cast" value={number.format(totals.votes.up + totals.votes.down)} note={`${number.format(totals.votes.up)} up · ${number.format(totals.votes.down)} down`} />
+            <Card
+              label="votes cast"
+              value={number.format(totals.votes.up + totals.votes.down)}
+              note={`${number.format(totals.votes.up)} up · ${number.format(totals.votes.down)} down${totals.votes.fires ? ` · ${number.format(totals.votes.fires)} fires live` : ""}`}
+            />
             <Card label="email subscribers" value={number.format(totals.subscribers)} note={`${number.format(totals.pushDevices)} push devices`} />
             <Card label="avg. per day" value={number.format(Math.round(graphWindow / Math.max(series.length, 1)))} note={`across the last ${series.length} days`} />
           </section>
@@ -287,9 +295,14 @@ export default async function StatsPage() {
                     <span className="stats-rank mono">{String(index + 1).padStart(2, "0")}</span>
                     <span className="stats-rank-name">{displayName(entry.key)}</span>
                     <span className="stats-rank-votes mono">
+                      {/* The weighted total is the ranking figure; the two
+                          halves beside it add up to it only when a fire is
+                          counted, so a boosted row names the fire that raised
+                          it instead of leaving the gap unexplained. */}
                       <span>{number.format(totalVotes(entry))} votes</span>
                       <span className="stats-rank-up">▲ {number.format(entry.up)}</span>
                       {entry.down > 0 ? <span className="stats-rank-down">▼ {number.format(entry.down)}</span> : null}
+                      {entry.fires ? <span className="stats-rank-fire">🔥 {number.format(entry.fires)}</span> : null}
                     </span>
                   </li>
                 ))}

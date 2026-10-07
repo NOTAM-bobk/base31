@@ -297,6 +297,42 @@ assert.ok(
   drawerSource.includes('{exploreOpen ? "Close" : "Open"}') && drawerSource.includes('{moreOpen ? "Close" : "Open"}'),
   "Each list in the drawer carries a text control that folds it away",
 );
+
+// The desktop side rail: the wide screen's navigation, drawn from the same two
+// lists the drawer uses, so the two can never disagree about where a section
+// lives. It shows the collections with their counts, folds them away behind
+// their own heading, marks the page the visitor is already on, and puts the
+// submission at its foot — and the `⌘K` printed on its search row has to be
+// bound, or it is a hint nobody can press.
+const railSource = fs.readFileSync("components/side-rail.tsx", "utf8");
+assert.ok(home.includes("<SideRail") && home.includes("categories={directoryNavLinks}") && home.includes("links={siteNavLinks}"), "The rail draws the same two lists the drawer does");
+assert.ok(home.includes("categories={[...directoryNavLinks, SUBMIT_LINK]}"), "The drawer keeps the submission as the last row of its categories");
+assert.equal((home.match(/const SUBMIT_LINK: RailLink = \{/g) || []).length, 1, "One submission link serves both navigations");
+assert.ok(home.includes('current={isExplore ? "/explore" : ""}'), "The rail is told which page it is on, so it can mark that row");
+assert.ok(railSource.includes("aria-current={here ? \"page\" : undefined}"), "The row for the current page is marked for assistive technology");
+assert.ok(railSource.includes("event.metaKey || event.ctrlKey") && railSource.includes('event.key.toLowerCase() !== "k"'), "⌘K and Ctrl+K are bound to the rail's search row");
+assert.ok(railSource.includes('if (!(event.metaKey || event.ctrlKey) || event.key.toLowerCase() !== "k") return;'), "The shortcut only answers ⌘K, and never swallows another key");
+assert.ok(railSource.includes('aria-expanded={open}') && railSource.includes('aria-controls="side-rail-categories"') && railSource.includes("hidden={!open}"), "The collections fold behind a real disclosure");
+assert.ok(railSource.includes("link.meta"), "Each collection's count is printed from its own row's data");
+assert.ok(!railSource.includes("next/link") && railSource.includes('href={link.href}'), "Every row is an ordinary link, so the rail needs no routing code");
+
+// The rail is a fixed column that takes its width out of the page rather than
+// covering it, and it is shown only where there is room: hidden by default, on
+// at 1200px. The page band is the one thing that has to be re-measured with it,
+// because its full-bleed rule centres `100vw` on the viewport and would leave
+// the grey slab half a rail's width out of place.
+const railCss = fs.readFileSync("app/directory.css", "utf8");
+assert.ok(/\.side-rail \{ display: none; \}/.test(railCss), "The rail is off by default, so a phone never sees it");
+const railBlock = railCss.match(/@media \(min-width: 1200px\) \{[\s\S]*?\n\}\n/)?.[0] || "";
+assert.ok(railBlock.includes("position: fixed; top: 64px"), "The rail sits under the fixed header");
+assert.ok(railBlock.includes("body:has(.side-rail) { padding-left: var(--rail-w); }"), "The rail's width is taken out of the page, not laid over it");
+assert.ok(
+  railBlock.includes("width: calc(100vw - var(--rail-w));") && /margin-left: calc\(50% - \(100vw - var\(--rail-w\)\) \/ 2\);/.test(railBlock),
+  "The page band is re-measured against the space the rail leaves",
+);
+assert.ok(/\.side-rail-link\.is-current::before \{[^}]*background: var\(--live\)/.test(railBlock), "The current row carries a bar on the rail's own edge");
+assert.ok(/\.side-rail-group-head \{[^}]*text-transform: uppercase;/.test(railBlock), "The collections' heading is set as a quiet group label");
+assert.ok(/\.side-rail-submit \{[^}]*margin-top: auto;/.test(railBlock), "The submission is held at the foot of the column");
 assert.ok(drawerSource.includes("aria-expanded={exploreOpen}"), "A fold control reports whether its group is open");
 assert.ok(drawerSource.includes("searchScore"), "The panel ranks its own results with the directory's own rule");
 assert.ok(drawerSource.includes("href={`/sites/${item.slug}`}"), "A result listed in the panel opens that pick's detail page");
@@ -406,8 +442,23 @@ assert.match(
 const heroStats = fs.readFileSync("components/hero-stats.tsx", "utf8");
 assert.ok(!heroStats.includes("estimated lines of code") && !heroStats.includes("estimateLines"), "The hero no longer prints an estimated line count");
 assert.ok(!heroStats.includes("visitors") && !heroStats.includes("views"), "The hero no longer prints the read count");
-assert.ok(heroStats.includes("websites linked across"), "The hero still names the sites it links to and the categories holding them");
-assert.ok(heroStats.includes("categories"), "The hero figures the number of categories");
+assert.ok(heroStats.includes("websites linked") && heroStats.includes("categories"), "The hero names both the sites it links to and the collections holding them");
+// Both figures are the same figure to a visitor: one component, one class, one
+// count-up each, and one CSS rule drawing both. The category count used to be
+// plain words inside the first figure's label, which left one number climbing
+// and the other sitting still and smaller.
+assert.ok(heroStats.includes("useCountUp(sites)") && heroStats.includes("useCountUp(categories)"), "Both hero figures climb on their own count-up");
+assert.equal((heroStats.match(/<HeroFigure /g) || []).length, 2, "Both figures are drawn by the one figure component");
+assert.equal((heroStats.match(/className="hero-stat-value"/g) || []).length, 1, "and by a single class, so neither can be styled apart from the other");
+assert.ok(!/hero-stat-label">\s*websites linked across/.test(heroStats), "The category count is no longer plain text inside the first figure's label");
+assert.ok(heroStats.includes("aria-hidden=\"true\"") && heroStats.includes("aria-label={sentence}"), "The line is named by its own sentence, so the figures are decorative to a screen reader");
+const heroCss = fs.readFileSync("app/late.css", "utf8");
+assert.ok(/(^|\n)\.hero-stat-value \{[^}]*font-family: var\(--font-display, inherit\)/.test(heroCss), "Both figures wear the display face");
+const heroValueSelectors = heroCss.match(/(^|\n)[^\n{]*\.hero-stat-value[^\n{]*\{/g) || [];
+assert.ok(
+  heroValueSelectors.length > 0 && heroValueSelectors.every(selector => !/:nth-child|:first-child|:last-child|:not\(/.test(selector)),
+  "No rule singles out one hero figure: every rule that draws a figure draws both",
+);
 assert.ok(!fs.readFileSync("app/directory.css", "utf8").includes(".hero-stat:nth-child(3)"), "The third figure's colour rule went with it");
 const heroCallSite = fs.readFileSync("components/home-page.tsx", "utf8").match(/<HeroStats[\s\S]{0,400}?\/>/)?.[0] || "";
 assert.ok(heroCallSite.includes("categories={directorySections.length}"), "The hero's category count is the registry's own length, not a hard-coded number");

@@ -19,7 +19,8 @@ import CoolSites from "@/components/cool-sites";
 import CoolApis from "@/components/cool-apis";
 import CoolApps from "@/components/cool-apps";
 import SiteHeader from "@/components/site-header";
-import NavDrawer, { type DrawerLink, type DrawerSearchItem } from "@/components/nav-drawer";
+import NavDrawer, { type DrawerSearchItem } from "@/components/nav-drawer";
+import SideRail, { type RailLink } from "@/components/side-rail";
 import { useDialogFocus } from "@/lib/dialog-focus";
 import { LOCALES, type Dictionary, type Locale, EN } from "@/lib/i18n";
 import { resetConsent, useConsent } from "@/lib/consent";
@@ -100,6 +101,11 @@ const heroWordsOf = (title: string) => title.split(/\s+/).filter(Boolean);
 const drawerSearchIndex: DrawerSearchItem[] = directoryEntries.map(({ name, slug, url, section, description, tags }) => ({
   name, slug, url, section, description, tags,
 }));
+
+// The submission, as its own row: the desktop rail puts it at its foot and the
+// drawer keeps it as the last row of its categories. Defined once, at module
+// scope, so both render the same object rather than two copies of one link.
+const SUBMIT_LINK: RailLink = { href: "/explore#request-url", label: "Submit a URL", icon: "plus" };
 
 const visibleSites = (sites as Site[]).filter((site) => site.show !== false);
 
@@ -933,30 +939,32 @@ export default function HomePage({ dict = EN, locale = "en", mode = "home" }: { 
     { id: "updates", label: "Updates" },
   ]), [dict, isExplore]);
 
-  // The mobile drawer's two lists. "Explore" is the directory's own sections:
-  // every row is a plain link to /explore with that section's id as the hash,
-  // so the browser loads the page and scrolls to the list the visitor asked
-  // for without any routing code. "More" is the rest of the site.
-  const drawerCategories = useMemo<DrawerLink[]>(() => [
-    { href: "/explore", label: "Everything", meta: `${allSites.length} sites` },
-    { href: "/explore#sites", label: dict.featured, meta: `${allSites.length}` },
-    { href: "/explore#cool-sites", label: dict.coolSites, meta: `${coolSites.length}` },
-    { href: "/explore#cool-apis", label: dict.coolApis, meta: `${coolApis.length}` },
-    { href: "/explore#cool-apps", label: dict.coolApps, meta: `${coolApps.length}` },
-    { href: "/explore#cool-ais", label: dict.coolAis, meta: `${allCoolAis.length}` },
-    { href: "/explore#no-code-ai-tools", label: dict.noCodeAiTools, meta: `${sectionCount("no-code-ai-tools")}` },
-    { href: "/explore#request-url", label: "Submit a URL" },
+  // The navigation both the phone's drawer and the desktop rail draw. "The
+  // directory's own collections" is its sections: every row is a plain link to
+  // /explore with that section's id as the hash, so the browser loads the page
+  // and scrolls to the list the visitor asked for without any routing code.
+  // "The site's own pages" is the rest of base31. One list each, so the two
+  // navigations can never disagree about where something lives; the glyph on
+  // each row is the rail's, and the drawer simply ignores it.
+  const directoryNavLinks = useMemo<RailLink[]>(() => [
+    { href: "/explore", label: "Everything", meta: `${allSites.length} sites`, icon: "grid" },
+    { href: "/explore#sites", label: dict.featured, meta: `${allSites.length}`, icon: "bookmark" },
+    { href: "/explore#cool-sites", label: dict.coolSites, meta: `${coolSites.length}`, icon: "compass" },
+    { href: "/explore#cool-apis", label: dict.coolApis, meta: `${coolApis.length}`, icon: "braces" },
+    { href: "/explore#cool-apps", label: dict.coolApps, meta: `${coolApps.length}`, icon: "cube" },
+    { href: "/explore#cool-ais", label: dict.coolAis, meta: `${allCoolAis.length}`, icon: "sparkle" },
+    { href: "/explore#no-code-ai-tools", label: dict.noCodeAiTools, meta: `${sectionCount("no-code-ai-tools")}`, icon: "wand" },
   ], [allSites.length, dict]);
 
-  const drawerMore = useMemo<DrawerLink[]>(() => [
-    { href: "/blog", label: "Blog" },
-    { href: "/tools", label: "Tool guides" },
-    { href: "/recently-added", label: "Recently added", meta: `${recentlyAdded.length}` },
-    { href: "/tags", label: "Tags", meta: `${tagCount}` },
-    { href: "/quality-report", label: "Quality report" },
-    { href: "/websites-of-the-week", label: "Website of the week" },
-    { href: "/stats", label: "Stats" },
-    { href: "/about", label: "About us" },
+  const siteNavLinks = useMemo<RailLink[]>(() => [
+    { href: "/blog", label: "Blog", icon: "article" },
+    { href: "/tools", label: "Tool guides", icon: "tools" },
+    { href: "/recently-added", label: "Recently added", meta: `${recentlyAdded.length}`, icon: "clock" },
+    { href: "/tags", label: "Tags", meta: `${tagCount}`, icon: "hash" },
+    { href: "/websites-of-the-week", label: "Website of the week", icon: "trophy" },
+    { href: "/stats", label: "Stats", icon: "chart" },
+    { href: "/quality-report", label: "Quality report", icon: "shield" },
+    { href: "/about", label: "About us", icon: "info" },
   ], []);
 
   // How many off-directory picks the same search found — the cool sites, the
@@ -1184,13 +1192,25 @@ export default function HomePage({ dict = EN, locale = "en", mode = "home" }: { 
       />
 
       {/* The phone's menu: the search field and the category list, drawn over
-          the page instead of under it. */}
+          the page instead of under it. Its categories are the shared list plus
+          the submission the rail carries as a row of its own. */}
       <NavDrawer
         open={navOpen}
         onClose={() => setNavOpen(false)}
-        categories={drawerCategories}
-        more={drawerMore}
+        categories={[...directoryNavLinks, SUBMIT_LINK]}
+        more={siteNavLinks}
         searchIndex={drawerSearchIndex}
+      />
+
+      {/* The desktop rail: the same two lists down the left edge, with the
+          collections' counts beside them. CSS keeps it off screen below
+          1200px, so the phone keeps the header and this drawer and nothing
+          double is offered at either end. */}
+      <SideRail
+        links={siteNavLinks}
+        categories={directoryNavLinks}
+        submit={SUBMIT_LINK}
+        current={isExplore ? "/explore" : ""}
       />
 
       {/* The lines down the right edge: where you are, and the fast way

@@ -229,4 +229,62 @@ toggled.toggle();
 assert.equal(toggled.theme(), 'light', 'The toggle flips back');
 assert.equal(toggled.stored(), 'light', 'The stored choice follows the toggle');
 
-console.log('UI tests passed: rail tap/hold/drag/cancel, minute polling, detail structure, AA light tokens, device-default theme rule and auto-release guards.');
+// The desktop side rail, driven. Three things are load-bearing rather than
+// decorative: the collections fold away behind their own heading (and a folded
+// group is hidden, not merely styled away, so its rows leave the tab order
+// too), the row for the page the visitor is on is marked, and ⌘K does what the
+// row prints it does. The shortcut stops at the anchor: the browser navigates,
+// exactly as if the visitor had tapped the row, so there is no second router
+// hiding in the rail.
+const sideRailKeys = [];
+let sideRailClicks = 0;
+const sideRail = mount('components/side-rail.tsx', {
+  links: [{ href: '/blog', label: 'Blog', icon: 'article' }],
+  categories: [{ href: '/explore#cool-sites', label: 'Cool sites', meta: '45', icon: 'compass' }],
+  submit: { href: '/explore#request-url', label: 'Submit a URL', icon: 'plus' },
+  current: '/explore#cool-sites',
+}, {
+  document: { addEventListener: (type, fn) => sideRailKeys.push(fn), removeEventListener() {} },
+}, { '@/lib/haptics': { tick() {} } });
+let sideRailTree = sideRail.render();
+const sideRailSearch = find(sideRailTree, item => item.props?.className === 'side-rail-search');
+sideRailSearch.props.ref.current = { click: () => { sideRailClicks++; } };
+assert.equal(sideRailSearch.props.href, '/explore', 'The search row goes to the page the field is on');
+assert.equal(find(sideRailTree, item => item.props?.className?.includes('side-rail-kbd')).props.children, '⌘K');
+// A row is a component, so the harness keeps it as an element instead of
+// calling it: reaching the row's own markup means calling it as React would.
+const railRowFor = href => {
+  const element = find(sideRailTree, item => item.props?.link?.href === href);
+  assert.ok(element && typeof element.type === 'function', `The rail renders a row for ${href}`);
+  return element.type(element.props);
+};
+const sideRailRow = railRowFor('/explore#cool-sites');
+assert.equal(sideRailRow.props.className, 'side-rail-link is-current', 'The page you are on is the row marked current');
+assert.equal(sideRailRow.props['aria-current'], 'page', 'and it says so to assistive technology');
+assert.equal(railRowFor('/blog').props['aria-current'], undefined, 'Every other row is left unmarked');
+assert.equal(find(sideRailRow, item => item.props?.className?.includes('side-rail-meta')).props.children, '45', 'A collection prints its own count');
+assert.equal(find(sideRailTree, item => item.props?.className?.includes('side-rail-submit')).props.href, '/explore#request-url', 'The submission sits at the foot of the rail');
+const sideRailFold = find(sideRailTree, item => item.type === 'button');
+assert.equal(sideRailFold.props['aria-expanded'], true, 'The collections start open');
+assert.equal(find(sideRailTree, item => item.props?.id === 'side-rail-categories').props.hidden, false);
+sideRailFold.props.onClick();
+sideRailTree = sideRail.render();
+assert.equal(find(sideRailTree, item => item.type === 'button').props['aria-expanded'], false);
+assert.equal(
+  find(sideRailTree, item => item.props?.id === 'side-rail-categories').props.hidden, true,
+  'A folded group is hidden, so its rows leave the tab order as well as the screen',
+);
+sideRail.effects();
+assert.equal(sideRailKeys.length, 1, 'The rail listens for the shortcut on the document');
+const pressShortcut = (patch = {}) => {
+  let prevented = false;
+  sideRailKeys[0]({ key: 'k', metaKey: false, ctrlKey: false, preventDefault: () => { prevented = true; }, ...patch });
+  return prevented;
+};
+assert.equal(pressShortcut(), false);
+assert.equal(sideRailClicks, 0, 'A plain K is left to the page');
+assert.equal(pressShortcut({ metaKey: true }), true);
+assert.equal(pressShortcut({ ctrlKey: true, key: 'K' }), true);
+assert.equal(sideRailClicks, 2, '⌘K and Ctrl+K both follow the search row, and swallow the key they used');
+
+console.log('UI tests passed: rail tap/hold/drag/cancel, desktop side-rail fold and shortcut, minute polling, detail structure, AA light tokens, device-default theme rule and auto-release guards.');

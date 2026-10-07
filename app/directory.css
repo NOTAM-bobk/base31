@@ -529,6 +529,113 @@ html[data-theme="light"] .explore-cta::after { opacity: 0.4; }
   .explore-cta::before, .explore-cta::after { animation: none; }
 }
 
+/* Desktop side rail ---------------------------------------------------
+   The wide screen's navigation: the same two lists the phone's drawer
+   carries — the directory's collections with the count of what each holds,
+   and the site's own pages — drawn down the left edge under the header, with
+   the search row at the top and the submission at the foot. It is a fixed
+   column, so the page scrolls behind it, and it exists only where there is
+   room for it: below 1200px it is not rendered at all and the header's links
+   and the drawer carry everything, which is why `display: none` is the base
+   rule and the rail is switched on inside one media query.
+
+   The rail takes its width out of the page instead of sitting over it, so
+   nothing is ever hidden under it: `body:has(.side-rail)` pays that width as
+   padding, which moves `main`'s centred column and the footer together. The
+   page band has to be told about the same thing — its full-bleed rule centres
+   `100vw` on the viewport, so the grey slab would otherwise start half a
+   rail's width to the left of the text and stop short of the right edge — and
+   the override at the end of this block re-measures it against the space the
+   column actually has. Those formulas are `late.css`'s own, re-aimed at that
+   narrower space, so the band's content stays level with the header and the
+   hero at every width the rail is shown. */
+:root { --rail-w: 248px; }
+.side-rail { display: none; }
+@media (min-width: 1200px) {
+  .side-rail {
+    position: fixed; top: 64px; left: 0; bottom: 0; z-index: 40;
+    display: flex; width: var(--rail-w); flex-direction: column; gap: 6px;
+    padding: 18px 14px calc(20px + env(safe-area-inset-bottom));
+    overflow-y: auto; overscroll-behavior: contain;
+    border-right: 1px solid var(--line);
+    background: var(--surface);
+  }
+  body:has(.side-rail) { padding-left: var(--rail-w); }
+  body:has(.side-rail) .page-band {
+    width: calc(100vw - var(--rail-w));
+    margin-left: calc(50% - (100vw - var(--rail-w)) / 2);
+    padding-left: max(32px, calc((100vw - var(--rail-w) - 1080px) / 2));
+    padding-right: max(32px, calc((100vw - var(--rail-w) - 1080px) / 2));
+  }
+
+  /* The search row: the field it stands for lives on /explore, so the row is
+     the trip there. The `⌘K` on the right is bound to the same trip
+     (components/side-rail.tsx), which is the only thing that makes printing a
+     shortcut honest. */
+  .side-rail-search {
+    display: flex; align-items: center; gap: 9px; margin-bottom: 8px;
+    padding: 9px 10px; border: 1px solid var(--line); border-radius: 11px;
+    background: var(--input-bg); color: var(--muted); font-size: 13px; text-decoration: none;
+    transition: border-color 150ms ease, color 150ms ease, background 150ms ease;
+  }
+  .side-rail-search:hover { border-color: var(--line-strong); background: var(--surface-hover); color: var(--text-strong); }
+  .side-rail-kbd {
+    margin-left: auto; padding: 2px 6px; border: 1px solid var(--line); border-radius: 6px;
+    color: var(--subtle); font-size: 10px; letter-spacing: 0.02em;
+  }
+  .side-rail-search:hover .side-rail-kbd { color: var(--muted); }
+
+  /* Rows. Both lists are the same row, so a collection and a page of the site
+     cannot drift into two different silhouettes. */
+  .side-rail-nav { display: flex; flex-direction: column; gap: 1px; }
+  .side-rail-link {
+    position: relative; display: flex; align-items: center; gap: 11px;
+    padding: 8px 10px; border-radius: 9px;
+    color: var(--muted); font-size: 13px; text-decoration: none;
+    transition: color 140ms ease, background 140ms ease;
+  }
+  .side-rail-link:hover { color: var(--text-strong); background: var(--surface-hover); }
+  .side-rail-icon { flex: 0 0 auto; color: var(--subtle); transition: color 140ms ease; }
+  .side-rail-link:hover .side-rail-icon, .side-rail-link.is-current .side-rail-icon { color: currentColor; }
+  .side-rail-label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .side-rail-meta { margin-left: auto; color: var(--subtle); font-size: 10.5px; font-variant-numeric: tabular-nums; }
+  /* The page you are already on: the row brightens and a bar appears on the
+     rail's own edge, so a glance down the column finds it before the labels do. */
+  .side-rail-link.is-current { color: var(--text-strong); background: color-mix(in srgb, var(--live) 9%, transparent); }
+  .side-rail-link.is-current::before {
+    position: absolute; top: 6px; bottom: 6px; left: -14px; width: 2px;
+    border-radius: 0 2px 2px 0; background: var(--live); content: "";
+  }
+
+  /* The collections, behind their own heading. Open by default — a visitor who
+     is here to browse wants the lists — but foldable, for the visitor who came
+     for one page and does not want twenty rows in the way. */
+  .side-rail-group { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--line); }
+  .side-rail-group-head {
+    display: flex; width: 100%; align-items: center; justify-content: space-between;
+    padding: 2px 10px 8px; border: 0; background: none;
+    color: var(--subtle); font: inherit; font-size: 10px; letter-spacing: 0.12em;
+    text-transform: uppercase; cursor: pointer;
+    transition: color 150ms ease;
+  }
+  .side-rail-group-head:hover { color: var(--text-strong); }
+  .side-rail-chevron { font-size: 12px; line-height: 1; transition: transform 180ms ease; }
+  .side-rail-chevron.is-open { transform: rotate(180deg); }
+
+  /* The one thing the rail asks for, at its foot: `margin-top: auto` holds it
+     against the bottom of the column however long the lists above it grow. */
+  .side-rail-submit {
+    display: flex; align-items: center; gap: 10px; margin-top: auto;
+    padding: 10px; border: 1px solid var(--line); border-radius: 11px;
+    background: var(--surface-hover); color: var(--text-strong);
+    font-size: 12.5px; text-decoration: none;
+    transition: border-color 150ms ease, background 150ms ease;
+  }
+  .side-rail-submit:hover { border-color: color-mix(in srgb, var(--live) 45%, var(--line)); }
+  .side-rail-submit-arrow { margin-left: auto; color: var(--subtle); }
+  .side-rail-submit:hover .side-rail-submit-arrow { color: var(--live); }
+}
+
 /* Mobile navigation drawer -------------------------------------------
    The phone's menu. The header button that opens it only exists below 820px
    (`.nav-toggle`), so a wide screen keeps the header links and the section

@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 
 // How long a figure takes to climb from zero to its final value. Deliberately
 // slow: the climb is meant to be watched, not missed on the way to something
-// else.
+// else. Both of the hero's figures use it, so they finish together.
 const COUNT_MS = 3400;
 
 /**
@@ -40,29 +40,47 @@ function useCountUp(target: number, duration = COUNT_MS) {
 }
 
 /**
- * The one figure the hero prints, directly above the directory's call to
+ * One figure and what it counts: the number, then its label.
+ *
+ * It is hidden from assistive technology on purpose. The line it sits in is
+ * named by its own `aria-label` — the sentence the figures spell out — so a
+ * screen reader reading both would say the same thing twice.
+ */
+function HeroFigure({ value, label }: { value: number; label: string }) {
+  return (
+    <span className="hero-stat" aria-hidden="true">
+      <span className="hero-stat-value">{value.toLocaleString()}</span>
+      <span className="hero-stat-label">{label}</span>
+    </span>
+  );
+}
+
+/**
+ * The two figures the hero prints, directly above the directory's call to
  * action: how many websites it links out to and how many collections those
  * websites are filed under.
  *
- * It is a sentence rather than a row of counters. Every other number on the
- * page is a list's own count, and the hero had two figures — reads and links —
- * that pulled in opposite directions: a read count is about the page, the
- * links are about the directory, and side by side neither read as the point.
- * The reads still live on /stats, where a number about the site belongs; what
- * is left here is the one claim the landing page exists to make. The count is a
- * live total (`directoryEntries` plus the site list), so it stays true as the
- * directory grows, and it is exactly the sum of the collections it names.
+ * Both are the same figure as far as a visitor is concerned, so both are drawn
+ * by the same markup and climb with the same hook. The categories count used to
+ * be plain words inside the first figure's label — which left one number
+ * animating and the other sitting still — and reading them as one sentence is
+ * still exactly what the line's `aria-label` does, so the sentence a screen
+ * reader hears is the one the two figures spell out. The count is the sum of
+ * the collections it names (`directorySections` in lib/sections.ts), so the two
+ * halves of that sentence cannot disagree, and it stays true as the directory
+ * grows.
  */
 export default function HeroStats({ sites, categories }: { sites: number; categories: number }) {
   const siteCount = useCountUp(sites);
-  const sentence = `${sites.toLocaleString()} websites linked across ${categories} ${categories === 1 ? "category" : "categories"}`;
+  const categoryCount = useCountUp(categories);
+  const categoryLabel = categories === 1 ? "category" : "categories";
+  const sentence = `${sites.toLocaleString()} websites linked across ${categories} ${categoryLabel}`;
 
   return (
     <p className="hero-stats" aria-label={sentence}>
-      <span className="hero-stat-value" aria-hidden="true">{siteCount.toLocaleString()}</span>
-      <span className="hero-stat-label" aria-hidden="true">
-        websites linked across {categories} {categories === 1 ? "category" : "categories"}
-      </span>
+      <HeroFigure value={siteCount} label="websites linked" />
+      <span className="hero-stat-join" aria-hidden="true">across</span>
+      <HeroFigure value={categoryCount} label={categoryLabel} />
     </p>
   );
 }

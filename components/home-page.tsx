@@ -19,7 +19,7 @@ import CoolSites from "@/components/cool-sites";
 import CoolApis from "@/components/cool-apis";
 import CoolApps from "@/components/cool-apps";
 import SiteHeader from "@/components/site-header";
-import NavDrawer, { type DrawerLink } from "@/components/nav-drawer";
+import NavDrawer, { type DrawerLink, type DrawerSearchItem } from "@/components/nav-drawer";
 import { useDialogFocus } from "@/lib/dialog-focus";
 import { LOCALES, type Dictionary, type Locale, EN } from "@/lib/i18n";
 import { resetConsent, useConsent } from "@/lib/consent";
@@ -84,6 +84,16 @@ const SECTION_PREVIEW = 9;
 // matcher keeps the JSX a plain list instead of a per-locale special case.
 const HERO_ACCENT_WORD = /^(not|no|nada|pas)$/i;
 const heroWordsOf = (title: string) => title.split(/\s+/).filter(Boolean);
+
+// What the phone drawer's own search answers with: a slim copy of every pick
+// in every collection — the name, the collection, the address of its detail
+// page, and the text the matcher reads. The panel lists the strongest few in
+// place instead of sending the visitor to /explore for a query it can already
+// answer, and it costs nothing extra to ship: `directoryEntries` is already in
+// this bundle. Built once, at module scope, so the prop keeps one identity.
+const drawerSearchIndex: DrawerSearchItem[] = directoryEntries.map(({ name, slug, url, section, description, tags }) => ({
+  name, slug, url, section, description, tags,
+}));
 
 const visibleSites = (sites as Site[]).filter((site) => site.show !== false);
 
@@ -1113,7 +1123,13 @@ export default function HomePage({ dict = EN, locale = "en", mode = "home" }: { 
 
       {/* The phone's menu: the search field and the category list, drawn over
           the page instead of under it. */}
-      <NavDrawer open={navOpen} onClose={() => setNavOpen(false)} categories={drawerCategories} more={drawerMore} />
+      <NavDrawer
+        open={navOpen}
+        onClose={() => setNavOpen(false)}
+        categories={drawerCategories}
+        more={drawerMore}
+        searchIndex={drawerSearchIndex}
+      />
 
       {/* The lines down the right edge: where you are, and the fast way
           between sections. */}

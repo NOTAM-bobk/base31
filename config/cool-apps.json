@@ -249,14 +249,6 @@
   },
   {
     "addedAt": "2026-09-30",
-    "name": "Radio Garden",
-    "category": "Media & sound",
-    "url": "https://radio.garden",
-    "tags": ["radio", "world"],
-    "description": "Spin a globe and drop into a live radio station anywhere on it — thousands of cities, playing what they play right now."
-  },
-  {
-    "addedAt": "2026-09-30",
     "name": "myNoise",
     "category": "Media & sound",
     "url": "https://mynoise.net",

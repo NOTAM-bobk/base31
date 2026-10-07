@@ -46,13 +46,31 @@ const externalLists = [
   { file: "cool-apis.json", label: "Cool API", count: 0 },
   { file: "cool-apps.json", label: "Cool app", count: 0 },
   { file: "cool-ais.json", label: "Cool AI", count: 0 },
+  { file: "no-code-ai.json", label: "No-code AI tool", count: 0 },
 ];
 const base31Host = /^https:\/\/[a-z0-9-]+\.base31\.org/;
+// The address to compare two picks by: trimmed, with any trailing slashes
+// dropped. Several entries were once listed twice under one collection
+// differing only by that slash, which the raw-string check below could not
+// see — `https://neal.fun` and `https://neal.fun/` are different strings and
+// the same website.
+const sameUrl = (value) => String(value).trim().replace(/\/+$/, "");
+// Which collection already claimed an address. `directoryEntries` keeps two
+// entries that share a URL when their sections differ, so a site listed in two
+// collections is not merged away: it is shown twice on /explore and published
+// as two detail pages. One pick belongs to one collection.
+const urlOwner = new Map();
 for (const list of externalLists) {
   const entries = JSON.parse(fs.readFileSync(path.join(root, "config", list.file), "utf8"));
   list.count = Array.isArray(entries) ? entries.length : 0;
   if (!Array.isArray(entries) || entries.length === 0) errors.push(`${list.file} needs at least one entry`);
-  checkUnique(entries.map((entry) => String(entry.url)), `${list.label} URL`);
+  checkUnique(entries.map((entry) => sameUrl(entry.url)), `${list.label} URL`);
+  for (const entry of entries) {
+    const url = sameUrl(entry.url);
+    const owner = urlOwner.get(url);
+    if (owner) errors.push(`${list.file} lists ${url}, which ${owner} already lists — a pick belongs to one collection`);
+    else urlOwner.set(url, list.file);
+  }
   for (const [index, entry] of entries.entries()) {
     const at = `${list.label} ${index + 1}`;
     for (const field of ["addedAt", "lastChecked"]) {
@@ -224,6 +242,6 @@ if (errors.length > 0) {
   process.exitCode = 1;
 } else {
   console.log(
-    `Content validation passed: ${sites.length} sites, ${posts.length} blog posts, ${referrals.length} referrals, ${donations.length} donations, ${releases.length} releases, ${guideBlocks.length} tool guides, ${externalLists[0].count} cool sites, ${externalLists[1].count} cool APIs, ${externalLists[2].count} cool apps, ${externalLists[3].count} cool AIs.`,
+    `Content validation passed: ${sites.length} sites, ${posts.length} blog posts, ${referrals.length} referrals, ${donations.length} donations, ${releases.length} releases, ${guideBlocks.length} tool guides, ${externalLists[0].count} cool sites, ${externalLists[1].count} cool APIs, ${externalLists[2].count} cool apps, ${externalLists[3].count} cool AIs, ${externalLists[4].count} no-code AI tools.`,
   );
 }

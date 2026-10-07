@@ -1,5 +1,19 @@
 [
   {
+    "version": "1.47.0",
+    "date": "2026-10-07",
+    "title": "A drawer that answers, and one grey everywhere",
+    "summary": "The phone menu can be dismissed by tapping beside it, folds its own lists away, and searches in place instead of sending you to the directory; every page outside the homepage now sits on the same grey; and the directory has no duplicate picks left.",
+    "highlights": [
+      "Tapping beside the open phone menu closes it. The full-screen overlay wrapped around the panel was taking pointer events of its own and swallowing every tap in the strip next to it; only the panel is interactive now, and that strip is always at least 56px wide.",
+      "The drawer's two lists each carry their own text control — Close folds a group away, Open brings it back — so a phone's short viewport is not a wall of links.",
+      "The drawer's search answers inside the drawer. The field is still a plain GET form to /explore, so it works before hydration and still makes a shareable link, but the panel now lists the six strongest matches and links each one to that pick's page.",
+      "Every page outside the homepage — site details, tags, tools, stats, the section pages — sits on the same grey the landing page's sections do, so a card looks the same on a detail page as it does at home.",
+      "A phone pass over the whole site: taps no longer wait out double-tap zoom, form fields are the 16px Safari will not zoom for, page heights follow the collapsing URL bar, and the full-bleed band and footer keep clear of a notch held sideways.",
+      "Six picks were listed twice in Other cool sites under addresses that differed only by a trailing slash, and three more appeared in two collections at once. The duplicates are gone, and content validation now compares those lists by address and fails a URL two of them both claim."
+    ]
+  },
+  {
     "version": "1.46.0",
     "date": "2026-10-06",
     "title": "A weekly pick, and an inbox for reports",

@@ -79,20 +79,6 @@
     "description": "A curated showcase of simply beautiful websites — proof that great design is not the same as heavy design."
   },
   {
-    "name": "Neal.fun",
-    "url": "https://neal.fun/",
-    "category": "Toys",
-    "tags": ["interactive", "games", "experiments", "design"],
-    "description": "A collection of beautifully made interactive web experiments, including space visualizations, drawing challenges, and playful simulations."
-  },
-  {
-    "name": "The Useless Web",
-    "url": "https://theuselessweb.com/",
-    "category": "Toys",
-    "tags": ["random", "weird", "fun", "discovery"],
-    "description": "Press one button to be sent to a random, pointless, strange, and entertaining website."
-  },
-  {
     "name": "Cloudhiker",
     "url": "https://cloudhiker.net/",
     "category": "Knowledge",
@@ -114,13 +100,6 @@
     "description": "Open a digital door and instantly discover a random image or place from somewhere on the internet."
   },
   {
-    "name": "Radio Garden",
-    "url": "https://radio.garden/",
-    "category": "Sounds",
-    "tags": ["music", "radio", "map", "world"],
-    "description": "Explore a 3D globe and tune into live radio stations from cities all around the world."
-  },
-  {
     "name": "Drive & Listen",
     "url": "https://driveandlisten.herokuapp.com/",
     "category": "Places",
@@ -133,13 +112,6 @@
     "category": "Places",
     "tags": ["weather", "data", "visualization", "science"],
     "description": "A mesmerizing live visualization of global wind, ocean currents, weather systems, and air conditions."
-  },
-  {
-    "name": "Pointer Pointer",
-    "url": "https://pointerpointer.com/",
-    "category": "Toys",
-    "tags": ["weird", "funny", "cursor", "random"],
-    "description": "Move your cursor anywhere on the screen and the site finds a photo of someone pointing directly at it."
   },
   {
     "name": "Cat Bounce",
@@ -177,25 +149,11 @@
     "description": "Use increasingly loud sound cues to find an invisible cow hidden somewhere on the page."
   },
   {
-    "name": "A Soft Murmur",
-    "url": "https://asoftmurmur.com/",
-    "category": "Sounds",
-    "tags": ["ambient", "sounds", "focus", "relaxing"],
-    "description": "Mix rain, thunder, wind, waves, café noise, and other ambient sounds into a custom background soundscape."
-  },
-  {
     "name": "WindowSwap",
     "url": "https://www.window-swap.com/",
     "category": "Places",
     "tags": ["travel", "video", "world", "ambient"],
     "description": "Look through video windows submitted by people around the world and experience views from their homes."
-  },
-  {
-    "name": "Zoomquilt",
-    "url": "https://zoomquilt.org/",
-    "category": "Art & calm",
-    "tags": ["art", "animation", "surreal", "interactive"],
-    "description": "An endlessly zooming collaborative painting — keep going deeper and the scene never stops unfolding."
   },
   {
     "name": "The Zen Zone",
@@ -275,25 +233,11 @@
     "description": "A classic demonstration of how dramatically different designs can be created using the same HTML and different CSS."
   },
   {
-    "name": "Coolors",
-    "url": "https://coolors.co/",
-    "category": "Design & code",
-    "tags": ["design", "colors", "ui", "tools"],
-    "description": "A fast color-palette generator for finding polished color combinations for websites, brands, and interfaces."
-  },
-  {
     "name": "Khroma",
     "url": "https://www.khroma.co/",
     "category": "Design & code",
     "tags": ["design", "colors", "ai", "branding"],
     "description": "An AI-powered color tool that learns your preferences and generates personalized color palette ideas."
-  },
-  {
-    "name": "Type Scale",
-    "url": "https://typescale.com/",
-    "category": "Design & code",
-    "tags": ["typography", "design", "ui", "frontend"],
-    "description": "A typography tool for creating balanced font-size scales and type systems for web projects."
   },
   {
     "name": "Spline",

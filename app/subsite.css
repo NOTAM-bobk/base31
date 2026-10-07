@@ -4,7 +4,7 @@
    /tools/<slug>, /recently-added, /quality-report and the per-section
    subsites at /explore/<section>.
 
-   Two things live here.
+   Three things live here.
 
    1. The path. Every one of those pages opens with the same
       `<nav class="breadcrumb mono">` — `base31.org / Tags / discovery` — and
@@ -15,12 +15,36 @@
       any accent colour, because it belongs to the site chrome and not to the
       content under it, and every subsite gets the same one.
 
-   2. The per-section explorer at /explore/<section>: the search field, the
+   2. The grey field. Every one of those pages sits on the same `--page-band`
+      grey the landing page's sections sit on, so a card looks the same on a
+      detail page as it does on the homepage.
+
+   3. The per-section explorer at /explore/<section>: the search field, the
       count, and the grid of cards that section owns.
 
    The token set is the one app/globals.css defines, with the light theme
    overridden rather than duplicated — the same way the rest of the sheets do
    it. */
+
+/* The grey field behind every page that is not the homepage ------------
+   The landing page lays its sections on the grey slab `--page-band` draws
+   (see the page-band block in app/late.css), so everything below its hero is
+   one continuous field. A subsite had no equivalent: /sites/<slug>, /tags,
+   /tools/<slug>, /stats and the rest each opened on the page's own
+   background and its cards sat on that instead, which made the same panels
+   look like they belonged to a different site. They all wear the same grey
+   now — the path band above every one of them is already a grey gradient, so
+   the page it sits on finally matches it.
+
+   It is set on <body> rather than on `main` on purpose: `main` is the
+   centered reading column, so painting it would leave the gutters on the old
+   colour and draw a visible box down the middle of the window. The homepage
+   is the single exception — it renders `<main class="home-main">` with
+   `.page-band` inside it, and that band's own gradient has to start at
+   `--background` — and `:has()` lets the exception be named in one place
+   instead of being repeated on every subsite route. A browser too old for
+   `:has()` keeps exactly the page background it has today. */
+body:has(main:not(.home-main)) { background: var(--page-band); }
 
 .breadcrumb {
   display: flex;

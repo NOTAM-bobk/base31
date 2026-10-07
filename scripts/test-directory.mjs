@@ -216,6 +216,58 @@ assert.ok(drawerSource.includes("useDialogFocus"), "The drawer traps focus while
 assert.ok(drawerSource.includes('event.key === "Escape"'), "The drawer closes on Escape");
 assert.ok(drawerSource.includes('document.body.style.overflow = "hidden"'), "The page behind the drawer does not scroll");
 assert.ok(drawerSource.includes('aria-hidden={!open}'), "The closed drawer is hidden from assistive technology");
+// The panel's own behaviour since it grew result rows and fold controls. The
+// full-screen overlay wrapped around the panel used to take pointer events of
+// its own, which put it above the scrim and swallowed every tap in the strip
+// beside the panel — so the drawer could not be dismissed by tapping out at
+// all. Only the panel may be interactive.
+assert.ok(drawerSource.includes("onClick={onClose}"), "Tapping the scrim beside the panel closes the drawer");
+assert.ok(
+  !/\.nav-drawer\.is-open \{ visibility: visible; pointer-events: auto; \}/.test(fs.readFileSync("app/directory.css", "utf8")),
+  "The overlay around the panel must not take pointer events, or it swallows the tap meant for the scrim",
+);
+assert.match(
+  fs.readFileSync("app/directory.css", "utf8"),
+  /\.nav-drawer\.is-open \.nav-drawer-panel \{[^}]*pointer-events: auto/,
+  "Only the panel itself is interactive",
+);
+assert.ok(
+  drawerSource.includes('{exploreOpen ? "Close" : "Open"}') && drawerSource.includes('{moreOpen ? "Close" : "Open"}'),
+  "Each list in the drawer carries a text control that folds it away",
+);
+assert.ok(drawerSource.includes("aria-expanded={exploreOpen}"), "A fold control reports whether its group is open");
+assert.ok(drawerSource.includes("searchScore"), "The panel ranks its own results with the directory's own rule");
+assert.ok(drawerSource.includes("href={`/sites/${item.slug}`}"), "A result listed in the panel opens that pick's detail page");
+assert.ok(drawerSource.includes("href={`/explore?q=${encodeURIComponent(trimmed)}`}"), "The panel still hands the query to the full directory");
+assert.ok(home.includes("searchIndex={drawerSearchIndex}"), "The homepage hands the drawer the index its own search reads");
+// Every page outside the homepage sits on the same grey the landing page's
+// sections do, so a card looks the same on a detail page as it does at home.
+assert.ok(
+  fs.readFileSync("app/subsite.css", "utf8").includes("body:has(main:not(.home-main)) { background: var(--page-band); }"),
+  "Subsites paint the same page-band grey the landing page's sections sit on",
+);
+// The panel's results are only real if each row opens a page that exists. The
+// drawer reads the same slim index the homepage builds (`drawerSearchIndex`)
+// and ranks it with `searchScore`, the rule the "Best matches" block uses, so
+// this runs that same pipeline over the real entries: a query has to produce
+// results, and every result has to name a published detail page.
+const search = load("lib/search.ts");
+const drawerIndex = entries.map(({ name, slug, url, section, description, tags }) => ({ name, slug, url, section, description, tags }));
+assert.equal(drawerIndex.length, entries.length, "The drawer's index covers every pick in every collection");
+const rankForDrawer = (query) => drawerIndex
+  .map((item) => ({ item, score: search.searchScore(item, query) }))
+  .filter((ranked) => ranked.score > 0)
+  .sort((a, b) => b.score - a.score || a.item.name.localeCompare(b.item.name))
+  .slice(0, 6)
+  .map((ranked) => ranked.item);
+assert.ok(rankForDrawer("canvas").length > 0, "A drawer search answers with something");
+for (const query of ["canvas", "radio", "#game", "free tools"]) {
+  for (const item of rankForDrawer(query)) {
+    assert.ok(entries.some((entry) => entry.slug === item.slug), `A drawer result (${item.name}) must have a detail page to open`);
+  }
+}
+assert.equal(rankForDrawer("no-such-pick-xyz").length, 0, "A query nothing matches answers with nothing");
+assert.equal(rankForDrawer("   ").length, 0, "An empty field lists no results at all");
 const headerSource = fs.readFileSync("components/site-header.tsx", "utf8");
 assert.ok(headerSource.includes('className="icon-button nav-toggle"'), "The header carries the drawer button");
 assert.ok(headerSource.includes('href="/explore"'), "The header links the directory at every width");

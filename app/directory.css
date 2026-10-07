@@ -420,7 +420,16 @@ html[data-theme="light"] .explore-cta { box-shadow: 0 8px 22px rgb(0 0 0 / 6%), 
    target, and Escape and the panel's own close button are the other two ways
    out (components/nav-drawer.tsx). It is mounted at every width and hidden
    with `visibility` rather than `display`, so it can transition both ways and
-   so nothing inside it is reachable by keyboard while it is shut. */
+   so nothing inside it is reachable by keyboard while it is shut.
+
+   The wrapper `.nav-drawer` is a full-viewport overlay that is painted above
+   the scrim, so it must take no pointer events of its own: with
+   `pointer-events: auto` on it, every tap in the strip beside the panel landed
+   on the overlay instead of the scrim underneath and the drawer could not be
+   dismissed by tapping out at all. Only the panel is interactive; the rest of
+   the overlay is transparent to the pointer, which lets the tap through to the
+   scrim. The panel also stops 56px short of the left edge at every width, so
+   that strip is always wide enough to aim at. */
 .nav-toggle { display: none; }
 @media (max-width: 819px) { .nav-toggle { display: inline-flex; } }
 
@@ -438,9 +447,9 @@ html[data-theme="light"] .nav-drawer-scrim { background: rgb(0 0 0 / 32%); }
   display: flex; justify-content: flex-end;
   visibility: hidden; pointer-events: none;
 }
-.nav-drawer.is-open { visibility: visible; pointer-events: auto; }
+.nav-drawer.is-open { visibility: visible; }
 .nav-drawer-panel {
-  display: flex; width: min(360px, 88vw); height: 100%; flex-direction: column;
+  display: flex; width: min(360px, calc(100vw - 56px)); height: 100%; flex-direction: column;
   padding: 18px 18px calc(26px + env(safe-area-inset-bottom));
   overflow-y: auto; overscroll-behavior: contain;
   border-left: 1px solid var(--line-strong);
@@ -449,7 +458,7 @@ html[data-theme="light"] .nav-drawer-scrim { background: rgb(0 0 0 / 32%); }
   transform: translateX(101%);
   transition: transform 260ms cubic-bezier(.22,.68,.24,1);
 }
-.nav-drawer.is-open .nav-drawer-panel { transform: none; }
+.nav-drawer.is-open .nav-drawer-panel { transform: none; pointer-events: auto; }
 .nav-drawer-panel:focus { outline: none; }
 @media (prefers-reduced-motion: reduce) { .nav-drawer-panel { transition: none; } }
 
@@ -491,7 +500,29 @@ html[data-theme="light"] .nav-drawer-scrim { background: rgb(0 0 0 / 32%); }
 .nav-drawer-go:active { transform: scale(0.97); }
 
 .nav-drawer-label { margin: 24px 0 8px; }
+
+/* A group's own row is a button, so a visitor can fold the list away instead
+   of scrolling past it: the label on the left, the action word on the right.
+   It is 44px tall like every other row in here — a text control a thumb can
+   still hit — and it carries no other affordance, which is what makes the
+   word "Close" the thing to press. */
+.nav-drawer-group { margin-top: 24px; }
+.nav-drawer-group-toggle {
+  display: flex; width: 100%; align-items: center; justify-content: space-between; gap: 12px;
+  min-height: 44px; padding: 8px 11px;
+  border: 1px solid transparent; border-radius: 10px;
+  background: transparent; font: inherit; text-align: left; cursor: pointer;
+  transition: background 150ms ease, border-color 150ms ease;
+}
+.nav-drawer-group-toggle:hover { border-color: var(--line); background: var(--surface-hover); }
+.nav-drawer-group-toggle .eyebrow { margin: 0; }
+.nav-drawer-group-action { color: var(--live); font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; }
+.nav-drawer-group-toggle[aria-expanded="false"] .nav-drawer-group-action { color: var(--muted); }
+
 .nav-drawer-links { display: grid; gap: 2px; }
+/* The `hidden` attribute is how a folded group disappears; a grid display
+   would otherwise outrank the browser's own `display: none` for it. */
+.nav-drawer-links[hidden] { display: none; }
 .nav-drawer-links a {
   display: flex; align-items: center; justify-content: space-between; gap: 12px;
   min-height: 44px; padding: 10px 11px; border-radius: 10px;
@@ -501,6 +532,29 @@ html[data-theme="light"] .nav-drawer-scrim { background: rgb(0 0 0 / 32%); }
 .nav-drawer-links a:hover { background: var(--surface-hover); color: var(--live); }
 .nav-drawer-meta { color: var(--subtle); font-size: 10px; }
 .nav-drawer-links.is-secondary a { color: var(--muted); font-size: 12.5px; }
+
+/* Search results, inside the panel -------------------------------------
+   The field used to be a way out to /explore and nothing else: type, submit,
+   leave the page. It answers in place now (see components/nav-drawer.tsx) —
+   the rows below are the same 44px rows as the categories, with the
+   collection printed quietly on the right, and the last row hands the query
+   to the full directory when six results are not enough. */
+.nav-drawer-results { margin-top: 4px; }
+.nav-drawer-links.is-results a { align-items: baseline; }
+.nav-drawer-result-name { min-width: 0; overflow-wrap: anywhere; }
+.nav-drawer-links.is-results .nav-drawer-meta {
+  flex: 0 0 auto; max-width: 45%; overflow: hidden;
+  text-overflow: ellipsis; white-space: nowrap; text-transform: uppercase;
+}
+.nav-drawer-empty { margin: 4px 0 0; padding: 4px 11px; color: var(--muted); font-size: 12.5px; line-height: 1.6; }
+.nav-drawer-all {
+  display: flex; min-height: 44px; align-items: center; gap: 8px;
+  margin-top: 10px; padding: 8px 11px;
+  border-top: 1px solid var(--line); border-radius: 0 0 10px 10px;
+  color: var(--live); font-size: 11px; text-decoration: none;
+}
+.nav-drawer-all:hover { text-decoration: underline; text-underline-offset: 3px; }
+.nav-drawer-group-toggle:focus-visible, .nav-drawer-all:focus-visible { outline: 2px solid var(--live); outline-offset: 2px; }
 
 @media (max-width: 600px) {
   .explore-cta { margin: 26px auto 0; }
@@ -678,4 +732,58 @@ html[data-theme="light"] .top-ten-rank { -webkit-text-stroke-color: color-mix(in
   .weekly-pick-week { margin-left: 0; }
   .weekly-pick-name { margin-top: 11px; font-size: 14px; }
   .weekly-pick-story { font-size: 12px; }
+}
+
+/* Mobile pass -----------------------------------------------------------
+   One pass over the phone experience, kept here because directory.css already
+   owns the narrow-width rules — `main`'s gutters, the header's breakpoint,
+   the drawer — and loads late enough to win over globals.css without a new
+   sheet. Four things a narrow, touch-first viewport does that a desktop one
+   never shows, plus the safe areas a notched phone needs:
+
+   1. Double-tap zoom. A tap on a link or a button is held back while the
+      browser waits to see whether a second tap is coming, and a quick second
+      tap zooms the page instead of opening whatever is under the finger.
+      `touch-action: manipulation` removes both delays and keeps pinch-zoom,
+      so a visitor can still zoom on purpose.
+
+   2. iOS form zoom. Safari zooms the whole page when a field under 16px takes
+      focus, which leaves the visitor scrolled sideways mid-sentence. Every
+      field a phone can focus is lifted to 16px — the threshold that behaviour
+      keys on — rather than switching zoom off with `maximum-scale`, which
+      would take zoom away from everyone.
+
+   3. A collapsing browser bar. On a phone `100vh` means "the viewport with
+      the URL bar out of the way", so a page sized from it leaves a strip of
+      empty scroll under the footer while the bar is showing. `100dvh` tracks
+      the height the page actually has.
+
+   4. The notch. Held sideways, a phone puts its sensor housing over the left
+      edge of the screen; the full-bleed band and the footer move their own
+      padding clear of it with `env(safe-area-inset-*)`, which resolves to 0
+      everywhere that has no cutout. */
+@media (pointer: coarse) {
+  a, button, input, select, textarea, summary, [role="button"] { touch-action: manipulation; }
+}
+
+@media (max-width: 819px) {
+  /* The honeypot and the hidden file picker take the rule too; neither is
+     ever seen, and one selector beats a list that goes stale. */
+  input:not([type="checkbox"]):not([type="radio"]), select, textarea { font-size: 16px; }
+}
+
+@supports (height: 100dvh) {
+  main { min-height: calc(100dvh - 129px); }
+  .privacy-page, .stats-page, .admin-shell, .page-state { min-height: 100dvh; }
+}
+
+@media (max-width: 600px) {
+  .page-band {
+    padding-left: max(12px, env(safe-area-inset-left));
+    padding-right: max(12px, env(safe-area-inset-right));
+  }
+  .site-footer-inner {
+    padding-left: max(0px, env(safe-area-inset-left));
+    padding-right: max(0px, env(safe-area-inset-right));
+  }
 }

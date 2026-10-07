@@ -113,14 +113,19 @@ page, its canonical metadata, its sitemap line, the count on its key row and the
 rule a search uses to decide whether it stays on screen all follow. The two key
 rows and the phone drawer still carry a row of their own, because each also
 needs its own count text and href shape; `npm run test:directory` fails if any
-hash the drawer offers is missing from the registry.
+hash the drawer offers is missing from the registry. The phone drawer also
+searches in place, so a new collection is reachable from there: it lists the
+strongest six matches by `searchScore` and links each to that pick's
+`/sites/<slug>` page.
 
 Shared components live in `components/`. Styling uses hand-written
 CSS; `app/directory.css` owns editor's picks, the Top 10, the refreshed
 featured cards, the tag shelf and the mobile navigation drawer, and
 `app/subsite.css` (loaded last) owns the pages outside the homepage: the path
-band at the top of every subsite with its grey gradient, the Best matches block
-and the per-section explorer.
+band at the top of every subsite with its grey gradient, the `--page-band` grey
+those pages sit on, the Best matches block and the per-section explorer. A pick
+belongs to one collection: `npm run validate:content` fails a URL that two of
+the external lists both claim.
 Read the README's style load order before changing overrides. Prefer the existing CSS custom properties and component
 patterns over new abstractions.
 

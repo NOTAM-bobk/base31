@@ -560,6 +560,34 @@ assert.ok(fs.readFileSync("app/late.css", "utf8").includes('html[data-motion="en
 assert.equal((home.match(/<SiteWeb \/>/g) || []).length, 1, "The landing page renders the web once");
 assert.ok(home.includes('{ id: "site-web", label: "The web" }'), "The rail walks the page and names the web");
 
+// The map is free-standing: no panel is drawn around it, and a hairline rule
+// separates it from the tag shelf above, because the two are different ways of
+// browsing the same picks and the map's bigger picture should not read as one
+// more block of the shelf. The map's own rule says how much air it wants under
+// that line, since `margin` is a shorthand and would reset `margin-top`.
+const lateCss = fs.readFileSync("app/late.css", "utf8");
+const webRule = lateCss.match(/\.site-web \{([\s\S]*?)\}/);
+assert.ok(webRule, "The map still has a rule of its own to draw it");
+assert.ok(
+  /border: 0/.test(webRule[1]) && /background: radial-gradient/.test(webRule[1]) && !/box-shadow: var\(--shadow\)/.test(webRule[1]),
+  "The map stands on the page band with no border, surface or shadow around it",
+);
+assert.ok(lateCss.includes(".section-divider + .site-web"), "The rule above the map owns the air under the line");
+assert.ok(
+  home.slice(home.indexOf('<section id="browse-tags"'), home.indexOf("<SiteWeb />")).includes('<hr className="section-divider"'),
+  "A hairline separates the tag shelf from the map",
+);
+
+// Its controls. The wander pick comes from the platform's entropy source rather
+// than from the hash the geometry uses, so pressing the button is a surprise
+// while the two renderings still agree; the label and the met count are both
+// the visitor's own, the first drawn on the canvas, the second kept in their
+// browser like the fire button's own count.
+assert.ok(siteWeb.includes('className="site-web-wander"'), "The map offers a wander control");
+assert.ok(siteWeb.includes("crypto.getRandomValues"), "The wander pick comes from the platform's entropy source");
+assert.ok(siteWeb.includes('className="site-web-label-name"') && lateCss.includes(".site-web-label-name"), "The hot node is named on the canvas itself");
+assert.ok(siteWeb.includes('className="site-web-met-fill"') && siteWeb.includes("base31-web-met"), "The map keeps count of the picks a visitor has met, in their own browser");
+
 // SEO: the question people really ask about the useless web is answered on the
 // page, repeated in the FAQPage structured data, and spelled out for an
 // assistant in llms.txt. Nothing is claimed that the directory cannot show.

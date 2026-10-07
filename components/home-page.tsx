@@ -1396,6 +1396,14 @@ export default function HomePage({ dict = EN, locale = "en", mode = "home" }: { 
             </div>
           </section>
 
+          {/* A hairline between the shelf and the map. Both are ways of
+              browsing by shape rather than by name — the tags index the picks
+              by their labels, the map draws where they sit — and without the
+              rule the map's larger picture reads as one more block of the
+              shelf above it. The map's own rule in app/late.css says how much
+              air it wants under this line. */}
+          <hr className="section-divider" aria-hidden="true" />
+
           {/* The site web closes the browsing half: the whole directory drawn
               as one branching map, hubs for its collections and a thread for
               every pick. It is built from the same registry and the same entry

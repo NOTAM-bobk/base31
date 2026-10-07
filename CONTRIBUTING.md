@@ -131,13 +131,26 @@ which keeps a list of timestamps per key and drops the ones older than
 twenty-four hours as it reads them.
 
 The site web (`components/site-web.tsx`) is the branching map of the whole
-directory at the foot of the landing page's browsing half. Its hubs and leaves
-come from `lib/sections.ts` and `lib/directory.ts`, so a new pick needs no edit
-in the component — which also means the picture is only right while those two
-stay the single source of truth for collections and entries. Keep the geometry
-free of `Math.random()` and of the clock: it is computed once at module scope
-from a hash of each slug, and that is what keeps the server and the browser
-drawing the same picture. Its rules are at the foot of `app/late.css`.
+directory at the foot of the landing page's browsing half, with a hairline
+`<hr class="section-divider">` between it and the tag shelf above. Its hubs and
+leaves come from `lib/sections.ts` and `lib/directory.ts`, so a new pick needs
+no edit in the component — which also means the picture is only right while
+those two stay the single source of truth for collections and entries. Keep the
+geometry free of `Math.random()` and of the clock: it is computed once at module
+scope from a hash of each slug, and that is what keeps the server and the
+browser drawing the same picture. Its rules are at the foot of `app/late.css`,
+and none of them draws a panel: the map has no border, surface or shadow of its
+own, only a radial glow behind the canvas, and the `.section-divider + .site-web`
+rule beside it owns the air under that hairline.
+
+The map's own controls are the visitor's rather than the directory's. `Wander
+the web` is the one place a random number is allowed in the component — taken
+from `crypto.getRandomValues` at the press, never at module scope, so hydration
+is untouched — and it lights a leaf the geometry has already placed rather than
+moving anything. The node under the pointer is named in SVG on the canvas, and
+the met count is kept in `base31-web-met` in the visitor's own browser, beside
+their votes and their fires, with a reset button because nothing else can clear
+it. Keep anything else that wants a random number or the clock out of this file.
 
 Shared components live in `components/`. Styling uses hand-written
 CSS; `app/directory.css` owns editor's picks, the Top 10, the website of the

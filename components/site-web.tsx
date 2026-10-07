@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { CSSProperties, FocusEvent } from "react";
 import { directoryEntries } from "@/lib/directory";
+import { tick } from "@/lib/haptics";
 import { directorySections } from "@/lib/sections";
 
 /* The site web: the whole directory drawn as one branching graph.
@@ -18,14 +19,17 @@ import { directorySections } from "@/lib/sections";
    appears on the next build with no edit in this file, which is what makes the
    map maintain itself.
 
-   Two decisions are worth knowing about before changing anything here.
+   Three decisions are worth knowing about before changing anything here.
 
    1. The geometry is computed once, at module scope, and rounded to a tenth of
    a pixel. The server and the browser each run this file, so a layout that
    depended on `Math.random()` or on a live clock would hydrate differently on
    every visit — React would then throw a mismatch. A stable hash of each
    slug supplies the small irregularity that stops the picture looking like a
-   printout, so the same input always gives the same picture.
+   printout, so the same input always gives the same picture. The one number
+   that should *be* a surprise — which pick the wander button lights — is drawn
+   from the platform's entropy source at the moment the visitor asks for it, so
+   the picture still hydrates identically and the button still surprises.
 
    2. Every node is a real `<a href>`, not an onClick handler: a hub opens its
    collection's page (`/explore/<id>`) and a leaf opens its pick
@@ -34,14 +38,23 @@ import { directorySections } from "@/lib/sections";
    before any JavaScript has run. Hovering or focusing anything lights its whole
    branch and dims the rest, which is the "how does this link up" answer.
 
-   The drawing is decoration with real links in it, so the SVG carries a short
+   3. The drawing is decoration with real links in it, so the SVG carries a short
    `aria-label` and a second, visually-hidden list under it names every
    collection with its count — a screen reader does not have to read 200 nodes
    to learn what the map says. Motion is the site's own rule: the idle drift
    only runs while <html> has `data-motion="enabled"` (set by the pre-paint
    script in app/layout.tsx for visitors who have not asked for reduced
    motion), and app/late.css drops it entirely under
-   `prefers-reduced-motion: reduce`. */
+   `prefers-reduced-motion: reduce`.
+
+   The map is not a panel. There is no box drawn around it — the canvas, its
+   heading and its controls sit on the page band itself, and the only thing
+   behind them is a soft glow (see the foot of app/late.css). Everything
+   interactive is on the canvas: the hot node's name is written next to it,
+   `Wander the web` lights a pick at random and the line beneath the canvas
+   offers the visit it just named, and the small bar under that counts the picks
+   this visitor has met, which is kept in their browser rather than on the
+   server. */
 
 // The canvas. A 1000x600 box scaled to the container keeps the proportions
 // right at every width; the hubs sit on this ellipse and each cluster spreads
@@ -168,32 +181,146 @@ const LEAVES: Leaf[] = (() => {
   return placed;
 })();
 
+/** Every slug the map can hand a visitor, for the met-count lookup below. */
+const LEAF_SLUGS = new Set(LEAVES.map((leaf) => leaf.slug));
+
+// The picks this visitor has already met, kept beside the votes and the fires
+// in localStorage. Like those two it is a keepsake rather than a record: the
+// server never sees it, nothing depends on it, and a cleared browser starts the
+// count again at zero.
+const MET_STORAGE_KEY = "base31-web-met";
+
 /** What the label over the canvas says when nothing is under the pointer. */
 const IDLE_TIP = "Hover, tap or tab a node to light its branch — every node opens its own page.";
 
-type Highlight = { sectionId: string; label: string; note: string };
+type Highlight = {
+  sectionId: string;
+  label: string;
+  note: string;
+  x: number;
+  y: number;
+  /** Set on a leaf: what the tip's visit link opens. Absent on a hub. */
+  slug?: string;
+};
+
+/** The hot state a leaf produces, so hovering and wandering describe it alike. */
+const describeLeaf = (leaf: Leaf): Highlight => ({
+  sectionId: leaf.sectionId,
+  label: leaf.name,
+  note: `${leaf.sectionLabel}${leaf.category ? ` · ${leaf.category}` : ""}`,
+  x: leaf.x,
+  y: leaf.y,
+  slug: leaf.slug,
+});
+
+/** The picks met so far, narrowed to the ones the directory still lists. */
+const readMet = (): Set<string> => {
+  try {
+    const saved: unknown = JSON.parse(localStorage.getItem(MET_STORAGE_KEY) || "[]");
+    if (!Array.isArray(saved)) return new Set();
+    return new Set(saved.filter((slug): slug is string => typeof slug === "string" && LEAF_SLUGS.has(slug)));
+  } catch {
+    return new Set();
+  }
+};
+
+/**
+ * One index out of `length`, never the one already lit.
+ *
+ * The geometry avoids `Math.random()` so both sides of the hydration agree on
+ * it, but a wander button that always landed on the same node would be a puzzle
+ * instead of a wander. This is the one number that is better off random, so it
+ * comes from the platform's entropy source — and only at the moment the visitor
+ * presses the button, which is long after the two renderings have to match.
+ */
+const pickIndex = (length: number, avoid: number): number => {
+  if (length <= 1) return 0;
+  let index = 0;
+  if (typeof crypto !== "undefined" && typeof crypto.getRandomValues === "function") {
+    const draws = crypto.getRandomValues(new Uint32Array(1));
+    index = (draws[0] ?? 0) % length;
+  }
+  if (index === avoid) index = (index + 1) % length;
+  return index;
+};
 
 export default function SiteWeb() {
-  // `hot` is the branch under the pointer (or holding focus). It starts null on
-  // the server and on the first client render, so the two markups match; only a
-  // real interaction ever changes it.
-  const [hot, setHot] = useState<Highlight | null>(null);
+  // `hover` is the node under the pointer (or holding focus) and `wanderIndex`
+  // points at the pick the button lit. Both start empty on the server and on
+  // the first client render, so the two markups match; only a real interaction
+  // ever fills them. A wandered pick stays lit after the pointer leaves the
+  // canvas, which is why the two are separate states rather than one: leaving
+  // the map hands the branch back to the pick you asked to see, and the button
+  // clears the hover when it is pressed so the tip describes that pick rather
+  // than whatever the pointer was last over.
+  const [hover, setHover] = useState<Highlight | null>(null);
+  const [wanderIndex, setWanderIndex] = useState<number | null>(null);
+  const [met, setMet] = useState<Set<string>>(() => new Set());
 
-  const highlightHub = (hub: Hub) => setHot({ sectionId: hub.id, label: hub.label, note: `${hub.count} ${hub.unit}` });
-  const highlightLeaf = (leaf: Leaf) =>
-    setHot({
-      sectionId: leaf.sectionId,
-      label: leaf.name,
-      note: `${leaf.sectionLabel}${leaf.category ? ` · ${leaf.category}` : ""}`,
-    });
-  // Leaving the panel clears the highlight; a blur only clears it when focus
-  // has actually left the whole graph, or tabbing between nodes would flicker.
+  // The count lives in the visitor's browser, so it can only be read after
+  // mount: the server has no way to know it, and rendering it during hydration
+  // would be a guess that React would then have to correct. Reading it in an
+  // effect keeps the first paint on both sides identical.
+  useEffect(() => {
+    setMet(readMet());
+  }, []);
+
+  const wanderLeaf = wanderIndex === null ? null : LEAVES[wanderIndex] ?? null;
+  const hot = hover ?? (wanderLeaf ? describeLeaf(wanderLeaf) : null);
+
+  const meet = (slug: string) => {
+    if (met.has(slug)) return;
+    const next = new Set(met).add(slug);
+    setMet(next);
+    try {
+      localStorage.setItem(MET_STORAGE_KEY, JSON.stringify([...next]));
+    } catch {
+      // Storage can be full or switched off; the count is a keepsake, not state.
+    }
+  };
+
+  const forgetMet = () => {
+    setMet(new Set());
+    try {
+      localStorage.removeItem(MET_STORAGE_KEY);
+    } catch {
+      // Nothing to undo if the write was never possible in the first place.
+    }
+  };
+
+  const highlightHub = (hub: Hub) =>
+    setHover({ sectionId: hub.id, label: hub.label, note: `${hub.count} ${hub.unit}`, x: hub.x, y: hub.y });
+  const highlightLeaf = (leaf: Leaf) => {
+    setHover(describeLeaf(leaf));
+    meet(leaf.slug);
+  };
+  // Leaving the panel clears the pointer's highlight; a blur only clears it when
+  // focus has actually left the whole graph, or tabbing between nodes would
+  // flicker.
   const handleBlur = (event: FocusEvent<HTMLElement>) => {
-    if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setHot(null);
+    if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setHover(null);
+  };
+
+  const wander = () => {
+    const index = pickIndex(LEAVES.length, wanderIndex ?? -1);
+    const leaf = LEAVES[index];
+    setWanderIndex(index);
+    if (!leaf) return;
+    setHover(null);
+    meet(leaf.slug);
+    tick(14);
   };
 
   const summary = `${HUBS.length} collections and ${LEAVES.length} picks`;
   const activeSection = hot?.sectionId ?? null;
+  const visit = hot?.slug ?? null;
+  // The label grows away from the middle of the canvas, so a name near an edge
+  // opens inward instead of running off the picture, and it sits above its node
+  // unless the node is at the very top.
+  const labelFlipped = hot ? hot.x > VIEW_WIDTH * 0.62 : false;
+  const labelX = hot ? round(hot.x + (labelFlipped ? -16 : 16)) : 0;
+  const labelY = hot ? round(hot.y < 60 ? hot.y + 30 : hot.y - 16) : 0;
+  const metPercent = Math.round((met.size / Math.max(1, LEAVES.length)) * 100);
 
   return (
     <section
@@ -201,7 +328,7 @@ export default function SiteWeb() {
       className={`site-web directory-section${hot ? " is-dimmed" : ""}`}
       data-reveal
       aria-labelledby="site-web-heading"
-      onMouseLeave={() => setHot(null)}
+      onMouseLeave={() => setHover(null)}
       onBlur={handleBlur}
     >
       <div className="site-web-head">
@@ -240,6 +367,11 @@ export default function SiteWeb() {
             ))}
           </g>
           <g className="site-web-nodes">
+            {/* The ripple that marks where the wander button landed. Drawn
+                under the dots so it reads as a wave leaving the pick. */}
+            {wanderLeaf && (
+              <circle className="site-web-aim" cx={wanderLeaf.x} cy={wanderLeaf.y} r={7} aria-hidden="true" />
+            )}
             {LEAVES.map((leaf) => (
               <a
                 key={leaf.slug}
@@ -272,6 +404,29 @@ export default function SiteWeb() {
               </a>
             ))}
           </g>
+          {/* What you are pointing at, named where you are pointing. The line
+              under the canvas says the same thing for anyone who cannot see
+              this, so the label is decoration. */}
+          {hot && (
+            <g className="site-web-label" aria-hidden="true">
+              <text
+                className="site-web-label-name"
+                x={labelX}
+                y={labelY}
+                textAnchor={labelFlipped ? "end" : "start"}
+              >
+                {hot.label}
+              </text>
+              <text
+                className="site-web-label-note"
+                x={labelX}
+                y={labelY + 13}
+                textAnchor={labelFlipped ? "end" : "start"}
+              >
+                {hot.note}
+              </text>
+            </g>
+          )}
         </svg>
       </div>
 
@@ -279,11 +434,34 @@ export default function SiteWeb() {
         {hot ? (
           <>
             <strong>{hot.label}</strong> <span className="site-web-tip-note mono">{hot.note}</span>
+            {visit && (
+              <a className="site-web-tip-visit" href={`/sites/${visit}`} onClick={() => tick(12)}>
+                Visit <span aria-hidden="true">→</span>
+              </a>
+            )}
           </>
         ) : (
           IDLE_TIP
         )}
       </p>
+
+      {/* The map's one control, and the count of how much of it this visitor has
+          walked past. Both are quiet: the picture is the point. */}
+      <div className="site-web-controls">
+        <button type="button" className="site-web-wander" onClick={wander}>
+          <span className="site-web-wander-icon" aria-hidden="true">✦</span>
+          <span>{wanderLeaf ? "Wander again" : "Wander the web"}</span>
+        </button>
+        <div className="site-web-met">
+          <span className="site-web-met-bar" aria-hidden="true">
+            <span className="site-web-met-fill" style={{ width: `${metPercent}%` }} />
+          </span>
+          <span className="site-web-met-label mono">{met.size} / {LEAVES.length} picks met</span>
+          {met.size > 0 && (
+            <button type="button" className="site-web-met-reset" onClick={forgetMet}>Reset</button>
+          )}
+        </div>
+      </div>
 
       <ul className="site-web-legend">
         {HUBS.map((hub) => (
@@ -306,7 +484,8 @@ export default function SiteWeb() {
           picture — and cheap enough to print instead of 200 node labels. */}
       <p className="sr-only">
         A map of the base31.org directory, {summary}. {HUBS.map((hub) => `${hub.label}: ${hub.count} ${hub.unit}, at /explore/${hub.id}`).join(". ")}. Every
-        pick is also listed at /explore, and each has its own page under /sites.
+        pick is also listed at /explore, and each has its own page under /sites. A button below the map lights one pick at
+        random, and the count beside it remembers how many of the {LEAVES.length} picks this visitor has pointed at.
       </p>
     </section>
   );

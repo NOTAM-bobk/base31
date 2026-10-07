@@ -610,7 +610,20 @@ assert.ok(behaviors.includes("wakeLock.request"), "Screen Wake Lock stays");
 assert.ok(behaviors.includes("base31:scroll:"), "Scroll-position resume stays");
 
 // The landing page's way into the directory is centred on the hero.
-assert.match(fs.readFileSync("app/directory.css", "utf8"), /\.explore-cta \{[^}]*margin: 30px auto 0;/, "The Explore the directory button is centred");
+const ctaCss = fs.readFileSync("app/directory.css", "utf8");
+assert.match(ctaCss, /\.explore-cta \{[^}]*margin: 30px auto 0;/, "The Explore the directory button is centred");
+// A thin, unevenly-moving thread of light runs around the button's edge: the
+// ring is a masked hairline outside the frame, its arc length tweens, and the
+// animation stops under reduced motion. A ring that covered the label, spun at
+// one constant rate, or kept moving when motion is unwanted would all be
+// regressions this pins.
+assert.match(ctaCss, /\.explore-cta \{[^}]*position: relative;/, "The ring needs the button as its positioning context");
+assert.match(ctaCss, /\.explore-cta::before \{[^}]*inset: -2px;[^}]*padding: 1\.6px;/, "The ring is a hairline sitting on the button's edge");
+assert.match(ctaCss, /\.explore-cta::before \{[^}]*mask-composite: exclude;/, "The ring is masked to a frame so it cannot cover the copy");
+assert.match(ctaCss, /@property --ring-tail \{ syntax: "<percentage>";/, "The arc's length is animatable");
+assert.match(ctaCss, /@keyframes explore-ring-spin \{[\s\S]*?38% \{[^}]*--ring-angle: 150deg;[^}]*animation-timing-function:[^;]+;[\s\S]*?55% \{[^}]*--ring-angle: 196deg;/, "The thread changes speed rather than spinning at one rate");
+assert.match(ctaCss, /@keyframes explore-ring-spin \{[\s\S]*?38% \{[^}]*--ring-tail: 25%;[\s\S]*?55% \{[^}]*--ring-tail: 10%;/, "The thread stretches and shortens with its speed");
+assert.match(ctaCss, /@media \(prefers-reduced-motion: reduce\) \{\s*\.explore-cta::before, \.explore-cta::after \{ animation: none; \}\s*\}/, "The ring holds still under reduced motion");
 const statsPage = fs.readFileSync("app/stats/page.tsx", "utf8");
 const styles = fs.readFileSync("app/inner-pages.css", "utf8");
 for (const [, classList] of statsPage.matchAll(/className="([^"]+)"/g)) {

@@ -130,7 +130,13 @@ async function releaseCase({ exists = false, moved = false, conflict = false, de
 const published = await releaseCase();
 assert.equal(published[0].tag_name, `v${version}`);
 assert.equal(published[0].target_commitish, 'checked');
-assert.ok(published[0].body.includes('Light mode'));
+// The notes must be the ones that belong to the version being released, not a
+// stale entry from an earlier bump: the workflow takes the newest entry, so
+// the published name and body carry that entry's own title and summary.
+const notes = JSON.parse(fs.readFileSync('config/changelog.json', 'utf8')).find(entry => entry.version === version);
+assert.ok(notes, `config/changelog.json must carry notes for ${version}`);
+assert.ok(published[0].body.includes(notes.summary), 'The release body carries the matching changelog entry');
+assert.equal(published[0].name, `v${version} — ${notes.title}`, 'The release is titled with the matching changelog entry');
 assert.deepEqual(await releaseCase({ exists: true }), []);
 assert.deepEqual(await releaseCase({ moved: true }), []);
 await assert.rejects(() => releaseCase({ conflict: true }), /different commit/);

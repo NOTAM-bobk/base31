@@ -1,5 +1,16 @@
 [
   {
+    "version": "1.50.0",
+    "date": "2026-10-07",
+    "title": "A thread of light around the way into the directory",
+    "summary": "The hero's Explore the directory button now wears the travelling light of Google's own controls: a hairline comet that runs around its edge, changing speed and stretching as it goes.",
+    "highlights": [
+      "A thin, masked ring of colour circles the Explore the directory button, sitting on its edge so the label stays clear and readable.",
+      "The thread is not a spinner: it sweeps in quickly, crawls through the middle of the lap, then accelerates home, and its arc stretches and shortens with that speed.",
+      "The light is drawn from the directory's own palette — emerald, sky and amber — and holds still for visitors who ask for reduced motion."
+    ]
+  },
+  {
     "version": "1.49.0",
     "date": "2026-10-07",
     "title": "A lighter page, clearer picks and a rail you can scrub",

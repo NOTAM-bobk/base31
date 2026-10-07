@@ -454,8 +454,20 @@ html::-webkit-scrollbar, body::-webkit-scrollbar { display: none; width: 0; heig
    — same raised frame, same glyph tile, same hover ring — but it is an <a>,
    because the searching happens on /explore. Sharing the frame keeps the
    hero looking the same; the meta line names what is behind the tap, so the
-   link is not a mystery door. */
+   link is not a mystery door.
+
+   A thread of light runs around its edge, the way Google's own controls
+   breathe. It is a hairline comet: the frame is masked down to a 1.6px band
+   (`::before`) with a soft out-of-focus echo behind it (`::after`), so the
+   copy is never covered and the frame itself stays thin. The comet changes
+   speed as it goes and stretches and shortens along the way — that uneven
+   travel is what stops it reading as a spinning loader. `--ring-angle` is
+   registered in overrides.css, which is what lets a conic gradient tween;
+   here the arc's length tweens too, through a property of its own. Under
+   reduced motion the thread simply holds still. */
+@property --ring-tail { syntax: "<percentage>"; inherits: false; initial-value: 15%; }
 .explore-cta {
+  position: relative;
   display: flex; align-items: center; gap: 12px;
   max-width: 560px; margin: 30px auto 0; padding: 9px 11px;
   border: 1px solid var(--line-strong); border-radius: 14px;
@@ -483,6 +495,48 @@ html[data-theme="light"] .explore-cta { box-shadow: 0 8px 22px rgb(0 0 0 / 6%), 
 .explore-cta-meta { color: var(--subtle); font-size: 10.5px; }
 .explore-cta-arrow { flex: 0 0 auto; color: var(--muted); font-size: 14px; transition: transform 160ms ease, color 160ms ease; }
 .explore-cta:hover .explore-cta-arrow { color: var(--live); transform: translateX(3px); }
+.explore-cta::before,
+.explore-cta::after {
+  content: ""; position: absolute; pointer-events: none;
+  background: conic-gradient(from var(--ring-angle, 0deg), transparent 0%,
+    var(--live) calc(var(--ring-tail) * 0.6),
+    var(--accent-sky) calc(var(--ring-tail) * 0.85),
+    var(--accent-amber) var(--ring-tail),
+    transparent calc(var(--ring-tail) * 1.4), transparent 100%);
+  animation: explore-ring-spin 3.8s cubic-bezier(.72, .02, .34, 1) infinite;
+}
+/* The hairline on the edge itself. */
+.explore-cta::before {
+  inset: -2px; padding: 1.6px; border-radius: 16px;
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask-composite: exclude;
+}
+/* The same arc, blurred: colour spilling just off the edge rather than a
+   second line. Kept faint so the frame still reads as a hairline. */
+.explore-cta::after {
+  inset: -4px; padding: 4px; border-radius: 18px;
+  opacity: 0.45; filter: blur(6px);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask-composite: exclude;
+}
+html[data-theme="light"] .explore-cta::after { opacity: 0.4; }
+.explore-cta:hover::after { opacity: 0.8; }
+/* Uneven travel: a swift sweep in, a crawl through the middle, then home.
+   The tail stretches with the speed, so the thread looks pulled thin when
+   it is quick and relaxed when it slows. */
+@keyframes explore-ring-spin {
+  0% { --ring-angle: 0deg; --ring-tail: 15%; animation-timing-function: cubic-bezier(.72, .02, .34, 1); }
+  38% { --ring-angle: 150deg; --ring-tail: 25%; animation-timing-function: cubic-bezier(.9, .02, .5, .6); }
+  55% { --ring-angle: 196deg; --ring-tail: 10%; animation-timing-function: cubic-bezier(.16, .86, .36, 1); }
+  100% { --ring-angle: 360deg; --ring-tail: 15%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .explore-cta::before, .explore-cta::after { animation: none; }
+}
 
 /* Mobile navigation drawer -------------------------------------------
    The phone's menu. The header button that opens it only exists below 820px

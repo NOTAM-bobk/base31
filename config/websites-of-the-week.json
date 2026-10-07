@@ -1,5 +1,13 @@
 [
   {
+    "weekOf": "2026-10-07",
+    "name": "Nychthemeron",
+    "url": "https://nychthemeron.vercel.app/",
+    "tagline": "A poetic exploration of day and night, light and darkness.",
+    "story": "Nychthemeron creates a contemplative experience that bridges day and night cycles through interactive, thoughtfully designed web interactions. The site exemplifies how the web can be a canvas for artistic expression, using minimalist design and purposeful interactivity to guide visitors through themes of time, perception, and the passage from dusk to dawn. It demonstrates that a website doesn't need elaborate features to be memorable—just clear intent, beautiful restraint, and a compelling idea executed with care.",
+    "tags": ["interactive art", "experimental", "poetic web"]
+  },
+  {
     "weekOf": "2026-10-03",
     "name": "Low-tech Magazine",
     "url": "https://solar.lowtechmagazine.com/",

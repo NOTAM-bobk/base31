@@ -111,7 +111,7 @@ export default function DiscussionBoard() {
     let fetching = false;
     // The first load of an effect run is a deliberate one — a page turn, a
     // refresh, the visitor's own post — so it replaces what is on screen. The
-    // 15-second polls that follow hold new messages back instead.
+    // one-minute polls that follow hold new messages back instead.
     let deliberate = true;
     const load = async () => {
       if (fetching || document.hidden) return;
@@ -134,7 +134,7 @@ export default function DiscussionBoard() {
     };
     setLoading(true);
     void load();
-    const timer = window.setInterval(() => void load(), 15000);
+    const timer = window.setInterval(() => void load(), 60000);
     const visible = () => { if (!document.hidden) void load(); };
     document.addEventListener("visibilitychange", visible);
     return () => { controller.abort(); window.clearInterval(timer); document.removeEventListener("visibilitychange", visible); };
@@ -262,7 +262,7 @@ export default function DiscussionBoard() {
             Refresh
           </button>
         </div>
-        <p className="discussion-poll-note mono">Refreshes every 15 seconds while this tab is visible</p>
+        <p className="discussion-poll-note mono">Refreshes every minute while this tab is visible</p>
         {loadError && <p className="discussion-error" role="status">{loadError} Your draft is safe; use Refresh to retry.</p>}
         {feedNote && <p className="discussion-error" role="status">{feedNote}</p>}
         {pending && <button type="button" className="discussion-new-pill" onClick={showPending}>

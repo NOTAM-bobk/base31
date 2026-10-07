@@ -1,0 +1,72 @@
+name: Auto release
+
+on:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+    branches: [main]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: auto-release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    if: >-
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.event == 'push' &&
+      github.event.workflow_run.head_branch == 'main' &&
+      github.event.workflow_run.head_repository.full_name == github.repository
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+          persist-credentials: false
+
+      # No dependency installation or execution of repository scripts in this
+      # privileged workflow. Read only the version and checked release notes.
+      - name: Publish the checked version, unless it already exists
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('node:fs');
+            const { version } = JSON.parse(fs.readFileSync('package.json', 'utf8'));
+            const releases = JSON.parse(fs.readFileSync('config/changelog.json', 'utf8'));
+            if (!/^\d+\.\d+\.\d+$/.test(version)) throw new Error('Invalid release version');
+            const notes = releases[0];
+            if (notes?.version !== version || !notes.title || !notes.summary || !Array.isArray(notes.highlights)) {
+              throw new Error('Package version must match the newest changelog entry');
+            }
+            const tag = `v${version}`;
+            const repo = { owner: context.repo.owner, repo: context.repo.repo };
+            try {
+              await github.rest.repos.getReleaseByTag({ ...repo, tag });
+              core.info(`${tag} is already released; nothing to publish.`);
+              return;
+            } catch (error) {
+              if (error.status !== 404) throw error;
+            }
+            const sha = context.payload.workflow_run.head_sha;
+            // A newer push may have arrived during CI. Its own passing run
+            // will publish it; never tag a stale main-branch build as latest.
+            const branch = await github.rest.repos.getBranch({ ...repo, branch: 'main' });
+            if (branch.data.commit.sha !== sha) {
+              core.info('Main has moved; wait for CI on its current tip.');
+              return;
+            }
+            try {
+              const existing = await github.rest.git.getRef({ ...repo, ref: `tags/${tag}` });
+              if (existing.data.object.sha !== sha) throw new Error(`${tag} already points at a different commit`);
+            } catch (error) {
+              if (error.status !== 404) throw error;
+            }
+            const body = `${notes.summary}\n\n${notes.highlights.map(item => `- ${item}`).join('\n')}`;
+            const result = await github.rest.repos.createRelease({
+              ...repo, tag_name: tag, target_commitish: sha,
+              name: `${tag} — ${notes.title}`, body, draft: false, prerelease: false,
+            });
+            core.info(`Published ${result.data.html_url}`);

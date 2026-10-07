@@ -282,7 +282,7 @@ The board sits below About the directory and the support hub, and shares one `Di
 
 Posting uses a display name (1–32 characters), plain-text body (1–2,000 characters), and optional numeric parent message ID. Replies to replies stay in their original thread with an explicit parent label. A thread holds at most 100 replies; start another once full. Request bodies are bounded at 12 KB. HTML is rendered as text, not markup or clickable links. Network-based limits allow one message every 15 seconds and 50 per UTC day. The Worker replaces client-supplied visitor signals with a daily hash of Cloudflare's connecting IP; raw IPs are not stored in discussion tables. Old rate-limit records are cleaned on subsequent posts.
 
-The board polls every 15 seconds only while the tab is visible; it is not WebSocket realtime. Drafts survive failed submissions but not page reloads. Only the display name is saved locally. Messages/names are public and names are **not verified identities**. Rate limits are basic protection, not a substitute for active moderation, CAPTCHA or authentication at higher traffic.
+The board polls every minute only while the tab is visible; it is not WebSocket realtime. Drafts survive failed submissions but not page reloads. Only the display name is saved locally. Messages/names are public and names are **not verified identities**. Rate limits are basic protection, not a substitute for active moderation, CAPTCHA or authentication at higher traffic.
 
 Each message shows a small avatar built by the DiceBear API from the display name (style `bottts`, seed = the name). It is deterministic, so the same name always draws the same picture, and nothing is stored or uploaded. The request is made by the visitor's browser to `api.dicebear.com` and carries the name in its URL — it is a third-party request, not a local one. The avatar is decorative and hidden from assistive technology; the message header is what names the author.
 
@@ -297,6 +297,10 @@ To moderate, configure `DISCUSSION_MODERATOR_SECRET` as a Worker secret and send
 - The hero used to print an **estimated source size** from `/repos/…/languages`. It does not any more: the figure and its fetch are gone rather than kept as a third number that could only ever be an estimate. The hero now prints two figures — views and the sites it links to.
 
 ## Deployment and domains
+
+The `Auto release` workflow in `.github/workflows/auto-release.yml` runs after successful CI on a push to `main`. It publishes `v<package.json version>` at the checked commit, using the newest matching entry in `config/changelog.json` for its title and notes. It skips existing releases and builds overtaken by a newer push, rejects conflicting tags, and never publishes from pull-request CI. Bump the package and lockfile versions and add the matching changelog entry to prepare a new release. The workflow uses GitHub's built-in token with Contents write permission; no additional secret is needed. Repository policy must allow that permission. It creates a GitHub release, not a production deployment.
+
+Site detail pages separate the preview and collection facts from voting and sharing, with section shortcuts above and related picks below. On a phone the columns become a single reading flow. The section rail supports taps and arrow keys as before; holding a line for 280 milliseconds starts a drag that scrubs through every section, including those outside the clipped rail. Releasing or cancelling the pointer ends the gesture.
 
 The existing setup deploys Next.js to **Vercel** on repository pushes. CI runs `npm ci`, content validation, external-link checks, directory regression tests, TypeScript, and a production build. The Worker is a **separate deployment**:
 

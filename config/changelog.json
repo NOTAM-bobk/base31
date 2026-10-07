@@ -1,5 +1,19 @@
 [
   {
+    "version": "1.49.0",
+    "date": "2026-10-07",
+    "title": "A lighter page, clearer picks and a rail you can scrub",
+    "summary": "Light mode has calmer paper colours and stronger small text, detail pages separate the overview from voting and sharing, the section rail can be held and dragged, the community board checks for messages once a minute, and checked versions are published automatically as GitHub releases.",
+    "highlights": [
+      "Light mode uses warm paper surfaces, readable captions, quiet shadows and more visible graph threads without changing the dark theme.",
+      "Every site detail page has section shortcuts, a labelled preview, collection and website facts, a separate voting and sharing column, and a two-column related-picks list. Collection breadcrumbs and return links now open the actual collection page.",
+      "Hold a section-rail line briefly, then slide up or down to scrub across all sections, including ones outside the rail's visible area. Ordinary taps and keyboard navigation still work.",
+      "The discussion board polls once a minute while the tab is visible. Manual refresh, returning to the tab and posting still refresh immediately, and incoming messages do not move the conversation while someone is reading.",
+      "The Auto release workflow publishes the package version with its matching changelog notes after successful main-branch push CI. Existing releases are skipped, stale builds are not tagged, and pull-request runs cannot publish a release.",
+      "The directory web now sits freely on the background below a spaced divider, with on-canvas node labels, a wander button and a resettable count of picks met."
+    ]
+  },
+  {
     "version": "1.48.0",
     "date": "2026-10-07",
     "title": "A fire button, and the whole directory drawn as one web",

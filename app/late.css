@@ -332,6 +332,9 @@ html[data-theme="light"] .site-footer {
    desktop, bars only where the gutter narrows, and a slim strip of bars on a
    phone, where there is no hover to open a label anyway. */
 .section-rail {
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
   position: fixed; top: 50%; right: 14px; z-index: 40;
   display: flex; flex-direction: column; align-items: flex-end; gap: 6px;
   max-height: min(56vh, 152px);
@@ -363,6 +366,12 @@ html[data-theme="light"] .site-footer {
   display: flex; align-items: center; justify-content: flex-end; gap: 7px;
   width: 100%; padding: 4px 1px; border: 0; border-radius: 6px;
   background: transparent; color: var(--subtle); cursor: pointer;
+}
+.rail-scrub-label { position: fixed; right: 30px; top: 0; max-width: 160px; padding: 8px 12px; border-radius: 8px; background: var(--surface); color: var(--text-strong); box-shadow: var(--shadow); font-size: 12px; white-space: nowrap; pointer-events: none; }
+.section-rail.is-scrubbing .rail-item { cursor: grabbing; }
+@media (pointer: coarse) {
+  .section-rail { padding: 4px 10px; right: 0; }
+  .section-rail .rail-item { min-height: 22px; min-width: 24px; }
 }
 .rail-item:hover { color: var(--text-strong); }
 .rail-item.is-active { color: var(--live); }

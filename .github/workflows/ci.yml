@@ -38,6 +38,9 @@ jobs:
       - name: Directory regression tests
         run: npm run test:directory
 
+      - name: UI and release regression tests
+        run: npm run test:ui
+
       - name: Discussion regression tests
         run: npm run test:discussion
 

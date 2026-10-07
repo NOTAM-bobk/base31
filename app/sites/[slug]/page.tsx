@@ -58,7 +58,7 @@ export default function SiteDetailPage({ params }: Props) {
       {
         "@type": "BreadcrumbList", "@id": `${url}#breadcrumb`, itemListElement: [
           { "@type": "ListItem", position: 1, name: "base31.org", item: origin },
-          { "@type": "ListItem", position: 2, name: entry.section, item: `${origin}/#${entry.sectionId}` },
+          { "@type": "ListItem", position: 2, name: entry.section, item: `${origin}/explore/${entry.sectionId}` },
           { "@type": "ListItem", position: 3, name: entry.name, item: url },
         ],
       },
@@ -68,16 +68,25 @@ export default function SiteDetailPage({ params }: Props) {
     <main className="tool-page site-detail-page">
       <nav className="breadcrumb mono" aria-label="Breadcrumb">
         <Link href="/">base31.org</Link><span aria-hidden="true">/</span>
-        <Link href={`/#${entry.sectionId}`}>{entry.section}</Link><span aria-hidden="true">/</span>
+        <Link href={`/explore/${entry.sectionId}`}>{entry.section}</Link><span aria-hidden="true">/</span>
         <span aria-current="page">{entry.name}</span>
       </nav>
+      <header className="site-detail-header">
       <p className="eyebrow mono">{entry.category ?? entry.section}</p>
       <h1>{entry.name}</h1>
       <p className="tool-summary">{entry.description}</p>
       <Freshness item={entry} />
-      <div className="site-detail-preview">
+      </header>
+      <nav className="site-detail-jumps" aria-label="On this page">
+        <a href="#site-overview">Overview</a><a href="#site-votes-heading">Rate this pick</a>
+        <a href="#site-related-heading">Related picks</a><a href="#site-share-heading">Share</a>
+      </nav>
+      <div className="site-detail-layout">
+      <div className="site-detail-main">
+      <figure className="site-detail-preview">
         <Image src={`https://image.thum.io/get/width/960/crop/480/noanimate/${entry.url}`} alt={`Preview of ${entry.name}`} width={960} height={480} sizes="(max-width: 780px) 100vw, 780px" />
-      </div>
+        <figcaption className="mono">Website preview · {new URL(entry.url).hostname}</figcaption>
+      </figure>
       <a className="tool-cta" href={entry.url} target="_blank" rel="noopener noreferrer">
         <span className="tool-cta-label">Visit {entry.name}</span>
         <span className="tool-cta-host mono">{new URL(entry.url).hostname}</span>
@@ -85,7 +94,12 @@ export default function SiteDetailPage({ params }: Props) {
       </a>
       <section className="tool-block" aria-labelledby="site-overview">
         <h2 id="site-overview">About this pick</h2>
-        <p>{entry.name} is listed in our {entry.section.toLowerCase()} collection{entry.category ? ` under ${entry.category.toLowerCase()}` : ""}. {entry.description}</p>
+        <dl className="site-detail-facts">
+          <div><dt>Collection</dt><dd><Link href={`/explore/${entry.sectionId}`}>{entry.section}</Link></dd></div>
+          {entry.category && <div><dt>Category</dt><dd>{entry.category}</dd></div>}
+          <div><dt>Website</dt><dd>{new URL(entry.url).hostname}</dd></div>
+        </dl>
+        <h3>Topics to explore</h3>
         {!!entry.tags?.length && (
           <ul className="detail-tags mono" aria-label="Topics">
             {entry.tags.map((tag) => (
@@ -100,12 +114,22 @@ export default function SiteDetailPage({ params }: Props) {
         {entry.sectionId === "cool-ais" && <p className="ai-notice">AI answers can be inaccurate. Verify sources and do not upload confidential or sensitive personal information without reviewing the provider&apos;s privacy terms.</p>}
         {guide && <Link className="site-detail-link" href={`/tools/${entry.slug}`}>Read the full guide: {guide.headline} →</Link>}
       </section>
+      </div>
+      <aside className="site-detail-sidebar" aria-label="Rate and share this pick">
       <section className="tool-block" aria-labelledby="site-votes-heading">
         <h2 id="site-votes-heading">Worth a visit?</h2>
-        <p>Share your vote with the directory. Click your selected arrow again to clear your vote.</p>
+        <p>Share your vote with the directory. Click your selected thumb again to clear it. A fire boosts this pick by ten votes for 24 hours.</p>
         <DetailVotes voteKey={entry.voteKey} name={entry.name} />
       </section>
-      <section className="tool-block" aria-labelledby="site-related-heading">
+      <section className="tool-block" aria-labelledby="site-share-heading">
+        <h2 id="site-share-heading">Share this pick</h2>
+        <p>Send {entry.name} to someone who would use it, or keep the link for later.</p>
+        <ShareLink url={url} title={`${entry.name} — ${entry.section}`} text={entry.description} />
+        <p className="detail-share-url mono">{url}</p>
+      </section>
+      </aside>
+      </div>
+      <section className="tool-block site-detail-related" aria-labelledby="site-related-heading">
         <h2 id="site-related-heading">Related picks</h2>
         <p className="detail-related-lede">Chosen by shared tags first, then the rest of the {entry.section.toLowerCase()} collection.</p>
         <ul className="tool-related">
@@ -120,13 +144,7 @@ export default function SiteDetailPage({ params }: Props) {
           ))}
         </ul>
       </section>
-      <section className="tool-block" aria-labelledby="site-share-heading">
-        <h2 id="site-share-heading">Share this pick</h2>
-        <p>Send {entry.name} to someone who would use it, or keep the link for later.</p>
-        <ShareLink url={url} title={`${entry.name} — ${entry.section}`} text={entry.description} />
-        <p className="detail-share-url mono">{url}</p>
-      </section>
-      <p className="stats-foot"><Link href={`/#${entry.sectionId}`}>← Back to {entry.section}</Link> · <Link href="/recently-added">Recently added</Link> · <Link href="/tags">Browse by tag</Link></p>
+      <p className="stats-foot"><Link href={`/explore/${entry.sectionId}`}>← Back to {entry.section}</Link> · <Link href="/recently-added">Recently added</Link> · <Link href="/tags">Browse by tag</Link></p>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(graph).replace(/</g, "\\u003c") }} />
     </main>
   );

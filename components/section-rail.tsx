@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import type { KeyboardEvent } from "react";
+import type { KeyboardEvent, PointerEvent } from "react";
 import { tick } from "@/lib/haptics";
 
 export type RailSection = { id: string; label: string };
@@ -18,14 +18,15 @@ export type RailSection = { id: string; label: string };
  *
  * Every section is rendered, so the whole page is reachable from the rail
  * itself: when the list is taller than the rail's cap the column scrolls —
- * the wheel and a drag work inside it like any other scroll container — and
+ * the wheel works inside it like any other scroll container — and
  * the line for the section you are reading is kept scrolled into view as you
  * read down the page, so the readout never slides off the end of the column.
  *
  * The line for the current section stands on end and turns green while its
  * label slides out beside it, so the rail is both a position readout and a
  * menu. Clicking a line scrolls the page there, and the arrow keys walk the
- * list one section at a time.
+ * list one section at a time. Hold a line briefly, then drag to scrub the full
+ * section list; pointer capture keeps the gesture working outside the rail.
  *
  * It is always there, from the first screen on, at every width: on a wide
  * monitor it sits in the gutter beside the centered column, on a phone it is a
@@ -40,6 +41,12 @@ export type RailSection = { id: string; label: string };
 export default function SectionRail({ sections }: { sections: RailSection[] }) {
   const [active, setActive] = useState(0);
   const rail = useRef<HTMLElement | null>(null);
+  const [scrubbing, setScrubbing] = useState(false);
+  const gesture = useRef<{ id: number; startY: number; y: number; index: number; last: number; held: boolean } | null>(null);
+  const holdTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const suppressClick = useRef(false);
+
+  useEffect(() => () => { if (holdTimer.current) clearTimeout(holdTimer.current); }, []);
 
   // Which section is on screen: the last one whose top has passed a third of
   // the way down the viewport. Measured on scroll inside a rAF so a fast wheel
@@ -55,7 +62,7 @@ export default function SectionRail({ sections }: { sections: RailSection[] }) {
         const element = document.getElementById(section.id);
         if (element && element.getBoundingClientRect().top <= line) current = index;
       });
-      setActive(current);
+      if (!gesture.current?.held) setActive(current);
     };
     const onScroll = () => {
       if (!frame) frame = window.requestAnimationFrame(measure);
@@ -75,7 +82,7 @@ export default function SectionRail({ sections }: { sections: RailSection[] }) {
   // the current section — a manual scroll of the list is left alone.
   useEffect(() => {
     const node = rail.current;
-    if (!node) return;
+    if (!node || gesture.current?.held) return;
     const line = node.querySelector<HTMLElement>(".rail-item.is-active");
     if (!line) return;
     const top = line.offsetTop - (node.clientHeight - line.offsetHeight) / 2;
@@ -84,7 +91,7 @@ export default function SectionRail({ sections }: { sections: RailSection[] }) {
   }, [active]);
 
   const goTo = useCallback(
-    (index: number) => {
+    (index: number, instant = false) => {
       const section = sections[index];
       if (!section) return;
       const element = document.getElementById(section.id);
@@ -93,7 +100,8 @@ export default function SectionRail({ sections }: { sections: RailSection[] }) {
       // The first entry is the hero, which starts at the very top of the page;
       // everything else stops just below the fixed header.
       const top = section.id === "page-title" ? 0 : element.getBoundingClientRect().top + window.scrollY - 84;
-      window.scrollTo({ top: Math.max(0, top), behavior: reduced ? "auto" : "smooth" });
+      window.scrollTo({ top: Math.max(0, top), behavior: reduced || instant ? "instant" : "smooth" });
+      setActive(index);
       tick(12);
     },
     [sections],
@@ -109,8 +117,61 @@ export default function SectionRail({ sections }: { sections: RailSection[] }) {
     [active, goTo, sections.length],
   );
 
+  // Hold for 280ms, then scrub from the pressed section. Moving one rail
+  // height traverses the full list, including lines outside the clipped area.
+  const scrub = () => {
+    const current = gesture.current;
+    const node = rail.current;
+    if (!current?.held || !node) return;
+    const step = Math.max(12, node.clientHeight / Math.max(1, sections.length - 1));
+    const index = Math.min(sections.length - 1, Math.max(0, current.index + Math.round((current.y - current.startY) / step)));
+    if (index === current.last) return;
+    current.last = index;
+    goTo(index, true);
+  };
+  const pointerDown = (event: PointerEvent<HTMLElement>) => {
+    if (!event.isPrimary || event.button !== 0 || gesture.current) return;
+    const button = (event.target as Element).closest<HTMLButtonElement>(".rail-item");
+    if (!button) return;
+    const index = Number(button.dataset.index);
+    suppressClick.current = false;
+    gesture.current = { id: event.pointerId, startY: event.clientY, y: event.clientY, index, last: index, held: false };
+    button.setPointerCapture(event.pointerId);
+    holdTimer.current = setTimeout(() => {
+      const current = gesture.current;
+      if (!current) return;
+      current.held = true;
+      suppressClick.current = true;
+      setScrubbing(true);
+      goTo(current.index, true);
+      scrub();
+    }, 280);
+  };
+  const pointerMove = (event: PointerEvent<HTMLElement>) => {
+    const current = gesture.current;
+    if (!current || current.id !== event.pointerId) return;
+    current.y = event.clientY;
+    if (!current.held && Math.abs(current.y - current.startY) > 8) {
+      if (holdTimer.current) clearTimeout(holdTimer.current);
+      suppressClick.current = true;
+      return;
+    }
+    scrub();
+  };
+  const pointerEnd = (event: PointerEvent<HTMLElement>) => {
+    if (gesture.current?.id !== event.pointerId) return;
+    if (holdTimer.current) clearTimeout(holdTimer.current);
+    if (event.type === "pointercancel") suppressClick.current = true;
+    gesture.current = null;
+    setScrubbing(false);
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) event.currentTarget.releasePointerCapture(event.pointerId);
+  };
+
   return (
-    <nav ref={rail} className="section-rail" aria-label="Page sections" onKeyDown={onKeyDown}>
+    <nav ref={rail} className={`section-rail${scrubbing ? " is-scrubbing" : ""}`} aria-label="Page sections" onKeyDown={onKeyDown}
+      onPointerDown={pointerDown} onPointerMove={pointerMove} onPointerUp={pointerEnd} onPointerCancel={pointerEnd} onLostPointerCapture={pointerEnd}>
+      <span className="sr-only">Tap a line to jump. Hold a line, then slide up or down to move between sections.</span>
+      {scrubbing && <span className="rail-scrub-label mono" aria-hidden="true">{sections[active]?.label}</span>}
       {sections.map((section, index) => {
         const current = index === active;
         return (
@@ -118,7 +179,11 @@ export default function SectionRail({ sections }: { sections: RailSection[] }) {
             key={section.id}
             type="button"
             className={`rail-item${current ? " is-active" : ""}`}
-            onClick={() => goTo(index)}
+            data-index={index}
+            onClick={(event) => {
+              if (event.detail !== 0 && suppressClick.current) { suppressClick.current = false; return; }
+              goTo(index);
+            }}
             aria-label={section.label}
             aria-current={current ? "true" : undefined}
             title={section.label}

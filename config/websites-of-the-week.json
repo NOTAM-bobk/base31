@@ -1,11 +1,27 @@
 [
   {
+    "weekOf": "2026-10-10",
+    "name": "WindowSwap",
+    "url": "https://www.window-swap.com/",
+    "tagline": "A window into ordinary life from somewhere else in the world.",
+    "story": "WindowSwap lets you peek through real windows shared by people around the globe. Each click turns an ordinary view\u2014rain on a pane, a distant skyline, a quiet street\u2014into a tiny, calming postcard from a place you have never visited.",
+    "tags": [
+      "global",
+      "ambient",
+      "community"
+    ]
+  },
+  {
     "weekOf": "2026-10-07",
     "name": "Nychthemeron",
     "url": "https://nychthemeron.vercel.app/",
     "tagline": "A ephemeral social network that resets itself every 24 hours.",
-    "story": "Nychthemeron creates a unique social network experience where everything vanishes after 24 hours. The entire platform completely resets, leaving no trace—except for your account. It's a thought-provoking exploration of temporary digital connections and what it means when nothing is meant to last.",
-    "tags": ["social network", "24hrs", "vanish"]
+    "story": "Nychthemeron creates a unique social network experience where everything vanishes after 24 hours. The entire platform completely resets, leaving no trace\u2014except for your account. It's a thought-provoking exploration of temporary digital connections and what it means when nothing is meant to last.",
+    "tags": [
+      "social network",
+      "24hrs",
+      "vanish"
+    ]
   },
   {
     "weekOf": "2026-10-03",
@@ -13,6 +29,10 @@
     "url": "https://solar.lowtechmagazine.com/",
     "tagline": "A solar-powered magazine about sustainable technology.",
     "story": "Low-tech Magazine is a great example of a website whose design follows its subject. Its solar-powered server can go offline when the battery is low, turning energy use into part of the reading experience.",
-    "tags": ["sustainable web", "technology", "independent publishing"]
+    "tags": [
+      "sustainable web",
+      "technology",
+      "independent publishing"
+    ]
   }
 ]

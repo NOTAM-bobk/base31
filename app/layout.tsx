@@ -28,6 +28,7 @@ import StructuredData from "@/components/structured-data";
 import BlogTransitions from "@/components/blog-transitions";
 import PageBehaviors from "@/components/page-behaviors";
 import TopAccent from "@/components/top-accent";
+import BenLaunchesGate from "@/components/ben-launches-gate";
 
 // Two display faces from Google Fonts. next/font downloads and self-hosts the
 // files at build time, so nothing on the page ever asks fonts.googleapis.com
@@ -125,6 +126,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         {/* Screen Wake Lock plus the leave warning; see the component for why. */}
         <PageBehaviors />
         {children}
+        <BenLaunchesGate />
         {/* Trustpilot TrustBox bootstrap. It scans for `.trustpilot-widget`
             placeholders (the review collector lives in app/page.tsx) and swaps
             them for the hosted widget once the page is interactive. */}

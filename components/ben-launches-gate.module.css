@@ -1,0 +1,123 @@
+.dialog {
+  width: min(34rem, calc(100% - 2rem));
+  max-width: none;
+  max-height: calc(100% - 2rem);
+  margin: auto;
+  padding: 0;
+  overflow: auto;
+  border: 1px solid var(--line-strong);
+  border-radius: 18px;
+  background: var(--surface);
+  color: var(--text-strong);
+  box-shadow: 0 30px 90px #0008;
+}
+
+.dialog::backdrop {
+  background: rgb(12 14 18 / 68%);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+}
+
+.card {
+  position: relative;
+  padding: clamp(1.5rem, 6vw, 3rem);
+  text-align: center;
+}
+
+.card::before {
+  position: absolute;
+  inset: 0 0 auto;
+  height: 3px;
+  background: var(--text-strong);
+  content: "";
+}
+
+.eyebrow {
+  margin: 0 0 1rem;
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  line-height: 1.5;
+  text-transform: uppercase;
+}
+
+.title {
+  max-width: 14ch;
+  margin: 0 auto;
+  color: var(--text-strong);
+  font-size: clamp(2rem, 7vw, 3.25rem);
+  font-weight: 600;
+  letter-spacing: -0.055em;
+  line-height: 1.04;
+}
+
+.copy {
+  margin: 1rem 0 1.7rem;
+  color: var(--muted);
+  font-size: clamp(0.95rem, 3.4vw, 1.1rem);
+  line-height: 1.55;
+}
+
+.copy strong {
+  color: var(--text-strong);
+  font-weight: 600;
+}
+
+.primary {
+  display: flex;
+  min-height: 3.1rem;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  padding: 0.8rem 1rem;
+  border: 1px solid var(--invert-bg);
+  border-radius: 9px;
+  background: var(--invert-bg);
+  color: var(--invert-fg);
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-align: center;
+  text-decoration: none;
+  transition: opacity 140ms ease, transform 140ms ease;
+}
+
+.primary:hover {
+  opacity: 0.88;
+  transform: translateY(-1px);
+}
+
+.primary:focus-visible,
+.legacy:focus-visible {
+  outline: 3px solid var(--text-strong);
+  outline-offset: 4px;
+}
+
+.legacy {
+  display: inline-block;
+  margin-top: 1rem;
+  padding: 0.3rem 0.45rem;
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.76rem;
+  font-weight: 500;
+  line-height: 1.4;
+  text-decoration: underline;
+  text-decoration-color: var(--line-strong);
+  text-underline-offset: 0.2rem;
+}
+
+.legacy:hover {
+  color: var(--text-strong);
+  text-decoration-color: currentColor;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .primary {
+    transition: none;
+  }
+}

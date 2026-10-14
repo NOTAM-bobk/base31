@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import styles from "./ben-launches-gate.module.css";
 
 const BEN_LAUNCHES_HOME = "https://www.benlaunches.icu/";
+const GATE_SEEN_KEY = "base31-ben-launches-gate-seen";
 
 /** A required first-load choice between the new Ben Launches site and legacy base31. */
 export default function BenLaunchesGate() {
@@ -11,7 +12,14 @@ export default function BenLaunchesGate() {
   const [visible, setVisible] = useState(true);
   const dialogRef = useRef<HTMLDialogElement>(null);
 
-  useEffect(() => setMounted(true), []);
+  useEffect(() => {
+    try {
+      setVisible(window.localStorage.getItem(GATE_SEEN_KEY) !== "1");
+    } catch {
+      // Storage may be disabled; the gate remains usable for this visit.
+    }
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     if (!mounted || !visible) return;
@@ -31,6 +39,15 @@ export default function BenLaunchesGate() {
     };
   }, [mounted, visible]);
 
+  function rememberChoice() {
+    try {
+      window.localStorage.setItem(GATE_SEEN_KEY, "1");
+    } catch {
+      // Storage may be disabled; continue without persisting the choice.
+    }
+    setVisible(false);
+  }
+
   if (!mounted || !visible) return null;
 
   return (
@@ -48,13 +65,13 @@ export default function BenLaunchesGate() {
         <p id="ben-launches-gate-copy" className={styles.copy}>
           Our name is <strong>Ben Launches.</strong>
         </p>
-        <a autoFocus className={styles.primary} href={BEN_LAUNCHES_HOME}>
+        <a autoFocus className={styles.primary} href={BEN_LAUNCHES_HOME} onClick={rememberChoice}>
           Continue to Ben Launches <span aria-hidden="true">→</span>
         </a>
         <button
           className={styles.legacy}
           type="button"
-          onClick={() => setVisible(false)}
+          onClick={rememberChoice}
         >
           Continue to legacy
         </button>

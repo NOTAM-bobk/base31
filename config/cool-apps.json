@@ -302,5 +302,12 @@
     "url": "https://puzzlify.app/en/puzzle-maker/",
     "tags": ["puzzle", "image", "games"],
     "description": "Upload a photo and it becomes a real tab-and-blank jigsaw you play in the browser, 24 to 252 pieces, and recipients need no account. The preview is free; publishing a shareable link costs EUR 3.99. It is a browser puzzle, not a printed one, and not puzzlify.io. Built by the team behind base31."
+  },
+  {
+    "name": "Lookslate Beginner Routine Checklist",
+    "category": "Utilities",
+    "url": "https://szj2ys.github.io/lookslate-beginner-routine-checklist/",
+    "tags": ["utility", "makeup", "checklist", "offline"],
+    "description": "A free browser checklist for a beginner makeup routine, with optional eyeshadow, progress, reset and print. It works offline after download; checks are not saved between visits. Built with AI assistance by Lookslate."
   }
 ]

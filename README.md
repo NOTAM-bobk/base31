@@ -226,6 +226,8 @@ The directory and public GitHub statistics do **not** need a GitHub API key. Pub
 | --- | --- | --- |
 | `NEXT_PUBLIC_COUNTER_URL` | Optional Worker override | Public base URL; defaults to the existing live Worker. Build-time variable—redeploy after changing it. Never put a secret in a `NEXT_PUBLIC_` variable. |
 | `ADMIN_PANEL_PASSWORD` | `/admin/community-sites` | The password the moderation page asks for; it must match the Worker's `COUNTER_SECRET` |
+| `GITHUB_TOKEN` | "Approve & submit" in `/admin/community-sites` | Fine-grained token with Contents read/write on this repository; the approval commits a community site's files to `public/sites/<slug>/` |
+| `GITHUB_REPO`, `GITHUB_BRANCH` | Optional approval destination | Defaults are `NOTAM-bobk/base31` and `main` |
 
 A bug or feature report needs **no** credential on this side: the route queues it with the Worker, so the Resend variables that used to deliver it are no longer part of the Next.js environment. `RESEND_API_KEY` and `RESEND_FROM_EMAIL` remain Worker secrets, where they send publication updates.
 
@@ -258,6 +260,8 @@ Resend's test sender has recipient restrictions. For real subscriber delivery, v
 | `POST /vote` | `{ key, from, to }`, where choices are `-1`, `0`, or `1` |
 | `POST /fire` | `{ key }`; record one fire and return that key's totals and fire count |
 | `GET /sites` | List community-published sites |
+| `GET /site?slug=<slug>` | One community site's public metadata, read directly by key so a fresh upload renders its card immediately |
+| `GET /admin/sites/<slug>/export` | Protected: one site's metadata plus every file body, used by the admin approval |
 | `GET /quality` | Public health-check report: last check time and failure count per community site, behind `/quality-report` |
 | `POST /submit` | Publish static files with title, description, tags, and slug |
 | `POST /report` | File a bug report or feature idea; saved to KV and listed in the admin inbox, never emailed |
@@ -271,6 +275,8 @@ Resend's test sender has recipient restrictions. For real subscriber delivery, v
 URL suggestions use the existing `/request-url` Worker endpoint and private moderation queue. The form is on the landing page and at the bottom of `/explore`; both post to the same route. They are reviewed, not automatically published. Bug reports and feature ideas filed from the community panel travel the same way through `POST /report`: the Next.js route checks the visitor's own throttle and forwards the report (with the visitor's address in `x-report-origin`, since the call is server-to-server) to the Worker, which stores it under `request:report:` and lists it in the same inbox. Nothing is emailed, so a mail-provider outage cannot lose a report. See `worker/src/index.ts` for legacy confirmation, unsubscribe, and push routes. Single-step signup records form consent but does not verify email ownership; operators should monitor for abusive or unwanted subscriptions.
 
 Community uploads are served on the Worker origin, separate from the directory. Limits are 40 files, 2 MB per file, and 8 MB per upload. KV listings are eventually consistent, so new entries may take about a minute to appear elsewhere. Optional GitHub mirroring is best-effort; it does not automatically add an entry to curated `sites.json`.
+
+After an upload the author sees a "featured on base31.org" card with an iframe snippet. The card is served by `GET /featured/<slug>` on the Next.js site and reads the published metadata from `GET /site?slug=<slug>` on the Worker. The moderation panel's **Approve & submit** button goes the other way: `/api/admin` reads the site back from the Worker's protected export endpoint and commits every file to `public/sites/<slug>/` in the repository (one commit, using the Vercel `GITHUB_TOKEN`). Redeploying after that serves the approved copy from its own base31 subdomain. Deploy the Worker after changing `worker/src/index.ts` so the export and single-site routes exist.
 
 **Operational limitations:** votes and fires rely on browser-local choices and client-supplied requests, not verified identities; they are not abuse-proof, not synchronized across devices, and a visitor who clears their browser storage can fire again. KV totals are not transactional, and a key's fires are a short list of timestamps read, pruned and written back on every fire — fine at this traffic, not a guarantee under heavy concurrency. Community uploads are public and unmoderated. Unique visitor estimates use hashed IP/browser signals, so shared networks can undercount and changes in browser signals can overcount; hashing is not a promise that data is impossible to re-identify. Review these tradeoffs before operating at larger scale.
 

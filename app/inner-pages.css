@@ -203,9 +203,18 @@
    what the visitor wrote. */
 .admin-site .admin-report-body { white-space: pre-wrap; }
 .admin-remove { flex: 0 0 auto; border-color: color-mix(in srgb, var(--danger) 50%, var(--line)); color: var(--danger); }
+/* Approval sits beside removal but reads as the positive action: committing
+   the site's files to the repository is what the operator came here to do. */
+.admin-actions { display: flex; flex: 0 0 auto; flex-wrap: wrap; align-items: center; gap: 8px; }
+.admin-approve { padding: 12px 15px; border: 1px solid color-mix(in srgb, var(--live) 45%, var(--line)); border-radius: 10px; background: color-mix(in srgb, var(--live) 12%, var(--surface)); color: var(--live); cursor: pointer; font: inherit; }
+.admin-approve:disabled { opacity: .5; cursor: wait; }
+.admin-approved { color: var(--live); font-size: 11px; text-decoration: none; }
+.admin-approved:hover { text-decoration: underline; }
 .admin-empty { color: var(--subtle); font-size: 13px; }
 @media (max-width: 600px) {
   .admin-shell { padding: 56px 0 96px; }
   .admin-form { align-items: stretch; flex-direction: column; }
   .admin-site { align-items: stretch; flex-direction: column; }
+  .admin-actions { align-items: stretch; flex-direction: column; }
+  .admin-approved { padding: 12px 0; }
 }

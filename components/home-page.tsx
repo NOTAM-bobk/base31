@@ -396,6 +396,11 @@ export default function HomePage({ dict = EN, locale = "en", mode = "home" }: { 
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [uploadFiles, setUploadFiles] = useState<File[]>([]);
+  // The site just published, held so the follow-up dialog can hand its author
+  // the embed snippet. It is separate from the upload form so the form can
+  // close cleanly before the card appears.
+  const [publishedSite, setPublishedSite] = useState<PublishedSite | null>(null);
+  const [snippetCopied, setSnippetCopied] = useState(false);
   const [form, setForm] = useState({ title: "", description: "", tags: "", slug: "", email: "" });
   const searchRef = useRef<HTMLInputElement>(null);
   const toastTimer = useRef<number | null>(null);
@@ -407,11 +412,13 @@ export default function HomePage({ dict = EN, locale = "en", mode = "home" }: { 
   const shareRef = useRef<HTMLDivElement>(null);
   const milestoneRef = useRef<HTMLDivElement>(null);
   const submitRef = useRef<HTMLDivElement>(null);
+  const publishedRef = useRef<HTMLDivElement>(null);
   const exitRef = useRef<HTMLDivElement>(null);
 
   useDialogFocus(shareOpen, shareRef);
   useDialogFocus(milestone != null, milestoneRef);
   useDialogFocus(submitOpen, submitRef);
+  useDialogFocus(publishedSite != null, publishedRef);
   useDialogFocus(exitNudge != null, exitRef);
 
   // The directory's own shake, mirroring the Support section's: it starts on
@@ -1098,6 +1105,10 @@ export default function HomePage({ dict = EN, locale = "en", mode = "home" }: { 
       buzz([14, 50, 14, 50, 24]);
       setSubmitOpen(false);
       setUploadFiles([]);
+      if (data?.site) {
+        setSnippetCopied(false);
+        setPublishedSite(data.site as PublishedSite);
+      }
       notify("Your site is live");
     } catch (error) {
       setSubmitError(error instanceof Error ? error.message : "Couldn't publish that site.");
@@ -1106,7 +1117,7 @@ export default function HomePage({ dict = EN, locale = "en", mode = "home" }: { 
     }
   }, [buzz, form, notify, submitting, uploadFiles]);
 
-  const copyLink = useCallback(async (text = siteUrl) => {
+  const copyLink = useCallback(async (text = siteUrl, message = "Link copied") => {
     try {
       if (navigator.clipboard?.writeText) {
         await navigator.clipboard.writeText(text);
@@ -1122,11 +1133,29 @@ export default function HomePage({ dict = EN, locale = "en", mode = "home" }: { 
         input.remove();
       }
       buzz([10, 40, 10]);
-      notify("Link copied");
+      notify(message);
+      return true;
     } catch {
       notify("Couldn't copy");
+      return false;
     }
   }, [buzz, notify]);
+
+  // The snippet publishers paste into their own site. The title is escaped as
+  // an HTML attribute because it is visitor-supplied text.
+  const featuredSnippet = useMemo(() => {
+    if (!publishedSite) return "";
+    const safeTitle = publishedSite.title
+      .replace(/&/g, "&amp;")
+      .replace(/"/g, "&quot;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;");
+    return `<iframe src="${siteUrl}/featured/${publishedSite.slug}" title="${safeTitle} — featured on base31.org" width="320" height="150" style="border:0;overflow:hidden" loading="lazy"></iframe>`;
+  }, [publishedSite]);
+
+  const copySnippet = useCallback(async () => {
+    if (await copyLink(featuredSnippet, "Embed code copied")) setSnippetCopied(true);
+  }, [copyLink, featuredSnippet]);
 
   const nativeShare = useCallback(async () => {
     const data = { title: "base31.org", text: "Cool sites for curious people.", url: siteUrl };
@@ -2148,6 +2177,38 @@ export default function HomePage({ dict = EN, locale = "en", mode = "home" }: { 
                 <button type="button" onClick={() => setSubmitOpen(false)} disabled={submitting}>Cancel</button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {publishedSite && (
+        <div className="modal-backdrop" onClick={(event) => event.target === event.currentTarget && setPublishedSite(null)}>
+          <div ref={publishedRef} tabIndex={-1} className="modal featured-modal" role="dialog" aria-modal="true" aria-labelledby="featured-title">
+            <button type="button" className="modal-close" onClick={() => setPublishedSite(null)} aria-label="Close">×</button>
+            <p className="eyebrow mono">published</p>
+            <h2 id="featured-title">Your site is live.</h2>
+            <p>Show visitors you are featured on base31.org. Paste this card on your own site — the backlink is the domain rating boost that comes with your listing.</p>
+
+            <div className="featured-preview">
+              <iframe
+                src={`/featured/${publishedSite.slug}`}
+                title={`${publishedSite.title} — featured on base31.org`}
+                width={320}
+                height={150}
+                loading="lazy"
+              />
+            </div>
+
+            <pre className="featured-snippet mono" aria-label="Iframe embed code">{featuredSnippet}</pre>
+            <div className="featured-snippet-actions">
+              <button type="button" className="featured-copy" onClick={() => void copySnippet()}>{snippetCopied ? "Copied" : "Copy iframe code"}</button>
+              <a className="featured-open" href={publishedSite.url} target="_blank" rel="noreferrer">View your site ↗</a>
+            </div>
+            <p className="featured-note mono">Paste it in your footer so it loads on every page. The card stays up to date on its own.</p>
+
+            <div className="modal-actions">
+              <button type="button" onClick={() => setPublishedSite(null)}>Done</button>
+            </div>
           </div>
         </div>
       )}

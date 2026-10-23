@@ -1294,6 +1294,25 @@ export default {
       }
     }
 
+    // GET /site?slug=<slug> → one community site's public metadata. Like
+    // /sites but a direct key read, so the author's "featured on" card can
+    // render immediately after publishing instead of waiting for the KV list
+    // to become consistent.
+    if (url.pathname === "/site") {
+      if (request.method !== "GET") return json({ error: "Method not allowed" }, 405);
+      const slug = url.searchParams.get("slug") || "";
+      if (!isValidSlug(slug)) return json({ error: "Invalid site slug" }, 400);
+      try {
+        const raw = await env.VIEW_COUNTER.get(siteKey(slug));
+        if (!raw) return json({ error: "Site not found" }, 404);
+        const site = JSON.parse(raw) as PublishedSite;
+        if (site.active === false) return json({ error: "Site not found" }, 404);
+        return json({ site: publicSite(site, url.origin) });
+      } catch {
+        return json({ error: "Site temporarily unavailable" }, 503);
+      }
+    }
+
     // GET /quality → the health-check report behind /quality-report.
     if (url.pathname === "/quality") {
       if (request.method !== "GET") return json({ error: "Method not allowed" }, 405);
@@ -1351,6 +1370,31 @@ export default {
           return json({ sites: sites.map((site) => ({ ...publicSite(site, url.origin), lastCheckedAt: site.lastCheckedAt ?? null, healthFailures: site.healthFailures ?? 0 })) });
         } catch {
           return json({ error: "Directory temporarily unavailable" }, 503);
+        }
+      }
+      // GET /admin/sites/<slug>/export → one site's metadata plus every file
+      // body, base64 exactly as KV stores it. The moderation panel forwards
+      // this to /api/admin, which commits the files to the repository on the
+      // operator's approval. It is admin-only like the rest of this block.
+      const exportMatch = url.pathname.match(/^\/admin\/sites\/([^/]+)\/export$/);
+      if (exportMatch) {
+        if (request.method !== "GET") return json({ error: "Method not allowed" }, 405);
+        const exportSlug = exportMatch[1];
+        if (!isValidSlug(exportSlug)) return json({ error: "Invalid site slug" }, 400);
+        try {
+          const raw = await env.VIEW_COUNTER.get(siteKey(exportSlug));
+          if (!raw) return json({ error: "Site not found" }, 404);
+          const site = JSON.parse(raw) as PublishedSite;
+          const files = await Promise.all(
+            site.files.map(async (file) => ({
+              path: file.path,
+              type: file.type,
+              data: await env.VIEW_COUNTER.get(fileKey(exportSlug, file.path)),
+            })),
+          );
+          return json({ site, files });
+        } catch {
+          return json({ error: "Could not export that site." }, 503);
         }
       }
       if (request.method !== "DELETE") return json({ error: "Method not allowed" }, 405);

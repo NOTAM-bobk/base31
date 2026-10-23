@@ -18,11 +18,16 @@ export default function AdminCommunitySites() {
   const [signedIn, setSignedIn] = useState(false);
   const [status, setStatus] = useState("");
   const [busy, setBusy] = useState(false);
+  // Slugs committed during this visit, and the one currently being committed.
+  // The Worker has no approval flag, so a reload starts this list empty again.
+  const [approved, setApproved] = useState<Record<string, string | null>>({});
+  const [approving, setApproving] = useState<string | null>(null);
 
   // Empties the inbox. Called whenever the page stops being signed in, so the
   // section counts can never keep showing the last admin's numbers.
   const clearData = useCallback(() => {
     setSites([]); setRequests([]); setDmca([]); setSubscribers([]); setReports([]); setSignedIn(false);
+    setApproved({}); setApproving(null);
   }, []);
 
   const authHeaders = useCallback(() => ({ "x-admin-password": password.trim(), "Content-Type": "application/json" }), [password]);
@@ -61,6 +66,22 @@ export default function AdminCommunitySites() {
   const changePassword = (value: string) => {
     setPassword(value);
     if (!value.trim()) { clearData(); setStatus(""); }
+  };
+
+  // Approval is the hand-off from the Worker's storage to the repository: the
+  // API reads the site's files back from the Worker and commits them under
+  // public/sites/<slug>/ with the Vercel GITHUB_TOKEN.
+  const approveSite = async (site: AdminSite) => {
+    if (!window.confirm(`Approve ${site.title} and commit its files to the GitHub repository?`)) return;
+    setApproving(site.slug); setStatus("");
+    try {
+      const response = await fetch("/api/admin", { method: "POST", headers: authHeaders(), body: JSON.stringify({ kind: "approve", slug: site.slug }) });
+      const data = await response.json().catch(() => null);
+      if (!response.ok) throw new Error(data?.error || "Could not commit that site.");
+      setApproved((current) => ({ ...current, [site.slug]: typeof data?.commitUrl === "string" ? data.commitUrl : null }));
+      setStatus(`${site.title} was committed to the repository${typeof data?.files === "number" ? ` (${data.files} ${data.files === 1 ? "file" : "files"})` : ""}.`);
+    } catch (error) { setStatus(error instanceof Error ? error.message : "Could not commit that site."); }
+    finally { setApproving(null); }
   };
 
   const removeSite = async (site: AdminSite) => {
@@ -151,7 +172,7 @@ export default function AdminCommunitySites() {
 
           <section className="admin-section"><div className="admin-section-head"><h2>Published sites</h2><span className="mono">{sites.length}</span></div>
             {sites.length === 0 ? <p className="admin-empty">No community sites loaded.</p> : sites.map((site) => (
-              <article className={`admin-site${site.active ? "" : " is-inactive"}`} key={site.slug}><div><h3>{site.title}</h3><p className="mono">/s/{site.slug}/ · {site.active ? "visible" : "hidden"} · {site.healthFailures} failed checks</p><p>{site.description || "No description"}</p><p className="mono">Last check: {site.lastCheckedAt ? new Date(site.lastCheckedAt).toLocaleString() : "not checked yet"}</p></div><button type="button" className="admin-remove" disabled={busy} onClick={() => void removeSite(site)}>Remove</button></article>
+              <article className={`admin-site${site.active ? "" : " is-inactive"}`} key={site.slug}><div><h3>{site.title}</h3><p className="mono">/s/{site.slug}/ · {site.active ? "visible" : "hidden"} · {site.healthFailures} failed checks</p><p>{site.description || "No description"}</p><p className="mono">Last check: {site.lastCheckedAt ? new Date(site.lastCheckedAt).toLocaleString() : "not checked yet"}</p></div><div className="admin-actions">{site.slug in approved ? <a className="admin-approved mono" href={approved[site.slug] ?? undefined} target="_blank" rel="noreferrer">{approved[site.slug] ? "Approved · view commit" : "Approved"}</a> : <button type="button" className="admin-approve" disabled={busy || approving !== null} onClick={() => void approveSite(site)}>{approving === site.slug ? "Committing…" : "Approve & submit"}</button>}<button type="button" className="admin-remove" disabled={busy || approving !== null} onClick={() => void removeSite(site)}>Remove</button></div></article>
             ))}
           </section>
         </>
